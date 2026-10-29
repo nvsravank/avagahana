@@ -1,0 +1,669 @@
+[
+ {
+  "kind": "row",
+  "id": "Pending",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Awaiting payment",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "_start1",
+    "name": "start",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "Charging",
+    "name": "Charging",
+    "label": "submit",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "_start1",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "Pending",
+    "name": "Awaiting payment",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Charging",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Charging",
+     "bold": true,
+     "italic": false
+    }
+   ],
+   [
+    {
+     "text": "entry / call the gateway",
+     "bold": false,
+     "italic": false
+    }
+   ],
+   [
+    {
+     "text": "exit / record the answer",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Pending",
+    "name": "Awaiting payment",
+    "label": "submit",
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "check",
+    "name": "choice",
+    "label": "answer",
+    "glyph": "→"
+   },
+   {
+    "dir": "in",
+    "other": "Retrying",
+    "name": "Retrying",
+    "label": "retry",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "check",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "check",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Charging",
+    "name": "Charging",
+    "label": "answer",
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "Paid",
+    "name": "Paid",
+    "label": "ok",
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "Retrying",
+    "name": "Retrying",
+    "label": "declined",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Paid",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Paid",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "check",
+    "name": "choice",
+    "label": "ok",
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "Fulfilment",
+    "name": "Fulfilment",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Retrying",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-selected",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Retrying",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "check",
+    "name": "choice",
+    "label": "declined",
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "Retrying",
+    "name": "Retrying",
+    "label": "wait 30 s",
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "Charging",
+    "name": "Charging",
+    "label": "retry",
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "Failed",
+    "name": "Failed",
+    "label": "give up",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Failed",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k7 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-hit",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Failed",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Retrying",
+    "name": "Retrying",
+    "label": "give up",
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "_end2",
+    "name": "end",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "_end2",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k8 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Failed",
+    "name": "Failed",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "in",
+    "other": "Shipped",
+    "name": "Shipped",
+    "label": null,
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Fulfilment",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k9 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Fulfilment",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Paid",
+    "name": "Paid",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "done",
+    "name": "join",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "_region4",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k9 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "_start3",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "Picking",
+    "name": "Picking",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Picking",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Picking",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "_start3",
+    "name": "start",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "Packed",
+    "name": "Packed",
+    "label": "picked",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Packed",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Packed",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Picking",
+    "name": "Picking",
+    "label": "picked",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "_region5",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k9 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "_start6",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "Invoicing",
+    "name": "Invoicing",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Invoicing",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Invoicing",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "_start6",
+    "name": "start",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "Invoiced",
+    "name": "Invoiced",
+    "label": "sent",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Invoiced",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Invoiced",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Invoicing",
+    "name": "Invoicing",
+    "label": "sent",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "done",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k10 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "done",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "Fulfilment",
+    "name": "Fulfilment",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "Shipped",
+    "name": "Shipped",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "Shipped",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k11 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Shipped",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "done",
+    "name": "join",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "_end2",
+    "name": "end",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ }
+]

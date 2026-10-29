@@ -1,0 +1,395 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "shop",
+   "x": 0,
+   "y": 0,
+   "w": 838.4,
+   "h": 304,
+   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Shop system, level 1, 6 children, has a note, a box",
+   "title": {
+    "text": "Shop system",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": {
+    "x": 808.4,
+    "y": 6,
+    "size": 16
+   },
+   "dot": {
+    "x": 837.4,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "orders",
+   "x": -328.7,
+   "y": 21.85,
+   "w": 153,
+   "h": 114,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "name": "Orders service, level 2, 2 children, a box",
+   "title": {
+    "text": "Orders service",
+    "x": 32,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 12,
+     "y": 6
+    }
+   ],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 152,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "web",
+   "x": 321.2,
+   "y": -55,
+   "w": 129,
+   "h": 114,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c9 mmv-p0",
+   "name": "Web app, level 2, 2 children, a box",
+   "title": {
+    "text": "Web app",
+    "x": 32,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [
+    {
+     "code": "ph browser",
+     "ph": "browser",
+     "color": null,
+     "label": "Browser",
+     "size": 15,
+     "x": 12,
+     "y": 6
+    }
+   ],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 128,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "pay",
+   "x": 321.2,
+   "y": 81,
+   "w": 168,
+   "h": 114,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "name": "Payments, level 2, 2 children, a box",
+   "title": {
+    "text": "Payments",
+    "x": 32,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 12,
+     "y": 6
+    }
+   ],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 167,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "ord",
+   "x": -328.7,
+   "y": 34.85,
+   "w": 125,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Order handler, level 3",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Order handler",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 34.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "queue",
+   "x": -26.1,
+   "y": 21.85,
+   "w": 169,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c11 mmv-p0",
+   "grow": 1,
+   "name": "Event queue, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "subroutine",
+   "outline": "M0,0 H169 V60 H0 Z M8,0 V60 M161,0 V60",
+   "icons": [
+    {
+     "code": "ph tray",
+     "ph": "tray",
+     "color": null,
+     "label": "Tray",
+     "size": 15,
+     "x": 20,
+     "y": 22.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Event queue",
+      "bold": false,
+      "italic": false,
+      "x": 41,
+      "y": 34.3
+     }
+    ]
+   },
+   "note": {
+    "x": 133.7,
+    "y": 22.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "ui",
+   "x": 321.2,
+   "y": -42,
+   "w": 101,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c9 mmv-p0",
+   "grow": 1,
+   "name": "Storefront, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Storefront",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 34.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "payh",
+   "x": 321.2,
+   "y": 94,
+   "w": 140,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Payment handler, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Payment handler",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 34.3
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "ord>queue",
+   "d": "M-266.2,24.85 L-133.1,24.85 Q-126.6,24.85 -126.6,18.35 L-126.6,18.35 Q-126.6,11.85 -120.1,11.85 L-110.6,11.85",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -204.4,
+    "y": 28.85,
+    "text": "order placed"
+   },
+   "items": [
+    {
+     "from": "ord",
+     "to": "queue",
+     "label": "order placed"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "queue>payh",
+   "d": "M58.4,21.85 L213.2,21.85 Q221.2,21.85 221.2,29.85 L221.2,76 Q221.2,84 229.2,84 L251.2,84",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 133.8,
+    "y": 25.85,
+    "text": "charge requested"
+   },
+   "items": [
+    {
+     "from": "queue",
+     "to": "payh",
+     "label": "charge requested"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "payh>queue",
+   "d": "M251.2,104 L219.2,104 Q211.2,104 211.2,96 L211.2,49.85 Q211.2,41.85 203.2,41.85 L58.4,41.85",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 162,
+    "y": 45.85,
+    "text": "payment taken"
+   },
+   "items": [
+    {
+     "from": "payh",
+     "to": "queue",
+     "label": "payment taken"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "queue>ord",
+   "d": "M-110.6,44.85 L-266.2,44.85",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -162.2,
+    "y": 48.85,
+    "text": "mark paid"
+   },
+   "items": [
+    {
+     "from": "queue",
+     "to": "ord",
+     "label": "mark paid"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "queue>ui",
+   "d": "M58.4,1.85 L203.2,1.85 Q211.2,1.85 211.2,-6.15 L211.2,-34 Q211.2,-42 219.2,-42 L270.7,-42",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 120.2,
+    "y": 5.85,
+    "text": "order status"
+   },
+   "items": [
+    {
+     "from": "queue",
+     "to": "ui",
+     "label": "order status"
+    }
+   ]
+  }
+ ]
+}

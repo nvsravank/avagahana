@@ -1,0 +1,470 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "shop",
+   "x": 2.8,
+   "y": 0,
+   "w": 759.2,
+   "h": 176,
+   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Shop system, level 1, 6 children, has a note, a box",
+   "title": {
+    "text": "Shop system",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": {
+    "x": 729.2,
+    "y": 6,
+    "size": 16
+   },
+   "dot": {
+    "x": 758.2,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "customer",
+   "x": -518.9,
+   "y": 0,
+   "w": 89,
+   "h": 72,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Customer, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph user",
+     "ph": "user",
+     "color": null,
+     "label": "User",
+     "size": 38,
+     "x": 25.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Customer",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "web",
+   "x": -313.3,
+   "y": 13,
+   "w": 99,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c9 mmv-p0",
+   "grow": 1,
+   "name": "Web app, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [
+    {
+     "code": "ph browser",
+     "ph": "browser",
+     "color": null,
+     "label": "Browser",
+     "size": 15,
+     "x": 12,
+     "y": 17.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Web app",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 29.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 98,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  },
+  {
+   "kind": "node",
+   "id": "api",
+   "x": -131.7,
+   "y": 13,
+   "w": 69,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c10 mmv-p0",
+   "grow": 1,
+   "name": "API, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [
+    {
+     "code": "ph door-open",
+     "ph": "door-open",
+     "color": null,
+     "label": "Door open",
+     "size": 15,
+     "x": 12,
+     "y": 17.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "API",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 29.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 68,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  },
+  {
+   "kind": "node",
+   "id": "orders",
+   "x": 23.3,
+   "y": 13,
+   "w": 153,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Orders service, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 12,
+     "y": 17.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Orders service",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 29.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 152,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  },
+  {
+   "kind": "node",
+   "id": "pay",
+   "x": 287.9,
+   "y": -23,
+   "w": 161,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Payments, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 39,
+     "y": 17.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Payments",
+      "bold": false,
+      "italic": false,
+      "x": 60,
+      "y": 29.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 160,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  },
+  {
+   "kind": "node",
+   "id": "db",
+   "x": 287.9,
+   "y": 49,
+   "w": 161,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
+   "grow": 1,
+   "name": "Orders database, level 2",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "cylinder",
+   "outline": "M0,6 A80.5,6 0 0 1 161,6 V44 A80.5,6 0 0 1 0,44 Z M0,6 A80.5,6 0 0 0 161,6",
+   "icons": [
+    {
+     "code": "ph database",
+     "ph": "database",
+     "color": null,
+     "label": "Database",
+     "size": 15,
+     "x": 12,
+     "y": 20.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Orders database",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 32.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "psp",
+   "x": 494.9,
+   "y": 0,
+   "w": 137,
+   "h": 72,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Card provider, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph globe",
+     "ph": "globe",
+     "color": null,
+     "label": "Globe",
+     "size": 38,
+     "x": 49.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Card provider",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "customer>web",
+   "d": "M-474.4,13 L-362.8,13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -429.6,
+    "y": 17,
+    "text": "2 links"
+   },
+   "items": [
+    {
+     "from": "customer",
+     "to": "ui",
+     "label": ""
+    },
+    {
+     "from": "customer",
+     "to": "cart",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "web>api",
+   "d": "M-263.8,13 L-166.2,13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -219,
+    "y": 17,
+    "text": "2 links"
+   },
+   "items": [
+    {
+     "from": "ui",
+     "to": "gw",
+     "label": ""
+    },
+    {
+     "from": "cart",
+     "to": "gw",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "api>orders",
+   "d": "M-97.2,13 L-53.2,13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "gw",
+     "to": "ord",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "orders>pay",
+   "d": "M99.8,3 L183.4,3 Q191.4,3 191.4,-5 L191.4,-15 Q191.4,-23 199.4,-23 L207.4,-23",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "ord",
+     "to": "payh",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "pay>psp",
+   "d": "M368.4,-23 L426.4,-23",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "payh",
+     "to": "psp",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "orders>db",
+   "d": "M99.8,23 L183.4,23 Q191.4,23 191.4,31 L191.4,41 Q191.4,49 199.4,49 L207.4,49",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 144.6,
+    "y": 27,
+    "text": "2 links"
+   },
+   "items": [
+    {
+     "from": "ord",
+     "to": "db",
+     "label": ""
+    },
+    {
+     "from": "stock",
+     "to": "db",
+     "label": ""
+    }
+   ]
+  }
+ ]
+}

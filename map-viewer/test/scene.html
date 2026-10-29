@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map viewer: scene snapshots</title>
+<style>
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; }
+  #out { padding: 10px 14px; }
+  .pass { color: #2b8a3e; } .fail { color: #c92a2a; font-weight: 600; }
+  .diff { margin: 2px 0 8px 18px; font: 12px/1.4 ui-monospace, monospace; white-space: pre-wrap; color: #555; }
+  #snapshots { display: none; }
+</style>
+<!-- the checks live in a file, so the page also runs under the relay server's CSP -->
+<script type="module" src="scene.js"></script>
+</head>
+<body>
+<div id="out">Running…</div>
+<pre id="snapshots"></pre>
+</body>
+</html>

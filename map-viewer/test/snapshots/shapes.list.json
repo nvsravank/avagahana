@@ -1,0 +1,581 @@
+[
+ {
+  "kind": "row",
+  "id": "n1",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k0 mmv-l0 mmv-d0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Weather",
+     "bold": false,
+     "italic": false
+    }
+   ],
+   [
+    {
+     "text": "station",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n2",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Sensors",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n3",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph thermometer"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Thermometer",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n4",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k4 mmv-l2 mmv-d2 mmv-p0 is-hit",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph drop"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Rain gauge",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n5",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "ph wind"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Anemometer",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "n16",
+    "name": "Every minute",
+    "label": "feeds",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n6",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Cups",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n7",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Vane",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n8",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Reed switch that counts each turn of the cups and sends a pulse to the logger",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n9",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Power",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n10",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph sun",
+   "done"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Solar panel",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "n11",
+    "name": "Battery",
+    "label": "charges",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n11",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "status-amber"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Battery",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "n10",
+    "name": "Solar panel",
+    "label": "charges",
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "n15",
+    "name": "Logger",
+    "label": "powers",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n12",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "flag-red"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Brown-out",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n13",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Data",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n14",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph cloud-arrow-up"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Cloud upload",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n15",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0 is-selected",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Logger",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "n11",
+    "name": "Battery",
+    "label": "powers",
+    "glyph": "←"
+   }
+  ],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n16",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Every minute",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "n5",
+    "name": "Anemometer",
+    "label": "feeds",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n17",
+  "depth": 4,
+  "cls": "mmv-lrow mmv-k2 mmv-l4 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Average",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n18",
+  "depth": 5,
+  "cls": "mmv-lrow mmv-k2 mmv-l5 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Minimum",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n19",
+  "depth": 5,
+  "cls": "mmv-lrow mmv-k2 mmv-l5 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Maximum",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n20",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "idea",
+   "favorite",
+   "question"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Local display",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n21",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Site",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n22",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Two metres above grass",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n23",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Away from walls",
+     "bold": false,
+     "italic": false
+    }
+   ],
+   [
+    {
+     "text": "and trees",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ }
+]

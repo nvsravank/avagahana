@@ -1,0 +1,867 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "Fulfilment",
+   "x": 386.3,
+   "y": -48,
+   "w": 377.2,
+   "h": 332,
+   "cls": "mmv-frame mmv-k9 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Fulfilment, level 1, 2 children, a box",
+   "title": {
+    "text": "Fulfilment",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 376.2,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "_region4",
+   "x": 386.3,
+   "y": -110,
+   "w": 331.8,
+   "h": 128,
+   "cls": "mmv-frame mmv-k9 mmv-l2 mmv-d2 mmv-c0 mmv-p0 is-region",
+   "name": "Fulfilment, region, level 2, 3 children, a box",
+   "title": {
+    "text": "",
+    "x": 12,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": null
+  },
+  {
+   "kind": "frame",
+   "id": "_region5",
+   "x": 386.3,
+   "y": 40,
+   "w": 349.2,
+   "h": 128,
+   "cls": "mmv-frame mmv-k9 mmv-l2 mmv-d2 mmv-c0 mmv-p0 is-region",
+   "name": "Fulfilment, region, level 2, 3 children, a box",
+   "title": {
+    "text": "",
+    "x": 12,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": null
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "_start1",
+   "x": -821.9,
+   "y": 81.51,
+   "w": 20,
+   "h": 20,
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "start, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-start",
+   "outline": "M1,10 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0",
+   "solid": true,
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Pending",
+   "x": -678.9,
+   "y": 81.51,
+   "w": 178,
+   "h": 74,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Awaiting payment, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Awaiting payment",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Charging",
+   "x": -371.6,
+   "y": 81.51,
+   "w": 255,
+   "h": 74,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Charging, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Charging",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     },
+     {
+      "text": "entry / call the gateway",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 46.2
+     },
+     {
+      "text": "exit / record the answer",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 66.2
+     }
+    ]
+   },
+   "divider": {
+    "y": 28,
+    "w": 255
+   }
+  },
+  {
+   "kind": "node",
+   "id": "check",
+   "x": -129.3,
+   "y": 49.13,
+   "w": 28,
+   "h": 28,
+   "cls": "mmv-node mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "choice, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-choice",
+   "outline": "M14,0 L28,14 L14,28 L0,14 Z",
+   "mark": true,
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Paid",
+   "x": 49.6,
+   "y": -48,
+   "w": 101,
+   "h": 74,
+   "cls": "mmv-node mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Paid, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Paid",
+      "bold": false,
+      "italic": false,
+      "x": 31,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Retrying",
+   "x": 49.6,
+   "y": 146.26,
+   "w": 101,
+   "h": 74,
+   "cls": "mmv-node mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Retrying, level 1",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Retrying",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "_start3",
+   "x": 244.4,
+   "y": -97,
+   "w": 20,
+   "h": 20,
+   "cls": "mmv-node mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "start, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-start",
+   "outline": "M1,10 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0",
+   "solid": true,
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Picking",
+   "x": 337.4,
+   "y": -97,
+   "w": 78,
+   "h": 74,
+   "cls": "mmv-node mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Picking, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Picking",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 41.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Packed",
+   "x": 502.7,
+   "y": -97,
+   "w": 71,
+   "h": 74,
+   "cls": "mmv-node mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Packed, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Packed",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 41.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "_start6",
+   "x": 235.7,
+   "y": 53,
+   "w": 20,
+   "h": 20,
+   "cls": "mmv-node mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "start, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-start",
+   "outline": "M1,10 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0",
+   "solid": true,
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Invoicing",
+   "x": 336.7,
+   "y": 53,
+   "w": 94,
+   "h": 74,
+   "cls": "mmv-node mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Invoicing, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Invoicing",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 41.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Invoiced",
+   "x": 503.9,
+   "y": 53,
+   "w": 86,
+   "h": 74,
+   "cls": "mmv-node mmv-k9 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Invoiced, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Invoiced",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 41.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Failed",
+   "x": 386.3,
+   "y": 177,
+   "w": 107,
+   "h": 74,
+   "cls": "mmv-node mmv-k7 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Failed, level 1, has a note",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Failed",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   },
+   "note": {
+    "x": 77.6,
+    "y": 28.5,
+    "size": 17
+   }
+  },
+  {
+   "kind": "node",
+   "id": "done",
+   "x": 623.4,
+   "y": 41.63,
+   "w": 9,
+   "h": 60,
+   "cls": "mmv-node mmv-k10 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "join, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-bar",
+   "outline": "M0,0 H9 V60 H0 Z",
+   "solid": true,
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Shipped",
+   "x": 717.9,
+   "y": 41.63,
+   "w": 92,
+   "h": 74,
+   "cls": "mmv-node mmv-k11 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Shipped, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Shipped",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "_end2",
+   "x": 819.9,
+   "y": 72.13,
+   "w": 24,
+   "h": 24,
+   "cls": "mmv-node mmv-k8 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "end, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-end",
+   "outline": "M1,12 a11,11 0 1 0 22,0 a11,11 0 1 0 -22,0 M6,12 a6,6 0 1 0 12,0 a6,6 0 1 0 -12,0",
+   "mark": true,
+   "innerDot": {
+    "x": 12,
+    "y": 12,
+    "r": 3
+   },
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "_start1>Pending",
+   "d": "M-811.9,81.51 L-767.9,81.51",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "_start1",
+     "to": "Pending",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Pending>Charging",
+   "d": "M-589.9,81.51 L-499.1,81.51",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -548.5,
+    "y": 85.51,
+    "text": "submit"
+   },
+   "items": [
+    {
+     "from": "Pending",
+     "to": "Charging",
+     "label": "submit"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Charging>check",
+   "d": "M-244.1,71.51 L-167.3,71.51 Q-159.3,71.51 -159.3,63.51 L-159.3,57.13 Q-159.3,49.13 -151.3,49.13 L-143.3,49.13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -202.7,
+    "y": 75.51,
+    "text": "answer"
+   },
+   "items": [
+    {
+     "from": "Charging",
+     "to": "check",
+     "label": "answer"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "check>Paid",
+   "d": "M-115.3,41.13 L-24.9,41.13 Q-16.9,41.13 -16.9,33.13 L-16.9,-40 Q-16.9,-48 -8.9,-48 L-0.9,-48",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -87.5,
+    "y": 45.13,
+    "text": "ok"
+   },
+   "items": [
+    {
+     "from": "check",
+     "to": "Paid",
+     "label": "ok"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "check>Retrying",
+   "d": "M-115.3,57.13 L-24.9,57.13 Q-16.9,57.13 -16.9,65.13 L-16.9,128.26 Q-16.9,136.26 -8.9,136.26 L-0.9,136.26",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -67.1,
+    "y": 61.13,
+    "text": "declined"
+   },
+   "items": [
+    {
+     "from": "check",
+     "to": "Retrying",
+     "label": "declined"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Retrying>Charging",
+   "d": "M-0.9,156.26 L-11.9,156.26 Q-16.9,156.26 -16.9,151.26 L-16.9,151.26 Q-16.9,146.26 -21.9,146.26 L-151.3,146.26 Q-159.3,146.26 -159.3,138.26 L-159.3,99.51 Q-159.3,91.51 -167.3,91.51 L-244.1,91.51",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -38.9,
+    "y": 150.26,
+    "text": "retry"
+   },
+   "items": [
+    {
+     "from": "Retrying",
+     "to": "Charging",
+     "label": "retry"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Retrying>Failed",
+   "d": "M100.1,146.26 L332.8,146.26",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 144.9,
+    "y": 150.26,
+    "text": "give up"
+   },
+   "items": [
+    {
+     "from": "Retrying",
+     "to": "Failed",
+     "label": "give up"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Failed>_end2",
+   "d": "M439.8,177 L594.9,177 Q602.9,177 602.9,169 L602.9,110.63 Q602.9,102.63 610.9,102.63 L783.9,102.63 Q791.9,102.63 791.9,94.63 L791.9,86.13 Q791.9,78.13 799.9,78.13 L807.9,78.13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Failed",
+     "to": "_end2",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Paid>Fulfilment",
+   "d": "M100.1,-48 L197.7,-48",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Paid",
+     "to": "Fulfilment",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "_start3>Picking",
+   "d": "M254.4,-97 L298.4,-97",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "_start3",
+     "to": "Picking",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Picking>Packed",
+   "d": "M376.4,-97 L467.2,-97",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 417.8,
+    "y": -93,
+    "text": "picked"
+   },
+   "items": [
+    {
+     "from": "Picking",
+     "to": "Packed",
+     "label": "picked"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "_start6>Invoicing",
+   "d": "M245.7,53 L289.7,53",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "_start6",
+     "to": "Invoicing",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Invoicing>Invoiced",
+   "d": "M383.7,53 L460.9,53",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 418.3,
+    "y": 57,
+    "text": "sent"
+   },
+   "items": [
+    {
+     "from": "Invoicing",
+     "to": "Invoiced",
+     "label": "sent"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Fulfilment>done",
+   "d": "M574.9,41.63 L618.9,41.63",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Fulfilment",
+     "to": "done",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "done>Shipped",
+   "d": "M627.9,41.63 L671.9,41.63",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "done",
+     "to": "Shipped",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Shipped>_end2",
+   "d": "M763.9,66.13 L807.9,66.13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Shipped",
+     "to": "_end2",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Retrying>Retrying",
+   "d": "M87.1,109.26 A13,13 0 1 1 108.46,119.22 L100.1,122.26",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "self": true,
+   "label": {
+    "x": 149.7,
+    "y": 100.26,
+    "text": "wait 30 s"
+   },
+   "items": [
+    {
+     "from": "Retrying",
+     "to": "Retrying",
+     "label": "wait 30 s"
+    }
+   ]
+  }
+ ]
+}

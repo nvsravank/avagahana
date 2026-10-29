@@ -1,0 +1,100 @@
+[
+ {
+  "kind": "step",
+  "step": 0,
+  "depth": 0,
+  "cls": "mmv-lstep",
+  "num": "1",
+  "text": "Worker A → Jobs table",
+  "label": "SELECT job WHERE status = pending",
+  "note": true
+ },
+ {
+  "kind": "step",
+  "step": 1,
+  "depth": 0,
+  "cls": "mmv-lstep is-reply",
+  "num": "1↩",
+  "text": "Jobs table ⇠ Worker A",
+  "label": "job 7",
+  "note": false
+ },
+ {
+  "kind": "step",
+  "step": 2,
+  "depth": 0,
+  "cls": "mmv-lstep",
+  "num": "2",
+  "text": "Worker B → Jobs table",
+  "label": "SELECT job WHERE status = pending",
+  "note": false
+ },
+ {
+  "kind": "step",
+  "step": 3,
+  "depth": 0,
+  "cls": "mmv-lstep is-reply",
+  "num": "2↩",
+  "text": "Jobs table ⇠ Worker B",
+  "label": "job 7",
+  "note": false
+ },
+ {
+  "kind": "block",
+  "text": "parallel: both mark it",
+  "depth": 0
+ },
+ {
+  "kind": "step",
+  "step": 4,
+  "depth": 1,
+  "cls": "mmv-lstep",
+  "num": "3",
+  "text": "Worker A → Jobs table",
+  "label": "UPDATE job 7 SET status = running",
+  "note": false
+ },
+ {
+  "kind": "step",
+  "step": 4,
+  "depth": 1,
+  "cls": "mmv-lstep",
+  "num": "4",
+  "text": "Worker B → Jobs table",
+  "label": "UPDATE job 7 SET status = running",
+  "note": false
+ },
+ {
+  "kind": "block",
+  "text": "loop: each item in job 7",
+  "depth": 0
+ },
+ {
+  "kind": "step",
+  "step": 5,
+  "depth": 1,
+  "cls": "mmv-lstep",
+  "num": "5",
+  "text": "Worker A, to itself",
+  "label": "process item",
+  "note": false
+ },
+ {
+  "kind": "step",
+  "step": 6,
+  "depth": 1,
+  "cls": "mmv-lstep",
+  "num": "6",
+  "text": "Worker B, to itself",
+  "label": "process item",
+  "note": false
+ },
+ {
+  "kind": "step",
+  "step": 7,
+  "depth": 0,
+  "cls": "mmv-lstep is-repeat",
+  "num": "↻",
+  "text": "repeat: each item in job 7"
+ }
+]

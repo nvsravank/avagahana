@@ -1,0 +1,564 @@
+[
+ {
+  "kind": "row",
+  "id": "customer",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph user"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Customer",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "ui",
+    "name": "Storefront",
+    "label": null,
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "cart",
+    "name": "Basket page",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "shop",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Shop system",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "web",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c9 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "ph browser"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Web app",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "ui",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c9 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Storefront",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "customer",
+    "name": "Customer",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "gw",
+    "name": "Gateway",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "cart",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c9 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Basket page",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "customer",
+    "name": "Customer",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "gw",
+    "name": "Gateway",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "api",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c10 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "ph door-open"
+  ],
+  "runs": [
+   [
+    {
+     "text": "API",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "gw",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c10 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Gateway",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ui",
+    "name": "Storefront",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "in",
+    "other": "cart",
+    "name": "Basket page",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "auth",
+    "name": "Sign-in",
+    "label": null,
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "ord",
+    "name": "Order handler",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "auth",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c10 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Sign-in",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "gw",
+    "name": "Gateway",
+    "label": null,
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "orders",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "ph gear-six"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Orders service",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "ord",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0 is-selected",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Order handler",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "gw",
+    "name": "Gateway",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "stock",
+    "name": "Stock check",
+    "label": null,
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "payh",
+    "name": "Payment handler",
+    "label": null,
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "db",
+    "name": "Orders database",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "stock",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Stock check",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ord",
+    "name": "Order handler",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "db",
+    "name": "Orders database",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "pay",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "ph gear-six"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Payments",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "payh",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Payment handler",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ord",
+    "name": "Order handler",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "fraud",
+    "name": "Fraud check",
+    "label": null,
+    "glyph": "→"
+   },
+   {
+    "dir": "out",
+    "other": "psp",
+    "name": "Card provider",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "fraud",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Fraud check",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "payh",
+    "name": "Payment handler",
+    "label": null,
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "db",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0 is-hit",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph database"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Orders database",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ord",
+    "name": "Order handler",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "in",
+    "other": "stock",
+    "name": "Stock check",
+    "label": null,
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "queue",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c11 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph tray"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Event queue",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "psp",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph globe"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Card provider",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "payh",
+    "name": "Payment handler",
+    "label": null,
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ }
+]

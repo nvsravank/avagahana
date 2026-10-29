@@ -1,0 +1,6092 @@
+{
+ "about": "Official cloud architecture icons: `<set> <name>` in ::icon lines, ## Node icons and ## Classes. Each name maps to a file under vendor/, used as the vendor published it, for architecture diagrams under the vendor's terms (vendor/<set>/NOTICE.md). Written by scripts/import_vendor_icons.py; do not edit by hand.",
+ "sets": {
+  "aws": {
+   "title": "AWS Architecture Icons",
+   "url": "https://aws.amazon.com/architecture/icons/",
+   "package": [
+    "Icon-package_07312026.5846e92413caa21490223536cc97f1269e44fa92.zip"
+   ],
+   "icons": {
+    "account": [
+     "aws/group/AWS-Account_32.svg",
+     "AWS Account"
+    ],
+    "activate": [
+     "aws/service/Arch_AWS-Activate_48.svg",
+     "AWS Activate"
+    ],
+    "alert": [
+     "aws/resource/Res_Alert_48_Light.svg",
+     "Alert",
+     "aws/resource/Res_Alert_48_Dark.svg"
+    ],
+    "amplify": [
+     "aws/service/Arch_AWS-Amplify_48.svg",
+     "AWS Amplify"
+    ],
+    "amplify-studio": [
+     "aws/resource/Res_AWS-Amplify_AWS-Amplify-Studio_48.svg",
+     "AWS Amplify Studio"
+    ],
+    "apache-mxnet-on-aws": [
+     "aws/service/Arch_Apache-MXNet-on-AWS_48.svg",
+     "Apache MXNet on AWS"
+    ],
+    "api-gateway": [
+     "aws/service/Arch_Amazon-API-Gateway_48.svg",
+     "Amazon API Gateway"
+    ],
+    "api-gateway-endpoint": [
+     "aws/resource/Res_Amazon-API-Gateway_Endpoint_48.svg",
+     "Amazon API Gateway Endpoint"
+    ],
+    "app-mesh": [
+     "aws/service/Arch_AWS-App-Mesh_48.svg",
+     "AWS App Mesh"
+    ],
+    "app-mesh-mesh": [
+     "aws/resource/Res_AWS-App-Mesh_Mesh_48.svg",
+     "AWS App Mesh Mesh"
+    ],
+    "app-mesh-virtual-gateway": [
+     "aws/resource/Res_AWS-App-Mesh_Virtual-Gateway_48.svg",
+     "AWS App Mesh Virtual Gateway"
+    ],
+    "app-mesh-virtual-node": [
+     "aws/resource/Res_AWS-App-Mesh_Virtual-Node_48.svg",
+     "AWS App Mesh Virtual Node"
+    ],
+    "app-mesh-virtual-router": [
+     "aws/resource/Res_AWS-App-Mesh_Virtual-Router_48.svg",
+     "AWS App Mesh Virtual Router"
+    ],
+    "app-mesh-virtual-service": [
+     "aws/resource/Res_AWS-App-Mesh_Virtual-Service_48.svg",
+     "AWS App Mesh Virtual Service"
+    ],
+    "app-runner": [
+     "aws/service/Arch_AWS-App-Runner_48.svg",
+     "AWS App Runner"
+    ],
+    "app-studio": [
+     "aws/service/Arch_AWS-App-Studio_48.svg",
+     "AWS App Studio"
+    ],
+    "appconfig": [
+     "aws/service/Arch_AWS-AppConfig_48.svg",
+     "AWS AppConfig"
+    ],
+    "appfabric": [
+     "aws/service/Arch_AWS-AppFabric_48.svg",
+     "AWS AppFabric"
+    ],
+    "appflow": [
+     "aws/service/Arch_Amazon-AppFlow_48.svg",
+     "Amazon AppFlow"
+    ],
+    "application-auto-scaling": [
+     "aws/service/Arch_AWS-Application-Auto-Scaling_48.svg",
+     "AWS Application Auto Scaling"
+    ],
+    "application-discovery-service": [
+     "aws/service/Arch_AWS-Application-Discovery-Service_48.svg",
+     "AWS Application Discovery Service"
+    ],
+    "application-discovery-service-aws-agentless-collector": [
+     "aws/resource/Res_AWS-Application-Discovery-Service_AWS-Agentless-Collector_48.svg",
+     "AWS Application Discovery Service AWS Agentless Collector"
+    ],
+    "application-discovery-service-aws-discovery-agent": [
+     "aws/resource/Res_AWS-Application-Discovery-Service_AWS-Discovery-Agent_48.svg",
+     "AWS Application Discovery Service AWS Discovery Agent"
+    ],
+    "application-discovery-service-migration-evaluator-collector": [
+     "aws/resource/Res_AWS-Application-Discovery-Service_Migration-Evaluator-Collector_48.svg",
+     "AWS Application Discovery Service Migration Evaluator Collector"
+    ],
+    "application-migration-service": [
+     "aws/service/Arch_AWS-Application-Migration-Service_48.svg",
+     "AWS Application Migration Service"
+    ],
+    "application-recovery-controller": [
+     "aws/service/Arch_Amazon-Application-Recovery-Controller_48.svg",
+     "Amazon Application Recovery Controller"
+    ],
+    "appsync": [
+     "aws/service/Arch_AWS-AppSync_48.svg",
+     "AWS AppSync"
+    ],
+    "artifact": [
+     "aws/service/Arch_AWS-Artifact_48.svg",
+     "AWS Artifact"
+    ],
+    "athena": [
+     "aws/service/Arch_Amazon-Athena_48.svg",
+     "Amazon Athena"
+    ],
+    "athena-data-source-connectors": [
+     "aws/resource/Res_Amazon-Athena_Data-Source-Connectors_48.svg",
+     "Amazon Athena Data Source Connectors"
+    ],
+    "audit-manager": [
+     "aws/service/Arch_AWS-Audit-Manager_48.svg",
+     "AWS Audit Manager"
+    ],
+    "augmented-ai-a2i": [
+     "aws/service/Arch_Amazon-Augmented-AI-A2I_48.svg",
+     "Amazon Augmented AI A2I"
+    ],
+    "aurora": [
+     "aws/service/Arch_Amazon-Aurora_48.svg",
+     "Amazon Aurora"
+    ],
+    "aurora-amazon-rds-instance": [
+     "aws/resource/Res_Amazon-Aurora_Amazon-RDS-Instance_48.svg",
+     "Amazon Aurora Amazon RDS Instance"
+    ],
+    "aurora-amazon-rds-instance-aternate": [
+     "aws/resource/Res_Amazon-Aurora_Amazon-RDS-Instance-Aternate_48.svg",
+     "Amazon Aurora Amazon RDS Instance Aternate"
+    ],
+    "aurora-instance": [
+     "aws/resource/Res_Amazon-Aurora-Instance_48.svg",
+     "Amazon Aurora Instance"
+    ],
+    "aurora-instance-alternate": [
+     "aws/resource/Res_Amazon-Aurora_Amazon-Aurora-Instance-alternate_48.svg",
+     "Amazon Aurora Instance alternate"
+    ],
+    "aurora-mariadb-instance": [
+     "aws/resource/Res_Amazon-Aurora-MariaDB-Instance_48.svg",
+     "Amazon Aurora MariaDB Instance"
+    ],
+    "aurora-mariadb-instance-alternate": [
+     "aws/resource/Res_Amazon-Aurora-MariaDB-Instance-Alternate_48.svg",
+     "Amazon Aurora MariaDB Instance Alternate"
+    ],
+    "aurora-mysql-instance": [
+     "aws/resource/Res_Amazon-Aurora-MySQL-Instance_48.svg",
+     "Amazon Aurora MySQL Instance"
+    ],
+    "aurora-mysql-instance-alternate": [
+     "aws/resource/Res_Amazon-Aurora-MySQL-Instance-Alternate_48.svg",
+     "Amazon Aurora MySQL Instance Alternate"
+    ],
+    "aurora-oracle-instance": [
+     "aws/resource/Res_Amazon-Aurora-Oracle-Instance_48.svg",
+     "Amazon Aurora Oracle Instance"
+    ],
+    "aurora-oracle-instance-alternate": [
+     "aws/resource/Res_Amazon-Aurora-Oracle-Instance-Alternate_48.svg",
+     "Amazon Aurora Oracle Instance Alternate"
+    ],
+    "aurora-piops-instance": [
+     "aws/resource/Res_Amazon-Aurora-PIOPS-Instance_48.svg",
+     "Amazon Aurora PIOPS Instance"
+    ],
+    "aurora-postgresql-instance": [
+     "aws/resource/Res_Amazon-Aurora-PostgreSQL-Instance_48.svg",
+     "Amazon Aurora PostgreSQL Instance"
+    ],
+    "aurora-postgresql-instance-alternate": [
+     "aws/resource/Res_Amazon-Aurora-PostgreSQL-Instance-Alternate_48.svg",
+     "Amazon Aurora PostgreSQL Instance Alternate"
+    ],
+    "aurora-sql-server-instance": [
+     "aws/resource/Res_Amazon-Aurora-SQL-Server-Instance_48.svg",
+     "Amazon Aurora SQL Server Instance"
+    ],
+    "aurora-sql-server-instance-alternate": [
+     "aws/resource/Res_Amazon-Aurora-SQL-Server-Instance-Alternate_48.svg",
+     "Amazon Aurora SQL Server Instance Alternate"
+    ],
+    "aurora-trusted-language-extensions-for-postgresql": [
+     "aws/resource/Res_Amazon-Aurora_Trusted-Language-Extensions-for-PostgreSQL_48.svg",
+     "Amazon Aurora Trusted Language Extensions for PostgreSQL"
+    ],
+    "authenticated-user": [
+     "aws/resource/Res_Authenticated-User_48_Light.svg",
+     "Authenticated User",
+     "aws/resource/Res_Authenticated-User_48_Dark.svg"
+    ],
+    "auto-scaling": [
+     "aws/service/Arch_AWS-Auto-Scaling_48.svg",
+     "AWS Auto Scaling"
+    ],
+    "auto-scaling-group": [
+     "aws/group/Auto-Scaling-group_32.svg",
+     "Auto Scaling group"
+    ],
+    "b2b-data-interchange": [
+     "aws/service/Arch_AWS-B2B-Data-Interchange_48.svg",
+     "AWS B2B Data Interchange"
+    ],
+    "backint-agent": [
+     "aws/service/Arch_AWS-Backint-Agent_48.svg",
+     "AWS Backint Agent"
+    ],
+    "backup": [
+     "aws/service/Arch_AWS-Backup_48.svg",
+     "AWS Backup"
+    ],
+    "backup-audit-manager": [
+     "aws/resource/Res_AWS-Backup_Audit-Manager_48.svg",
+     "AWS Backup Audit Manager"
+    ],
+    "backup-backup-plan": [
+     "aws/resource/Res_AWS-Backup_Backup-Plan_48.svg",
+     "AWS Backup Backup Plan"
+    ],
+    "backup-backup-restore": [
+     "aws/resource/Res_AWS-Backup_Backup-Restore_48.svg",
+     "AWS Backup Backup Restore"
+    ],
+    "backup-backup-vault": [
+     "aws/resource/Res_AWS-Backup_Backup-Vault_48.svg",
+     "AWS Backup Backup Vault"
+    ],
+    "backup-compliance-reporting": [
+     "aws/resource/Res_AWS-Backup_Compliance-Reporting_48.svg",
+     "AWS Backup Compliance Reporting"
+    ],
+    "backup-compute": [
+     "aws/resource/Res_AWS-Backup_Compute_48.svg",
+     "AWS Backup Compute"
+    ],
+    "backup-database": [
+     "aws/resource/Res_AWS-Backup_Database_48.svg",
+     "AWS Backup Database"
+    ],
+    "backup-for-aws-cloudformation": [
+     "aws/resource/Res_AWS-Backup_AWS-Backup-for-AWS-CloudFormation_48.svg",
+     "AWS Backup for AWS CloudFormation"
+    ],
+    "backup-gateway": [
+     "aws/resource/Res_AWS-Backup_Gateway_48.svg",
+     "AWS Backup Gateway"
+    ],
+    "backup-legal-hold": [
+     "aws/resource/Res_AWS-Backup_Legal-Hold_48.svg",
+     "AWS Backup Legal Hold"
+    ],
+    "backup-recovery-point-objective": [
+     "aws/resource/Res_AWS-Backup_Recovery-Point-Objective_48.svg",
+     "AWS Backup Recovery Point Objective"
+    ],
+    "backup-recovery-time-objective": [
+     "aws/resource/Res_AWS-Backup_Recovery-Time-Objective_48.svg",
+     "AWS Backup Recovery Time Objective"
+    ],
+    "backup-storage": [
+     "aws/resource/Res_AWS-Backup_Storage_48.svg",
+     "AWS Backup Storage"
+    ],
+    "backup-support-for-amazon-fsx-for-netapp-ontap": [
+     "aws/resource/Res_AWS-Backup_AWS-Backup-support-for-Amazon-FSx-for-NetApp-ONTAP_48.svg",
+     "AWS Backup support for Amazon FSx for NetApp ONTAP"
+    ],
+    "backup-support-for-amazon-s3": [
+     "aws/resource/Res_AWS-Backup_AWS-Backup-support-for-Amazon-S3_48.svg",
+     "AWS Backup support for Amazon S3"
+    ],
+    "backup-support-for-vmware-workloads": [
+     "aws/resource/Res_AWS-Backup_AWS-Backup-Support-for-VMware-Workloads_48.svg",
+     "AWS Backup Support for VMware Workloads"
+    ],
+    "backup-vault-lock": [
+     "aws/resource/Res_AWS-Backup_Vault-Lock_48.svg",
+     "AWS Backup Vault Lock"
+    ],
+    "backup-virtual-machine": [
+     "aws/resource/Res_AWS-Backup_Virtual-Machine_48.svg",
+     "AWS Backup Virtual Machine"
+    ],
+    "backup-virtual-machine-monitor": [
+     "aws/resource/Res_AWS-Backup_Virtual-Machine-Monitor_48.svg",
+     "AWS Backup Virtual Machine Monitor"
+    ],
+    "batch": [
+     "aws/service/Arch_AWS-Batch_48.svg",
+     "AWS Batch"
+    ],
+    "bedrock": [
+     "aws/service/Arch_Amazon-Bedrock_48.svg",
+     "Amazon Bedrock"
+    ],
+    "bedrock-agentcore": [
+     "aws/service/Arch_Amazon-Bedrock-AgentCore_48.svg",
+     "Amazon Bedrock AgentCore"
+    ],
+    "billing-conductor": [
+     "aws/service/Arch_AWS-Billing-Conductor_48.svg",
+     "AWS Billing Conductor"
+    ],
+    "bottlerocket": [
+     "aws/service/Arch_Bottlerocket_48.svg",
+     "Bottlerocket"
+    ],
+    "braket": [
+     "aws/service/Arch_Amazon-Braket_48.svg",
+     "Amazon Braket"
+    ],
+    "braket-chandelier": [
+     "aws/resource/Res_Amazon-Braket_Chandelier_48.svg",
+     "Amazon Braket Chandelier"
+    ],
+    "braket-chip": [
+     "aws/resource/Res_Amazon-Braket_Chip_48.svg",
+     "Amazon Braket Chip"
+    ],
+    "braket-embedded-simulator": [
+     "aws/resource/Res_Amazon-Braket_Embedded-Simulator_48.svg",
+     "Amazon Braket Embedded Simulator"
+    ],
+    "braket-managed-simulator": [
+     "aws/resource/Res_Amazon-Braket_Managed-Simulator_48.svg",
+     "Amazon Braket Managed Simulator"
+    ],
+    "braket-noise-simulator": [
+     "aws/resource/Res_Amazon-Braket_Noise-Simulator_48.svg",
+     "Amazon Braket Noise Simulator"
+    ],
+    "braket-qpu": [
+     "aws/resource/Res_Amazon-Braket_QPU_48.svg",
+     "Amazon Braket QPU"
+    ],
+    "braket-simulator": [
+     "aws/resource/Res_Amazon-Braket_Simulator_48.svg",
+     "Amazon Braket Simulator"
+    ],
+    "braket-simulator-1": [
+     "aws/resource/Res_Amazon-Braket_Simulator-1_48.svg",
+     "Amazon Braket Simulator 1"
+    ],
+    "braket-simulator-2": [
+     "aws/resource/Res_Amazon-Braket_Simulator-2_48.svg",
+     "Amazon Braket Simulator 2"
+    ],
+    "braket-simulator-3": [
+     "aws/resource/Res_Amazon-Braket_Simulator-3_48.svg",
+     "Amazon Braket Simulator 3"
+    ],
+    "braket-simulator-4": [
+     "aws/resource/Res_Amazon-Braket_Simulator-4_48.svg",
+     "Amazon Braket Simulator 4"
+    ],
+    "braket-state-vector": [
+     "aws/resource/Res_Amazon-Braket_State-Vector_48.svg",
+     "Amazon Braket State Vector"
+    ],
+    "braket-tensor-network": [
+     "aws/resource/Res_Amazon-Braket_Tensor-Network_48.svg",
+     "Amazon Braket Tensor Network"
+    ],
+    "budgets": [
+     "aws/service/Arch_AWS-Budgets_48.svg",
+     "AWS Budgets"
+    ],
+    "camera": [
+     "aws/resource/Res_Camera_48_Light.svg",
+     "Camera",
+     "aws/resource/Res_Camera_48_Dark.svg"
+    ],
+    "category-analytics": [
+     "aws/category/Arch-Category_Analytics_48.svg",
+     "Analytics (category)"
+    ],
+    "category-application-integration": [
+     "aws/category/Arch-Category_Application-Integration_48.svg",
+     "Application Integration (category)"
+    ],
+    "category-artificial-intelligence": [
+     "aws/category/Arch-Category_Artificial-Intelligence_48.svg",
+     "Artificial Intelligence (category)"
+    ],
+    "category-blockchain": [
+     "aws/category/Arch-Category_Blockchain_48.svg",
+     "Blockchain (category)"
+    ],
+    "category-business-applications": [
+     "aws/category/Arch-Category_Business-Applications_48.svg",
+     "Business Applications (category)"
+    ],
+    "category-cloud-financial-management": [
+     "aws/category/Arch-Category_Cloud-Financial-Management_48.svg",
+     "Cloud Financial Management (category)"
+    ],
+    "category-compute": [
+     "aws/category/Arch-Category_Compute_48.svg",
+     "Compute (category)"
+    ],
+    "category-containers": [
+     "aws/category/Arch-Category_Containers_48.svg",
+     "Containers (category)"
+    ],
+    "category-customer-enablement": [
+     "aws/category/Arch-Category_Customer-Enablement_48.svg",
+     "Customer Enablement (category)"
+    ],
+    "category-customer-experience": [
+     "aws/category/Arch-Category_Customer-Experience_48.svg",
+     "Customer Experience (category)"
+    ],
+    "category-databases": [
+     "aws/category/Arch-Category_Databases_48.svg",
+     "Databases (category)"
+    ],
+    "category-developer-tools": [
+     "aws/category/Arch-Category_Developer-Tools_48.svg",
+     "Developer Tools (category)"
+    ],
+    "category-end-user-computing": [
+     "aws/category/Arch-Category_End-User-Computing_48.svg",
+     "End User Computing (category)"
+    ],
+    "category-front-end-web-mobile": [
+     "aws/category/Arch-Category_Front-End-Web-Mobile_48.svg",
+     "Front End Web Mobile (category)"
+    ],
+    "category-games": [
+     "aws/category/Arch-Category_Games_48.svg",
+     "Games (category)"
+    ],
+    "category-internet-of-things": [
+     "aws/category/Arch-Category_Internet-of-Things_48.svg",
+     "Internet of Things (category)"
+    ],
+    "category-management-tools": [
+     "aws/category/Arch-Category_Management-Tools_48.svg",
+     "Management Tools (category)"
+    ],
+    "category-media-services": [
+     "aws/category/Arch-Category_Media-Services_48.svg",
+     "Media Services (category)"
+    ],
+    "category-migration-modernization": [
+     "aws/category/Arch-Category_Migration-Modernization_48.svg",
+     "Migration Modernization (category)"
+    ],
+    "category-multicloud-and-hybrid": [
+     "aws/category/Arch-Category_Multicloud-and-Hybrid_48.svg",
+     "Multicloud and Hybrid (category)"
+    ],
+    "category-networking-content-delivery": [
+     "aws/category/Arch-Category_Networking-Content-Delivery_48.svg",
+     "Networking Content Delivery (category)"
+    ],
+    "category-quantum-technologies": [
+     "aws/category/Arch-Category_Quantum-Technologies_48.svg",
+     "Quantum Technologies (category)"
+    ],
+    "category-satellite": [
+     "aws/category/Arch-Category_Satellite_48.svg",
+     "Satellite (category)"
+    ],
+    "category-security-identity": [
+     "aws/category/Arch-Category_Security-Identity_48.svg",
+     "Security Identity (category)"
+    ],
+    "category-serverless": [
+     "aws/category/Arch-Category_Serverless_48.svg",
+     "Serverless (category)"
+    ],
+    "category-storage": [
+     "aws/category/Arch-Category_Storage_48.svg",
+     "Storage (category)"
+    ],
+    "certificate-manager": [
+     "aws/service/Arch_AWS-Certificate-Manager_48.svg",
+     "AWS Certificate Manager"
+    ],
+    "certificate-manager-certificate-authority": [
+     "aws/resource/Res_AWS-Certificate-Manager_Certificate-Authority_48.svg",
+     "AWS Certificate Manager Certificate Authority"
+    ],
+    "chat": [
+     "aws/resource/Res_Chat_48_Light.svg",
+     "Chat",
+     "aws/resource/Res_Chat_48_Dark.svg"
+    ],
+    "chatbot": [
+     "aws/service/Arch_AWS-Chatbot_48.svg",
+     "AWS Chatbot"
+    ],
+    "chime": [
+     "aws/service/Arch_Amazon-Chime_48.svg",
+     "Amazon Chime"
+    ],
+    "chime-sdk": [
+     "aws/service/Arch_Amazon-Chime-SDK_48.svg",
+     "Amazon Chime SDK"
+    ],
+    "clean-rooms": [
+     "aws/service/Arch_AWS-Clean-Rooms_48.svg",
+     "AWS Clean Rooms"
+    ],
+    "client": [
+     "aws/resource/Res_Client_48_Light.svg",
+     "Client",
+     "aws/resource/Res_Client_48_Dark.svg"
+    ],
+    "client-vpn": [
+     "aws/service/Arch_AWS-Client-VPN_48.svg",
+     "AWS Client VPN"
+    ],
+    "cloud": [
+     "aws/group/AWS-Cloud_32.svg",
+     "AWS Cloud",
+     "aws/group/AWS-Cloud_32_Dark.svg"
+    ],
+    "cloud-control-api": [
+     "aws/service/Arch_AWS-Cloud-Control-API_48.svg",
+     "AWS Cloud Control API"
+    ],
+    "cloud-development-kit": [
+     "aws/service/Arch_AWS-Cloud-Development-Kit_48.svg",
+     "AWS Cloud Development Kit"
+    ],
+    "cloud-digital-interface": [
+     "aws/resource/Res_AWS-Cloud-Digital-Interface_48.svg",
+     "AWS Cloud Digital Interface"
+    ],
+    "cloud-directory": [
+     "aws/service/Arch_Amazon-Cloud-Directory_48.svg",
+     "Amazon Cloud Directory"
+    ],
+    "cloud-logo": [
+     "aws/group/AWS-Cloud-logo_32.svg",
+     "AWS Cloud logo",
+     "aws/group/AWS-Cloud-logo_32_Dark.svg"
+    ],
+    "cloud-map": [
+     "aws/service/Arch_AWS-Cloud-Map_48.svg",
+     "AWS Cloud Map"
+    ],
+    "cloud-map-namespace": [
+     "aws/resource/Res_AWS-Cloud-Map_Namespace_48.svg",
+     "AWS Cloud Map Namespace"
+    ],
+    "cloud-map-resource": [
+     "aws/resource/Res_AWS-Cloud-Map_Resource_48.svg",
+     "AWS Cloud Map Resource"
+    ],
+    "cloud-map-service": [
+     "aws/resource/Res_AWS-Cloud-Map_Service_48.svg",
+     "AWS Cloud Map Service"
+    ],
+    "cloud-wan": [
+     "aws/service/Arch_AWS-Cloud-WAN_48.svg",
+     "AWS Cloud WAN"
+    ],
+    "cloud-wan-core-network-edge": [
+     "aws/resource/Res_AWS-Cloud-WAN_Core-Network-Edge_48.svg",
+     "AWS Cloud WAN Core Network Edge"
+    ],
+    "cloud-wan-segment-network": [
+     "aws/resource/Res_AWS-Cloud-WAN_Segment-Network_48.svg",
+     "AWS Cloud WAN Segment Network"
+    ],
+    "cloud-wan-transit-gateway-route-table-attachment": [
+     "aws/resource/Res_AWS-Cloud-WAN_Transit-Gateway-Route-Table-Attachment_48.svg",
+     "AWS Cloud WAN Transit Gateway Route Table Attachment"
+    ],
+    "cloud9": [
+     "aws/service/Arch_AWS-Cloud9_48.svg",
+     "AWS Cloud9"
+    ],
+    "cloud9-cloud9": [
+     "aws/resource/Res_AWS-Cloud9_Cloud9_48.svg",
+     "AWS Cloud9 Cloud9"
+    ],
+    "cloudformation": [
+     "aws/service/Arch_AWS-CloudFormation_48.svg",
+     "AWS CloudFormation"
+    ],
+    "cloudformation-change-set": [
+     "aws/resource/Res_AWS-CloudFormation_Change-Set_48.svg",
+     "AWS CloudFormation Change Set"
+    ],
+    "cloudformation-stack": [
+     "aws/resource/Res_AWS-CloudFormation_Stack_48.svg",
+     "AWS CloudFormation Stack"
+    ],
+    "cloudformation-template": [
+     "aws/resource/Res_AWS-CloudFormation_Template_48.svg",
+     "AWS CloudFormation Template"
+    ],
+    "cloudfront": [
+     "aws/service/Arch_Amazon-CloudFront_48.svg",
+     "Amazon CloudFront"
+    ],
+    "cloudfront-download-distribution": [
+     "aws/resource/Res_Amazon-CloudFront_Download-Distribution_48.svg",
+     "Amazon CloudFront Download Distribution"
+    ],
+    "cloudfront-edge-location": [
+     "aws/resource/Res_Amazon-CloudFront_Edge-Location_48.svg",
+     "Amazon CloudFront Edge Location"
+    ],
+    "cloudfront-functions": [
+     "aws/resource/Res_Amazon-CloudFront_Functions_48.svg",
+     "Amazon CloudFront Functions"
+    ],
+    "cloudfront-streaming-distribution": [
+     "aws/resource/Res_Amazon-CloudFront_Streaming-Distribution_48.svg",
+     "Amazon CloudFront Streaming Distribution"
+    ],
+    "cloudhsm": [
+     "aws/service/Arch_AWS-CloudHSM_48.svg",
+     "AWS CloudHSM"
+    ],
+    "cloudsearch": [
+     "aws/service/Arch_Amazon-CloudSearch_48.svg",
+     "Amazon CloudSearch"
+    ],
+    "cloudsearch-search-documents": [
+     "aws/resource/Res_Amazon-CloudSearch_Search-Documents_48.svg",
+     "Amazon CloudSearch Search Documents"
+    ],
+    "cloudshell": [
+     "aws/service/Arch_AWS-CloudShell_48.svg",
+     "AWS CloudShell"
+    ],
+    "cloudtrail": [
+     "aws/service/Arch_AWS-CloudTrail_48.svg",
+     "AWS CloudTrail"
+    ],
+    "cloudtrail-cloudtrail-lake": [
+     "aws/resource/Res_AWS-CloudTrail_CloudTrail-Lake_48.svg",
+     "AWS CloudTrail CloudTrail Lake"
+    ],
+    "cloudwatch": [
+     "aws/service/Arch_Amazon-CloudWatch_48.svg",
+     "Amazon CloudWatch"
+    ],
+    "cloudwatch-alarm": [
+     "aws/resource/Res_Amazon-CloudWatch_Alarm_48.svg",
+     "Amazon CloudWatch Alarm"
+    ],
+    "cloudwatch-cross-account-observability": [
+     "aws/resource/Res_Amazon-CloudWatch_Cross-account-Observability_48.svg",
+     "Amazon CloudWatch Cross account Observability"
+    ],
+    "cloudwatch-data-protection": [
+     "aws/resource/Res_Amazon-CloudWatch_Data-Protection_48.svg",
+     "Amazon CloudWatch Data Protection"
+    ],
+    "cloudwatch-event-event-based": [
+     "aws/resource/Res_Amazon-CloudWatch_Event-Event-Based_48.svg",
+     "Amazon CloudWatch Event Event Based"
+    ],
+    "cloudwatch-event-time-based": [
+     "aws/resource/Res_Amazon-CloudWatch_Event-Time-Based_48.svg",
+     "Amazon CloudWatch Event Time Based"
+    ],
+    "cloudwatch-evidently": [
+     "aws/resource/Res_Amazon-CloudWatch_Evidently_48.svg",
+     "Amazon CloudWatch Evidently"
+    ],
+    "cloudwatch-logs": [
+     "aws/resource/Res_Amazon-CloudWatch_Logs_48.svg",
+     "Amazon CloudWatch Logs"
+    ],
+    "cloudwatch-metrics-insights": [
+     "aws/resource/Res_Amazon-CloudWatch_Metrics-Insights_48.svg",
+     "Amazon CloudWatch Metrics Insights"
+    ],
+    "cloudwatch-rule": [
+     "aws/resource/Res_Amazon-CloudWatch_Rule_48.svg",
+     "Amazon CloudWatch Rule"
+    ],
+    "cloudwatch-rum": [
+     "aws/resource/Res_Amazon-CloudWatch_RUM_48.svg",
+     "Amazon CloudWatch RUM"
+    ],
+    "cloudwatch-synthetics": [
+     "aws/resource/Res_Amazon-CloudWatch_Synthetics_48.svg",
+     "Amazon CloudWatch Synthetics"
+    ],
+    "codeartifact": [
+     "aws/service/Arch_AWS-CodeArtifact_48.svg",
+     "AWS CodeArtifact"
+    ],
+    "codebuild": [
+     "aws/service/Arch_AWS-CodeBuild_48.svg",
+     "AWS CodeBuild"
+    ],
+    "codecatalyst": [
+     "aws/service/Arch_Amazon-CodeCatalyst_48.svg",
+     "Amazon CodeCatalyst"
+    ],
+    "codecommit": [
+     "aws/service/Arch_AWS-CodeCommit_48.svg",
+     "AWS CodeCommit"
+    ],
+    "codedeploy": [
+     "aws/service/Arch_AWS-CodeDeploy_48.svg",
+     "AWS CodeDeploy"
+    ],
+    "codeguru": [
+     "aws/service/Arch_Amazon-CodeGuru_48.svg",
+     "Amazon CodeGuru"
+    ],
+    "codepipeline": [
+     "aws/service/Arch_AWS-CodePipeline_48.svg",
+     "AWS CodePipeline"
+    ],
+    "codewhisperer": [
+     "aws/service/Arch_Amazon-CodeWhisperer_48.svg",
+     "Amazon CodeWhisperer"
+    ],
+    "cognito": [
+     "aws/service/Arch_Amazon-Cognito_48.svg",
+     "Amazon Cognito"
+    ],
+    "cold-storage": [
+     "aws/resource/Res_Cold-Storage_48_Light.svg",
+     "Cold Storage",
+     "aws/resource/Res_Cold-Storage_48_Dark.svg"
+    ],
+    "command-line-interface": [
+     "aws/service/Arch_AWS-Command-Line-Interface_48.svg",
+     "AWS Command Line Interface"
+    ],
+    "comprehend": [
+     "aws/service/Arch_Amazon-Comprehend_48.svg",
+     "Amazon Comprehend"
+    ],
+    "comprehend-medical": [
+     "aws/service/Arch_Amazon-Comprehend-Medical_48.svg",
+     "Amazon Comprehend Medical"
+    ],
+    "compute-optimizer": [
+     "aws/service/Arch_AWS-Compute-Optimizer_48.svg",
+     "AWS Compute Optimizer"
+    ],
+    "compute-optimizer-service": [
+     "aws/service/Arch_AWS-Compute-Optimizer_48.svg",
+     "AWS Compute Optimizer"
+    ],
+    "config": [
+     "aws/service/Arch_AWS-Config_48.svg",
+     "AWS Config"
+    ],
+    "connect": [
+     "aws/service/Arch_Amazon-Connect_48.svg",
+     "Amazon Connect"
+    ],
+    "console-mobile-application": [
+     "aws/service/Arch_AWS-Console-Mobile-Application_48.svg",
+     "AWS Console Mobile Application"
+    ],
+    "control-tower": [
+     "aws/service/Arch_AWS-Control-Tower_48.svg",
+     "AWS Control Tower"
+    ],
+    "corporate-data-center": [
+     "aws/group/Corporate-data-center_32.svg",
+     "Corporate data center"
+    ],
+    "corretto": [
+     "aws/service/Arch_Amazon-Corretto_48.svg",
+     "Amazon Corretto"
+    ],
+    "cost-and-usage-report": [
+     "aws/service/Arch_AWS-Cost-and-Usage-Report_48.svg",
+     "AWS Cost and Usage Report"
+    ],
+    "cost-explorer": [
+     "aws/service/Arch_AWS-Cost-Explorer_48.svg",
+     "AWS Cost Explorer"
+    ],
+    "credentials": [
+     "aws/resource/Res_Credentials_48_Light.svg",
+     "Credentials",
+     "aws/resource/Res_Credentials_48_Dark.svg"
+    ],
+    "data-exchange": [
+     "aws/service/Arch_AWS-Data-Exchange_48.svg",
+     "AWS Data Exchange"
+    ],
+    "data-exchange-for-apis": [
+     "aws/resource/Res_AWS-Data-Exchange-for-APIs_48.svg",
+     "AWS Data Exchange for APIs"
+    ],
+    "data-firehose": [
+     "aws/service/Arch_Amazon-Data-Firehose_48.svg",
+     "Amazon Data Firehose"
+    ],
+    "data-stream": [
+     "aws/resource/Res_Data-Stream_48_Light.svg",
+     "Data Stream",
+     "aws/resource/Res_Data-Stream_48_Dark.svg"
+    ],
+    "data-table": [
+     "aws/resource/Res_Data-Table_48_Light.svg",
+     "Data Table",
+     "aws/resource/Res_Data-Table_48_Dark.svg"
+    ],
+    "data-transfer-terminal": [
+     "aws/service/Arch_AWS-Data-Transfer-Terminal_48.svg",
+     "AWS Data Transfer Terminal"
+    ],
+    "database": [
+     "aws/resource/Res_Database_48_Light.svg",
+     "Database",
+     "aws/resource/Res_Database_48_Dark.svg"
+    ],
+    "database-migration-service": [
+     "aws/service/Arch_AWS-Database-Migration-Service_48.svg",
+     "AWS Database Migration Service"
+    ],
+    "database-migration-service-database-migration-workflow-or-job": [
+     "aws/resource/Res_AWS-Database-Migration-Service_Database-migration-workflow-or-job_48.svg",
+     "AWS Database Migration Service Database migration workflow or job"
+    ],
+    "datasync": [
+     "aws/service/Arch_AWS-DataSync_48.svg",
+     "AWS DataSync"
+    ],
+    "datasync-agent": [
+     "aws/resource/Res_AWS-Datasync_Agent_48.svg",
+     "AWS Datasync Agent"
+    ],
+    "datasync-discovery": [
+     "aws/resource/Res_AWS-DataSync_Discovery_48.svg",
+     "AWS DataSync Discovery"
+    ],
+    "datazone": [
+     "aws/service/Arch_Amazon-DataZone_48.svg",
+     "Amazon DataZone"
+    ],
+    "datazone-business-data-catalog": [
+     "aws/resource/Res_Amazon-DataZone_Business-Data-Catalog_48.svg",
+     "Amazon DataZone Business Data Catalog"
+    ],
+    "datazone-data-portal": [
+     "aws/resource/Res_Amazon-DataZone_Data-Portal_48.svg",
+     "Amazon DataZone Data Portal"
+    ],
+    "datazone-data-projects": [
+     "aws/resource/Res_Amazon-DataZone_Data-Projects_48.svg",
+     "Amazon DataZone Data Projects"
+    ],
+    "dcv": [
+     "aws/service/Arch_Amazon-DCV_48.svg",
+     "Amazon DCV"
+    ],
+    "deadline-cloud": [
+     "aws/service/Arch_AWS-Deadline-Cloud_48.svg",
+     "AWS Deadline Cloud"
+    ],
+    "deep-learning-amis": [
+     "aws/service/Arch_AWS-Deep-Learning-AMIs_48.svg",
+     "AWS Deep Learning AMIs"
+    ],
+    "deep-learning-containers": [
+     "aws/service/Arch_AWS-Deep-Learning-Containers_48.svg",
+     "AWS Deep Learning Containers"
+    ],
+    "deepracer": [
+     "aws/service/Arch_AWS-DeepRacer_48.svg",
+     "AWS DeepRacer"
+    ],
+    "detective": [
+     "aws/service/Arch_Amazon-Detective_48.svg",
+     "Amazon Detective"
+    ],
+    "device-farm": [
+     "aws/service/Arch_AWS-Device-Farm_48.svg",
+     "AWS Device Farm"
+    ],
+    "devops-agent": [
+     "aws/service/Arch_AWS-DevOps-Agent_48.svg",
+     "AWS DevOps Agent"
+    ],
+    "devops-guru": [
+     "aws/service/Arch_Amazon-DevOps-Guru_48.svg",
+     "Amazon DevOps Guru"
+    ],
+    "devops-guru-insights": [
+     "aws/resource/Res_Amazon-DevOps-Guru_Insights_48.svg",
+     "Amazon DevOps Guru Insights"
+    ],
+    "direct-connect": [
+     "aws/service/Arch_AWS-Direct-Connect_48.svg",
+     "AWS Direct Connect"
+    ],
+    "direct-connect-gateway": [
+     "aws/resource/Res_AWS-Direct-Connect_Gateway_48.svg",
+     "AWS Direct Connect Gateway"
+    ],
+    "directory-service": [
+     "aws/service/Arch_AWS-Directory-Service_48.svg",
+     "AWS Directory Service"
+    ],
+    "directory-service-ad-connector": [
+     "aws/resource/Res_AWS-Directory-Service_AD-Connector_48.svg",
+     "AWS Directory Service AD Connector"
+    ],
+    "directory-service-aws-managed-microsoft-ad": [
+     "aws/resource/Res_AWS-Directory-Service_AWS-Managed-Microsoft-AD_48.svg",
+     "AWS Directory Service AWS Managed Microsoft AD"
+    ],
+    "directory-service-simple-ad": [
+     "aws/resource/Res_AWS-Directory-Service_Simple-AD_48.svg",
+     "AWS Directory Service Simple AD"
+    ],
+    "disk": [
+     "aws/resource/Res_Disk_48_Light.svg",
+     "Disk",
+     "aws/resource/Res_Disk_48_Dark.svg"
+    ],
+    "distro-for-opentelemetry": [
+     "aws/service/Arch_AWS-Distro-for-OpenTelemetry_48.svg",
+     "AWS Distro for OpenTelemetry"
+    ],
+    "document": [
+     "aws/resource/Res_Document_48_Light.svg",
+     "Document",
+     "aws/resource/Res_Document_48_Dark.svg"
+    ],
+    "documentdb": [
+     "aws/service/Arch_Amazon-DocumentDB_48.svg",
+     "Amazon DocumentDB"
+    ],
+    "documentdb-elastic-clusters": [
+     "aws/resource/Res_Amazon-DocumentDB_Elastic-Clusters_48.svg",
+     "Amazon DocumentDB Elastic Clusters"
+    ],
+    "documents": [
+     "aws/resource/Res_Documents_48_Light.svg",
+     "Documents",
+     "aws/resource/Res_Documents_48_Dark.svg"
+    ],
+    "dynamodb": [
+     "aws/service/Arch_Amazon-DynamoDB_48.svg",
+     "Amazon DynamoDB"
+    ],
+    "dynamodb-accelerator": [
+     "aws/resource/Res_Amazon-DynamoDB_Amazon-DynamoDB-Accelerator_48.svg",
+     "Amazon DynamoDB Accelerator"
+    ],
+    "dynamodb-attribute": [
+     "aws/resource/Res_Amazon-DynamoDB_Attribute_48.svg",
+     "Amazon DynamoDB Attribute"
+    ],
+    "dynamodb-attributes": [
+     "aws/resource/Res_Amazon-DynamoDB_Attributes_48.svg",
+     "Amazon DynamoDB Attributes"
+    ],
+    "dynamodb-global-secondary-index": [
+     "aws/resource/Res_Amazon-DynamoDB_Global-secondary-index_48.svg",
+     "Amazon DynamoDB Global secondary index"
+    ],
+    "dynamodb-item": [
+     "aws/resource/Res_Amazon-DynamoDB_Item_48.svg",
+     "Amazon DynamoDB Item"
+    ],
+    "dynamodb-items": [
+     "aws/resource/Res_Amazon-DynamoDB_Items_48.svg",
+     "Amazon DynamoDB Items"
+    ],
+    "dynamodb-standard-access-table-class": [
+     "aws/resource/Res_Amazon-DynamoDB_Standard-Access-Table-Class_48.svg",
+     "Amazon DynamoDB Standard Access Table Class"
+    ],
+    "dynamodb-standard-infrequent-access-table-class": [
+     "aws/resource/Res_Amazon-DynamoDB_Standard-Infrequent-Access-Table-Class_48.svg",
+     "Amazon DynamoDB Standard Infrequent Access Table Class"
+    ],
+    "dynamodb-stream": [
+     "aws/resource/Res_Amazon-DynamoDB_Stream_48.svg",
+     "Amazon DynamoDB Stream"
+    ],
+    "dynamodb-table": [
+     "aws/resource/Res_Amazon-DynamoDB_Table_48.svg",
+     "Amazon DynamoDB Table"
+    ],
+    "ec2": [
+     "aws/service/Arch_Amazon-EC2_48.svg",
+     "Amazon EC2"
+    ],
+    "ec2-ami": [
+     "aws/resource/Res_Amazon-EC2_AMI_48.svg",
+     "Amazon EC2 AMI"
+    ],
+    "ec2-auto-scaling": [
+     "aws/service/Arch_Amazon-EC2-Auto-Scaling_48.svg",
+     "Amazon EC2 Auto Scaling"
+    ],
+    "ec2-auto-scaling-resource": [
+     "aws/resource/Res_Amazon-EC2_Auto-Scaling_48.svg",
+     "Amazon EC2 Auto Scaling"
+    ],
+    "ec2-aws-microservice-extractor-for-net": [
+     "aws/resource/Res_Amazon-EC2_AWS-Microservice-Extractor-for-.NET_48.svg",
+     "Amazon EC2 AWS Microservice Extractor for .NET"
+    ],
+    "ec2-db-instance": [
+     "aws/resource/Res_Amazon-EC2_DB-Instance_48.svg",
+     "Amazon EC2 DB Instance"
+    ],
+    "ec2-elastic-ip-address": [
+     "aws/resource/Res_Amazon-EC2_Elastic-IP-Address_48.svg",
+     "Amazon EC2 Elastic IP Address"
+    ],
+    "ec2-image-builder": [
+     "aws/service/Arch_Amazon-EC2-Image-Builder_48.svg",
+     "Amazon EC2 Image Builder"
+    ],
+    "ec2-instance": [
+     "aws/resource/Res_Amazon-EC2_Instance_48.svg",
+     "Amazon EC2 Instance"
+    ],
+    "ec2-instance-contents": [
+     "aws/group/EC2-instance-contents_32.svg",
+     "EC2 instance contents"
+    ],
+    "ec2-instance-with-cloudwatch": [
+     "aws/resource/Res_Amazon-EC2_Instance-with-CloudWatch_48.svg",
+     "Amazon EC2 Instance with CloudWatch"
+    ],
+    "ec2-instances": [
+     "aws/resource/Res_Amazon-EC2_Instances_48.svg",
+     "Amazon EC2 Instances"
+    ],
+    "ec2-rescue": [
+     "aws/resource/Res_Amazon-EC2_Rescue_48.svg",
+     "Amazon EC2 Rescue"
+    ],
+    "ec2-spot-instance": [
+     "aws/resource/Res_Amazon-EC2_Spot-Instance_48.svg",
+     "Amazon EC2 Spot Instance"
+    ],
+    "ecs-anywhere": [
+     "aws/service/Arch_Amazon-ECS-Anywhere_48.svg",
+     "Amazon ECS Anywhere"
+    ],
+    "efs": [
+     "aws/service/Arch_Amazon-EFS_48.svg",
+     "Amazon EFS"
+    ],
+    "eks-anywhere": [
+     "aws/service/Arch_Amazon-EKS-Anywhere_48.svg",
+     "Amazon EKS Anywhere"
+    ],
+    "eks-distro": [
+     "aws/service/Arch_Amazon-EKS-Distro_48.svg",
+     "Amazon EKS Distro"
+    ],
+    "elastic-beanstalk": [
+     "aws/service/Arch_AWS-Elastic-Beanstalk_48.svg",
+     "AWS Elastic Beanstalk"
+    ],
+    "elastic-beanstalk-application": [
+     "aws/resource/Res_AWS-Elastic-Beanstalk_Application_48.svg",
+     "AWS Elastic Beanstalk Application"
+    ],
+    "elastic-beanstalk-deployment": [
+     "aws/resource/Res_AWS-Elastic-Beanstalk_Deployment_48.svg",
+     "AWS Elastic Beanstalk Deployment"
+    ],
+    "elastic-block-store": [
+     "aws/service/Arch_Amazon-Elastic-Block-Store_48.svg",
+     "Amazon Elastic Block Store"
+    ],
+    "elastic-block-store-amazon-data-lifecycle-manager": [
+     "aws/resource/Res_Amazon-Elastic-Block-Store_Amazon-Data-Lifecycle-Manager_48.svg",
+     "Amazon Elastic Block Store Amazon Data Lifecycle Manager"
+    ],
+    "elastic-block-store-multiple-volumes": [
+     "aws/resource/Res_Amazon-Elastic-Block-Store_Multiple-Volumes_48.svg",
+     "Amazon Elastic Block Store Multiple Volumes"
+    ],
+    "elastic-block-store-snapshot": [
+     "aws/resource/Res_Amazon-Elastic-Block-Store_Snapshot_48.svg",
+     "Amazon Elastic Block Store Snapshot"
+    ],
+    "elastic-block-store-volume": [
+     "aws/resource/Res_Amazon-Elastic-Block-Store_Volume_48.svg",
+     "Amazon Elastic Block Store Volume"
+    ],
+    "elastic-block-store-volume-gp3": [
+     "aws/resource/Res_Amazon-Elastic-Block-Store_Volume-gp3_48.svg",
+     "Amazon Elastic Block Store Volume gp3"
+    ],
+    "elastic-container-registry": [
+     "aws/service/Arch_Amazon-Elastic-Container-Registry_48.svg",
+     "Amazon Elastic Container Registry"
+    ],
+    "elastic-container-registry-image": [
+     "aws/resource/Res_Amazon-Elastic-Container-Registry_Image_48.svg",
+     "Amazon Elastic Container Registry Image"
+    ],
+    "elastic-container-registry-registry": [
+     "aws/resource/Res_Amazon-Elastic-Container-Registry_Registry_48.svg",
+     "Amazon Elastic Container Registry Registry"
+    ],
+    "elastic-container-service": [
+     "aws/service/Arch_Amazon-Elastic-Container-Service_48.svg",
+     "Amazon Elastic Container Service"
+    ],
+    "elastic-container-service-container-1": [
+     "aws/resource/Res_Amazon-Elastic-Container-Service_Container-1_48.svg",
+     "Amazon Elastic Container Service Container 1"
+    ],
+    "elastic-container-service-container-2": [
+     "aws/resource/Res_Amazon-Elastic-Container-Service_Container-2_48.svg",
+     "Amazon Elastic Container Service Container 2"
+    ],
+    "elastic-container-service-container-3": [
+     "aws/resource/Res_Amazon-Elastic-Container-Service_Container-3_48.svg",
+     "Amazon Elastic Container Service Container 3"
+    ],
+    "elastic-container-service-copiiot-cli": [
+     "aws/resource/Res_Amazon-Elastic-Container-Service_CopiIoT-CLI_48.svg",
+     "Amazon Elastic Container Service CopiIoT CLI"
+    ],
+    "elastic-container-service-ecs-service-connect": [
+     "aws/resource/Res_Amazon-Elastic-Container-Service_ECS-Service-Connect_48.svg",
+     "Amazon Elastic Container Service ECS Service Connect"
+    ],
+    "elastic-container-service-service": [
+     "aws/resource/Res_Amazon-Elastic-Container-Service_Service_48.svg",
+     "Amazon Elastic Container Service Service"
+    ],
+    "elastic-container-service-task": [
+     "aws/resource/Res_Amazon-Elastic-Container-Service_Task_48.svg",
+     "Amazon Elastic Container Service Task"
+    ],
+    "elastic-disaster-recovery": [
+     "aws/service/Arch_AWS-Elastic-Disaster-Recovery_48.svg",
+     "AWS Elastic Disaster Recovery"
+    ],
+    "elastic-fabric-adapter": [
+     "aws/service/Arch_Elastic-Fabric-Adapter_48.svg",
+     "Elastic Fabric Adapter"
+    ],
+    "elastic-file-system-efs-intelligent-tiering": [
+     "aws/resource/Res_Amazon-Elastic-File-System_EFS-Intelligent-Tiering_48.svg",
+     "Amazon Elastic File System EFS Intelligent Tiering"
+    ],
+    "elastic-file-system-efs-one-zone": [
+     "aws/resource/Res_Amazon-Elastic-File-System_EFS-One-Zone_48.svg",
+     "Amazon Elastic File System EFS One Zone"
+    ],
+    "elastic-file-system-efs-one-zone-infrequent-access": [
+     "aws/resource/Res_Amazon-Elastic-File-System_EFS-One-Zone-Infrequent-Access_48.svg",
+     "Amazon Elastic File System EFS One Zone Infrequent Access"
+    ],
+    "elastic-file-system-efs-standard": [
+     "aws/resource/Res_Amazon-Elastic-File-System_EFS-Standard_48.svg",
+     "Amazon Elastic File System EFS Standard"
+    ],
+    "elastic-file-system-efs-standard-infrequent-access": [
+     "aws/resource/Res_Amazon-Elastic-File-System_EFS-Standard-Infrequent-Access_48.svg",
+     "Amazon Elastic File System EFS Standard Infrequent Access"
+    ],
+    "elastic-file-system-elastic-throughput": [
+     "aws/resource/Res_Amazon-Elastic-File-System_Elastic-Throughput_48.svg",
+     "Amazon Elastic File System Elastic Throughput"
+    ],
+    "elastic-file-system-file-system": [
+     "aws/resource/Res_Amazon-Elastic-File-System_File-System_48.svg",
+     "Amazon Elastic File System File System"
+    ],
+    "elastic-inference": [
+     "aws/service/Arch_Amazon-Elastic-Inference_48.svg",
+     "Amazon Elastic Inference"
+    ],
+    "elastic-kubernetes-service": [
+     "aws/service/Arch_Amazon-Elastic-Kubernetes-Service_48.svg",
+     "Amazon Elastic Kubernetes Service"
+    ],
+    "elastic-kubernetes-service-eks-on-outposts": [
+     "aws/resource/Res_Amazon-Elastic-Kubernetes-Service_EKS-on-Outposts_48.svg",
+     "Amazon Elastic Kubernetes Service EKS on Outposts"
+    ],
+    "elastic-load-balancing": [
+     "aws/service/Arch_Elastic-Load-Balancing_48.svg",
+     "Elastic Load Balancing"
+    ],
+    "elastic-load-balancing-application-load-balancer": [
+     "aws/resource/Res_Elastic-Load-Balancing_Application-Load-Balancer_48.svg",
+     "Elastic Load Balancing Application Load Balancer"
+    ],
+    "elastic-load-balancing-classic-load-balancer": [
+     "aws/resource/Res_Elastic-Load-Balancing_Classic-Load-Balancer_48.svg",
+     "Elastic Load Balancing Classic Load Balancer"
+    ],
+    "elastic-load-balancing-gateway-load-balancer": [
+     "aws/resource/Res_Elastic-Load-Balancing_Gateway-Load-Balancer_48.svg",
+     "Elastic Load Balancing Gateway Load Balancer"
+    ],
+    "elastic-load-balancing-network-load-balancer": [
+     "aws/resource/Res_Elastic-Load-Balancing_Network-Load-Balancer_48.svg",
+     "Elastic Load Balancing Network Load Balancer"
+    ],
+    "elastic-vmware-service": [
+     "aws/service/Arch_Amazon-Elastic-VMware-Service_48.svg",
+     "Amazon Elastic VMware Service"
+    ],
+    "elasticache": [
+     "aws/service/Arch_Amazon-ElastiCache_48.svg",
+     "Amazon ElastiCache"
+    ],
+    "elasticache-cache-node": [
+     "aws/resource/Res_Amazon-ElastiCache_Cache-Node_48.svg",
+     "Amazon ElastiCache Cache Node"
+    ],
+    "elasticache-elasticache-for-memcached": [
+     "aws/resource/Res_Amazon-ElastiCache_ElastiCache-for-Memcached_48.svg",
+     "Amazon ElastiCache ElastiCache for Memcached"
+    ],
+    "elasticache-elasticache-for-redis": [
+     "aws/resource/Res_Amazon-ElastiCache_ElastiCache-for-Redis_48.svg",
+     "Amazon ElastiCache ElastiCache for Redis"
+    ],
+    "elasticache-elasticache-for-valkey": [
+     "aws/resource/Res_Amazon-ElastiCache_ElastiCache-for-Valkey_48.svg",
+     "Amazon ElastiCache ElastiCache for Valkey"
+    ],
+    "elemental-appliances-software": [
+     "aws/service/Arch_AWS-Elemental-Appliances-&-Software_48.svg",
+     "AWS Elemental Appliances & Software"
+    ],
+    "elemental-conductor": [
+     "aws/service/Arch_AWS-Elemental-Conductor_48.svg",
+     "AWS Elemental Conductor"
+    ],
+    "elemental-delta": [
+     "aws/service/Arch_AWS-Elemental-Delta_48.svg",
+     "AWS Elemental Delta"
+    ],
+    "elemental-inference": [
+     "aws/service/Arch_AWS-Elemental-Inference_48.svg",
+     "AWS Elemental Inference"
+    ],
+    "elemental-link": [
+     "aws/service/Arch_AWS-Elemental-Link_48.svg",
+     "AWS Elemental Link"
+    ],
+    "elemental-live": [
+     "aws/service/Arch_AWS-Elemental-Live_48.svg",
+     "AWS Elemental Live"
+    ],
+    "elemental-mediaconnect": [
+     "aws/service/Arch_AWS-Elemental-MediaConnect_48.svg",
+     "AWS Elemental MediaConnect"
+    ],
+    "elemental-mediaconnect-mediaconnect-gateway": [
+     "aws/resource/Res_AWS-Elemental-MediaConnect_MediaConnect-Gateway_48.svg",
+     "AWS Elemental MediaConnect MediaConnect Gateway"
+    ],
+    "elemental-mediaconvert": [
+     "aws/service/Arch_AWS-Elemental-MediaConvert_48.svg",
+     "AWS Elemental MediaConvert"
+    ],
+    "elemental-medialive": [
+     "aws/service/Arch_AWS-Elemental-MediaLive_48.svg",
+     "AWS Elemental MediaLive"
+    ],
+    "elemental-mediapackage": [
+     "aws/service/Arch_AWS-Elemental-MediaPackage_48.svg",
+     "AWS Elemental MediaPackage"
+    ],
+    "elemental-mediastore": [
+     "aws/service/Arch_AWS-Elemental-MediaStore_48.svg",
+     "AWS Elemental MediaStore"
+    ],
+    "elemental-mediatailor": [
+     "aws/service/Arch_AWS-Elemental-MediaTailor_48.svg",
+     "AWS Elemental MediaTailor"
+    ],
+    "elemental-server": [
+     "aws/service/Arch_AWS-Elemental-Server_48.svg",
+     "AWS Elemental Server"
+    ],
+    "email": [
+     "aws/resource/Res_Email_48_Light.svg",
+     "Email",
+     "aws/resource/Res_Email_48_Dark.svg"
+    ],
+    "emr": [
+     "aws/service/Arch_Amazon-EMR_48.svg",
+     "Amazon EMR"
+    ],
+    "emr-cluster": [
+     "aws/resource/Res_Amazon-EMR_Cluster_48.svg",
+     "Amazon EMR Cluster"
+    ],
+    "emr-emr-engine": [
+     "aws/resource/Res_Amazon-EMR_EMR-Engine_48.svg",
+     "Amazon EMR EMR Engine"
+    ],
+    "emr-hdfs-cluster": [
+     "aws/resource/Res_Amazon-EMR_HDFS-Cluster_48.svg",
+     "Amazon EMR HDFS Cluster"
+    ],
+    "end-user-messaging": [
+     "aws/service/Arch_AWS-End-User-Messaging_48.svg",
+     "AWS End User Messaging"
+    ],
+    "entity-resolution": [
+     "aws/service/Arch_AWS-Entity-Resolution_48.svg",
+     "AWS Entity Resolution"
+    ],
+    "eventbridge": [
+     "aws/service/Arch_Amazon-EventBridge_48.svg",
+     "Amazon EventBridge"
+    ],
+    "eventbridge-custom-event-bus": [
+     "aws/resource/Res_Amazon-EventBridge_Custom-Event-Bus_48.svg",
+     "Amazon EventBridge Custom Event Bus"
+    ],
+    "eventbridge-default-event-bus": [
+     "aws/resource/Res_Amazon-EventBridge_Default-Event-Bus_48.svg",
+     "Amazon EventBridge Default Event Bus"
+    ],
+    "eventbridge-event": [
+     "aws/resource/Res_Amazon-EventBridge-Event_48.svg",
+     "Amazon EventBridge Event"
+    ],
+    "eventbridge-pipes": [
+     "aws/resource/Res_Amazon-EventBridge_Pipes_48.svg",
+     "Amazon EventBridge Pipes"
+    ],
+    "eventbridge-rule": [
+     "aws/resource/Res_Amazon-EventBridge_Rule_48.svg",
+     "Amazon EventBridge Rule"
+    ],
+    "eventbridge-saas-partner-event": [
+     "aws/resource/Res_Amazon-EventBridge_Saas-Partner-Event_48.svg",
+     "Amazon EventBridge Saas Partner Event"
+    ],
+    "eventbridge-scheduler": [
+     "aws/resource/Res_Amazon-EventBridge_Scheduler_48.svg",
+     "Amazon EventBridge Scheduler"
+    ],
+    "eventbridge-schema": [
+     "aws/resource/Res_Amazon-EventBridge_Schema_48.svg",
+     "Amazon EventBridge Schema"
+    ],
+    "eventbridge-schema-registry": [
+     "aws/resource/Res_Amazon-EventBridge_Schema-Registry_48.svg",
+     "Amazon EventBridge Schema Registry"
+    ],
+    "express-workflows": [
+     "aws/service/Arch_AWS-Express-Workflows_48.svg",
+     "AWS Express Workflows"
+    ],
+    "fargate": [
+     "aws/service/Arch_AWS-Fargate_48.svg",
+     "AWS Fargate"
+    ],
+    "fault-injection-service": [
+     "aws/service/Arch_AWS-Fault-Injection-Service_48.svg",
+     "AWS Fault Injection Service"
+    ],
+    "file-cache": [
+     "aws/service/Arch_Amazon-File-Cache_48.svg",
+     "Amazon File Cache"
+    ],
+    "file-cache-hybrid-nfs-linked-datasets": [
+     "aws/resource/Res_Amazon-File-Cache_Hybrid-NFS-linked-datasets_48.svg",
+     "Amazon File Cache Hybrid NFS linked datasets"
+    ],
+    "file-cache-on-premises-nfs-linked-datasets": [
+     "aws/resource/Res_Amazon-File-Cache_On-premises-NFS-linked-datasets_48.svg",
+     "Amazon File Cache On premises NFS linked datasets"
+    ],
+    "file-cache-s3-linked-datasets": [
+     "aws/resource/Res_Amazon-File-Cache_S3-linked-datasets_48.svg",
+     "Amazon File Cache S3 linked datasets"
+    ],
+    "finops-agent": [
+     "aws/service/Arch_AWS-FinOps-Agent_48.svg",
+     "AWS FinOps Agent"
+    ],
+    "finspace": [
+     "aws/service/Arch_Amazon-FinSpace_48.svg",
+     "Amazon FinSpace"
+    ],
+    "firewall": [
+     "aws/resource/Res_Firewall_48_Light.svg",
+     "Firewall",
+     "aws/resource/Res_Firewall_48_Dark.svg"
+    ],
+    "firewall-manager": [
+     "aws/service/Arch_AWS-Firewall-Manager_48.svg",
+     "AWS Firewall Manager"
+    ],
+    "folder": [
+     "aws/resource/Res_Folder_48_Light.svg",
+     "Folder",
+     "aws/resource/Res_Folder_48_Dark.svg"
+    ],
+    "folders": [
+     "aws/resource/Res_Folders_48_Light.svg",
+     "Folders",
+     "aws/resource/Res_Folders_48_Dark.svg"
+    ],
+    "forecast": [
+     "aws/service/Arch_Amazon-Forecast_48.svg",
+     "Amazon Forecast"
+    ],
+    "forums": [
+     "aws/resource/Res_Forums_48_Light.svg",
+     "Forums",
+     "aws/resource/Res_Forums_48_Dark.svg"
+    ],
+    "fraud-detector": [
+     "aws/service/Arch_Amazon-Fraud-Detector_48.svg",
+     "Amazon Fraud Detector"
+    ],
+    "freertos": [
+     "aws/service/Arch_FreeRTOS_48.svg",
+     "FreeRTOS"
+    ],
+    "fsx": [
+     "aws/service/Arch_Amazon-FSx_48.svg",
+     "Amazon FSx"
+    ],
+    "fsx-for-lustre": [
+     "aws/service/Arch_Amazon-FSx-for-Lustre_48.svg",
+     "Amazon FSx for Lustre"
+    ],
+    "fsx-for-netapp-ontap": [
+     "aws/service/Arch_Amazon-FSx-for-NetApp-ONTAP_48.svg",
+     "Amazon FSx for NetApp ONTAP"
+    ],
+    "fsx-for-openzfs": [
+     "aws/service/Arch_Amazon-FSx-for-OpenZFS_48.svg",
+     "Amazon FSx for OpenZFS"
+    ],
+    "fsx-for-wfs": [
+     "aws/service/Arch_Amazon-FSx-for-WFS_48.svg",
+     "Amazon FSx for WFS"
+    ],
+    "gamelift-servers": [
+     "aws/service/Arch_Amazon-GameLift-Servers_48.svg",
+     "Amazon GameLift Servers"
+    ],
+    "gamelift-streams": [
+     "aws/service/Arch_Amazon-GameLift-Streams_48.svg",
+     "Amazon GameLift Streams"
+    ],
+    "gear": [
+     "aws/resource/Res_Gear_48_Light.svg",
+     "Gear",
+     "aws/resource/Res_Gear_48_Dark.svg"
+    ],
+    "generic-application": [
+     "aws/resource/Res_Generic-Application_48_Light.svg",
+     "Generic Application",
+     "aws/resource/Res_Generic-Application_48_Dark.svg"
+    ],
+    "git-repository": [
+     "aws/resource/Res_Git-Repository_48_Light.svg",
+     "Git Repository",
+     "aws/resource/Res_Git-Repository_48_Dark.svg"
+    ],
+    "global-accelerator": [
+     "aws/service/Arch_AWS-Global-Accelerator_48.svg",
+     "AWS Global Accelerator"
+    ],
+    "globe": [
+     "aws/resource/Res_Globe_48_Light.svg",
+     "Globe",
+     "aws/resource/Res_Globe_48_Dark.svg"
+    ],
+    "glue": [
+     "aws/service/Arch_AWS-Glue_48.svg",
+     "AWS Glue"
+    ],
+    "glue-crawler": [
+     "aws/resource/Res_AWS-Glue_Crawler_48.svg",
+     "AWS Glue Crawler"
+    ],
+    "glue-data-catalog": [
+     "aws/resource/Res_AWS-Glue_Data-Catalog_48.svg",
+     "AWS Glue Data Catalog"
+    ],
+    "glue-data-quality": [
+     "aws/resource/Res_AWS-Glue_Data-Quality_48.svg",
+     "AWS Glue Data Quality"
+    ],
+    "glue-databrew": [
+     "aws/service/Arch_AWS-Glue-DataBrew_48.svg",
+     "AWS Glue DataBrew"
+    ],
+    "glue-for-ray": [
+     "aws/resource/Res_AWS-Glue_AWS-Glue-for-Ray_48.svg",
+     "AWS Glue for Ray"
+    ],
+    "ground-station": [
+     "aws/service/Arch_AWS-Ground-Station_48.svg",
+     "AWS Ground Station"
+    ],
+    "guardduty": [
+     "aws/service/Arch_Amazon-GuardDuty_48.svg",
+     "Amazon GuardDuty"
+    ],
+    "health-dashboard": [
+     "aws/service/Arch_AWS-Health-Dashboard_48.svg",
+     "AWS Health Dashboard"
+    ],
+    "healthimaging": [
+     "aws/service/Arch_AWS-HealthImaging_48.svg",
+     "AWS HealthImaging"
+    ],
+    "healthlake": [
+     "aws/service/Arch_AWS-HealthLake_48.svg",
+     "AWS HealthLake"
+    ],
+    "healthomics": [
+     "aws/service/Arch_AWS-HealthOmics_48.svg",
+     "AWS HealthOmics"
+    ],
+    "healthscribe": [
+     "aws/service/Arch_AWS-HealthScribe_48.svg",
+     "AWS HealthScribe"
+    ],
+    "iam-identity-center": [
+     "aws/service/Arch_AWS-IAM-Identity-Center_48.svg",
+     "AWS IAM Identity Center"
+    ],
+    "identity-access-management-add-on": [
+     "aws/resource/Res_AWS-Identity-Access-Management_Add-on_48.svg",
+     "AWS Identity Access Management Add on"
+    ],
+    "identity-access-management-aws-sts": [
+     "aws/resource/Res_AWS-Identity-Access-Management_AWS-STS_48.svg",
+     "AWS Identity Access Management AWS STS"
+    ],
+    "identity-access-management-aws-sts-alternate": [
+     "aws/resource/Res_AWS-Identity-Access-Management_AWS-STS-Alternate_48.svg",
+     "AWS Identity Access Management AWS STS Alternate"
+    ],
+    "identity-access-management-data-encryption-key": [
+     "aws/resource/Res_AWS-Identity-Access-Management_Data-Encryption-Key_48.svg",
+     "AWS Identity Access Management Data Encryption Key"
+    ],
+    "identity-access-management-encrypted-data": [
+     "aws/resource/Res_AWS-Identity-Access-Management_Encrypted-Data_48.svg",
+     "AWS Identity Access Management Encrypted Data"
+    ],
+    "identity-access-management-iam-access-analyzer": [
+     "aws/resource/Res_AWS-Identity-Access-Management_IAM-Access-Analyzer_48.svg",
+     "AWS Identity Access Management IAM Access Analyzer"
+    ],
+    "identity-access-management-iam-roles-anywhere": [
+     "aws/resource/Res_AWS-Identity-Access-Management_IAM-Roles-Anywhere_48.svg",
+     "AWS Identity Access Management IAM Roles Anywhere"
+    ],
+    "identity-access-management-long-term-security-credential": [
+     "aws/resource/Res_AWS-Identity-Access-Management_Long-Term-Security-Credential_48.svg",
+     "AWS Identity Access Management Long Term Security Credential"
+    ],
+    "identity-access-management-mfa-token": [
+     "aws/resource/Res_AWS-Identity-Access-Management_MFA-Token_48.svg",
+     "AWS Identity Access Management MFA Token"
+    ],
+    "identity-access-management-permissions": [
+     "aws/resource/Res_AWS-Identity-Access-Management_Permissions_48.svg",
+     "AWS Identity Access Management Permissions"
+    ],
+    "identity-access-management-role": [
+     "aws/resource/Res_AWS-Identity-Access-Management_Role_48.svg",
+     "AWS Identity Access Management Role"
+    ],
+    "identity-access-management-temporary-security-credential": [
+     "aws/resource/Res_AWS-Identity-Access-Management_Temporary-Security-Credential_48.svg",
+     "AWS Identity Access Management Temporary Security Credential"
+    ],
+    "identity-and-access-management": [
+     "aws/service/Arch_AWS-Identity-and-Access-Management_48.svg",
+     "AWS Identity and Access Management"
+    ],
+    "infrastructure-composer": [
+     "aws/service/Arch_AWS-Infrastructure-Composer_48.svg",
+     "AWS Infrastructure Composer"
+    ],
+    "inspector": [
+     "aws/service/Arch_Amazon-Inspector_48.svg",
+     "Amazon Inspector"
+    ],
+    "inspector-agent": [
+     "aws/resource/Res_Amazon-Inspector_Agent_48.svg",
+     "Amazon Inspector Agent"
+    ],
+    "interactive-video-service": [
+     "aws/service/Arch_Amazon-Interactive-Video-Service_48.svg",
+     "Amazon Interactive Video Service"
+    ],
+    "interconnect": [
+     "aws/service/Arch_AWS-Interconnect_48.svg",
+     "AWS Interconnect"
+    ],
+    "internet": [
+     "aws/resource/Res_Internet_48_Light.svg",
+     "Internet",
+     "aws/resource/Res_Internet_48_Dark.svg"
+    ],
+    "internet-alt1": [
+     "aws/resource/Res_Internet-alt1_48_Light.svg",
+     "Internet alt1",
+     "aws/resource/Res_Internet-alt1_48_Dark.svg"
+    ],
+    "internet-alt2": [
+     "aws/resource/Res_Internet-alt2_48_Light.svg",
+     "Internet alt2",
+     "aws/resource/Res_Internet-alt2_48_Dark.svg"
+    ],
+    "iot-action": [
+     "aws/resource/Res_AWS-IoT_Action_48.svg",
+     "AWS IoT Action"
+    ],
+    "iot-actuator": [
+     "aws/resource/Res_AWS-IoT_Actuator_48.svg",
+     "AWS IoT Actuator"
+    ],
+    "iot-alexa-enabled-device": [
+     "aws/resource/Res_AWS-IoT_Alexa_Enabled-Device_48.svg",
+     "AWS IoT Alexa Enabled Device"
+    ],
+    "iot-alexa-skill": [
+     "aws/resource/Res_AWS-IoT_Alexa_Skill_48.svg",
+     "AWS IoT Alexa Skill"
+    ],
+    "iot-alexa-voice-service": [
+     "aws/resource/Res_AWS-IoT_Alexa_Voice-Service_48.svg",
+     "AWS IoT Alexa Voice Service"
+    ],
+    "iot-certificate": [
+     "aws/resource/Res_AWS-IoT_Certificate_48.svg",
+     "AWS IoT Certificate"
+    ],
+    "iot-core": [
+     "aws/service/Arch_AWS-IoT-Core_48.svg",
+     "AWS IoT Core"
+    ],
+    "iot-core-device-advisor": [
+     "aws/resource/Res_AWS-IoT-Core_Device-Advisor_48.svg",
+     "AWS IoT Core Device Advisor"
+    ],
+    "iot-core-device-location": [
+     "aws/resource/Res_AWS-IoT-Core_Device-Location_48.svg",
+     "AWS IoT Core Device Location"
+    ],
+    "iot-desired-state": [
+     "aws/resource/Res_AWS-IoT_Desired-State_48.svg",
+     "AWS IoT Desired State"
+    ],
+    "iot-device-defender": [
+     "aws/service/Arch_AWS-IoT-Device-Defender_48.svg",
+     "AWS IoT Device Defender"
+    ],
+    "iot-device-defender-iot-device-jobs": [
+     "aws/resource/Res_AWS-IoT-Device-Defender_IoT-Device-Jobs_48.svg",
+     "AWS IoT Device Defender IoT Device Jobs"
+    ],
+    "iot-device-gateway": [
+     "aws/resource/Res_AWS-IoT_Device-Gateway_48.svg",
+     "AWS IoT Device Gateway"
+    ],
+    "iot-device-management": [
+     "aws/service/Arch_AWS-IoT-Device-Management_48.svg",
+     "AWS IoT Device Management"
+    ],
+    "iot-device-management-fleet-hub": [
+     "aws/resource/Res_AWS-IoT-Device-Management_Fleet-Hub_48.svg",
+     "AWS IoT Device Management Fleet Hub"
+    ],
+    "iot-device-tester": [
+     "aws/resource/Res_AWS-IoT-Device-Tester_48.svg",
+     "AWS IoT Device Tester"
+    ],
+    "iot-echo": [
+     "aws/resource/Res_AWS-IoT_Echo_48.svg",
+     "AWS IoT Echo"
+    ],
+    "iot-events": [
+     "aws/service/Arch_AWS-IoT-Events_48.svg",
+     "AWS IoT Events"
+    ],
+    "iot-expresslink": [
+     "aws/service/Arch_AWS-IoT-ExpressLink_48.svg",
+     "AWS IoT ExpressLink"
+    ],
+    "iot-fire-tv": [
+     "aws/resource/Res_AWS-IoT_Fire_TV_48.svg",
+     "AWS IoT Fire TV"
+    ],
+    "iot-fire-tv-stick": [
+     "aws/resource/Res_AWS-IoT_Fire-TV_Stick_48.svg",
+     "AWS IoT Fire TV Stick"
+    ],
+    "iot-fleetwise": [
+     "aws/service/Arch_AWS-IoT-FleetWise_48.svg",
+     "AWS IoT FleetWise"
+    ],
+    "iot-greengrass": [
+     "aws/service/Arch_AWS-IoT-Greengrass_48.svg",
+     "AWS IoT Greengrass"
+    ],
+    "iot-greengrass-artifact": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Artifact_48.svg",
+     "AWS IoT Greengrass Artifact"
+    ],
+    "iot-greengrass-component": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Component_48.svg",
+     "AWS IoT Greengrass Component"
+    ],
+    "iot-greengrass-component-machine-learning": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Component-Machine-Learning_48.svg",
+     "AWS IoT Greengrass Component Machine Learning"
+    ],
+    "iot-greengrass-component-nucleus": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Component-Nucleus_48.svg",
+     "AWS IoT Greengrass Component Nucleus"
+    ],
+    "iot-greengrass-component-private": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Component-Private_48.svg",
+     "AWS IoT Greengrass Component Private"
+    ],
+    "iot-greengrass-component-public": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Component-Public_48.svg",
+     "AWS IoT Greengrass Component Public"
+    ],
+    "iot-greengrass-connector": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Connector_48.svg",
+     "AWS IoT Greengrass Connector"
+    ],
+    "iot-greengrass-deployment": [
+     "aws/group/AWS-IoT-Greengrass-Deployment_32.svg",
+     "AWS IoT Greengrass Deployment"
+    ],
+    "iot-greengrass-interprocess-communication": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Interprocess-Communication_48.svg",
+     "AWS IoT Greengrass Interprocess Communication"
+    ],
+    "iot-greengrass-protocol": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Protocol_48.svg",
+     "AWS IoT Greengrass Protocol"
+    ],
+    "iot-greengrass-recipe": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Recipe_48.svg",
+     "AWS IoT Greengrass Recipe"
+    ],
+    "iot-greengrass-stream-manager": [
+     "aws/resource/Res_AWS-IoT-Greengrass_Stream-Manager_48.svg",
+     "AWS IoT Greengrass Stream Manager"
+    ],
+    "iot-hardware-board": [
+     "aws/resource/Res_AWS-IoT-Hardware-Board_48.svg",
+     "AWS IoT Hardware Board"
+    ],
+    "iot-http-protocol": [
+     "aws/resource/Res_AWS-IoT_HTTP_Protocol_48.svg",
+     "AWS IoT HTTP Protocol"
+    ],
+    "iot-http2-protocol": [
+     "aws/resource/Res_AWS-IoT_HTTP2-Protocol_48.svg",
+     "AWS IoT HTTP2 Protocol"
+    ],
+    "iot-lambda-function": [
+     "aws/resource/Res_AWS-IoT_Lambda_Function_48.svg",
+     "AWS IoT Lambda Function"
+    ],
+    "iot-lorawan-protocol": [
+     "aws/resource/Res_AWS-IoT_LoRaWAN-Protocol_48.svg",
+     "AWS IoT LoRaWAN Protocol"
+    ],
+    "iot-mqtt-protocol": [
+     "aws/resource/Res_AWS-IoT_MQTT_Protocol_48.svg",
+     "AWS IoT MQTT Protocol"
+    ],
+    "iot-over-air-update": [
+     "aws/resource/Res_AWS-IoT_Over-Air-Update_48.svg",
+     "AWS IoT Over Air Update"
+    ],
+    "iot-policy": [
+     "aws/resource/Res_AWS-IoT_Policy_48.svg",
+     "AWS IoT Policy"
+    ],
+    "iot-reported-state": [
+     "aws/resource/Res_AWS-IoT_Reported-State_48.svg",
+     "AWS IoT Reported State"
+    ],
+    "iot-rule": [
+     "aws/resource/Res_AWS-IoT-Rule_48.svg",
+     "AWS IoT Rule"
+    ],
+    "iot-sailboat": [
+     "aws/resource/Res_AWS-IoT_Sailboat_48.svg",
+     "AWS IoT Sailboat"
+    ],
+    "iot-sensor": [
+     "aws/resource/Res_AWS-IoT_Sensor_48.svg",
+     "AWS IoT Sensor"
+    ],
+    "iot-servo": [
+     "aws/resource/Res_AWS-IoT_Servo_48.svg",
+     "AWS IoT Servo"
+    ],
+    "iot-shadow": [
+     "aws/resource/Res_AWS-IoT_Shadow_48.svg",
+     "AWS IoT Shadow"
+    ],
+    "iot-simulator": [
+     "aws/resource/Res_AWS-IoT_Simulator_48.svg",
+     "AWS IoT Simulator"
+    ],
+    "iot-sitewise": [
+     "aws/service/Arch_AWS-IoT-SiteWise_48.svg",
+     "AWS IoT SiteWise"
+    ],
+    "iot-sitewise-asset": [
+     "aws/resource/Res_AWS-IoT-SiteWise_Asset_48.svg",
+     "AWS IoT SiteWise Asset"
+    ],
+    "iot-sitewise-asset-hierarchy": [
+     "aws/resource/Res_AWS-IoT-SiteWise_Asset-Hierarchy_48.svg",
+     "AWS IoT SiteWise Asset Hierarchy"
+    ],
+    "iot-sitewise-asset-model": [
+     "aws/resource/Res_AWS-IoT-SiteWise_Asset-Model_48.svg",
+     "AWS IoT SiteWise Asset Model"
+    ],
+    "iot-sitewise-asset-properties": [
+     "aws/resource/Res_AWS-IoT-SiteWise_Asset-Properties_48.svg",
+     "AWS IoT SiteWise Asset Properties"
+    ],
+    "iot-sitewise-data-streams": [
+     "aws/resource/Res_AWS-IoT-SiteWise_Data-Streams_48.svg",
+     "AWS IoT SiteWise Data Streams"
+    ],
+    "iot-thing-bank": [
+     "aws/resource/Res_AWS-IoT_Thing_Bank_48.svg",
+     "AWS IoT Thing Bank"
+    ],
+    "iot-thing-bicycle": [
+     "aws/resource/Res_AWS-IoT_Thing_Bicycle_48.svg",
+     "AWS IoT Thing Bicycle"
+    ],
+    "iot-thing-camera": [
+     "aws/resource/Res_AWS-IoT_Thing_Camera_48.svg",
+     "AWS IoT Thing Camera"
+    ],
+    "iot-thing-car": [
+     "aws/resource/Res_AWS-IoT_Thing_Car_48.svg",
+     "AWS IoT Thing Car"
+    ],
+    "iot-thing-cart": [
+     "aws/resource/Res_AWS-IoT_Thing_Cart_48.svg",
+     "AWS IoT Thing Cart"
+    ],
+    "iot-thing-coffee-pot": [
+     "aws/resource/Res_AWS-IoT_Thing_Coffee-Pot_48.svg",
+     "AWS IoT Thing Coffee Pot"
+    ],
+    "iot-thing-door-lock": [
+     "aws/resource/Res_AWS-IoT_Thing_Door-Lock_48.svg",
+     "AWS IoT Thing Door Lock"
+    ],
+    "iot-thing-factory": [
+     "aws/resource/Res_AWS-IoT_Thing_Factory_48.svg",
+     "AWS IoT Thing Factory"
+    ],
+    "iot-thing-freertos-device": [
+     "aws/resource/Res_AWS-IoT_Thing_FreeRTOS-Device_48.svg",
+     "AWS IoT Thing FreeRTOS Device"
+    ],
+    "iot-thing-generic": [
+     "aws/resource/Res_AWS-IoT_Thing_Generic_48.svg",
+     "AWS IoT Thing Generic"
+    ],
+    "iot-thing-house": [
+     "aws/resource/Res_AWS-IoT_Thing_House_48.svg",
+     "AWS IoT Thing House"
+    ],
+    "iot-thing-humidity-sensor": [
+     "aws/resource/Res_AWS-IoT_Thing_Humidity-Sensor_48.svg",
+     "AWS IoT Thing Humidity Sensor"
+    ],
+    "iot-thing-industrial-pc": [
+     "aws/resource/Res_AWS-IoT_Thing_Industrial-PC_48.svg",
+     "AWS IoT Thing Industrial PC"
+    ],
+    "iot-thing-lightbulb": [
+     "aws/resource/Res_AWS-IoT_Thing_Lightbulb_48.svg",
+     "AWS IoT Thing Lightbulb"
+    ],
+    "iot-thing-medical-emergency": [
+     "aws/resource/Res_AWS-IoT_Thing_Medical-Emergency_48.svg",
+     "AWS IoT Thing Medical Emergency"
+    ],
+    "iot-thing-plc": [
+     "aws/resource/Res_AWS-IoT_Thing_PLC_48.svg",
+     "AWS IoT Thing PLC"
+    ],
+    "iot-thing-police-emergency": [
+     "aws/resource/Res_AWS-IoT_Thing_Police-Emergency_48.svg",
+     "AWS IoT Thing Police Emergency"
+    ],
+    "iot-thing-relay": [
+     "aws/resource/Res_AWS-IoT_Thing_Relay_48.svg",
+     "AWS IoT Thing Relay"
+    ],
+    "iot-thing-stacklight": [
+     "aws/resource/Res_AWS-IoT_Thing_Stacklight_48.svg",
+     "AWS IoT Thing Stacklight"
+    ],
+    "iot-thing-temperature-humidity-sensor": [
+     "aws/resource/Res_AWS-IoT_Thing_Temperature-Humidity-Sensor_48.svg",
+     "AWS IoT Thing Temperature Humidity Sensor"
+    ],
+    "iot-thing-temperature-sensor": [
+     "aws/resource/Res_AWS-IoT_Thing_Temperature-Sensor_48.svg",
+     "AWS IoT Thing Temperature Sensor"
+    ],
+    "iot-thing-temperature-vibration-sensor": [
+     "aws/resource/Res_AWS-IoT_Thing_Temperature-Vibration-Sensor_48.svg",
+     "AWS IoT Thing Temperature Vibration Sensor"
+    ],
+    "iot-thing-thermostat": [
+     "aws/resource/Res_AWS-IoT_Thing_Thermostat_48.svg",
+     "AWS IoT Thing Thermostat"
+    ],
+    "iot-thing-travel": [
+     "aws/resource/Res_AWS-IoT_Thing_Travel_48.svg",
+     "AWS IoT Thing Travel"
+    ],
+    "iot-thing-utility": [
+     "aws/resource/Res_AWS-IoT_Thing_Utility_48.svg",
+     "AWS IoT Thing Utility"
+    ],
+    "iot-thing-vibration-sensor": [
+     "aws/resource/Res_AWS-IoT_Thing_Vibration-Sensor_48.svg",
+     "AWS IoT Thing Vibration Sensor"
+    ],
+    "iot-thing-windfarm": [
+     "aws/resource/Res_AWS-IoT_Thing_Windfarm_48.svg",
+     "AWS IoT Thing Windfarm"
+    ],
+    "iot-topic": [
+     "aws/resource/Res_AWS-IoT_Topic_48.svg",
+     "AWS IoT Topic"
+    ],
+    "iot-twinmaker": [
+     "aws/service/Arch_AWS-IoT-TwinMaker_48.svg",
+     "AWS IoT TwinMaker"
+    ],
+    "iq": [
+     "aws/service/Arch_AWS-IQ_48.svg",
+     "AWS IQ"
+    ],
+    "json-script": [
+     "aws/resource/Res_JSON-Script_48_Light.svg",
+     "JSON Script",
+     "aws/resource/Res_JSON-Script_48_Dark.svg"
+    ],
+    "kendra": [
+     "aws/service/Arch_Amazon-Kendra_48.svg",
+     "Amazon Kendra"
+    ],
+    "key-management-service": [
+     "aws/service/Arch_AWS-Key-Management-Service_48.svg",
+     "AWS Key Management Service"
+    ],
+    "key-management-service-external-key-store": [
+     "aws/resource/Res_AWS-Key-Management-Service_External-Key-Store_48.svg",
+     "AWS Key Management Service External Key Store"
+    ],
+    "keyspaces": [
+     "aws/service/Arch_Amazon-Keyspaces_48.svg",
+     "Amazon Keyspaces"
+    ],
+    "kinesis": [
+     "aws/service/Arch_Amazon-Kinesis_48.svg",
+     "Amazon Kinesis"
+    ],
+    "kinesis-data-streams": [
+     "aws/service/Arch_Amazon-Kinesis-Data-Streams_48.svg",
+     "Amazon Kinesis Data Streams"
+    ],
+    "kinesis-video-streams": [
+     "aws/service/Arch_Amazon-Kinesis-Video-Streams_48.svg",
+     "Amazon Kinesis Video Streams"
+    ],
+    "kinesis-video-streams-service": [
+     "aws/service/Arch_Amazon-Kinesis-Video-Streams_48.svg",
+     "Amazon Kinesis Video Streams"
+    ],
+    "lake-formation": [
+     "aws/service/Arch_AWS-Lake-Formation_48.svg",
+     "AWS Lake Formation"
+    ],
+    "lake-formation-data-lake": [
+     "aws/resource/Res_AWS-Lake-Formation_Data-Lake_48.svg",
+     "AWS Lake Formation Data Lake"
+    ],
+    "lambda": [
+     "aws/service/Arch_AWS-Lambda_48.svg",
+     "AWS Lambda"
+    ],
+    "lambda-lambda-function": [
+     "aws/resource/Res_AWS-Lambda_Lambda-Function_48.svg",
+     "AWS Lambda Lambda Function"
+    ],
+    "launch-wizard": [
+     "aws/service/Arch_AWS-Launch-Wizard_48.svg",
+     "AWS Launch Wizard"
+    ],
+    "lex": [
+     "aws/service/Arch_Amazon-Lex_48.svg",
+     "Amazon Lex"
+    ],
+    "license-manager": [
+     "aws/service/Arch_AWS-License-Manager_48.svg",
+     "AWS License Manager"
+    ],
+    "license-manager-application-discovery": [
+     "aws/resource/Res_AWS-License-Manager_Application-Discovery_48.svg",
+     "AWS License Manager Application Discovery"
+    ],
+    "license-manager-license-blending": [
+     "aws/resource/Res_AWS-License-Manager_License-Blending_48.svg",
+     "AWS License Manager License Blending"
+    ],
+    "lightsail": [
+     "aws/service/Arch_Amazon-Lightsail_48.svg",
+     "Amazon Lightsail"
+    ],
+    "lightsail-for-research": [
+     "aws/service/Arch_Amazon-Lightsail-for-Research_48.svg",
+     "Amazon Lightsail for Research"
+    ],
+    "local-zones": [
+     "aws/service/Arch_AWS-Local-Zones_48.svg",
+     "AWS Local Zones"
+    ],
+    "location-service": [
+     "aws/service/Arch_Amazon-Location-Service_48.svg",
+     "Amazon Location Service"
+    ],
+    "location-service-geofence": [
+     "aws/resource/Res_Amazon-Location-Service_Geofence_48.svg",
+     "Amazon Location Service Geofence"
+    ],
+    "location-service-map": [
+     "aws/resource/Res_Amazon-Location-Service_Map _48.svg",
+     "Amazon Location Service Map"
+    ],
+    "location-service-place": [
+     "aws/resource/Res_Amazon-Location-Service_Place_48.svg",
+     "Amazon Location Service Place"
+    ],
+    "location-service-routes": [
+     "aws/resource/Res_Amazon-Location-Service_Routes_48.svg",
+     "Amazon Location Service Routes"
+    ],
+    "location-service-track": [
+     "aws/resource/Res_Amazon-Location-Service_Track _48.svg",
+     "Amazon Location Service Track"
+    ],
+    "logs": [
+     "aws/resource/Res_Logs_48_Light.svg",
+     "Logs",
+     "aws/resource/Res_Logs_48_Dark.svg"
+    ],
+    "lookout-for-equipment": [
+     "aws/service/Arch_Amazon-Lookout-for-Equipment_48.svg",
+     "Amazon Lookout for Equipment"
+    ],
+    "lookout-for-vision": [
+     "aws/service/Arch_Amazon-Lookout-for-Vision_48.svg",
+     "Amazon Lookout for Vision"
+    ],
+    "macie": [
+     "aws/service/Arch_Amazon-Macie_48.svg",
+     "Amazon Macie"
+    ],
+    "magnifying-glass": [
+     "aws/resource/Res_Magnifying-Glass_48_Light.svg",
+     "Magnifying Glass",
+     "aws/resource/Res_Magnifying-Glass_48_Dark.svg"
+    ],
+    "mainframe-modernization": [
+     "aws/service/Arch_AWS-Mainframe-Modernization_48.svg",
+     "AWS Mainframe Modernization"
+    ],
+    "mainframe-modernization-analyzer": [
+     "aws/resource/Res_AWS-Mainframe-Modernization_Analyzer_48.svg",
+     "AWS Mainframe Modernization Analyzer"
+    ],
+    "mainframe-modernization-compiler": [
+     "aws/resource/Res_AWS-Mainframe-Modernization_Compiler_48.svg",
+     "AWS Mainframe Modernization Compiler"
+    ],
+    "mainframe-modernization-converter": [
+     "aws/resource/Res_AWS-Mainframe-Modernization_Converter_48.svg",
+     "AWS Mainframe Modernization Converter"
+    ],
+    "mainframe-modernization-developer": [
+     "aws/resource/Res_AWS-Mainframe-Modernization_Developer_48.svg",
+     "AWS Mainframe Modernization Developer"
+    ],
+    "mainframe-modernization-runtime": [
+     "aws/resource/Res_AWS-Mainframe-Modernization_Runtime_48.svg",
+     "AWS Mainframe Modernization Runtime"
+    ],
+    "managed-blockchain": [
+     "aws/service/Arch_Amazon-Managed-Blockchain_48.svg",
+     "Amazon Managed Blockchain"
+    ],
+    "managed-blockchain-blockchain": [
+     "aws/resource/Res_Amazon-Managed-Blockchain_Blockchain_48.svg",
+     "Amazon Managed Blockchain Blockchain"
+    ],
+    "managed-grafana": [
+     "aws/service/Arch_Amazon-Managed-Grafana_48.svg",
+     "Amazon Managed Grafana"
+    ],
+    "managed-service-for-apache-flink": [
+     "aws/service/Arch_Amazon-Managed-Service-for-Apache-Flink_48.svg",
+     "Amazon Managed Service for Apache Flink"
+    ],
+    "managed-service-for-prometheus": [
+     "aws/service/Arch_Amazon-Managed-Service-for-Prometheus_48.svg",
+     "Amazon Managed Service for Prometheus"
+    ],
+    "managed-services": [
+     "aws/service/Arch_AWS-Managed-Services_48.svg",
+     "AWS Managed Services"
+    ],
+    "managed-streaming-for-apache-kafka": [
+     "aws/service/Arch_Amazon-Managed-Streaming-for-Apache-Kafka_48.svg",
+     "Amazon Managed Streaming for Apache Kafka"
+    ],
+    "managed-workflows-for-apache-airflow": [
+     "aws/service/Arch_Amazon-Managed-Workflows-for-Apache-Airflow_48.svg",
+     "Amazon Managed Workflows for Apache Airflow"
+    ],
+    "management-console": [
+     "aws/service/Arch_AWS-Management-Console_48.svg",
+     "AWS Management Console"
+    ],
+    "management-console-resource": [
+     "aws/resource/Res_AWS-Management-Console_48_Light.svg",
+     "AWS Management Console",
+     "aws/resource/Res_AWS-Management-Console_48_Dark.svg"
+    ],
+    "marketplace-dark": [
+     "aws/service/Arch_AWS-Marketplace_Dark_48.svg",
+     "AWS Marketplace Dark"
+    ],
+    "marketplace-light": [
+     "aws/service/Arch_AWS-Marketplace_Light_48.svg",
+     "AWS Marketplace Light"
+    ],
+    "memorydb": [
+     "aws/service/Arch_Amazon-MemoryDB_48.svg",
+     "Amazon MemoryDB"
+    ],
+    "metrics": [
+     "aws/resource/Res_Metrics_48_Light.svg",
+     "Metrics",
+     "aws/resource/Res_Metrics_48_Dark.svg"
+    ],
+    "migration-evaluator": [
+     "aws/service/Arch_AWS-Migration-Evaluator_48.svg",
+     "AWS Migration Evaluator"
+    ],
+    "mobile-client": [
+     "aws/resource/Res_Mobile-client_48_Light.svg",
+     "Mobile client",
+     "aws/resource/Res_Mobile-client_48_Dark.svg"
+    ],
+    "monitron": [
+     "aws/service/Arch_Amazon-Monitron_48.svg",
+     "Amazon Monitron"
+    ],
+    "mq": [
+     "aws/service/Arch_Amazon-MQ_48.svg",
+     "Amazon MQ"
+    ],
+    "mq-broker": [
+     "aws/resource/Res_Amazon-MQ_Broker_48.svg",
+     "Amazon MQ Broker"
+    ],
+    "msk-connect": [
+     "aws/resource/Res_Amazon-MSK_Amazon-MSK-Connect_48.svg",
+     "Amazon MSK Connect"
+    ],
+    "multimedia": [
+     "aws/resource/Res_Multimedia_48_Light.svg",
+     "Multimedia",
+     "aws/resource/Res_Multimedia_48_Dark.svg"
+    ],
+    "neptune": [
+     "aws/service/Arch_Amazon-Neptune_48.svg",
+     "Amazon Neptune"
+    ],
+    "network-firewall": [
+     "aws/service/Arch_AWS-Network-Firewall_48.svg",
+     "AWS Network Firewall"
+    ],
+    "network-firewall-endpoints": [
+     "aws/resource/Res_AWS-Network-Firewall_Endpoints_48.svg",
+     "AWS Network Firewall Endpoints"
+    ],
+    "neuron": [
+     "aws/service/Arch_AWS-Neuron_48.svg",
+     "AWS Neuron"
+    ],
+    "nitro-enclaves": [
+     "aws/service/Arch_AWS-Nitro-Enclaves_48.svg",
+     "AWS Nitro Enclaves"
+    ],
+    "nova": [
+     "aws/service/Arch_Amazon-Nova_48.svg",
+     "Amazon Nova"
+    ],
+    "office-building": [
+     "aws/resource/Res_Office-building_48_Light.svg",
+     "Office building",
+     "aws/resource/Res_Office-building_48_Dark.svg"
+    ],
+    "open-3d-engine": [
+     "aws/service/Arch_Open-3D-Engine_48.svg",
+     "Open 3D Engine"
+    ],
+    "opensearch-service": [
+     "aws/service/Arch_Amazon-OpenSearch-Service_48.svg",
+     "Amazon OpenSearch Service"
+    ],
+    "opensearch-service-cluster-administrator-node": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_Cluster-Administrator-Node_48.svg",
+     "Amazon OpenSearch Service Cluster Administrator Node"
+    ],
+    "opensearch-service-data-node": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_Data-Node_48.svg",
+     "Amazon OpenSearch Service Data Node"
+    ],
+    "opensearch-service-index": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_Index_48.svg",
+     "Amazon OpenSearch Service Index"
+    ],
+    "opensearch-service-observability": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_Observability_48.svg",
+     "Amazon OpenSearch Service Observability"
+    ],
+    "opensearch-service-opensearch-dashboards": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_OpenSearch-Dashboards_48.svg",
+     "Amazon OpenSearch Service OpenSearch Dashboards"
+    ],
+    "opensearch-service-opensearch-ingestion": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_OpenSearch-Ingestion_48.svg",
+     "Amazon OpenSearch Service OpenSearch Ingestion"
+    ],
+    "opensearch-service-traces": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_Traces_48.svg",
+     "Amazon OpenSearch Service Traces"
+    ],
+    "opensearch-service-ultrawarm-node": [
+     "aws/resource/Res_Amazon-OpenSearch-Service_UltraWarm-Node_48.svg",
+     "Amazon OpenSearch Service UltraWarm Node"
+    ],
+    "oracle-database-at-aws": [
+     "aws/service/Arch_Oracle-Database-at-AWS_48.svg",
+     "Oracle Database at AWS"
+    ],
+    "organizations": [
+     "aws/service/Arch_AWS-Organizations_48.svg",
+     "AWS Organizations"
+    ],
+    "organizations-account": [
+     "aws/resource/Res_AWS-Organizations_Account_48.svg",
+     "AWS Organizations Account"
+    ],
+    "organizations-management-account": [
+     "aws/resource/Res_AWS-Organizations_Management-Account_48.svg",
+     "AWS Organizations Management Account"
+    ],
+    "organizations-organizational-unit": [
+     "aws/resource/Res_AWS-Organizations_Organizational-Unit_48.svg",
+     "AWS Organizations Organizational Unit"
+    ],
+    "outposts-family": [
+     "aws/service/Arch_AWS-Outposts-family_48.svg",
+     "AWS Outposts family"
+    ],
+    "outposts-rack": [
+     "aws/service/Arch_AWS-Outposts-rack_48.svg",
+     "AWS Outposts rack"
+    ],
+    "outposts-servers": [
+     "aws/service/Arch_AWS-Outposts-servers_48.svg",
+     "AWS Outposts servers"
+    ],
+    "panorama": [
+     "aws/service/Arch_AWS-Panorama_48.svg",
+     "AWS Panorama"
+    ],
+    "parallel-cluster": [
+     "aws/service/Arch_AWS-Parallel-Cluster_48.svg",
+     "AWS Parallel Cluster"
+    ],
+    "parallel-computing-service": [
+     "aws/service/Arch_AWS-Parallel-Computing-Service_48.svg",
+     "AWS Parallel Computing Service"
+    ],
+    "partner-central": [
+     "aws/service/Arch_AWS-Partner-Central_48.svg",
+     "AWS Partner Central"
+    ],
+    "payment-cryptography": [
+     "aws/service/Arch_AWS-Payment-Cryptography_48.svg",
+     "AWS Payment Cryptography"
+    ],
+    "personalize": [
+     "aws/service/Arch_Amazon-Personalize_48.svg",
+     "Amazon Personalize"
+    ],
+    "pinpoint": [
+     "aws/service/Arch_Amazon-Pinpoint_48.svg",
+     "Amazon Pinpoint"
+    ],
+    "pinpoint-apis": [
+     "aws/service/Arch_Amazon-Pinpoint-APIs_48.svg",
+     "Amazon Pinpoint APIs"
+    ],
+    "pinpoint-journey": [
+     "aws/resource/Res_Amazon-Pinpoint_Journey_48.svg",
+     "Amazon Pinpoint Journey"
+    ],
+    "polly": [
+     "aws/service/Arch_Amazon-Polly_48.svg",
+     "Amazon Polly"
+    ],
+    "private-certificate-authority": [
+     "aws/service/Arch_AWS-Private-Certificate-Authority_48.svg",
+     "AWS Private Certificate Authority"
+    ],
+    "private-subnet": [
+     "aws/group/Private-subnet_32.svg",
+     "Private subnet"
+    ],
+    "privatelink": [
+     "aws/service/Arch_AWS-PrivateLink_48.svg",
+     "AWS PrivateLink"
+    ],
+    "professional-services": [
+     "aws/service/Arch_AWS-Professional-Services_48.svg",
+     "AWS Professional Services"
+    ],
+    "programming-language": [
+     "aws/resource/Res_Programming-Language_48_Light.svg",
+     "Programming Language",
+     "aws/resource/Res_Programming-Language_48_Dark.svg"
+    ],
+    "proton": [
+     "aws/service/Arch_AWS-Proton_48.svg",
+     "AWS Proton"
+    ],
+    "public-subnet": [
+     "aws/group/Public-subnet_32.svg",
+     "Public subnet"
+    ],
+    "pytorch-on-aws": [
+     "aws/service/Arch_PyTorch-on-AWS_48.svg",
+     "PyTorch on AWS"
+    ],
+    "q": [
+     "aws/service/Arch_Amazon-Q_48.svg",
+     "Amazon Q"
+    ],
+    "question": [
+     "aws/resource/Res_Question_48_Light.svg",
+     "Question",
+     "aws/resource/Res_Question_48_Dark.svg"
+    ],
+    "quick": [
+     "aws/service/Arch_Amazon-Quick_48.svg",
+     "Amazon Quick"
+    ],
+    "rds": [
+     "aws/service/Arch_Amazon-RDS_48.svg",
+     "Amazon RDS"
+    ],
+    "rds-blue-green-deployments": [
+     "aws/resource/Res_Amazon-RDS_Blue-Green-Deployments_48.svg",
+     "Amazon RDS Blue Green Deployments"
+    ],
+    "rds-multi-az": [
+     "aws/resource/Res_Amazon-RDS_Multi-AZ_48.svg",
+     "Amazon RDS Multi AZ"
+    ],
+    "rds-multi-az-db-cluster": [
+     "aws/resource/Res_Amazon-RDS_Multi-AZ-DB-Cluster_48.svg",
+     "Amazon RDS Multi AZ DB Cluster"
+    ],
+    "rds-optimized-writes": [
+     "aws/resource/Res_Amazon-RDS_Optimized-Writes_48.svg",
+     "Amazon RDS Optimized Writes"
+    ],
+    "rds-proxy-instance": [
+     "aws/resource/Res_Amazon-RDS-Proxy-Instance_48.svg",
+     "Amazon RDS Proxy Instance"
+    ],
+    "rds-proxy-instance-alternate": [
+     "aws/resource/Res_Amazon-RDS-Proxy-Instance-Alternate_48.svg",
+     "Amazon RDS Proxy Instance Alternate"
+    ],
+    "rds-trusted-language-extensions-for-postgresql": [
+     "aws/resource/Res_Amazon-RDS_Trusted-Language-Extensions-for-PostgreSQL_48.svg",
+     "Amazon RDS Trusted Language Extensions for PostgreSQL"
+    ],
+    "recover": [
+     "aws/resource/Res_Recover_48_Light.svg",
+     "Recover",
+     "aws/resource/Res_Recover_48_Dark.svg"
+    ],
+    "red-hat-openshift-service-on-aws": [
+     "aws/service/Arch_Red-Hat-OpenShift-Service-on-AWS_48.svg",
+     "Red Hat OpenShift Service on AWS"
+    ],
+    "redshift": [
+     "aws/service/Arch_Amazon-Redshift_48.svg",
+     "Amazon Redshift"
+    ],
+    "redshift-auto-copy": [
+     "aws/resource/Res_Amazon-Redshift_Auto-copy_48.svg",
+     "Amazon Redshift Auto copy"
+    ],
+    "redshift-data-sharing-governance": [
+     "aws/resource/Res_Amazon-Redshift_Data-Sharing-Governance_48.svg",
+     "Amazon Redshift Data Sharing Governance"
+    ],
+    "redshift-dense-compute-node": [
+     "aws/resource/Res_Amazon-Redshift_Dense-Compute-Node_48.svg",
+     "Amazon Redshift Dense Compute Node"
+    ],
+    "redshift-dense-storage-node": [
+     "aws/resource/Res_Amazon-Redshift_Dense-Storage-Node_48.svg",
+     "Amazon Redshift Dense Storage Node"
+    ],
+    "redshift-ml": [
+     "aws/resource/Res_Amazon-Redshift_ML_48.svg",
+     "Amazon Redshift ML"
+    ],
+    "redshift-query-editor-v2-0": [
+     "aws/resource/Res_Amazon-Redshift_Query-Editor-v2.0_48.svg",
+     "Amazon Redshift Query Editor v2.0"
+    ],
+    "redshift-ra3": [
+     "aws/resource/Res_Amazon-Redshift_RA3_48.svg",
+     "Amazon Redshift RA3"
+    ],
+    "redshift-streaming-ingestion": [
+     "aws/resource/Res_Amazon-Redshift_Streaming-Ingestion_48.svg",
+     "Amazon Redshift Streaming Ingestion"
+    ],
+    "region": [
+     "aws/group/Region_32.svg",
+     "Region"
+    ],
+    "rekognition": [
+     "aws/service/Arch_Amazon-Rekognition_48.svg",
+     "Amazon Rekognition"
+    ],
+    "rekognition-image": [
+     "aws/resource/Res_Amazon-Rekognition_Image_48.svg",
+     "Amazon Rekognition Image"
+    ],
+    "rekognition-video": [
+     "aws/resource/Res_Amazon-Rekognition_Video_48.svg",
+     "Amazon Rekognition Video"
+    ],
+    "repost": [
+     "aws/service/Arch_AWS-rePost_48.svg",
+     "AWS rePost"
+    ],
+    "repost-private": [
+     "aws/service/Arch_AWS-rePost-Private_48.svg",
+     "AWS rePost Private"
+    ],
+    "reserved-instance-reporting": [
+     "aws/service/Arch_Reserved-Instance-Reporting_48.svg",
+     "Reserved Instance Reporting"
+    ],
+    "resilience-hub": [
+     "aws/service/Arch_AWS-Resilience-Hub_48.svg",
+     "AWS Resilience Hub"
+    ],
+    "resource-access-manager": [
+     "aws/service/Arch_AWS-Resource-Access-Manager_48.svg",
+     "AWS Resource Access Manager"
+    ],
+    "resource-explorer": [
+     "aws/service/Arch_AWS-Resource-Explorer_48.svg",
+     "AWS Resource Explorer"
+    ],
+    "route-53": [
+     "aws/service/Arch_Amazon-Route-53_48.svg",
+     "Amazon Route 53"
+    ],
+    "route-53-hosted-zone": [
+     "aws/resource/Res_Amazon-Route-53-Hosted-Zone_48.svg",
+     "Amazon Route 53 Hosted Zone"
+    ],
+    "route-53-readiness-checks": [
+     "aws/resource/Res_Amazon-Route-53_Readiness-Checks_48.svg",
+     "Amazon Route 53 Readiness Checks"
+    ],
+    "route-53-resolver": [
+     "aws/resource/Res_Amazon-Route-53_Resolver_48.svg",
+     "Amazon Route 53 Resolver"
+    ],
+    "route-53-resolver-dns-firewall": [
+     "aws/resource/Res_Amazon-Route-53_Resolver-DNS-Firewall_48.svg",
+     "Amazon Route 53 Resolver DNS Firewall"
+    ],
+    "route-53-resolver-query-logging": [
+     "aws/resource/Res_Amazon-Route-53_Resolver-Query-Logging_48.svg",
+     "Amazon Route 53 Resolver Query Logging"
+    ],
+    "route-53-route-table": [
+     "aws/resource/Res_Amazon-Route-53_Route-Table_48.svg",
+     "Amazon Route 53 Route Table"
+    ],
+    "route-53-routing-controls": [
+     "aws/resource/Res_Amazon-Route-53_Routing-Controls_48.svg",
+     "Amazon Route 53 Routing Controls"
+    ],
+    "rtb-fabric": [
+     "aws/service/Arch_AWS-RTB-Fabric_48.svg",
+     "AWS RTB Fabric"
+    ],
+    "s3-on-outposts": [
+     "aws/service/Arch_Amazon-S3-on-Outposts_48.svg",
+     "Amazon S3 on Outposts"
+    ],
+    "sagemaker": [
+     "aws/service/Arch_Amazon-SageMaker_48.svg",
+     "Amazon SageMaker"
+    ],
+    "sagemaker-ai": [
+     "aws/service/Arch_Amazon-SageMaker-AI_48.svg",
+     "Amazon SageMaker AI"
+    ],
+    "sagemaker-ai-canvas": [
+     "aws/resource/Res_Amazon-SageMaker-AI_Canvas_48.svg",
+     "Amazon SageMaker AI Canvas"
+    ],
+    "sagemaker-ai-geospatial-ml": [
+     "aws/resource/Res_Amazon-SageMaker-AI_Geospatial-ML_48.svg",
+     "Amazon SageMaker AI Geospatial ML"
+    ],
+    "sagemaker-ai-model": [
+     "aws/resource/Res_Amazon-SageMaker-AI_Model_48.svg",
+     "Amazon SageMaker AI Model"
+    ],
+    "sagemaker-ai-notebook": [
+     "aws/resource/Res_Amazon-SageMaker-AI_Notebook_48.svg",
+     "Amazon SageMaker AI Notebook"
+    ],
+    "sagemaker-ai-shadow-testing": [
+     "aws/resource/Res_Amazon-SageMaker-AI_Shadow-Testing_48.svg",
+     "Amazon SageMaker AI Shadow Testing"
+    ],
+    "sagemaker-ai-train": [
+     "aws/resource/Res_Amazon-SageMaker-AI_Train_48.svg",
+     "Amazon SageMaker AI Train"
+    ],
+    "sagemaker-ground-truth": [
+     "aws/service/Arch_Amazon-SageMaker-Ground-Truth_48.svg",
+     "Amazon SageMaker Ground Truth"
+    ],
+    "sagemaker-studio-lab": [
+     "aws/service/Arch_Amazon-SageMaker-Studio-Lab_48.svg",
+     "Amazon SageMaker Studio Lab"
+    ],
+    "saml-token": [
+     "aws/resource/Res_SAML-token_48_Light.svg",
+     "SAML token",
+     "aws/resource/Res_SAML-token_48_Dark.svg"
+    ],
+    "savings-plans": [
+     "aws/service/Arch_Savings-Plans_48.svg",
+     "Savings Plans"
+    ],
+    "sdk": [
+     "aws/resource/Res_SDK_48_Light.svg",
+     "SDK",
+     "aws/resource/Res_SDK_48_Dark.svg"
+    ],
+    "secrets-manager": [
+     "aws/service/Arch_AWS-Secrets-Manager_48.svg",
+     "AWS Secrets Manager"
+    ],
+    "security-agent": [
+     "aws/service/Arch_AWS-Security-Agent_48.svg",
+     "AWS Security Agent"
+    ],
+    "security-hub": [
+     "aws/service/Arch_AWS-Security-Hub_48.svg",
+     "AWS Security Hub"
+    ],
+    "security-hub-finding": [
+     "aws/resource/Res_AWS-Security-Hub_Finding_48.svg",
+     "AWS Security Hub Finding"
+    ],
+    "security-incident-response": [
+     "aws/service/Arch_AWS-Security-Incident-Response_48.svg",
+     "AWS Security Incident Response"
+    ],
+    "security-lake": [
+     "aws/service/Arch_Amazon-Security-Lake_48.svg",
+     "Amazon Security Lake"
+    ],
+    "server": [
+     "aws/resource/Res_Server_48_Light.svg",
+     "Server",
+     "aws/resource/Res_Server_48_Dark.svg"
+    ],
+    "server-contents": [
+     "aws/group/Server-contents_32.svg",
+     "Server contents"
+    ],
+    "serverless-application-repository": [
+     "aws/service/Arch_AWS-Serverless-Application-Repository_48.svg",
+     "AWS Serverless Application Repository"
+    ],
+    "servers": [
+     "aws/resource/Res_Servers_48_Light.svg",
+     "Servers",
+     "aws/resource/Res_Servers_48_Dark.svg"
+    ],
+    "service-catalog": [
+     "aws/service/Arch_AWS-Service-Catalog_48.svg",
+     "AWS Service Catalog"
+    ],
+    "service-management-connector": [
+     "aws/service/Arch_AWS-Service-Management-Connector_48.svg",
+     "AWS Service Management Connector"
+    ],
+    "shield": [
+     "aws/service/Arch_AWS-Shield_48.svg",
+     "AWS Shield"
+    ],
+    "shield-advanced": [
+     "aws/resource/Res_AWS-Shield_AWS-Shield-Advanced_48.svg",
+     "AWS Shield Advanced"
+    ],
+    "shield-resource": [
+     "aws/resource/Res_Shield_48_Light.svg",
+     "Shield",
+     "aws/resource/Res_Shield_48_Dark.svg"
+    ],
+    "signer": [
+     "aws/service/Arch_AWS-Signer_48.svg",
+     "AWS Signer"
+    ],
+    "simple-email-service": [
+     "aws/service/Arch_Amazon-Simple-Email-Service_48.svg",
+     "Amazon Simple Email Service"
+    ],
+    "simple-email-service-email": [
+     "aws/resource/Res_Amazon-Simple-Email-Service_Email_48.svg",
+     "Amazon Simple Email Service Email"
+    ],
+    "simple-notification-service": [
+     "aws/service/Arch_Amazon-Simple-Notification-Service_48.svg",
+     "Amazon Simple Notification Service"
+    ],
+    "simple-notification-service-email-notification": [
+     "aws/resource/Res_Amazon-Simple-Notification-Service_Email-Notification_48.svg",
+     "Amazon Simple Notification Service Email Notification"
+    ],
+    "simple-notification-service-http-notification": [
+     "aws/resource/Res_Amazon-Simple-Notification-Service_HTTP-Notification_48.svg",
+     "Amazon Simple Notification Service HTTP Notification"
+    ],
+    "simple-notification-service-topic": [
+     "aws/resource/Res_Amazon-Simple-Notification-Service_Topic_48.svg",
+     "Amazon Simple Notification Service Topic"
+    ],
+    "simple-queue-service": [
+     "aws/service/Arch_Amazon-Simple-Queue-Service_48.svg",
+     "Amazon Simple Queue Service"
+    ],
+    "simple-queue-service-message": [
+     "aws/resource/Res_Amazon-Simple-Queue-Service_Message_48.svg",
+     "Amazon Simple Queue Service Message"
+    ],
+    "simple-queue-service-queue": [
+     "aws/resource/Res_Amazon-Simple-Queue-Service_Queue_48.svg",
+     "Amazon Simple Queue Service Queue"
+    ],
+    "simple-storage-service": [
+     "aws/service/Arch_Amazon-Simple-Storage-Service_48.svg",
+     "Amazon Simple Storage Service"
+    ],
+    "simple-storage-service-bucket": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_Bucket_48.svg",
+     "Amazon Simple Storage Service Bucket"
+    ],
+    "simple-storage-service-bucket-with-objects": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_Bucket-With-Objects_48.svg",
+     "Amazon Simple Storage Service Bucket With Objects"
+    ],
+    "simple-storage-service-directory-bucket": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_Directory-bucket_48.svg",
+     "Amazon Simple Storage Service Directory bucket"
+    ],
+    "simple-storage-service-general-access-points": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_General-Access-Points_48.svg",
+     "Amazon Simple Storage Service General Access Points"
+    ],
+    "simple-storage-service-glacier": [
+     "aws/service/Arch_Amazon-Simple-Storage-Service-Glacier_48.svg",
+     "Amazon Simple Storage Service Glacier"
+    ],
+    "simple-storage-service-glacier-archive": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service-Glacier_Archive_48.svg",
+     "Amazon Simple Storage Service Glacier Archive"
+    ],
+    "simple-storage-service-glacier-vault": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service-Glacier_Vault_48.svg",
+     "Amazon Simple Storage Service Glacier Vault"
+    ],
+    "simple-storage-service-object": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_Object_48.svg",
+     "Amazon Simple Storage Service Object"
+    ],
+    "simple-storage-service-s3-batch-operations": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Batch-Operations_48.svg",
+     "Amazon Simple Storage Service S3 Batch Operations"
+    ],
+    "simple-storage-service-s3-express-one-zone": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Express-One-Zone_48.svg",
+     "Amazon Simple Storage Service S3 Express One Zone"
+    ],
+    "simple-storage-service-s3-files": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Files_48.svg",
+     "Amazon Simple Storage Service S3 Files"
+    ],
+    "simple-storage-service-s3-glacier-deep-archive": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Glacier-Deep-Archive_48.svg",
+     "Amazon Simple Storage Service S3 Glacier Deep Archive"
+    ],
+    "simple-storage-service-s3-glacier-flexible-retrieval": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Glacier-Flexible-Retrieval_48.svg",
+     "Amazon Simple Storage Service S3 Glacier Flexible Retrieval"
+    ],
+    "simple-storage-service-s3-glacier-instant-retrieval": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Glacier-Instant-Retrieval_48.svg",
+     "Amazon Simple Storage Service S3 Glacier Instant Retrieval"
+    ],
+    "simple-storage-service-s3-intelligent-tiering": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Intelligent-Tiering_48.svg",
+     "Amazon Simple Storage Service S3 Intelligent Tiering"
+    ],
+    "simple-storage-service-s3-multi-region-access-points": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Multi-Region-Access-Points_48.svg",
+     "Amazon Simple Storage Service S3 Multi Region Access Points"
+    ],
+    "simple-storage-service-s3-object-lambda": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Object-Lambda_48.svg",
+     "Amazon Simple Storage Service S3 Object Lambda"
+    ],
+    "simple-storage-service-s3-object-lambda-access-points": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Object-Lambda-Access-Points_48.svg",
+     "Amazon Simple Storage Service S3 Object Lambda Access Points"
+    ],
+    "simple-storage-service-s3-object-lock": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Object-Lock_48.svg",
+     "Amazon Simple Storage Service S3 Object Lock"
+    ],
+    "simple-storage-service-s3-on-outposts": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-On-Outposts_48.svg",
+     "Amazon Simple Storage Service S3 On Outposts"
+    ],
+    "simple-storage-service-s3-one-zone-ia": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-One-Zone-IA_48.svg",
+     "Amazon Simple Storage Service S3 One Zone IA"
+    ],
+    "simple-storage-service-s3-replication": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Replication_48.svg",
+     "Amazon Simple Storage Service S3 Replication"
+    ],
+    "simple-storage-service-s3-replication-time-control": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Replication-Time-Control_48.svg",
+     "Amazon Simple Storage Service S3 Replication Time Control"
+    ],
+    "simple-storage-service-s3-select": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Select_48.svg",
+     "Amazon Simple Storage Service S3 Select"
+    ],
+    "simple-storage-service-s3-standard": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Standard_48.svg",
+     "Amazon Simple Storage Service S3 Standard"
+    ],
+    "simple-storage-service-s3-standard-ia": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Standard-IA_48.svg",
+     "Amazon Simple Storage Service S3 Standard IA"
+    ],
+    "simple-storage-service-s3-storage-lens": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Storage-Lens_48.svg",
+     "Amazon Simple Storage Service S3 Storage Lens"
+    ],
+    "simple-storage-service-s3-tables": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Tables_48.svg",
+     "Amazon Simple Storage Service S3 Tables"
+    ],
+    "simple-storage-service-s3-vectors": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_S3-Vectors_48.svg",
+     "Amazon Simple Storage Service S3 Vectors"
+    ],
+    "simple-storage-service-vpc-access-points": [
+     "aws/resource/Res_Amazon-Simple-Storage-Service_VPC-Access-Points_48.svg",
+     "Amazon Simple Storage Service VPC Access Points"
+    ],
+    "simspace-weaver": [
+     "aws/service/Arch_AWS-SimSpace-Weaver_48.svg",
+     "AWS SimSpace Weaver"
+    ],
+    "site-to-site-vpn": [
+     "aws/service/Arch_AWS-Site-to-Site-VPN_48.svg",
+     "AWS Site to Site VPN"
+    ],
+    "snowball": [
+     "aws/service/Arch_AWS-Snowball_48.svg",
+     "AWS Snowball"
+    ],
+    "snowball-edge": [
+     "aws/service/Arch_AWS-Snowball-Edge_48.svg",
+     "AWS Snowball Edge"
+    ],
+    "snowball-snowball-import-export": [
+     "aws/resource/Res_AWS-Snowball_Snowball-Import-Export_48.svg",
+     "AWS Snowball Snowball Import Export"
+    ],
+    "source-code": [
+     "aws/resource/Res_Source-Code_48_Light.svg",
+     "Source Code",
+     "aws/resource/Res_Source-Code_48_Dark.svg"
+    ],
+    "spot-fleet": [
+     "aws/group/Spot-Fleet_32.svg",
+     "Spot Fleet"
+    ],
+    "ssl-padlock": [
+     "aws/resource/Res_SSL-padlock_48_Light.svg",
+     "SSL padlock",
+     "aws/resource/Res_SSL-padlock_48_Dark.svg"
+    ],
+    "step-functions": [
+     "aws/service/Arch_AWS-Step-Functions_48.svg",
+     "AWS Step Functions"
+    ],
+    "storage-gateway": [
+     "aws/service/Arch_AWS-Storage-Gateway_48.svg",
+     "AWS Storage Gateway"
+    ],
+    "storage-gateway-amazon-fsx-file-gateway": [
+     "aws/resource/Res_AWS-Storage-Gateway_Amazon-FSx-File-Gateway_48.svg",
+     "AWS Storage Gateway Amazon FSx File Gateway"
+    ],
+    "storage-gateway-amazon-s3-file-gateway": [
+     "aws/resource/Res_AWS-Storage-Gateway_Amazon-S3-File-Gateway_48.svg",
+     "AWS Storage Gateway Amazon S3 File Gateway"
+    ],
+    "storage-gateway-cached-volume": [
+     "aws/resource/Res_AWS-Storage-Gateway_Cached-Volume_48.svg",
+     "AWS Storage Gateway Cached Volume"
+    ],
+    "storage-gateway-file-gateway": [
+     "aws/resource/Res_AWS-Storage-Gateway_File-Gateway_48.svg",
+     "AWS Storage Gateway File Gateway"
+    ],
+    "storage-gateway-noncached-volume": [
+     "aws/resource/Res_AWS-Storage-Gateway_Noncached-Volume_48.svg",
+     "AWS Storage Gateway Noncached Volume"
+    ],
+    "storage-gateway-tape-gateway": [
+     "aws/resource/Res_AWS-Storage-Gateway_Tape-Gateway_48.svg",
+     "AWS Storage Gateway Tape Gateway"
+    ],
+    "storage-gateway-virtual-tape-library": [
+     "aws/resource/Res_AWS-Storage-Gateway_Virtual-Tape-Library_48.svg",
+     "AWS Storage Gateway Virtual Tape Library"
+    ],
+    "storage-gateway-volume-gateway": [
+     "aws/resource/Res_AWS-Storage-Gateway_Volume-Gateway_48.svg",
+     "AWS Storage Gateway Volume Gateway"
+    ],
+    "supply-chain": [
+     "aws/service/Arch_AWS-Supply-Chain_48.svg",
+     "AWS Supply Chain"
+    ],
+    "support": [
+     "aws/service/Arch_AWS-Support_48.svg",
+     "AWS Support"
+    ],
+    "sustainability": [
+     "aws/service/Arch_AWS-Sustainability_48.svg",
+     "AWS Sustainability"
+    ],
+    "systems-manager": [
+     "aws/service/Arch_AWS-Systems-Manager_48.svg",
+     "AWS Systems Manager"
+    ],
+    "systems-manager-application-manager": [
+     "aws/resource/Res_AWS-Systems-Manager_Application-Manager_48.svg",
+     "AWS Systems Manager Application Manager"
+    ],
+    "systems-manager-automation": [
+     "aws/resource/Res_AWS-Systems-Manager_Automation_48.svg",
+     "AWS Systems Manager Automation"
+    ],
+    "systems-manager-change-calendar": [
+     "aws/resource/Res_AWS-Systems-Manager_Change-Calendar_48.svg",
+     "AWS Systems Manager Change Calendar"
+    ],
+    "systems-manager-change-manager": [
+     "aws/resource/Res_AWS-Systems-Manager_Change-Manager_48.svg",
+     "AWS Systems Manager Change Manager"
+    ],
+    "systems-manager-compliance": [
+     "aws/resource/Res_AWS-Systems-Manager_Compliance_48.svg",
+     "AWS Systems Manager Compliance"
+    ],
+    "systems-manager-distributor": [
+     "aws/resource/Res_AWS-Systems-Manager_Distributor_48.svg",
+     "AWS Systems Manager Distributor"
+    ],
+    "systems-manager-documents": [
+     "aws/resource/Res_AWS-Systems-Manager_Documents_48.svg",
+     "AWS Systems Manager Documents"
+    ],
+    "systems-manager-incident-manager": [
+     "aws/resource/Res_AWS-Systems-Manager_Incident-Manager_48.svg",
+     "AWS Systems Manager Incident Manager"
+    ],
+    "systems-manager-inventory": [
+     "aws/resource/Res_AWS-Systems-Manager_Inventory_48.svg",
+     "AWS Systems Manager Inventory"
+    ],
+    "systems-manager-maintenance-windows": [
+     "aws/resource/Res_AWS-Systems-Manager_Maintenance-Windows_48.svg",
+     "AWS Systems Manager Maintenance Windows"
+    ],
+    "systems-manager-opscenter": [
+     "aws/resource/Res_AWS-Systems-Manager_OpsCenter_48.svg",
+     "AWS Systems Manager OpsCenter"
+    ],
+    "systems-manager-parameter-store": [
+     "aws/resource/Res_AWS-Systems-Manager_Parameter-Store_48.svg",
+     "AWS Systems Manager Parameter Store"
+    ],
+    "systems-manager-patch-manager": [
+     "aws/resource/Res_AWS-Systems-Manager_Patch-Manager_48.svg",
+     "AWS Systems Manager Patch Manager"
+    ],
+    "systems-manager-run-command": [
+     "aws/resource/Res_AWS-Systems-Manager_Run-Command_48.svg",
+     "AWS Systems Manager Run Command"
+    ],
+    "systems-manager-session-manager": [
+     "aws/resource/Res_AWS-Systems-Manager_Session-Manager_48.svg",
+     "AWS Systems Manager Session Manager"
+    ],
+    "systems-manager-state-manager": [
+     "aws/resource/Res_AWS-Systems-Manager_State-Manager_48.svg",
+     "AWS Systems Manager State Manager"
+    ],
+    "tape-storage": [
+     "aws/resource/Res_Tape-storage_48_Light.svg",
+     "Tape storage",
+     "aws/resource/Res_Tape-storage_48_Dark.svg"
+    ],
+    "telco-network-builder": [
+     "aws/service/Arch_AWS-Telco-Network-Builder_48.svg",
+     "AWS Telco Network Builder"
+    ],
+    "tensorflow-on-aws": [
+     "aws/service/Arch_TensorFlow-on-AWS_48.svg",
+     "TensorFlow on AWS"
+    ],
+    "textract": [
+     "aws/service/Arch_Amazon-Textract_48.svg",
+     "Amazon Textract"
+    ],
+    "textract-analyze-lending": [
+     "aws/resource/Res_Amazon-Textract_Analyze-Lending_48.svg",
+     "Amazon Textract Analyze Lending"
+    ],
+    "thinkbox-deadline": [
+     "aws/service/Arch_AWS-Thinkbox-Deadline_48.svg",
+     "AWS Thinkbox Deadline"
+    ],
+    "thinkbox-frost": [
+     "aws/service/Arch_AWS-Thinkbox-Frost_48.svg",
+     "AWS Thinkbox Frost"
+    ],
+    "thinkbox-krakatoa": [
+     "aws/service/Arch_AWS-Thinkbox-Krakatoa_48.svg",
+     "AWS Thinkbox Krakatoa"
+    ],
+    "thinkbox-stoke": [
+     "aws/service/Arch_AWS-Thinkbox-Stoke_48.svg",
+     "AWS Thinkbox Stoke"
+    ],
+    "thinkbox-xmesh": [
+     "aws/service/Arch_AWS-Thinkbox-XMesh_48.svg",
+     "AWS Thinkbox XMesh"
+    ],
+    "timestream": [
+     "aws/service/Arch_Amazon-Timestream_48.svg",
+     "Amazon Timestream"
+    ],
+    "toolkit": [
+     "aws/resource/Res_Toolkit_48_Light.svg",
+     "Toolkit",
+     "aws/resource/Res_Toolkit_48_Dark.svg"
+    ],
+    "tools-and-sdks": [
+     "aws/service/Arch_AWS-Tools-and-SDKs_48.svg",
+     "AWS Tools and SDKs"
+    ],
+    "training-certification": [
+     "aws/service/Arch_AWS-Training-Certification_48.svg",
+     "AWS Training Certification"
+    ],
+    "transcribe": [
+     "aws/service/Arch_Amazon-Transcribe_48.svg",
+     "Amazon Transcribe"
+    ],
+    "transfer-family": [
+     "aws/service/Arch_AWS-Transfer-Family_48.svg",
+     "AWS Transfer Family"
+    ],
+    "transfer-family-aws-as2": [
+     "aws/resource/Res_AWS-Transfer-Family_AWS-AS2_48.svg",
+     "AWS Transfer Family AWS AS2"
+    ],
+    "transfer-family-aws-ftp": [
+     "aws/resource/Res_AWS-Transfer-Family_AWS-FTP_48.svg",
+     "AWS Transfer Family AWS FTP"
+    ],
+    "transfer-family-aws-ftps": [
+     "aws/resource/Res_AWS-Transfer-Family_AWS-FTPS_48.svg",
+     "AWS Transfer Family AWS FTPS"
+    ],
+    "transfer-family-aws-sftp": [
+     "aws/resource/Res_AWS-Transfer-Family_AWS-SFTP_48.svg",
+     "AWS Transfer Family AWS SFTP"
+    ],
+    "transform": [
+     "aws/service/Arch_AWS-Transform_48.svg",
+     "AWS Transform"
+    ],
+    "transit-gateway": [
+     "aws/service/Arch_AWS-Transit-Gateway_48.svg",
+     "AWS Transit Gateway"
+    ],
+    "transit-gateway-attachment": [
+     "aws/resource/Res_AWS-Transit-Gateway_Attachment_48.svg",
+     "AWS Transit Gateway Attachment"
+    ],
+    "translate": [
+     "aws/service/Arch_Amazon-Translate_48.svg",
+     "Amazon Translate"
+    ],
+    "trusted-advisor": [
+     "aws/service/Arch_AWS-Trusted-Advisor_48.svg",
+     "AWS Trusted Advisor"
+    ],
+    "trusted-advisor-checklist": [
+     "aws/resource/Res_AWS-Trusted-Advisor_Checklist_48.svg",
+     "AWS Trusted Advisor Checklist"
+    ],
+    "trusted-advisor-checklist-cost": [
+     "aws/resource/Res_AWS-Trusted-Advisor_Checklist-Cost_48.svg",
+     "AWS Trusted Advisor Checklist Cost"
+    ],
+    "trusted-advisor-checklist-fault-tolerant": [
+     "aws/resource/Res_AWS-Trusted-Advisor_Checklist-Fault-Tolerant_48.svg",
+     "AWS Trusted Advisor Checklist Fault Tolerant"
+    ],
+    "trusted-advisor-checklist-performance": [
+     "aws/resource/Res_AWS-Trusted-Advisor_Checklist-Performance_48.svg",
+     "AWS Trusted Advisor Checklist Performance"
+    ],
+    "trusted-advisor-checklist-security": [
+     "aws/resource/Res_AWS-Trusted-Advisor_Checklist-Security_48.svg",
+     "AWS Trusted Advisor Checklist Security"
+    ],
+    "user": [
+     "aws/resource/Res_User_48_Light.svg",
+     "User",
+     "aws/resource/Res_User_48_Dark.svg"
+    ],
+    "user-notifications": [
+     "aws/service/Arch_AWS-User-Notifications_48.svg",
+     "AWS User Notifications"
+    ],
+    "users": [
+     "aws/resource/Res_Users_48_Light.svg",
+     "Users",
+     "aws/resource/Res_Users_48_Dark.svg"
+    ],
+    "verified-access": [
+     "aws/service/Arch_AWS-Verified-Access_48.svg",
+     "AWS Verified Access"
+    ],
+    "verified-permissions": [
+     "aws/service/Arch_Amazon-Verified-Permissions_48.svg",
+     "Amazon Verified Permissions"
+    ],
+    "virtual-private-cloud": [
+     "aws/service/Arch_Amazon-Virtual-Private-Cloud_48.svg",
+     "Amazon Virtual Private Cloud"
+    ],
+    "virtual-private-cloud-vpc": [
+     "aws/group/Virtual-private-cloud-VPC_32.svg",
+     "Virtual private cloud VPC"
+    ],
+    "vpc-carrier-gateway": [
+     "aws/resource/Res_Amazon-VPC_Carrier-Gateway_48.svg",
+     "Amazon VPC Carrier Gateway"
+    ],
+    "vpc-customer-gateway": [
+     "aws/resource/Res_Amazon-VPC_Customer-Gateway_48.svg",
+     "Amazon VPC Customer Gateway"
+    ],
+    "vpc-elastic-network-adapter": [
+     "aws/resource/Res_Amazon-VPC_Elastic-Network-Adapter_48.svg",
+     "Amazon VPC Elastic Network Adapter"
+    ],
+    "vpc-elastic-network-interface": [
+     "aws/resource/Res_Amazon-VPC_Elastic-Network-Interface_48.svg",
+     "Amazon VPC Elastic Network Interface"
+    ],
+    "vpc-endpoints": [
+     "aws/resource/Res_Amazon-VPC_Endpoints_48.svg",
+     "Amazon VPC Endpoints"
+    ],
+    "vpc-flow-logs": [
+     "aws/resource/Res_Amazon-VPC_Flow-Logs_48.svg",
+     "Amazon VPC Flow Logs"
+    ],
+    "vpc-internet-gateway": [
+     "aws/resource/Res_Amazon-VPC_Internet-Gateway_48.svg",
+     "Amazon VPC Internet Gateway"
+    ],
+    "vpc-lattice": [
+     "aws/service/Arch_Amazon-VPC-Lattice_48.svg",
+     "Amazon VPC Lattice"
+    ],
+    "vpc-nat-gateway": [
+     "aws/resource/Res_Amazon-VPC_NAT-Gateway_48.svg",
+     "Amazon VPC NAT Gateway"
+    ],
+    "vpc-network-access-analyzer": [
+     "aws/resource/Res_Amazon-VPC_Network-Access-Analyzer_48.svg",
+     "Amazon VPC Network Access Analyzer"
+    ],
+    "vpc-network-access-control-list": [
+     "aws/resource/Res_Amazon-VPC_Network-Access-Control-List_48.svg",
+     "Amazon VPC Network Access Control List"
+    ],
+    "vpc-peering-connection": [
+     "aws/resource/Res_Amazon-VPC_Peering-Connection_48.svg",
+     "Amazon VPC Peering Connection"
+    ],
+    "vpc-reachability-analyzer": [
+     "aws/resource/Res_Amazon-VPC_Reachability-Analyzer_48.svg",
+     "Amazon VPC Reachability Analyzer"
+    ],
+    "vpc-router": [
+     "aws/resource/Res_Amazon-VPC_Router_48.svg",
+     "Amazon VPC Router"
+    ],
+    "vpc-traffic-mirroring": [
+     "aws/resource/Res_Amazon-VPC_Traffic-Mirroring_48.svg",
+     "Amazon VPC Traffic Mirroring"
+    ],
+    "vpc-virtual-private-cloud-vpc": [
+     "aws/resource/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg",
+     "Amazon VPC Virtual private cloud VPC"
+    ],
+    "vpc-vpn-connection": [
+     "aws/resource/Res_Amazon-VPC_VPN-Connection_48.svg",
+     "Amazon VPC VPN Connection"
+    ],
+    "vpc-vpn-gateway": [
+     "aws/resource/Res_Amazon-VPC_VPN-Gateway_48.svg",
+     "Amazon VPC VPN Gateway"
+    ],
+    "waf": [
+     "aws/service/Arch_AWS-WAF_48.svg",
+     "AWS WAF"
+    ],
+    "waf-bad-bot": [
+     "aws/resource/Res_AWS-WAF_Bad-Bot_48.svg",
+     "AWS WAF Bad Bot"
+    ],
+    "waf-bot": [
+     "aws/resource/Res_AWS-WAF_Bot_48.svg",
+     "AWS WAF Bot"
+    ],
+    "waf-bot-control": [
+     "aws/resource/Res_AWS-WAF_Bot-Control_48.svg",
+     "AWS WAF Bot Control"
+    ],
+    "waf-filtering-rule": [
+     "aws/resource/Res_AWS-WAF_Filtering-Rule_48.svg",
+     "AWS WAF Filtering Rule"
+    ],
+    "waf-labels": [
+     "aws/resource/Res_AWS-WAF_Labels_48.svg",
+     "AWS WAF Labels"
+    ],
+    "waf-managed-rule": [
+     "aws/resource/Res_AWS-WAF_Managed-Rule_48.svg",
+     "AWS WAF Managed Rule"
+    ],
+    "waf-rule": [
+     "aws/resource/Res_AWS-WAF_Rule_48.svg",
+     "AWS WAF Rule"
+    ],
+    "wavelength": [
+     "aws/service/Arch_AWS-Wavelength_48.svg",
+     "AWS Wavelength"
+    ],
+    "well-architected-tool": [
+     "aws/service/Arch_AWS-Well-Architected-Tool_48.svg",
+     "AWS Well Architected Tool"
+    ],
+    "wickr": [
+     "aws/service/Arch_AWS-Wickr_48.svg",
+     "AWS Wickr"
+    ],
+    "workdocs": [
+     "aws/service/Arch_Amazon-WorkDocs_48.svg",
+     "Amazon WorkDocs"
+    ],
+    "workdocs-sdk": [
+     "aws/service/Arch_Amazon-WorkDocs-SDK_48.svg",
+     "Amazon WorkDocs SDK"
+    ],
+    "workmail": [
+     "aws/service/Arch_Amazon-WorkMail_48.svg",
+     "Amazon WorkMail"
+    ],
+    "workspaces": [
+     "aws/service/Arch_Amazon-WorkSpaces_48.svg",
+     "Amazon WorkSpaces"
+    ],
+    "x-ray": [
+     "aws/service/Arch_AWS-X-Ray_48.svg",
+     "AWS X Ray"
+    ]
+   },
+   "aliases": {
+    "alb": "elastic-load-balancing",
+    "api": "api-gateway",
+    "apigateway": "api-gateway",
+    "autoscaling": "ec2-auto-scaling",
+    "dynamo": "dynamodb",
+    "ebs": "elastic-block-store",
+    "ecr": "elastic-container-registry",
+    "ecs": "elastic-container-service",
+    "eks": "elastic-kubernetes-service",
+    "elb": "elastic-load-balancing",
+    "iam": "identity-and-access-management",
+    "kms": "key-management-service",
+    "msk": "managed-streaming-for-apache-kafka",
+    "opensearch": "opensearch-service",
+    "route53": "route-53",
+    "s3": "simple-storage-service",
+    "secretsmanager": "secrets-manager",
+    "ses": "simple-email-service",
+    "sfn": "step-functions",
+    "sns": "simple-notification-service",
+    "sqs": "simple-queue-service",
+    "stepfunctions": "step-functions",
+    "vpc": "virtual-private-cloud"
+   }
+  },
+  "azure": {
+   "title": "Azure architecture icons",
+   "url": "https://learn.microsoft.com/azure/architecture/icons/",
+   "package": [
+    "Azure_Public_Service_Icons_V24.zip"
+   ],
+   "icons": {
+    "a": [
+     "azure/other/10018-icon-service-Azure-A.svg",
+     "Azure A"
+    ],
+    "abs-member": [
+     "azure/blockchain/10374-icon-service-ABS-Member.svg",
+     "ABS Member"
+    ],
+    "access-point": [
+     "azure/new-icons/031193085-icon-service-Azure-Access-Point.svg",
+     "Azure Access Point"
+    ],
+    "active-directory-connect-health": [
+     "azure/identity/10224-icon-service-Active-Directory-Connect-Health.svg",
+     "Active Directory Connect Health"
+    ],
+    "activity-log": [
+     "azure/management-governance/00007-icon-service-Activity-Log.svg",
+     "Activity Log"
+    ],
+    "ad-b2c": [
+     "azure/identity/10228-icon-service-Azure-AD-B2C.svg",
+     "Azure AD B2C"
+    ],
+    "administrative-units": [
+     "azure/identity/00919-icon-service-Administrative-Units.svg",
+     "Administrative Units"
+    ],
+    "advisor": [
+     "azure/management-governance/00003-icon-service-Advisor.svg",
+     "Advisor"
+    ],
+    "agentic-web-apps": [
+     "azure/new-icons/034296882-icon-service-Agentic-Web-Apps.svg",
+     "Agentic Web Apps"
+    ],
+    "ai-at-edge": [
+     "azure/hybrid-multicloud/03687-icon-service-AI-at-Edge.svg",
+     "AI at Edge"
+    ],
+    "ai-foundry": [
+     "azure/ai-machine-learning/035746832-icon-service-AI-Foundry.svg",
+     "AI Foundry"
+    ],
+    "ai-foundry-iq": [
+     "azure/ai-machine-learning/038470497-icon-service-Azure-AI-Foundry-IQ.svg",
+     "Azure AI Foundry IQ"
+    ],
+    "ai-gateway": [
+     "azure/new-icons/037838045-icon-service-AI-Gateway.svg",
+     "AI Gateway"
+    ],
+    "ai-studio": [
+     "azure/ai-machine-learning/03513-icon-service-AI-Studio.svg",
+     "AI Studio"
+    ],
+    "aks-automatic": [
+     "azure/compute/03543-icon-service-AKS-Automatic.svg",
+     "AKS Automatic"
+    ],
+    "aks-istio": [
+     "azure/other/03399-icon-service-AKS-Istio.svg",
+     "AKS Istio"
+    ],
+    "aks-network-policy": [
+     "azure/containers/032487601-icon-service-AKS-Network-Policy.svg",
+     "AKS Network Policy"
+    ],
+    "alerts": [
+     "azure/management-governance/00002-icon-service-Alerts.svg",
+     "Alerts"
+    ],
+    "all-resources": [
+     "azure/general/10001-icon-service-All-Resources.svg",
+     "All Resources"
+    ],
+    "analysis-services": [
+     "azure/analytics/10148-icon-service-Analysis-Services.svg",
+     "Analysis Services"
+    ],
+    "anomaly-detector": [
+     "azure/ai-machine-learning/00814-icon-service-Anomaly-Detector.svg",
+     "Anomaly Detector"
+    ],
+    "api-center": [
+     "azure/web/03291-icon-service-API-Center.svg",
+     "API Center"
+    ],
+    "api-connections": [
+     "azure/devops/10048-icon-service-API-Connections.svg",
+     "API Connections"
+    ],
+    "api-for-fhir": [
+     "azure/integration/10212-icon-service-Azure-API-for-FHIR.svg",
+     "Azure API for FHIR"
+    ],
+    "api-management-services": [
+     "azure/devops/10042-icon-service-API-Management-Services.svg",
+     "API Management Services"
+    ],
+    "api-proxy": [
+     "azure/identity/02386-icon-service-API-Proxy.svg",
+     "API Proxy"
+    ],
+    "app-compliance-automation": [
+     "azure/other/03071-icon-service-App-Compliance-Automation.svg",
+     "App Compliance Automation"
+    ],
+    "app-configuration": [
+     "azure/integration/10219-icon-service-App-Configuration.svg",
+     "App Configuration"
+    ],
+    "app-registrations": [
+     "azure/identity/10232-icon-service-App-Registrations.svg",
+     "App Registrations"
+    ],
+    "app-service-certificates": [
+     "azure/app-services/00049-icon-service-App-Service-Certificates.svg",
+     "App Service Certificates"
+    ],
+    "app-service-domains": [
+     "azure/app-services/00050-icon-service-App-Service-Domains.svg",
+     "App Service Domains"
+    ],
+    "app-service-environments": [
+     "azure/app-services/10047-icon-service-App-Service-Environments.svg",
+     "App Service Environments"
+    ],
+    "app-service-plans": [
+     "azure/app-services/00046-icon-service-App-Service-Plans.svg",
+     "App Service Plans"
+    ],
+    "app-services": [
+     "azure/app-services/10035-icon-service-App-Services.svg",
+     "App Services"
+    ],
+    "app-space": [
+     "azure/web/03397-icon-service-App-Space.svg",
+     "App Space"
+    ],
+    "app-space-component": [
+     "azure/web/03595-icon-service-App-Space-Component.svg",
+     "App Space Component"
+    ],
+    "app-testing": [
+     "azure/developer-tools/033805167-icon-service-Azure-App-Testing.svg",
+     "Azure App Testing"
+    ],
+    "applens": [
+     "azure/azure-ecosystem/02354-icon-service-Applens.svg",
+     "Applens"
+    ],
+    "application-gateway-containers": [
+     "azure/networking/03328-icon-service-Application-Gateway-Containers.svg",
+     "Application Gateway Containers"
+    ],
+    "application-gateways": [
+     "azure/networking/10076-icon-service-Application-Gateways.svg",
+     "Application Gateways"
+    ],
+    "application-group": [
+     "azure/compute/00329-icon-service-Application-Group.svg",
+     "Application Group"
+    ],
+    "application-insights": [
+     "azure/devops/00012-icon-service-Application-Insights.svg",
+     "Application Insights"
+    ],
+    "application-security-groups": [
+     "azure/security/10244-icon-service-Application-Security-Groups.svg",
+     "Application Security Groups"
+    ],
+    "applied-ai-services": [
+     "azure/ai-machine-learning/02749-icon-service-Azure-Applied-AI-Services.svg",
+     "Azure Applied AI Services"
+    ],
+    "aquila": [
+     "azure/other/02625-icon-service-Aquila.svg",
+     "Aquila"
+    ],
+    "arc": [
+     "azure/management-governance/00756-icon-service-Azure-Arc.svg",
+     "Azure Arc"
+    ],
+    "arc-data-services": [
+     "azure/other/02356-icon-service-Arc-Data-services.svg",
+     "Arc Data services"
+    ],
+    "arc-kubernetes": [
+     "azure/hybrid-multicloud/01088-icon-service-Arc-Kubernetes.svg",
+     "Arc Kubernetes"
+    ],
+    "arc-machines": [
+     "azure/management-governance/01710-icon-service-Arc-Machines.svg",
+     "Arc Machines"
+    ],
+    "arc-postgresql": [
+     "azure/other/01848-icon-service-Arc-PostgreSQL .svg",
+     "Arc PostgreSQL"
+    ],
+    "arc-sql-managed-instance": [
+     "azure/other/01849-icon-service-Arc-SQL-Managed-Instance.svg",
+     "Arc SQL Managed Instance"
+    ],
+    "arc-sql-server": [
+     "azure/other/01850-icon-service-Arc-SQL-Server.svg",
+     "Arc SQL Server"
+    ],
+    "atm-multistack": [
+     "azure/networking/03460-icon-service-ATM-Multistack.svg",
+     "ATM Multistack"
+    ],
+    "auto-scale": [
+     "azure/monitor/10832-icon-service-Auto-Scale.svg",
+     "Auto Scale"
+    ],
+    "automanaged-vm": [
+     "azure/compute/02112-icon-service-Automanaged-VM.svg",
+     "Automanaged VM"
+    ],
+    "automation-accounts": [
+     "azure/management-governance/00022-icon-service-Automation-Accounts.svg",
+     "Automation Accounts"
+    ],
+    "availability-sets": [
+     "azure/compute/10025-icon-service-Availability-Sets.svg",
+     "Availability Sets"
+    ],
+    "avs-vm": [
+     "azure/other/01846-icon-service-AVS-VM.svg",
+     "AVS VM"
+    ],
+    "azureattestation": [
+     "azure/other/10422-icon-service-AzureAttestation.svg",
+     "AzureAttestation"
+    ],
+    "azurite": [
+     "azure/other/02842-icon-service-Azurite.svg",
+     "Azurite"
+    ],
+    "backlog": [
+     "azure/general/10853-icon-service-Backlog.svg",
+     "Backlog"
+    ],
+    "backup-center": [
+     "azure/other/02360-icon-service-Azure-Backup-Center.svg",
+     "Azure Backup Center"
+    ],
+    "backup-vault": [
+     "azure/other/02361-icon-service-Backup-Vault.svg",
+     "Backup Vault"
+    ],
+    "bare-metal-infrastructure": [
+     "azure/other/02561-icon-service-Bare-Metal-Infrastructure.svg",
+     "Bare Metal Infrastructure"
+    ],
+    "bastions": [
+     "azure/networking/02422-icon-service-Bastions.svg",
+     "Bastions"
+    ],
+    "batch-accounts": [
+     "azure/compute/10031-icon-service-Batch-Accounts.svg",
+     "Batch Accounts"
+    ],
+    "batch-ai": [
+     "azure/ai-machine-learning/00028-icon-service-Batch-AI.svg",
+     "Batch AI"
+    ],
+    "biz-talk": [
+     "azure/general/10779-icon-service-Biz-Talk.svg",
+     "Biz Talk"
+    ],
+    "blob-block": [
+     "azure/general/10780-icon-service-Blob-Block.svg",
+     "Blob Block"
+    ],
+    "blob-page": [
+     "azure/general/10781-icon-service-Blob-Page.svg",
+     "Blob Page"
+    ],
+    "blockchain-applications": [
+     "azure/blockchain/10210-icon-service-Blockchain-Applications.svg",
+     "Blockchain Applications"
+    ],
+    "blockchain-service": [
+     "azure/blockchain/10366-icon-service-Azure-Blockchain-Service.svg",
+     "Azure Blockchain Service"
+    ],
+    "blueprints": [
+     "azure/management-governance/00006-icon-service-Blueprints.svg",
+     "Blueprints"
+    ],
+    "bonsai": [
+     "azure/ai-machine-learning/03337-icon-service-Bonsai.svg",
+     "Bonsai"
+    ],
+    "bot-services": [
+     "azure/ai-machine-learning/10165-icon-service-Bot-Services.svg",
+     "Bot Services"
+    ],
+    "branch": [
+     "azure/general/10782-icon-service-Branch.svg",
+     "Branch"
+    ],
+    "breeze": [
+     "azure/other/03633-icon-service-Breeze.svg",
+     "Breeze"
+    ],
+    "browser": [
+     "azure/general/10783-icon-service-Browser.svg",
+     "Browser"
+    ],
+    "bug": [
+     "azure/general/10784-icon-service-Bug.svg",
+     "Bug"
+    ],
+    "builds": [
+     "azure/general/10785-icon-service-Builds.svg",
+     "Builds"
+    ],
+    "business-process-tracking": [
+     "azure/integration/03637-icon-service-Business-Process-Tracking.svg",
+     "Business Process Tracking"
+    ],
+    "cache": [
+     "azure/general/10786-icon-service-Cache.svg",
+     "Cache"
+    ],
+    "cache-redis": [
+     "azure/databases/10137-icon-service-Cache-Redis.svg",
+     "Cache Redis"
+    ],
+    "capacity-reservation-groups": [
+     "azure/other/02732-icon-service-Capacity-Reservation-Groups.svg",
+     "Capacity Reservation Groups"
+    ],
+    "cdn-profiles": [
+     "azure/app-services/00056-icon-service-CDN-Profiles.svg",
+     "CDN Profiles"
+    ],
+    "center-for-sap": [
+     "azure/other/03090-icon-service-Azure-Center-for-SAP.svg",
+     "Azure Center for SAP"
+    ],
+    "central-service-instance-for-sap": [
+     "azure/other/03092-icon-service-Central-Service-Instance-For-SAP.svg",
+     "Central Service Instance For SAP"
+    ],
+    "ceres": [
+     "azure/other/02828-icon-service-Ceres.svg",
+     "Ceres"
+    ],
+    "change-analysis": [
+     "azure/devops/00563-icon-service-Change-Analysis.svg",
+     "Change Analysis"
+    ],
+    "chaos-studio": [
+     "azure/other/02223-icon-service-Azure-Chaos-Studio.svg",
+     "Azure Chaos Studio"
+    ],
+    "client-apps": [
+     "azure/intune/10331-icon-service-Client-Apps.svg",
+     "Client Apps"
+    ],
+    "cloud-services-classic": [
+     "azure/compute/10030-icon-service-Cloud-Services-(Classic).svg",
+     "Cloud Services (Classic)"
+    ],
+    "cloud-services-extended-support": [
+     "azure/other/02505-icon-service-Cloud-Services-(extended-support).svg",
+     "Cloud Services (extended support)"
+    ],
+    "cloud-shell": [
+     "azure/other/00559-icon-service-Azure-Cloud-Shell.svg",
+     "Azure Cloud Shell"
+    ],
+    "cloudtest": [
+     "azure/devops/02373-icon-service-CloudTest.svg",
+     "CloudTest"
+    ],
+    "code": [
+     "azure/general/10787-icon-service-Code.svg",
+     "Code"
+    ],
+    "code-optimization": [
+     "azure/devops/03455-icon-service-Code-Optimization.svg",
+     "Code Optimization"
+    ],
+    "cognitive-search": [
+     "azure/ai-machine-learning/10044-icon-service-Cognitive-Search.svg",
+     "Cognitive Search"
+    ],
+    "cognitive-services": [
+     "azure/ai-machine-learning/10162-icon-service-Cognitive-Services.svg",
+     "Cognitive Services"
+    ],
+    "cognitive-services-decisions": [
+     "azure/ai-machine-learning/03173-icon-service-Cognitive-Services-Decisions.svg",
+     "Cognitive Services Decisions"
+    ],
+    "collaborative-service": [
+     "azure/azure-ecosystem/01038-icon-service-Collaborative-Service.svg",
+     "Collaborative Service"
+    ],
+    "commit": [
+     "azure/general/10788-icon-service-Commit.svg",
+     "Commit"
+    ],
+    "communication-services": [
+     "azure/other/00968-icon-service-Azure-Communication-Services.svg",
+     "Azure Communication Services"
+    ],
+    "communications-gateway": [
+     "azure/networking/03311-icon-service-Azure-Communications-Gateway.svg",
+     "Azure Communications Gateway"
+    ],
+    "community-images": [
+     "azure/other/02865-icon-service-Community-Images.svg",
+     "Community Images"
+    ],
+    "compliance": [
+     "azure/management-governance/00011-icon-service-Compliance.svg",
+     "Compliance"
+    ],
+    "compliance-center": [
+     "azure/other/02931-icon-service-Compliance-Center.svg",
+     "Compliance Center"
+    ],
+    "compute-fleet": [
+     "azure/compute/03487-icon-service-Compute-Fleet.svg",
+     "Compute Fleet"
+    ],
+    "compute-galleries": [
+     "azure/compute/02864-icon-service-Azure-Compute-Galleries.svg",
+     "Azure Compute Galleries"
+    ],
+    "computer-vision": [
+     "azure/ai-machine-learning/00792-icon-service-Computer-Vision.svg",
+     "Computer Vision"
+    ],
+    "conditional-access": [
+     "azure/security/10233-icon-service-Conditional-Access.svg",
+     "Conditional Access"
+    ],
+    "confidential-ledgers": [
+     "azure/other/02668-icon-service-Confidential-Ledgers.svg",
+     "Confidential Ledgers"
+    ],
+    "connected-cache": [
+     "azure/networking/02509-icon-service-Connected-Cache.svg",
+     "Connected Cache"
+    ],
+    "connected-vehicle-platform": [
+     "azure/other/02573-icon-service-Connected-Vehicle-Platform.svg",
+     "Connected Vehicle Platform"
+    ],
+    "connections": [
+     "azure/networking/10081-icon-service-Connections.svg",
+     "Connections"
+    ],
+    "consortium": [
+     "azure/blockchain/10375-icon-service-Consortium.svg",
+     "Consortium"
+    ],
+    "consumption-commitment": [
+     "azure/other/03495-icon-service-Azure-Consumption-Commitment.svg",
+     "Azure Consumption Commitment"
+    ],
+    "container-apps-environments": [
+     "azure/other/02989-icon-service-Container-Apps-Environments.svg",
+     "Container Apps Environments"
+    ],
+    "container-instances": [
+     "azure/compute/10104-icon-service-Container-Instances.svg",
+     "Container Instances"
+    ],
+    "container-registries": [
+     "azure/containers/10105-icon-service-Container-Registries.svg",
+     "Container Registries"
+    ],
+    "container-storage": [
+     "azure/containers/03401-icon-service-Azure-Container-Storage.svg",
+     "Azure Container Storage"
+    ],
+    "content-moderators": [
+     "azure/ai-machine-learning/00795-icon-service-Content-Moderators.svg",
+     "Content Moderators"
+    ],
+    "content-safety": [
+     "azure/ai-machine-learning/03390-icon-service-Content-Safety.svg",
+     "Content Safety"
+    ],
+    "controls": [
+     "azure/general/10789-icon-service-Controls.svg",
+     "Controls"
+    ],
+    "controls-horizontal": [
+     "azure/general/10790-icon-service-Controls-Horizontal.svg",
+     "Controls Horizontal"
+    ],
+    "cosmos-db": [
+     "azure/databases/10121-icon-service-Azure-Cosmos-DB.svg",
+     "Azure Cosmos DB"
+    ],
+    "cost-alerts": [
+     "azure/general/10791-icon-service-Cost-Alerts.svg",
+     "Cost Alerts"
+    ],
+    "cost-analysis": [
+     "azure/general/10792-icon-service-Cost-Analysis.svg",
+     "Cost Analysis"
+    ],
+    "cost-budgets": [
+     "azure/general/10793-icon-service-Cost-Budgets.svg",
+     "Cost Budgets"
+    ],
+    "cost-export": [
+     "azure/other/00913-icon-service-Cost-Export.svg",
+     "Cost Export"
+    ],
+    "cost-management": [
+     "azure/general/10019-icon-service-Cost-Management.svg",
+     "Cost Management"
+    ],
+    "cost-management-and-billing": [
+     "azure/general/00004-icon-service-Cost-Management-and-Billing.svg",
+     "Cost Management and Billing"
+    ],
+    "counter": [
+     "azure/general/10794-icon-service-Counter.svg",
+     "Counter"
+    ],
+    "cubes": [
+     "azure/general/10795-icon-service-Cubes.svg",
+     "Cubes"
+    ],
+    "custom-ip-prefix": [
+     "azure/other/02654-icon-service-Custom-IP-Prefix.svg",
+     "Custom IP Prefix"
+    ],
+    "custom-vision": [
+     "azure/ai-machine-learning/00793-icon-service-Custom-Vision.svg",
+     "Custom Vision"
+    ],
+    "customer-lockbox-for-microsoft-azure": [
+     "azure/management-governance/10314-icon-service-Customer-Lockbox-for-Microsoft-Azure.svg",
+     "Customer Lockbox for Microsoft Azure"
+    ],
+    "dashboard": [
+     "azure/general/10015-icon-service-Dashboard.svg",
+     "Dashboard"
+    ],
+    "dashboard-hub": [
+     "azure/other/01757-icon-service-Dashboard-Hub.svg",
+     "Dashboard Hub"
+    ],
+    "data-box": [
+     "azure/migrate/10094-icon-service-Data-Box.svg",
+     "Data Box"
+    ],
+    "data-catalog": [
+     "azure/integration/10216-icon-service-Azure-Data-Catalog.svg",
+     "Azure Data Catalog"
+    ],
+    "data-collection-rules": [
+     "azure/other/01857-icon-service-Data-Collection-Rules.svg",
+     "Data Collection Rules"
+    ],
+    "data-explorer-clusters": [
+     "azure/analytics/10145-icon-service-Azure-Data-Explorer-Clusters.svg",
+     "Azure Data Explorer Clusters"
+    ],
+    "data-factories": [
+     "azure/analytics/10126-icon-service-Data-Factories.svg",
+     "Data Factories"
+    ],
+    "data-lake-analytics": [
+     "azure/analytics/10143-icon-service-Data-Lake-Analytics.svg",
+     "Data Lake Analytics"
+    ],
+    "data-lake-storage-gen1": [
+     "azure/storage/10090-icon-service-Data-Lake-Storage-Gen1.svg",
+     "Data Lake Storage Gen1"
+    ],
+    "data-lake-store-gen1": [
+     "azure/analytics/10150-icon-service-Data-Lake-Store-Gen1.svg",
+     "Data Lake Store Gen1"
+    ],
+    "data-share-invitations": [
+     "azure/storage/10097-icon-service-Data-Share-Invitations.svg",
+     "Data Share Invitations"
+    ],
+    "data-shares": [
+     "azure/storage/10098-icon-service-Data-Shares.svg",
+     "Data Shares"
+    ],
+    "data-sharing": [
+     "azure/new-icons/035824068-icon-service-Azure-Data-Sharing.svg",
+     "Azure Data Sharing"
+    ],
+    "data-transfer": [
+     "azure/new-icons/033740592-icon-service-Azure-Data-Transfer.svg",
+     "Azure Data Transfer"
+    ],
+    "data-virtualization": [
+     "azure/storage/029203566-icon-service-Data-Virtualization.svg",
+     "Data Virtualization"
+    ],
+    "database-instance-for-sap": [
+     "azure/other/03175-icon-service-Database-Instance-For-SAP.svg",
+     "Database Instance For SAP"
+    ],
+    "database-mariadb-server": [
+     "azure/databases/10123-icon-service-Azure-Database-MariaDB-Server.svg",
+     "Azure Database MariaDB Server"
+    ],
+    "database-migration-services": [
+     "azure/databases/10133-icon-service-Azure-Database-Migration-Services.svg",
+     "Azure Database Migration Services"
+    ],
+    "database-mysql-server": [
+     "azure/databases/10122-icon-service-Azure-Database-MySQL-Server.svg",
+     "Azure Database MySQL Server"
+    ],
+    "database-postgresql-server": [
+     "azure/databases/10131-icon-service-Azure-Database-PostgreSQL-Server.svg",
+     "Azure Database PostgreSQL Server"
+    ],
+    "database-postgresql-server-group": [
+     "azure/databases/02827-icon-service-Azure-Database-PostgreSQL-Server-Group.svg",
+     "Azure Database PostgreSQL Server Group"
+    ],
+    "databox-gateway": [
+     "azure/integration/00691-icon-service-Azure-Databox-Gateway.svg",
+     "Azure Databox Gateway"
+    ],
+    "databricks": [
+     "azure/analytics/10787-icon-service-Azure-Databricks.svg",
+     "Azure Databricks"
+    ],
+    "ddos-custom-policy": [
+     "azure/new-icons/035556610-icon-service-DDoS-Custom-Policy.svg",
+     "DDoS Custom Policy"
+    ],
+    "ddos-protection-plans": [
+     "azure/networking/10072-icon-service-DDoS-Protection-Plans.svg",
+     "DDoS Protection Plans"
+    ],
+    "dedicated-hsm": [
+     "azure/other/02322-icon-service-Dedicated-HSM.svg",
+     "Dedicated HSM"
+    ],
+    "defender-cm-local-manager": [
+     "azure/other/03402-icon-service-Defender-CM-Local-Manager.svg",
+     "Defender CM Local Manager"
+    ],
+    "defender-dcs-controller": [
+     "azure/other/03412-icon-service-Defender-DCS-Controller.svg",
+     "Defender DCS Controller"
+    ],
+    "defender-distributer-control-system": [
+     "azure/other/03413-icon-service-Defender-Distributer-Control-System.svg",
+     "Defender Distributer Control System"
+    ],
+    "defender-engineering-station": [
+     "azure/other/03414-icon-service-Defender-Engineering-Station.svg",
+     "Defender Engineering Station"
+    ],
+    "defender-external-management": [
+     "azure/other/03403-icon-service-Defender-External-Management.svg",
+     "Defender External Management"
+    ],
+    "defender-freezer-monitor": [
+     "azure/other/03404-icon-service-Defender-Freezer-Monitor.svg",
+     "Defender Freezer Monitor"
+    ],
+    "defender-historian": [
+     "azure/other/03405-icon-service-Defender-Historian.svg",
+     "Defender Historian"
+    ],
+    "defender-hmi": [
+     "azure/other/03406-icon-service-Defender-HMI.svg",
+     "Defender HMI"
+    ],
+    "defender-industrial-packaging-system": [
+     "azure/other/03415-icon-service-Defender-Industrial-Packaging-System.svg",
+     "Defender Industrial Packaging System"
+    ],
+    "defender-industrial-printer": [
+     "azure/other/03416-icon-service-Defender-Industrial-Printer.svg",
+     "Defender Industrial Printer"
+    ],
+    "defender-industrial-robot": [
+     "azure/other/03418-icon-service-Defender-Industrial-Robot.svg",
+     "Defender Industrial Robot"
+    ],
+    "defender-industrial-scale-system": [
+     "azure/other/03417-icon-service-Defender-Industrial-Scale-System.svg",
+     "Defender Industrial Scale System"
+    ],
+    "defender-marquee": [
+     "azure/other/03407-icon-service-Defender-Marquee.svg",
+     "Defender Marquee"
+    ],
+    "defender-meter": [
+     "azure/other/03419-icon-service-Defender-Meter.svg",
+     "Defender Meter"
+    ],
+    "defender-plc": [
+     "azure/other/03420-icon-service-Defender-PLC.svg",
+     "Defender PLC"
+    ],
+    "defender-pneumatic-device": [
+     "azure/other/03421-icon-service-Defender-Pneumatic-Device.svg",
+     "Defender Pneumatic Device"
+    ],
+    "defender-programable-board": [
+     "azure/other/03422-icon-service-Defender-Programable-Board.svg",
+     "Defender Programable Board"
+    ],
+    "defender-relay": [
+     "azure/other/03423-icon-service-Defender-Relay.svg",
+     "Defender Relay"
+    ],
+    "defender-robot-controller": [
+     "azure/other/03408-icon-service-Defender-Robot-Controller.svg",
+     "Defender Robot Controller"
+    ],
+    "defender-rtu": [
+     "azure/other/03424-icon-service-Defender-RTU.svg",
+     "Defender RTU"
+    ],
+    "defender-sensor": [
+     "azure/other/03409-icon-service-Defender-Sensor.svg",
+     "Defender Sensor"
+    ],
+    "defender-slot": [
+     "azure/other/03410-icon-service-Defender-Slot.svg",
+     "Defender Slot"
+    ],
+    "defender-web-guiding-system": [
+     "azure/other/03411-icon-service-Defender-Web-Guiding-System.svg",
+     "Defender Web Guiding System"
+    ],
+    "deployment-environments": [
+     "azure/other/03251-icon-service-Azure-Deployment-Environments.svg",
+     "Azure Deployment Environments"
+    ],
+    "detonation": [
+     "azure/security/00378-icon-service-Detonation.svg",
+     "Detonation"
+    ],
+    "dev-console": [
+     "azure/general/10796-icon-service-Dev-Console.svg",
+     "Dev Console"
+    ],
+    "dev-tunnels": [
+     "azure/other/03308-icon-service-Azure-Dev-Tunnels.svg",
+     "Azure Dev Tunnels"
+    ],
+    "device-compliance": [
+     "azure/intune/10333-icon-service-Device-Compliance.svg",
+     "Device Compliance"
+    ],
+    "device-configuration": [
+     "azure/intune/10338-icon-service-Device-Configuration.svg",
+     "Device Configuration"
+    ],
+    "device-enrollment": [
+     "azure/intune/10337-icon-service-Device-Enrollment.svg",
+     "Device Enrollment"
+    ],
+    "device-provisioning-services": [
+     "azure/iot/10369-icon-service-Device-Provisioning-Services.svg",
+     "Device Provisioning Services"
+    ],
+    "device-security-apple": [
+     "azure/intune/00399-icon-service-Device-Security-Apple.svg",
+     "Device Security Apple"
+    ],
+    "device-security-google": [
+     "azure/intune/00399-icon-service-Device-Security-Google.svg",
+     "Device Security Google"
+    ],
+    "device-security-windows": [
+     "azure/intune/00399-icon-service-Device-Security-Windows.svg",
+     "Device Security Windows"
+    ],
+    "device-update-iot-hub": [
+     "azure/other/02475-icon-service-Device-Update-IoT-Hub.svg",
+     "Device Update IoT Hub"
+    ],
+    "devices": [
+     "azure/intune/10332-icon-service-Devices.svg",
+     "Devices"
+    ],
+    "devops": [
+     "azure/devops/10261-icon-service-Azure-DevOps.svg",
+     "Azure DevOps"
+    ],
+    "devops-starter": [
+     "azure/devops/03339-icon-service-DevOps-Starter.svg",
+     "DevOps Starter"
+    ],
+    "devtest-labs": [
+     "azure/devops/10264-icon-service-DevTest-Labs.svg",
+     "DevTest Labs"
+    ],
+    "diagnostics-settings": [
+     "azure/management-governance/00008-icon-service-Diagnostics-Settings.svg",
+     "Diagnostics Settings"
+    ],
+    "digital-twins": [
+     "azure/iot/01030-icon-service-Digital-Twins.svg",
+     "Digital Twins"
+    ],
+    "disconnected-operations": [
+     "azure/new-icons/035712231-icon-service-Disconnected-Operations.svg",
+     "Disconnected Operations"
+    ],
+    "disk-encryption-sets": [
+     "azure/compute/00398-icon-service-Disk-Encryption-Sets.svg",
+     "Disk Encryption Sets"
+    ],
+    "disk-pool": [
+     "azure/other/02560-icon-service-Disk-Pool.svg",
+     "Disk Pool"
+    ],
+    "disks": [
+     "azure/compute/10032-icon-service-Disks.svg",
+     "Disks"
+    ],
+    "disks-snapshots": [
+     "azure/compute/10026-icon-service-Disks-Snapshots.svg",
+     "Disks Snapshots"
+    ],
+    "dns-multistack": [
+     "azure/networking/03459-icon-service-DNS-Multistack.svg",
+     "DNS Multistack"
+    ],
+    "dns-private-resolver": [
+     "azure/networking/02882-icon-service-DNS-Private-Resolver.svg",
+     "DNS Private Resolver"
+    ],
+    "dns-security-policy": [
+     "azure/networking/03368-icon-service-DNS-Security-Policy.svg",
+     "DNS Security Policy"
+    ],
+    "dns-zones": [
+     "azure/networking/10064-icon-service-DNS-Zones.svg",
+     "DNS Zones"
+    ],
+    "documentdb": [
+     "azure/databases/035656437-icon-service-Azure-DocumentDB.svg",
+     "Azure DocumentDB"
+    ],
+    "download": [
+     "azure/general/10797-icon-service-Download.svg",
+     "Download"
+    ],
+    "ebooks": [
+     "azure/intune/10330-icon-service-eBooks.svg",
+     "eBooks"
+    ],
+    "edge-actions": [
+     "azure/networking/029273094-icon-service-Edge-Actions.svg",
+     "Edge Actions"
+    ],
+    "edge-hardware-center": [
+     "azure/other/02810-icon-service-Azure-Edge-Hardware-Center.svg",
+     "Azure Edge Hardware Center"
+    ],
+    "edge-management": [
+     "azure/other/10117-icon-service-Edge-Management.svg",
+     "Edge Management"
+    ],
+    "edge-storage-accelerator": [
+     "azure/hybrid-multicloud/03521-icon-service-Edge-Storage-Accelerator.svg",
+     "Edge Storage Accelerator"
+    ],
+    "education": [
+     "azure/management-governance/00026-icon-service-Education.svg",
+     "Education"
+    ],
+    "elastic-job-agents": [
+     "azure/databases/10128-icon-service-Elastic-Job-Agents.svg",
+     "Elastic Job Agents"
+    ],
+    "elastic-san": [
+     "azure/other/03190-icon-service-Elastic-SAN.svg",
+     "Elastic SAN"
+    ],
+    "enclaves": [
+     "azure/other/03394-icon-service-Azure-Enclaves.svg",
+     "Azure Enclaves"
+    ],
+    "endpoint-analytics": [
+     "azure/analytics/00562-icon-service-Endpoint-Analytics.svg",
+     "Endpoint Analytics"
+    ],
+    "engage-center-connect": [
+     "azure/intune/029797391-icon-service-Engage-Center-Connect.svg",
+     "Engage Center Connect"
+    ],
+    "enterprise-applications": [
+     "azure/identity/10225-icon-service-Enterprise-Applications.svg",
+     "Enterprise Applications"
+    ],
+    "entra-connect": [
+     "azure/identity/02854-icon-service-Entra-Connect.svg",
+     "Entra Connect"
+    ],
+    "entra-connect-sync": [
+     "azure/identity/03533-icon-service-Entra-Connect-Sync.svg",
+     "Entra Connect Sync"
+    ],
+    "entra-domain-services": [
+     "azure/identity/10222-icon-service-Entra-Domain-Services.svg",
+     "Entra Domain Services"
+    ],
+    "entra-global-secure-access": [
+     "azure/identity/03309-icon-service-Entra-Global-Secure-Access.svg",
+     "Entra Global Secure Access"
+    ],
+    "entra-id-protection": [
+     "azure/identity/10231-icon-service-Entra-ID-Protection.svg",
+     "Entra ID Protection"
+    ],
+    "entra-identity-custom-roles": [
+     "azure/identity/02680-icon-service-Entra-Identity-Custom-Roles.svg",
+     "Entra Identity Custom Roles"
+    ],
+    "entra-identity-licenses": [
+     "azure/identity/02681-icon-service-Entra-Identity-Licenses.svg",
+     "Entra Identity Licenses"
+    ],
+    "entra-identity-risky-signins": [
+     "azure/security/03341-icon-service-Entra-Identity-Risky-Signins.svg",
+     "Entra Identity Risky Signins"
+    ],
+    "entra-identity-risky-users": [
+     "azure/security/03342-icon-service-Entra-Identity-Risky-Users.svg",
+     "Entra Identity Risky Users"
+    ],
+    "entra-identity-roles-and-administrators": [
+     "azure/identity/10340-icon-service-Entra-Identity-Roles-and-Administrators.svg",
+     "Entra Identity Roles and Administrators"
+    ],
+    "entra-internet-access": [
+     "azure/identity/03383-icon-service-Entra-Internet-Access.svg",
+     "Entra Internet Access"
+    ],
+    "entra-managed-identities": [
+     "azure/identity/10227-icon-service-Entra-Managed-Identities.svg",
+     "Entra Managed Identities"
+    ],
+    "entra-private-access": [
+     "azure/identity/03382-icon-service-Entra-Private-Access.svg",
+     "Entra Private Access"
+    ],
+    "entra-privleged-identity-management": [
+     "azure/identity/02251-icon-service-Entra-Privleged-Identity-Management.svg",
+     "Entra Privleged Identity Management"
+    ],
+    "entra-verified-id": [
+     "azure/identity/03143-icon-service-Entra-Verified-ID.svg",
+     "Entra Verified ID"
+    ],
+    "error": [
+     "azure/general/10798-icon-service-Error.svg",
+     "Error"
+    ],
+    "event-grid-domains": [
+     "azure/integration/10215-icon-service-Event-Grid-Domains.svg",
+     "Event Grid Domains"
+    ],
+    "event-grid-subscriptions": [
+     "azure/integration/10221-icon-service-Event-Grid-Subscriptions.svg",
+     "Event Grid Subscriptions"
+    ],
+    "event-grid-topics": [
+     "azure/integration/10206-icon-service-Event-Grid-Topics.svg",
+     "Event Grid Topics"
+    ],
+    "event-hub-clusters": [
+     "azure/analytics/10149-icon-service-Event-Hub-Clusters.svg",
+     "Event Hub Clusters"
+    ],
+    "event-hubs": [
+     "azure/analytics/00039-icon-service-Event-Hubs.svg",
+     "Event Hubs"
+    ],
+    "exchange-access": [
+     "azure/intune/10339-icon-service-Exchange-Access.svg",
+     "Exchange Access"
+    ],
+    "exchange-on-premises-access": [
+     "azure/other/10334-icon-service-Exchange-On-Premises-Access.svg",
+     "Exchange On Premises Access"
+    ],
+    "experimentation-studio": [
+     "azure/ai-machine-learning/01239-icon-service-Azure-Experimentation-Studio.svg",
+     "Azure Experimentation Studio"
+    ],
+    "express-route-traffic-collector": [
+     "azure/other/03137-icon-service-Express-Route-Traffic-Collector.svg",
+     "Express Route Traffic Collector"
+    ],
+    "expressroute-circuits": [
+     "azure/networking/10079-icon-service-ExpressRoute-Circuits.svg",
+     "ExpressRoute Circuits"
+    ],
+    "expressroute-direct": [
+     "azure/other/00903-icon-service-ExpressRoute-Direct.svg",
+     "ExpressRoute Direct"
+    ],
+    "extendedsecurityupdates": [
+     "azure/security/10572-icon-service-ExtendedSecurityUpdates.svg",
+     "ExtendedSecurityUpdates"
+    ],
+    "extensions": [
+     "azure/general/10799-icon-service-Extensions.svg",
+     "Extensions"
+    ],
+    "external-id": [
+     "azure/identity/03425-icon-service-external-id.svg",
+     "external id"
+    ],
+    "external-id-modified": [
+     "azure/identity/034251-icon-service-external-id-modified.svg",
+     "external id modified"
+    ],
+    "external-identities": [
+     "azure/identity/03338-icon-service-External-Identities.svg",
+     "External Identities"
+    ],
+    "face-apis": [
+     "azure/ai-machine-learning/00794-icon-service-Face-APIs.svg",
+     "Face APIs"
+    ],
+    "feature-previews": [
+     "azure/general/10827-icon-service-Feature-Previews.svg",
+     "Feature Previews"
+    ],
+    "fhir-service": [
+     "azure/other/02658-icon-service-FHIR-Service.svg",
+     "FHIR Service"
+    ],
+    "fiji": [
+     "azure/other/02486-icon-service-Fiji.svg",
+     "Fiji"
+    ],
+    "file": [
+     "azure/general/10800-icon-service-File.svg",
+     "File"
+    ],
+    "files": [
+     "azure/general/10801-icon-service-Files.svg",
+     "Files"
+    ],
+    "fileshares": [
+     "azure/storage/10400-icon-service-Azure-Fileshares.svg",
+     "Azure Fileshares"
+    ],
+    "firewall-manager": [
+     "azure/networking/00271-icon-service-Azure-Firewall-Manager.svg",
+     "Azure Firewall Manager"
+    ],
+    "firewall-policy": [
+     "azure/networking/00272-icon-service-Azure-Firewall-Policy.svg",
+     "Azure Firewall Policy"
+    ],
+    "firewalls": [
+     "azure/networking/10084-icon-service-Firewalls.svg",
+     "Firewalls"
+    ],
+    "folder-blank": [
+     "azure/general/10802-icon-service-Folder-Blank.svg",
+     "Folder Blank"
+    ],
+    "folder-website": [
+     "azure/general/10803-icon-service-Folder-Website.svg",
+     "Folder Website"
+    ],
+    "form-recognizers": [
+     "azure/ai-machine-learning/00819-icon-service-Form-Recognizers.svg",
+     "Form Recognizers"
+    ],
+    "foundry-agent-service": [
+     "azure/ai-machine-learning/038470523-icon-service-Foundry-Agent-Service.svg",
+     "Foundry Agent Service"
+    ],
+    "foundry-application": [
+     "azure/ai-machine-learning/036509374-icon-service-Foundry-Application.svg",
+     "Foundry Application"
+    ],
+    "foundry-control-plane": [
+     "azure/ai-machine-learning/038470534-icon-service-Foundry-Control-Plane.svg",
+     "Foundry Control Plane"
+    ],
+    "foundry-labs": [
+     "azure/ai-machine-learning/038470555-icon-service-Foundry-Labs.svg",
+     "Foundry Labs"
+    ],
+    "foundry-local": [
+     "azure/ai-machine-learning/038470593-icon-service-Foundry-Local.svg",
+     "Foundry Local"
+    ],
+    "foundry-models": [
+     "azure/ai-machine-learning/038470614-icon-service-Foundry-Models.svg",
+     "Foundry Models"
+    ],
+    "foundry-project": [
+     "azure/ai-machine-learning/036509415-icon-service-Foundry-Project.svg",
+     "Foundry Project"
+    ],
+    "frd-qa": [
+     "azure/ai-machine-learning/029455661-icon-service-FRD-QA.svg",
+     "FRD QA"
+    ],
+    "free-services": [
+     "azure/general/10016-icon-service-Free-Services.svg",
+     "Free Services"
+    ],
+    "front-door-and-cdn-profiles": [
+     "azure/networking/10073-icon-service-Front-Door-and-CDN-Profiles.svg",
+     "Front Door and CDN Profiles"
+    ],
+    "ftp": [
+     "azure/general/10804-icon-service-FTP.svg",
+     "FTP"
+    ],
+    "function-apps": [
+     "azure/compute/10029-icon-service-Function-Apps.svg",
+     "Function Apps"
+    ],
+    "gear": [
+     "azure/general/10805-icon-service-Gear.svg",
+     "Gear"
+    ],
+    "genomics": [
+     "azure/ai-machine-learning/00031-icon-service-Genomics.svg",
+     "Genomics"
+    ],
+    "globe-error": [
+     "azure/general/10807-icon-service-Globe-Error.svg",
+     "Globe Error"
+    ],
+    "globe-success": [
+     "azure/general/10808-icon-service-Globe-Success.svg",
+     "Globe Success"
+    ],
+    "globe-warning": [
+     "azure/general/10809-icon-service-Globe-Warning.svg",
+     "Globe Warning"
+    ],
+    "groups": [
+     "azure/identity/10223-icon-service-Groups.svg",
+     "Groups"
+    ],
+    "guide": [
+     "azure/general/10810-icon-service-Guide.svg",
+     "Guide"
+    ],
+    "hcp-cache": [
+     "azure/storage/00776-icon-service-Azure-HCP-Cache.svg",
+     "Azure HCP Cache"
+    ],
+    "hd-insight-clusters": [
+     "azure/analytics/10142-icon-service-HD-Insight-Clusters.svg",
+     "HD Insight Clusters"
+    ],
+    "hdi-aks-cluster": [
+     "azure/other/03468-icon-service-HDI-AKS-Cluster.svg",
+     "HDI AKS Cluster"
+    ],
+    "heart": [
+     "azure/general/10811-icon-service-Heart.svg",
+     "Heart"
+    ],
+    "help-and-support": [
+     "azure/general/10013-icon-service-Help-and-Support.svg",
+     "Help and Support"
+    ],
+    "host-groups": [
+     "azure/compute/10346-icon-service-Host-Groups.svg",
+     "Host Groups"
+    ],
+    "host-pools": [
+     "azure/compute/00328-icon-service-Host-Pools.svg",
+     "Host Pools"
+    ],
+    "hosts": [
+     "azure/compute/10347-icon-service-Hosts.svg",
+     "Hosts"
+    ],
+    "hpc-workbenches": [
+     "azure/other/02518-icon-service-Azure-HPC-Workbenches.svg",
+     "Azure HPC Workbenches"
+    ],
+    "hybrid-center": [
+     "azure/azure-ecosystem/02573-icon-service-Azure-Hybrid-Center.svg",
+     "Azure Hybrid Center"
+    ],
+    "hybrid-connectivity-hub": [
+     "azure/iot/03656-icon-service-Hybrid-Connectivity-Hub.svg",
+     "Hybrid Connectivity Hub"
+    ],
+    "icm-troubleshooting": [
+     "azure/other/03361-icon-service-IcM-Troubleshooting.svg",
+     "IcM Troubleshooting"
+    ],
+    "identity-governance": [
+     "azure/identity/10235-icon-service-Identity-Governance.svg",
+     "Identity Governance"
+    ],
+    "identity-secure-score": [
+     "azure/security/03340-icon-service-Identity-Secure-Score.svg",
+     "Identity Secure Score"
+    ],
+    "image": [
+     "azure/general/10812-icon-service-Image.svg",
+     "Image"
+    ],
+    "image-definitions": [
+     "azure/compute/10037-icon-service-Image-Definitions.svg",
+     "Image Definitions"
+    ],
+    "image-templates": [
+     "azure/compute/02634-icon-service-Image-Templates.svg",
+     "Image Templates"
+    ],
+    "image-versions": [
+     "azure/compute/10038-icon-service-Image-Versions.svg",
+     "Image Versions"
+    ],
+    "images": [
+     "azure/compute/10033-icon-service-Images.svg",
+     "Images"
+    ],
+    "immersive-readers": [
+     "azure/ai-machine-learning/00812-icon-service-Immersive-Readers.svg",
+     "Immersive Readers"
+    ],
+    "import-export-jobs": [
+     "azure/storage/10100-icon-service-Import-Export-Jobs.svg",
+     "Import Export Jobs"
+    ],
+    "industrial-iot": [
+     "azure/iot/02359-icon-service-Industrial-IoT.svg",
+     "Industrial IoT"
+    ],
+    "information": [
+     "azure/general/10005-icon-service-Information.svg",
+     "Information"
+    ],
+    "information-protection": [
+     "azure/identity/10229-icon-service-Azure-Information-Protection.svg",
+     "Azure Information Protection"
+    ],
+    "input-output": [
+     "azure/general/10813-icon-service-Input-Output.svg",
+     "Input Output"
+    ],
+    "instance-pools": [
+     "azure/databases/10139-icon-service-Instance-Pools.svg",
+     "Instance Pools"
+    ],
+    "integration-accounts": [
+     "azure/integration/10218-icon-service-Integration-Accounts.svg",
+     "Integration Accounts"
+    ],
+    "integration-environments": [
+     "azure/integration/03345-icon-service-Integration-Environments.svg",
+     "Integration Environments"
+    ],
+    "integration-service-environments": [
+     "azure/integration/00555-icon-service-Integration-Service-Environments.svg",
+     "Integration Service Environments"
+    ],
+    "internet-analyzer-profiles": [
+     "azure/other/00469-icon-service-Internet-Analyzer-Profiles.svg",
+     "Internet Analyzer Profiles"
+    ],
+    "intune": [
+     "azure/intune/10329-icon-service-Intune.svg",
+     "Intune"
+    ],
+    "intune-trends": [
+     "azure/management-governance/00408-icon-service-Intune-Trends.svg",
+     "Intune Trends"
+    ],
+    "iot-central-applications": [
+     "azure/iot/10184-icon-service-IoT-Central-Applications.svg",
+     "IoT Central Applications"
+    ],
+    "iot-edge": [
+     "azure/iot/10186-icon-service-IoT-Edge.svg",
+     "IoT Edge"
+    ],
+    "iot-hub": [
+     "azure/iot/10182-icon-service-IoT-Hub.svg",
+     "IoT Hub"
+    ],
+    "iot-operations": [
+     "azure/iot/03485-icon-service-Azure-IoT-Operations.svg",
+     "Azure IoT Operations"
+    ],
+    "ip-address-manager": [
+     "azure/networking/03461-icon-service-IP-Address-manager.svg",
+     "IP Address manager"
+    ],
+    "ip-groups": [
+     "azure/networking/00701-icon-service-IP-Groups.svg",
+     "IP Groups"
+    ],
+    "journey-hub": [
+     "azure/general/10814-icon-service-Journey-Hub.svg",
+     "Journey Hub"
+    ],
+    "key-vaults": [
+     "azure/security/10245-icon-service-Key-Vaults.svg",
+     "Key Vaults"
+    ],
+    "keys": [
+     "azure/menu/00787-icon-service-Keys.svg",
+     "Keys"
+    ],
+    "kubernetes-fleet-manager": [
+     "azure/other/03134-icon-service-Kubernetes-Fleet-Manager.svg",
+     "Kubernetes Fleet Manager"
+    ],
+    "kubernetes-hub": [
+     "azure/containers/033545113-icon-service-Kubernetes-Hub.svg",
+     "Kubernetes Hub"
+    ],
+    "kubernetes-services": [
+     "azure/compute/10023-icon-service-Kubernetes-Services.svg",
+     "Kubernetes Services"
+    ],
+    "lab-accounts": [
+     "azure/devops/02761-icon-service-Lab-Accounts.svg",
+     "Lab Accounts"
+    ],
+    "lab-services": [
+     "azure/devops/10265-icon-service-Lab-Services.svg",
+     "Lab Services"
+    ],
+    "landing-zone": [
+     "azure/new-icons/029636048-icon-service-Landing-Zone.svg",
+     "Landing Zone"
+    ],
+    "language": [
+     "azure/ai-machine-learning/02876-icon-service-Language.svg",
+     "Language"
+    ],
+    "language-understanding": [
+     "azure/ai-machine-learning/00801-icon-service-Language-Understanding.svg",
+     "Language Understanding"
+    ],
+    "launch-portal": [
+     "azure/general/10815-icon-service-Launch-Portal.svg",
+     "Launch Portal"
+    ],
+    "learn": [
+     "azure/general/10816-icon-service-Learn.svg",
+     "Learn"
+    ],
+    "lighthouse": [
+     "azure/management-governance/00471-icon-service-Azure-Lighthouse.svg",
+     "Azure Lighthouse"
+    ],
+    "linux": [
+     "azure/compute/03645-icon-service-Azure-Linux.svg",
+     "Azure Linux"
+    ],
+    "load-balancer-hub": [
+     "azure/networking/02302-icon-service-Load-Balancer-Hub.svg",
+     "Load Balancer Hub"
+    ],
+    "load-balancer-hub-networking": [
+     "azure/networking/029029174-icon-service-Load-Balancer-Hub.svg",
+     "Load Balancer Hub"
+    ],
+    "load-balancers": [
+     "azure/networking/10062-icon-service-Load-Balancers.svg",
+     "Load Balancers"
+    ],
+    "load-test": [
+     "azure/general/10817-icon-service-Load-Test.svg",
+     "Load Test"
+    ],
+    "load-testing": [
+     "azure/devops/02423-icon-service-Load-Testing.svg",
+     "Load Testing"
+    ],
+    "load-testing-other": [
+     "azure/other/02944-icon-service-Azure-Load-Testing.svg",
+     "Azure Load Testing"
+    ],
+    "local": [
+     "azure/hybrid-multicloud/033745116-icon-service-Azure-Local.svg",
+     "Azure Local"
+    ],
+    "local-network-gateways": [
+     "azure/networking/10077-icon-service-Local-Network-Gateways.svg",
+     "Local Network Gateways"
+    ],
+    "location": [
+     "azure/general/10818-icon-service-Location.svg",
+     "Location"
+    ],
+    "log-analytics-query-pack": [
+     "azure/other/01085-icon-service-Log-Analytics-Query-Pack.svg",
+     "Log Analytics Query Pack"
+    ],
+    "log-analytics-workspaces": [
+     "azure/analytics/00009-icon-service-Log-Analytics-Workspaces.svg",
+     "Log Analytics Workspaces"
+    ],
+    "log-streaming": [
+     "azure/general/10819-icon-service-Log-Streaming.svg",
+     "Log Streaming"
+    ],
+    "logic-apps": [
+     "azure/integration/02631-icon-service-Logic-Apps.svg",
+     "Logic Apps"
+    ],
+    "logic-apps-custom-connector": [
+     "azure/integration/10363-icon-service-Logic-Apps-Custom-Connector.svg",
+     "Logic Apps Custom Connector"
+    ],
+    "logic-apps-template": [
+     "azure/integration/032130874-icon-service-Logic-Apps-Template.svg",
+     "Logic Apps Template"
+    ],
+    "machine-learning": [
+     "azure/ai-machine-learning/038470510-icon-service-Azure-Machine-Learning.svg",
+     "Azure Machine Learning"
+    ],
+    "machine-learning-ai-machine-learning": [
+     "azure/ai-machine-learning/10166-icon-service-Machine-Learning.svg",
+     "Machine Learning"
+    ],
+    "machine-learning-studio-classic-web-services": [
+     "azure/ai-machine-learning/00030-icon-service-Machine-Learning-Studio-(Classic)-Web-Services.svg",
+     "Machine Learning Studio (Classic) Web Services"
+    ],
+    "machine-learning-studio-web-service-plans": [
+     "azure/ai-machine-learning/10168-icon-service-Machine-Learning-Studio-Web-Service-Plans.svg",
+     "Machine Learning Studio Web Service Plans"
+    ],
+    "machine-learning-studio-workspaces": [
+     "azure/ai-machine-learning/10167-icon-service-Machine-Learning-Studio-Workspaces.svg",
+     "Machine Learning Studio Workspaces"
+    ],
+    "machinesazurearc": [
+     "azure/management-governance/10450-icon-service-MachinesAzureArc.svg",
+     "MachinesAzureArc"
+    ],
+    "maintenance-configuration": [
+     "azure/compute/00195-icon-service-Maintenance-Configuration.svg",
+     "Maintenance Configuration"
+    ],
+    "managed-applications-center": [
+     "azure/management-governance/10313-icon-service-Managed-Applications-Center.svg",
+     "Managed Applications Center"
+    ],
+    "managed-database": [
+     "azure/databases/10135-icon-service-Managed-Database.svg",
+     "Managed Database"
+    ],
+    "managed-desktop": [
+     "azure/management-governance/10311-icon-service-Managed-Desktop.svg",
+     "Managed Desktop"
+    ],
+    "managed-devops-pools": [
+     "azure/devops/03393-icon-service-Managed-DevOps-Pools.svg",
+     "Managed DevOps Pools"
+    ],
+    "managed-file-shares": [
+     "azure/storage/03549-icon-service-Managed-File-Shares.svg",
+     "Managed File Shares"
+    ],
+    "managed-grafana": [
+     "azure/other/02905-icon-service-Azure-Managed-Grafana.svg",
+     "Azure Managed Grafana"
+    ],
+    "managed-identities": [
+     "azure/identity/10227-icon-service-Managed-Identities.svg",
+     "Managed Identities"
+    ],
+    "managed-instance-apache-cassandra": [
+     "azure/other/02663-icon-service-Managed-Instance-Apache-Cassandra.svg",
+     "Managed Instance Apache Cassandra"
+    ],
+    "managed-redis": [
+     "azure/databases/03675-icon-service-Azure-Managed-Redis.svg",
+     "Azure Managed Redis"
+    ],
+    "managed-service-fabric": [
+     "azure/compute/02370-icon-service-Managed-Service-Fabric.svg",
+     "Managed Service Fabric"
+    ],
+    "management-groups": [
+     "azure/general/10011-icon-service-Management-Groups.svg",
+     "Management Groups"
+    ],
+    "management-portal": [
+     "azure/general/10820-icon-service-Management-Portal.svg",
+     "Management Portal"
+    ],
+    "maps-accounts": [
+     "azure/iot/10185-icon-service-Azure-Maps-Accounts.svg",
+     "Azure Maps Accounts"
+    ],
+    "marketplace": [
+     "azure/general/10008-icon-service-Marketplace.svg",
+     "Marketplace"
+    ],
+    "marketplace-management": [
+     "azure/general/10112-icon-service-Marketplace-Management.svg",
+     "Marketplace Management"
+    ],
+    "media": [
+     "azure/general/10854-icon-service-Media.svg",
+     "Media"
+    ],
+    "media-file": [
+     "azure/general/10821-icon-service-Media-File.svg",
+     "Media File"
+    ],
+    "media-service": [
+     "azure/web/10309-icon-service-Azure-Media-Service.svg",
+     "Azure Media Service"
+    ],
+    "medtech-service": [
+     "azure/other/02660-icon-service-MedTech-Service.svg",
+     "MedTech Service"
+    ],
+    "mesh-applications": [
+     "azure/compute/10024-icon-service-Mesh-Applications.svg",
+     "Mesh Applications"
+    ],
+    "metrics": [
+     "azure/management-governance/00020-icon-service-Metrics.svg",
+     "Metrics"
+    ],
+    "metrics-advisor": [
+     "azure/ai-machine-learning/02409-icon-service-Metrics-Advisor.svg",
+     "Metrics Advisor"
+    ],
+    "microsoft-defender-easm": [
+     "azure/security/03336-icon-service-Microsoft-Defender-EASM.svg",
+     "Microsoft Defender EASM"
+    ],
+    "microsoft-defender-for-cloud": [
+     "azure/security/10241-icon-service-Microsoft-Defender-for-Cloud.svg",
+     "Microsoft Defender for Cloud"
+    ],
+    "microsoft-defender-for-iot": [
+     "azure/security/02247-icon-service-Microsoft-Defender-for-IoT.svg",
+     "Microsoft Defender for IoT"
+    ],
+    "microsoft-dev-box": [
+     "azure/other/03250-icon-service-Microsoft-Dev-Box.svg",
+     "Microsoft Dev Box"
+    ],
+    "microsoft-discovery": [
+     "azure/other/032869111-icon-service-Microsoft-Discovery.svg",
+     "Microsoft Discovery"
+    ],
+    "migrate": [
+     "azure/migrate/10281-icon-service-Azure-Migrate.svg",
+     "Azure Migrate"
+    ],
+    "mindaro": [
+     "azure/intune/10350-icon-service-Mindaro.svg",
+     "Mindaro"
+    ],
+    "mission-landing-zone": [
+     "azure/other/02793-icon-service-Mission-Landing-Zone.svg",
+     "Mission Landing Zone"
+    ],
+    "mobile": [
+     "azure/general/10822-icon-service-Mobile.svg",
+     "Mobile"
+    ],
+    "mobile-engagement": [
+     "azure/general/10823-icon-service-Mobile-Engagement.svg",
+     "Mobile Engagement"
+    ],
+    "mobile-networks": [
+     "azure/other/02794-icon-service-Mobile-Networks.svg",
+     "Mobile Networks"
+    ],
+    "modular-data-center": [
+     "azure/other/02323-icon-service-Modular-Data-Center.svg",
+     "Modular Data Center"
+    ],
+    "module": [
+     "azure/general/10855-icon-service-Module.svg",
+     "Module"
+    ],
+    "monitor": [
+     "azure/management-governance/00001-icon-service-Monitor.svg",
+     "Monitor"
+    ],
+    "monitor-dashboard": [
+     "azure/other/02488-icon-service-Azure-Monitor-Dashboard.svg",
+     "Azure Monitor Dashboard"
+    ],
+    "monitor-health-models": [
+     "azure/other/03528-icon-service-Monitor-Health-Models.svg",
+     "Monitor Health Models"
+    ],
+    "monitor-pipeline": [
+     "azure/hybrid-multicloud/03585-icon-service-Azure-Monitor-Pipeline.svg",
+     "Azure Monitor Pipeline"
+    ],
+    "monitors-for-sap-solutions": [
+     "azure/monitor/00438-icon-service-Azure-Monitors-for-SAP-Solutions.svg",
+     "Azure Monitors for SAP Solutions"
+    ],
+    "multi-factor-authentication": [
+     "azure/identity/03256-icon-service-Multi-Factor-Authentication.svg",
+     "Multi Factor Authentication"
+    ],
+    "multi-tenancy": [
+     "azure/identity/00965-icon-service-Multi-Tenancy.svg",
+     "Multi Tenancy"
+    ],
+    "multifactor-authentication": [
+     "azure/security/03344-icon-service-Multifactor-Authentication.svg",
+     "Multifactor Authentication"
+    ],
+    "nat": [
+     "azure/networking/10310-icon-service-NAT.svg",
+     "NAT"
+    ],
+    "netapp-files": [
+     "azure/storage/10096-icon-service-Azure-NetApp-Files.svg",
+     "Azure NetApp Files"
+    ],
+    "network-foundation-hub": [
+     "azure/networking/03643-icon-service-Network-Foundation-Hub.svg",
+     "Network Foundation Hub"
+    ],
+    "network-function-manager": [
+     "azure/other/02740-icon-service-Azure-Network-Function-Manager.svg",
+     "Azure Network Function Manager"
+    ],
+    "network-function-manager-functions": [
+     "azure/other/01001-icon-service-Azure-Network-Function-Manager-Functions.svg",
+     "Azure Network Function Manager Functions"
+    ],
+    "network-interfaces": [
+     "azure/networking/10080-icon-service-Network-Interfaces.svg",
+     "Network Interfaces"
+    ],
+    "network-managers": [
+     "azure/other/02237-icon-service-Network-Managers.svg",
+     "Network Managers"
+    ],
+    "network-security-groups": [
+     "azure/networking/10067-icon-service-Network-Security-Groups.svg",
+     "Network Security Groups"
+    ],
+    "network-security-hub": [
+     "azure/networking/03650-icon-service-Network-Security-Hub.svg",
+     "Network Security Hub"
+    ],
+    "network-security-perimeters": [
+     "azure/other/02939-icon-service-Network-Security-Perimeters.svg",
+     "Network Security Perimeters"
+    ],
+    "network-watcher": [
+     "azure/monitor/10066-icon-service-Network-Watcher.svg",
+     "Network Watcher"
+    ],
+    "notification-hub-namespaces": [
+     "azure/iot/10053-icon-service-Notification-Hub-Namespaces.svg",
+     "Notification Hub Namespaces"
+    ],
+    "notification-hubs": [
+     "azure/app-services/10045-icon-service-Notification-Hubs.svg",
+     "Notification Hubs"
+    ],
+    "object-understanding": [
+     "azure/ai-machine-learning/01688-icon-service-Azure-Object-Understanding.svg",
+     "Azure Object Understanding"
+    ],
+    "on-premises-data-gateways": [
+     "azure/networking/10070-icon-service-On-Premises-Data-Gateways.svg",
+     "On Premises Data Gateways"
+    ],
+    "open-supply-chain-platform": [
+     "azure/other/02602-icon-service-Open-Supply-Chain-Platform.svg",
+     "Open Supply Chain Platform"
+    ],
+    "openai": [
+     "azure/ai-machine-learning/03438-icon-service-Azure-OpenAI.svg",
+     "Azure OpenAI"
+    ],
+    "operation-log-classic": [
+     "azure/management-governance/00024-icon-service-Operation-Log-(Classic).svg",
+     "Operation Log (Classic)"
+    ],
+    "operator-5g-core": [
+     "azure/hybrid-multicloud/03248-icon-service-Azure-Operator-5G-Core.svg",
+     "Azure Operator 5G Core"
+    ],
+    "operator-insights": [
+     "azure/hybrid-multicloud/03333-icon-service-Azure-Operator-Insights.svg",
+     "Azure Operator Insights"
+    ],
+    "operator-nexus": [
+     "azure/hybrid-multicloud/03324-icon-service-Azure-Operator-Nexus.svg",
+     "Azure Operator Nexus"
+    ],
+    "operator-service-manager": [
+     "azure/hybrid-multicloud/03334-icon-service-Azure-Operator-Service-Manager.svg",
+     "Azure Operator Service Manager"
+    ],
+    "oracle-database": [
+     "azure/databases/03490-icon-service-Oracle-Database.svg",
+     "Oracle Database"
+    ],
+    "orbital": [
+     "azure/other/02697-icon-service-Azure-Orbital.svg",
+     "Azure Orbital"
+    ],
+    "os-images-classic": [
+     "azure/compute/10027-icon-service-OS-Images-(Classic).svg",
+     "OS Images (Classic)"
+    ],
+    "osconfig": [
+     "azure/other/03365-icon-service-OSConfig.svg",
+     "OSConfig"
+    ],
+    "outbound-connection": [
+     "azure/blockchain/10364-icon-service-Outbound-Connection.svg",
+     "Outbound Connection"
+    ],
+    "partner-namespace": [
+     "azure/integration/02266-icon-service-Partner-Namespace.svg",
+     "Partner Namespace"
+    ],
+    "partner-registration": [
+     "azure/integration/02265-icon-service-Partner-Registration.svg",
+     "Partner Registration"
+    ],
+    "partner-topic": [
+     "azure/integration/02072-icon-service-Partner-Topic.svg",
+     "Partner Topic"
+    ],
+    "peering-service": [
+     "azure/other/00970-icon-service-Peering-Service.svg",
+     "Peering Service"
+    ],
+    "peerings": [
+     "azure/other/01285-icon-service-Peerings.svg",
+     "Peerings"
+    ],
+    "personalizers": [
+     "azure/ai-machine-learning/00796-icon-service-Personalizers.svg",
+     "Personalizers"
+    ],
+    "planetary-computer-pro": [
+     "azure/ai-machine-learning/03755-icon-service-Planetary-Computer-Pro.svg",
+     "Planetary Computer Pro"
+    ],
+    "policy": [
+     "azure/management-governance/10316-icon-service-Policy.svg",
+     "Policy"
+    ],
+    "power": [
+     "azure/general/10824-icon-service-Power.svg",
+     "Power"
+    ],
+    "power-bi-embedded": [
+     "azure/analytics/03332-icon-service-Power-BI-Embedded.svg",
+     "Power BI Embedded"
+    ],
+    "power-platform": [
+     "azure/analytics/03335-icon-service-Power-Platform.svg",
+     "Power Platform"
+    ],
+    "power-up": [
+     "azure/general/10826-icon-service-Power-Up.svg",
+     "Power Up"
+    ],
+    "powershell": [
+     "azure/general/10825-icon-service-Powershell.svg",
+     "Powershell"
+    ],
+    "preview-features": [
+     "azure/general/00456-icon-service-Preview-Features.svg",
+     "Preview Features"
+    ],
+    "private-endpoints": [
+     "azure/other/02579-icon-service-Private-Endpoints.svg",
+     "Private Endpoints"
+    ],
+    "private-link": [
+     "azure/networking/00427-icon-service-Private-Link.svg",
+     "Private Link"
+    ],
+    "private-link-service": [
+     "azure/networking/01105-icon-service-Private-Link-Service.svg",
+     "Private Link Service"
+    ],
+    "private-link-services": [
+     "azure/analytics/02209-icon-service-Private-Link-Services.svg",
+     "Private Link Services"
+    ],
+    "process-explorer": [
+     "azure/general/10828-icon-service-Process-Explorer.svg",
+     "Process Explorer"
+    ],
+    "production-ready-database": [
+     "azure/general/10829-icon-service-Production-Ready-Database.svg",
+     "Production Ready Database"
+    ],
+    "programmable-connectivity": [
+     "azure/hybrid-multicloud/03347-icon-service-Azure-Programmable-Connectivity.svg",
+     "Azure Programmable Connectivity"
+    ],
+    "promethus": [
+     "azure/other/033112809-icon-service-promethus.svg",
+     "promethus"
+    ],
+    "proximity-placement-groups": [
+     "azure/networking/10365-icon-service-Proximity-Placement-Groups.svg",
+     "Proximity Placement Groups"
+    ],
+    "public-ip-addresses": [
+     "azure/networking/10069-icon-service-Public-IP-Addresses.svg",
+     "Public IP Addresses"
+    ],
+    "public-ip-addresses-classic": [
+     "azure/networking/10068-icon-service-Public-IP-Addresses-(Classic).svg",
+     "Public IP Addresses (Classic)"
+    ],
+    "public-ip-prefixes": [
+     "azure/networking/10372-icon-service-Public-IP-Prefixes.svg",
+     "Public IP Prefixes"
+    ],
+    "pubsub": [
+     "azure/integration/02987-icon-service-pubsub.svg",
+     "pubsub"
+    ],
+    "qna-makers": [
+     "azure/ai-machine-learning/00799-icon-service-QnA-Makers.svg",
+     "QnA Makers"
+    ],
+    "quickstart-center": [
+     "azure/general/10010-icon-service-Quickstart-Center.svg",
+     "Quickstart Center"
+    ],
+    "quotas": [
+     "azure/other/02951-icon-service-Azure-Quotas.svg",
+     "Azure Quotas"
+    ],
+    "recent": [
+     "azure/general/10006-icon-service-Recent.svg",
+     "Recent"
+    ],
+    "recovery-services-vaults": [
+     "azure/management-governance/00017-icon-service-Recovery-Services-Vaults.svg",
+     "Recovery Services Vaults"
+    ],
+    "red-hat-openshift": [
+     "azure/containers/03331-icon-service-Azure-Red-Hat-OpenShift.svg",
+     "Azure Red Hat OpenShift"
+    ],
+    "region-management": [
+     "azure/general/10116-icon-service-Region-Management.svg",
+     "Region Management"
+    ],
+    "relays": [
+     "azure/integration/10209-icon-service-Relays.svg",
+     "Relays"
+    ],
+    "remote-rendering": [
+     "azure/mixed-reality/00698-icon-service-Remote-Rendering.svg",
+     "Remote Rendering"
+    ],
+    "reservations": [
+     "azure/general/10003-icon-service-Reservations.svg",
+     "Reservations"
+    ],
+    "reserved-capacity": [
+     "azure/other/02638-icon-service-Reserved-Capacity.svg",
+     "Reserved Capacity"
+    ],
+    "reserved-ip-addresses-classic": [
+     "azure/networking/10371-icon-service-Reserved-IP-Addresses-(Classic).svg",
+     "Reserved IP Addresses (Classic)"
+    ],
+    "resiliency": [
+     "azure/new-icons/034923704-icon-service-Resiliency.svg",
+     "Resiliency"
+    ],
+    "resource-explorer": [
+     "azure/general/10349-icon-service-Resource-Explorer.svg",
+     "Resource Explorer"
+    ],
+    "resource-graph-explorer": [
+     "azure/management-governance/10318-icon-service-Resource-Graph-Explorer.svg",
+     "Resource Graph Explorer"
+    ],
+    "resource-group-list": [
+     "azure/general/10830-icon-service-Resource-Group-List.svg",
+     "Resource Group List"
+    ],
+    "resource-groups": [
+     "azure/general/10007-icon-service-Resource-Groups.svg",
+     "Resource Groups"
+    ],
+    "resource-guard": [
+     "azure/other/02819-icon-service-Resource-Guard.svg",
+     "Resource Guard"
+    ],
+    "resource-linked": [
+     "azure/general/10831-icon-service-Resource-Linked.svg",
+     "Resource Linked"
+    ],
+    "resource-management-private-link": [
+     "azure/networking/02145-icon-service-Resource-Management-Private-Link.svg",
+     "Resource Management Private Link"
+    ],
+    "resource-mover": [
+     "azure/other/02200-icon-service-Resource-Mover.svg",
+     "Resource Mover"
+    ],
+    "resources-provider": [
+     "azure/management-governance/03366-icon-service-Resources-Provider.svg",
+     "Resources Provider"
+    ],
+    "restore-points": [
+     "azure/compute/02817-icon-service-Restore-Points.svg",
+     "Restore Points"
+    ],
+    "restore-points-collections": [
+     "azure/compute/02818-icon-service-Restore-Points-Collections.svg",
+     "Restore Points Collections"
+    ],
+    "route-filters": [
+     "azure/networking/10071-icon-service-Route-Filters.svg",
+     "Route Filters"
+    ],
+    "route-tables": [
+     "azure/networking/10082-icon-service-Route-Tables.svg",
+     "Route Tables"
+    ],
+    "rtos": [
+     "azure/other/10778-icon-service-RTOS.svg",
+     "RTOS"
+    ],
+    "savings-plans": [
+     "azure/other/02880-icon-service-Savings-Plans.svg",
+     "Savings Plans"
+    ],
+    "scheduled-actions": [
+     "azure/compute/033049334-icon-service-Scheduled-Actions.svg",
+     "Scheduled Actions"
+    ],
+    "scheduler": [
+     "azure/general/10833-icon-service-Scheduler.svg",
+     "Scheduler"
+    ],
+    "scheduler-job-collections": [
+     "azure/management-governance/00010-icon-service-Scheduler-Job-Collections.svg",
+     "Scheduler Job Collections"
+    ],
+    "scvmm-management-servers": [
+     "azure/other/02503-icon-service-SCVMM-Management-Servers.svg",
+     "SCVMM Management Servers"
+    ],
+    "search": [
+     "azure/general/10834-icon-service-Search.svg",
+     "Search"
+    ],
+    "security": [
+     "azure/identity/00321-icon-service-Security.svg",
+     "Security"
+    ],
+    "security-baselines": [
+     "azure/intune/10336-icon-service-Security-Baselines.svg",
+     "Security Baselines"
+    ],
+    "sendgrid-accounts": [
+     "azure/integration/10220-icon-service-SendGrid-Accounts.svg",
+     "SendGrid Accounts"
+    ],
+    "sentinel": [
+     "azure/security/10248-icon-service-Azure-Sentinel.svg",
+     "Azure Sentinel"
+    ],
+    "server-farm": [
+     "azure/general/10835-icon-service-Server-Farm.svg",
+     "Server Farm"
+    ],
+    "serverless-search": [
+     "azure/ai-machine-learning/03321-icon-service-Serverless-Search.svg",
+     "Serverless Search"
+    ],
+    "service-bus": [
+     "azure/integration/10836-icon-service-Azure-Service-Bus.svg",
+     "Azure Service Bus"
+    ],
+    "service-catalog-mad": [
+     "azure/management-governance/00027-icon-service-Service-Catalog-MAD.svg",
+     "Service Catalog MAD"
+    ],
+    "service-endpoint-policies": [
+     "azure/networking/10085-icon-service-Service-Endpoint-Policies.svg",
+     "Service Endpoint Policies"
+    ],
+    "service-fabric-clusters": [
+     "azure/compute/10036-icon-service-Service-Fabric-Clusters.svg",
+     "Service Fabric Clusters"
+    ],
+    "service-group-relationships": [
+     "azure/management-governance/030777508-icon-service-Service-Group-Relationships.svg",
+     "Service Group Relationships"
+    ],
+    "service-groups": [
+     "azure/containers/029637767-icon-service-Service-Groups.svg",
+     "Service Groups"
+    ],
+    "service-health": [
+     "azure/general/10004-icon-service-Service-Health.svg",
+     "Service Health"
+    ],
+    "service-providers": [
+     "azure/management-governance/00025-icon-service-Service-Providers.svg",
+     "Service Providers"
+    ],
+    "shared-image-galleries": [
+     "azure/compute/10039-icon-service-Shared-Image-Galleries.svg",
+     "Shared Image Galleries"
+    ],
+    "signalr": [
+     "azure/web/10052-icon-service-SignalR.svg",
+     "SignalR"
+    ],
+    "software-as-a-service": [
+     "azure/integration/10213-icon-service-Software-as-a-Service.svg",
+     "Software as a Service"
+    ],
+    "software-updates": [
+     "azure/intune/10335-icon-service-Software-Updates.svg",
+     "Software Updates"
+    ],
+    "solutions": [
+     "azure/management-governance/00021-icon-service-Solutions.svg",
+     "Solutions"
+    ],
+    "sonic-dash": [
+     "azure/other/02922-icon-service-Sonic-Dash.svg",
+     "Sonic Dash"
+    ],
+    "spatial-anchor-accounts": [
+     "azure/mixed-reality/10352-icon-service-Spatial-Anchor-Accounts.svg",
+     "Spatial Anchor Accounts"
+    ],
+    "speech-services": [
+     "azure/ai-machine-learning/00797-icon-service-Speech-Services.svg",
+     "Speech Services"
+    ],
+    "sphere": [
+     "azure/other/10190-icon-service-Azure-Sphere.svg",
+     "Azure Sphere"
+    ],
+    "spot-vm": [
+     "azure/networking/02695-icon-service-Spot-VM.svg",
+     "Spot VM"
+    ],
+    "spot-vmss": [
+     "azure/networking/02692-icon-service-Spot-VMSS.svg",
+     "Spot VMSS"
+    ],
+    "spring-apps": [
+     "azure/compute/10370-icon-service-Azure-Spring-Apps.svg",
+     "Azure Spring Apps"
+    ],
+    "sql": [
+     "azure/databases/02390-icon-service-Azure-SQL.svg",
+     "Azure SQL"
+    ],
+    "sql-data-warehouses": [
+     "azure/databases/00036-icon-service-SQL-Data-Warehouses.svg",
+     "SQL Data Warehouses"
+    ],
+    "sql-database": [
+     "azure/databases/10130-icon-service-SQL-Database.svg",
+     "SQL Database"
+    ],
+    "sql-database-fleet-manager": [
+     "azure/databases/03565-icon-service-SQL-Database-Fleet-Manager.svg",
+     "SQL Database Fleet Manager"
+    ],
+    "sql-edge": [
+     "azure/databases/02750-icon-service-Azure-SQL-Edge.svg",
+     "Azure SQL Edge"
+    ],
+    "sql-elastic-pools": [
+     "azure/databases/10134-icon-service-SQL-Elastic-Pools.svg",
+     "SQL Elastic Pools"
+    ],
+    "sql-managed-instance": [
+     "azure/databases/10136-icon-service-SQL-Managed-Instance.svg",
+     "SQL Managed Instance"
+    ],
+    "sql-server": [
+     "azure/databases/10132-icon-service-SQL-Server.svg",
+     "SQL Server"
+    ],
+    "sql-server-registries": [
+     "azure/databases/10351-icon-service-SQL-Server-Registries.svg",
+     "SQL Server Registries"
+    ],
+    "sql-vm": [
+     "azure/databases/10124-icon-service-Azure-SQL-VM.svg",
+     "Azure SQL VM"
+    ],
+    "ssd": [
+     "azure/general/10837-icon-service-SSD.svg",
+     "SSD"
+    ],
+    "ssh-keys": [
+     "azure/other/00412-icon-service-SSH-Keys.svg",
+     "SSH Keys"
+    ],
+    "ssis-lift-and-shift-ir": [
+     "azure/databases/02392-icon-service-SSIS-Lift-And-Shift-IR.svg",
+     "SSIS Lift And Shift IR"
+    ],
+    "stack-hci-premium": [
+     "azure/iot/03466-icon-service-Stack-HCI-Premium.svg",
+     "Stack HCI Premium"
+    ],
+    "stack-hci-sizer": [
+     "azure/iot/03293-icon-service-Azure-Stack-HCI-Sizer.svg",
+     "Azure Stack HCI Sizer"
+    ],
+    "stage-maps": [
+     "azure/compute/030868929-icon-service-Stage-Maps.svg",
+     "Stage Maps"
+    ],
+    "static-apps": [
+     "azure/web/01007-icon-service-Static-Apps.svg",
+     "Static Apps"
+    ],
+    "storage-accounts": [
+     "azure/storage/10086-icon-service-Storage-Accounts.svg",
+     "Storage Accounts"
+    ],
+    "storage-accounts-classic": [
+     "azure/storage/10087-icon-service-Storage-Accounts-(Classic).svg",
+     "Storage Accounts (Classic)"
+    ],
+    "storage-actions": [
+     "azure/storage/03502-icon-service-Storage-Actions.svg",
+     "Storage Actions"
+    ],
+    "storage-azure-files": [
+     "azure/general/10838-icon-service-Storage-Azure-Files.svg",
+     "Storage Azure Files"
+    ],
+    "storage-container": [
+     "azure/general/10839-icon-service-Storage-Container.svg",
+     "Storage Container"
+    ],
+    "storage-explorer": [
+     "azure/storage/10091-icon-service-Storage-Explorer.svg",
+     "Storage Explorer"
+    ],
+    "storage-functions": [
+     "azure/other/02909-icon-service-Storage-Functions.svg",
+     "Storage Functions"
+    ],
+    "storage-hubs": [
+     "azure/storage/030486388-icon-service-Storage-Hubs.svg",
+     "Storage Hubs"
+    ],
+    "storage-mover": [
+     "azure/other/03091-icon-service-Azure-Storage-Mover.svg",
+     "Azure Storage Mover"
+    ],
+    "storage-queue": [
+     "azure/general/10840-icon-service-Storage-Queue.svg",
+     "Storage Queue"
+    ],
+    "storage-sync-services": [
+     "azure/storage/10093-icon-service-Storage-Sync-Services.svg",
+     "Storage Sync Services"
+    ],
+    "storsimple-data-managers": [
+     "azure/storage/10092-icon-service-StorSimple-Data-Managers.svg",
+     "StorSimple Data Managers"
+    ],
+    "storsimple-device-managers": [
+     "azure/integration/10089-icon-service-StorSimple-Device-Managers.svg",
+     "StorSimple Device Managers"
+    ],
+    "stream-analytics-jobs": [
+     "azure/analytics/00042-icon-service-Stream-Analytics-Jobs.svg",
+     "Stream Analytics Jobs"
+    ],
+    "subnet": [
+     "azure/networking/02742-icon-service-Subnet.svg",
+     "Subnet"
+    ],
+    "subscriptions": [
+     "azure/general/10002-icon-service-Subscriptions.svg",
+     "Subscriptions"
+    ],
+    "support-center-blue": [
+     "azure/other/02507-icon-service-Azure-Support-Center-Blue.svg",
+     "Azure Support Center Blue"
+    ],
+    "sustainability": [
+     "azure/other/03314-icon-service-Azure-Sustainability.svg",
+     "Azure Sustainability"
+    ],
+    "synapse-analytics": [
+     "azure/analytics/00606-icon-service-Azure-Synapse-Analytics.svg",
+     "Azure Synapse Analytics"
+    ],
+    "system-topic": [
+     "azure/integration/02073-icon-service-System-Topic.svg",
+     "System Topic"
+    ],
+    "table": [
+     "azure/general/10841-icon-service-Table.svg",
+     "Table"
+    ],
+    "tag": [
+     "azure/general/10014-icon-service-Tag.svg",
+     "Tag"
+    ],
+    "tags": [
+     "azure/general/10842-icon-service-Tags.svg",
+     "Tags"
+    ],
+    "targets-management": [
+     "azure/other/02908-icon-service-Targets-Management.svg",
+     "Targets Management"
+    ],
+    "template-specs": [
+     "azure/other/02340-icon-service-Template-Specs.svg",
+     "Template Specs"
+    ],
+    "templates": [
+     "azure/general/10009-icon-service-Templates.svg",
+     "Templates"
+    ],
+    "tenant-properties": [
+     "azure/identity/02679-icon-service-Tenant-Properties.svg",
+     "Tenant Properties"
+    ],
+    "tenant-status": [
+     "azure/intune/10342-icon-service-Tenant-Status.svg",
+     "Tenant Status"
+    ],
+    "test-base": [
+     "azure/other/02691-icon-service-Test-Base.svg",
+     "Test Base"
+    ],
+    "tfs-vc-repository": [
+     "azure/general/10843-icon-service-TFS-VC-Repository.svg",
+     "TFS VC Repository"
+    ],
+    "time-series-data-sets": [
+     "azure/iot/10198-icon-service-Time-Series-Data-Sets.svg",
+     "Time Series Data Sets"
+    ],
+    "time-series-insights-access-policies": [
+     "azure/iot/10192-icon-service-Time-Series-Insights-Access-Policies.svg",
+     "Time Series Insights Access Policies"
+    ],
+    "time-series-insights-environments": [
+     "azure/iot/10181-icon-service-Time-Series-Insights-Environments.svg",
+     "Time Series Insights Environments"
+    ],
+    "time-series-insights-event-sources": [
+     "azure/iot/10188-icon-service-Time-Series-Insights-Event-Sources.svg",
+     "Time Series Insights Event Sources"
+    ],
+    "token-service": [
+     "azure/blockchain/10367-icon-service-Azure-Token-Service.svg",
+     "Azure Token Service"
+    ],
+    "toolbox": [
+     "azure/general/10844-icon-service-Toolbox.svg",
+     "Toolbox"
+    ],
+    "traffic-manager-profiles": [
+     "azure/networking/10065-icon-service-Traffic-Manager-Profiles.svg",
+     "Traffic Manager Profiles"
+    ],
+    "translator-text": [
+     "azure/ai-machine-learning/00800-icon-service-Translator-Text.svg",
+     "Translator Text"
+    ],
+    "troubleshoot": [
+     "azure/general/10341-icon-service-Troubleshoot.svg",
+     "Troubleshoot"
+    ],
+    "universal-print": [
+     "azure/management-governance/00571-icon-service-Universal-Print.svg",
+     "Universal Print"
+    ],
+    "update-management-center": [
+     "azure/other/02846-icon-service-Update-Management-Center.svg",
+     "Update Management Center"
+    ],
+    "user-privacy": [
+     "azure/management-governance/10303-icon-service-User-Privacy.svg",
+     "User Privacy"
+    ],
+    "user-settings": [
+     "azure/identity/10433-icon-service-User-Settings.svg",
+     "User Settings"
+    ],
+    "user-subscriptions": [
+     "azure/identity/10111-icon-service-User-Subscriptions.svg",
+     "User Subscriptions"
+    ],
+    "users": [
+     "azure/identity/10230-icon-service-Users.svg",
+     "Users"
+    ],
+    "verifiable-credentials": [
+     "azure/identity/01084-icon-service-Verifiable-Credentials.svg",
+     "Verifiable Credentials"
+    ],
+    "verification-as-a-service": [
+     "azure/identity/03225-icon-service-Verification-As-A-Service.svg",
+     "Verification As A Service"
+    ],
+    "versions": [
+     "azure/general/10845-icon-service-Versions.svg",
+     "Versions"
+    ],
+    "video-analyzers": [
+     "azure/other/00712-icon-service-Video-Analyzers.svg",
+     "Video Analyzers"
+    ],
+    "video-indexer": [
+     "azure/other/01800-icon-service-Azure-Video-Indexer.svg",
+     "Azure Video Indexer"
+    ],
+    "virtual-clusters": [
+     "azure/databases/10127-icon-service-Virtual-Clusters.svg",
+     "Virtual Clusters"
+    ],
+    "virtual-desktop": [
+     "azure/other/00327-icon-service-Azure-Virtual-Desktop.svg",
+     "Azure Virtual Desktop"
+    ],
+    "virtual-instance-for-sap": [
+     "azure/other/03089-icon-service-Virtual-Instance-for-SAP.svg",
+     "Virtual Instance for SAP"
+    ],
+    "virtual-machine": [
+     "azure/compute/10021-icon-service-Virtual-Machine.svg",
+     "Virtual Machine"
+    ],
+    "virtual-machines-classic": [
+     "azure/compute/10028-icon-service-Virtual-Machines-(Classic).svg",
+     "Virtual Machines (Classic)"
+    ],
+    "virtual-network-gateways": [
+     "azure/networking/10063-icon-service-Virtual-Network-Gateways.svg",
+     "Virtual Network Gateways"
+    ],
+    "virtual-networks": [
+     "azure/networking/10061-icon-service-Virtual-Networks.svg",
+     "Virtual Networks"
+    ],
+    "virtual-networks-classic": [
+     "azure/networking/10075-icon-service-Virtual-Networks-(Classic).svg",
+     "Virtual Networks (Classic)"
+    ],
+    "virtual-router": [
+     "azure/networking/02496-icon-service-Virtual-Router.svg",
+     "Virtual Router"
+    ],
+    "virtual-visits-builder": [
+     "azure/other/02949-icon-service-Virtual-Visits-Builder.svg",
+     "Virtual Visits Builder"
+    ],
+    "virtual-wan-hub": [
+     "azure/networking/00860-icon-service-Virtual-WAN-Hub.svg",
+     "Virtual WAN Hub"
+    ],
+    "virtual-wans": [
+     "azure/networking/10353-icon-service-Virtual-WANs.svg",
+     "Virtual WANs"
+    ],
+    "vm-app-definitions": [
+     "azure/other/02805-icon-service-VM-App-Definitions.svg",
+     "VM App Definitions"
+    ],
+    "vm-app-versions": [
+     "azure/other/02806-icon-service-VM-App-Versions.svg",
+     "VM App Versions"
+    ],
+    "vm-image-version": [
+     "azure/other/02866-icon-service-VM-Image-Version.svg",
+     "VM Image Version"
+    ],
+    "vm-scale-sets": [
+     "azure/compute/10034-icon-service-VM-Scale-Sets.svg",
+     "VM Scale Sets"
+    ],
+    "vmware-solution": [
+     "azure/other/01219-icon-service-Azure-VMware-Solution.svg",
+     "Azure VMware Solution"
+    ],
+    "vnet-appliance": [
+     "azure/networking/034412066-icon-service-VNet-Appliance.svg",
+     "VNet Appliance"
+    ],
+    "vpnclientwindows": [
+     "azure/networking/03694-icon-service-VPNClientWindows.svg",
+     "VPNClientWindows"
+    ],
+    "wac": [
+     "azure/other/10355-icon-service-WAC.svg",
+     "WAC"
+    ],
+    "wac-installer": [
+     "azure/other/03563-icon-service-WAC-Installer.svg",
+     "WAC Installer"
+    ],
+    "web-app-database": [
+     "azure/other/02515-icon-service-Web-App-+-Database.svg",
+     "Web App + Database"
+    ],
+    "web-application-firewall-policies-waf": [
+     "azure/networking/10362-icon-service-Web-Application-Firewall-Policies(WAF).svg",
+     "Web Application Firewall Policies(WAF)"
+    ],
+    "web-jobs": [
+     "azure/other/10846-icon-service-Web-Jobs.svg",
+     "Web Jobs"
+    ],
+    "web-slots": [
+     "azure/general/10849-icon-service-Web-Slots.svg",
+     "Web Slots"
+    ],
+    "web-test": [
+     "azure/general/10850-icon-service-Web-Test.svg",
+     "Web Test"
+    ],
+    "website-power": [
+     "azure/general/10847-icon-service-Website-Power.svg",
+     "Website Power"
+    ],
+    "website-staging": [
+     "azure/general/10848-icon-service-Website-Staging.svg",
+     "Website Staging"
+    ],
+    "windows-notification-services": [
+     "azure/other/02733-icon-service-Windows-Notification-Services.svg",
+     "Windows Notification Services"
+    ],
+    "windows10-core-services": [
+     "azure/iot/10203-icon-service-Windows10-Core-Services.svg",
+     "Windows10 Core Services"
+    ],
+    "workbooks": [
+     "azure/analytics/02189-icon-service-Azure-Workbooks.svg",
+     "Azure Workbooks"
+    ],
+    "workbooks-general": [
+     "azure/general/10851-icon-service-Workbooks.svg",
+     "Workbooks"
+    ],
+    "worker-container-app": [
+     "azure/other/02884-icon-service-Worker-Container-App.svg",
+     "Worker Container App"
+    ],
+    "workflow": [
+     "azure/general/10852-icon-service-Workflow.svg",
+     "Workflow"
+    ],
+    "workload-orchestration": [
+     "azure/hybrid-multicloud/029109619-icon-service-Workload-Orchestration.svg",
+     "Workload Orchestration"
+    ],
+    "workspace-gateway": [
+     "azure/devops/03623-icon-service-Workspace-Gateway.svg",
+     "Workspace Gateway"
+    ],
+    "workspaces": [
+     "azure/compute/00330-icon-service-Workspaces.svg",
+     "Workspaces"
+    ],
+    "workspaces-compute": [
+     "azure/compute/00400-icon-service-Workspaces.svg",
+     "Workspaces"
+    ]
+   },
+   "aliases": {
+    "acr": "container-registries",
+    "adf": "data-factories",
+    "aks": "kubernetes-services",
+    "api-management": "api-management-services",
+    "apim": "api-management-services",
+    "app-gateway": "application-gateways",
+    "app-insights": "application-insights",
+    "app-service": "app-services",
+    "application-gateway": "application-gateways",
+    "blob": "storage-accounts",
+    "cdn": "front-door-and-cdn-profiles",
+    "container-apps": "container-apps-environments",
+    "container-registry": "container-registries",
+    "cosmos": "cosmos-db",
+    "cosmosdb": "cosmos-db",
+    "data-factory": "data-factories",
+    "dns": "dns-zones",
+    "event-grid": "event-grid-topics",
+    "event-hub": "event-hubs",
+    "eventhub": "event-hubs",
+    "firewall": "firewalls",
+    "front-door": "front-door-and-cdn-profiles",
+    "function-app": "function-apps",
+    "functions": "function-apps",
+    "key-vault": "key-vaults",
+    "keyvault": "key-vaults",
+    "kubernetes": "kubernetes-services",
+    "lb": "load-balancers",
+    "load-balancer": "load-balancers",
+    "log-analytics": "log-analytics-workspaces",
+    "logic-app": "logic-apps",
+    "redis": "cache-redis",
+    "sql-databases": "sql-database",
+    "storage": "storage-accounts",
+    "storage-account": "storage-accounts",
+    "synapse": "synapse-analytics",
+    "virtual-network": "virtual-networks",
+    "vm": "virtual-machine",
+    "vms": "virtual-machine",
+    "vnet": "virtual-networks",
+    "webapp": "app-services"
+   }
+  },
+  "gcp": {
+   "title": "Google Cloud icons",
+   "url": "https://cloud.google.com/icons",
+   "package": [
+    "category-icons.zip",
+    "core-products-icons.zip"
+   ],
+   "icons": {
+    "ai-hypercomputer": [
+     "gcp/service/AIHypercomputer-512-color.svg",
+     "AI Hypercomputer"
+    ],
+    "alloydb": [
+     "gcp/service/AlloyDB-512-color.svg",
+     "AlloyDB"
+    ],
+    "anthos": [
+     "gcp/service/Anthos-512-color.svg",
+     "Anthos"
+    ],
+    "apigee": [
+     "gcp/service/Apigee-512-color-rgb.svg",
+     "Apigee"
+    ],
+    "bigquery": [
+     "gcp/service/BigQuery-512-color.svg",
+     "BigQuery"
+    ],
+    "category-agents": [
+     "gcp/category/Agents-512-color.svg",
+     "Agents (category)"
+    ],
+    "category-ai-machine-learning": [
+     "gcp/category/AIMachineLearning-512-color.svg",
+     "AI / Machine Learning (category)"
+    ],
+    "category-business-intelligence": [
+     "gcp/category/BusinessIntelligence-512-color.svg",
+     "Business Intelligence (category)"
+    ],
+    "category-collaboration": [
+     "gcp/category/Collaboration-512-color.svg",
+     "Collaboration (category)"
+    ],
+    "category-compute": [
+     "gcp/category/Compute-512-color.svg",
+     "Compute (category)"
+    ],
+    "category-containers": [
+     "gcp/category/Containers-512-color.svg",
+     "Containers (category)"
+    ],
+    "category-data-analytics": [
+     "gcp/category/DataAnalytics-512-color.svg",
+     "Data Analytics (category)"
+    ],
+    "category-databases": [
+     "gcp/category/Databases-512-color.svg",
+     "Databases (category)"
+    ],
+    "category-developer-tools": [
+     "gcp/category/Developer_Tools-512-color.svg",
+     "Developer Tools (category)"
+    ],
+    "category-devops": [
+     "gcp/category/DevOps-512-color.svg",
+     "DevOps (category)"
+    ],
+    "category-hybrid-multicloud": [
+     "gcp/category/HybridMulticloud-512-color.svg",
+     "Hybrid & Multicloud (category)"
+    ],
+    "category-integration-services": [
+     "gcp/category/IntegrationServices-512-color.svg",
+     "Integration Services (category)"
+    ],
+    "category-management-tools": [
+     "gcp/category/ManagementTools-512-color.svg",
+     "Management Tools (category)"
+    ],
+    "category-maps-geospatial": [
+     "gcp/category/MapsGeospatial-512-color.svg",
+     "Maps & Geospatial (category)"
+    ],
+    "category-marketplace": [
+     "gcp/category/Marketplace-512-color.svg",
+     "Marketplace (category)"
+    ],
+    "category-media-services": [
+     "gcp/category/MediaServices-512-color.svg",
+     "Media Services (category)"
+    ],
+    "category-migration": [
+     "gcp/category/Migration-512-color.svg",
+     "Migration (category)"
+    ],
+    "category-mixed-reality": [
+     "gcp/category/MixedReality-512-color.svg",
+     "Mixed Reality (category)"
+    ],
+    "category-networking": [
+     "gcp/category/Networking-512-color-rgb.svg",
+     "Networking (category)"
+    ],
+    "category-observability": [
+     "gcp/category/Observability-512-color.svg",
+     "Observability (category)"
+    ],
+    "category-operations": [
+     "gcp/category/Operations-512-color.svg",
+     "Operations (category)"
+    ],
+    "category-security-identity": [
+     "gcp/category/SecurityIdentity-512-color.svg",
+     "Security Identity (category)"
+    ],
+    "category-serverless-computing": [
+     "gcp/category/ServerlessComputing-512-color.svg",
+     "Serverless Computing (category)"
+    ],
+    "category-storage": [
+     "gcp/category/Storage-512-color.svg",
+     "Storage (category)"
+    ],
+    "category-web-mobile": [
+     "gcp/category/WebMobile-512-color.svg",
+     "Web & Mobile (category)"
+    ],
+    "category-web3": [
+     "gcp/category/Web3-512-color.svg",
+     "Web3 (category)"
+    ],
+    "cloud-run": [
+     "gcp/service/CloudRun-512-color-rgb.svg",
+     "Cloud Run"
+    ],
+    "cloud-spanner": [
+     "gcp/service/CloudSpanner-512-color.svg",
+     "Cloud Spanner"
+    ],
+    "cloud-sql": [
+     "gcp/service/CloudSQL-512-color.svg",
+     "Cloud SQL"
+    ],
+    "cloud-storage": [
+     "gcp/service/Cloud_Storage-512-color.svg",
+     "Cloud Storage"
+    ],
+    "compute-engine": [
+     "gcp/service/ComputeEngine-512-color-rgb.svg",
+     "Compute Engine"
+    ],
+    "distributed-cloud": [
+     "gcp/service/DistributedCloud-512-color.svg",
+     "Distributed Cloud"
+    ],
+    "gke": [
+     "gcp/service/GKE-512-color.svg",
+     "GKE"
+    ],
+    "hyperdisk": [
+     "gcp/service/Hyperdisk-512-color.svg",
+     "Hyperdisk"
+    ],
+    "looker": [
+     "gcp/service/Looker-512-color.svg",
+     "Looker"
+    ],
+    "mandiant": [
+     "gcp/service/Mandiant-512-color.svg",
+     "Mandiant"
+    ],
+    "security-command-center": [
+     "gcp/service/SecurityCommandCenter-512-color.svg",
+     "Security Command Center"
+    ],
+    "security-operations": [
+     "gcp/service/SecOps-512-color-rgb.svg",
+     "Security Operations"
+    ],
+    "threat-intelligence": [
+     "gcp/service/ThreatIntelligence-512-color.svg",
+     "Threat Intelligence"
+    ],
+    "vertex-ai": [
+     "gcp/service/VertexAI-512-color.svg",
+     "Vertex AI"
+    ]
+   },
+   "aliases": {
+    "bq": "bigquery",
+    "compute": "compute-engine",
+    "gce": "compute-engine",
+    "gcs": "cloud-storage",
+    "kubernetes-engine": "gke",
+    "run": "cloud-run",
+    "spanner": "cloud-spanner",
+    "sql": "cloud-sql",
+    "storage": "cloud-storage",
+    "vertex": "vertex-ai",
+    "vertexai": "vertex-ai",
+    "vm": "compute-engine"
+   }
+  }
+ }
+}

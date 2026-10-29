@@ -1,0 +1,345 @@
+{
+ "edges": [
+  {
+   "kind": "edge",
+   "id": "n1>n2",
+   "d": "M44.5,0 C72.5,0 72.5,0 100.5,0",
+   "cls": "mmv-edge mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n3",
+   "d": "M220.5,0 C249.53,0 247.47,-44 276.5,-44",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n4",
+   "d": "M220.5,0 C248.5,0 248.5,0 276.5,0",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n5",
+   "d": "M220.5,0 C249.53,0 247.47,44 276.5,44",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n6",
+   "d": "M-44.5,0 C-72.5,0 -72.5,0 -100.5,0",
+   "cls": "mmv-edge mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n7",
+   "d": "M-240.5,0 C-269.53,0 -267.47,-44 -296.5,-44",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n8",
+   "d": "M-240.5,0 C-268.5,0 -268.5,0 -296.5,0",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n9",
+   "d": "M-240.5,0 C-269.53,0 -267.47,44 -296.5,44",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  }
+ ],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "n1",
+   "x": 0,
+   "y": 0,
+   "w": 89,
+   "h": 89,
+   "cls": "mmv-node mmv-k0 mmv-l0 mmv-d0 mmv-p0",
+   "grow": 1,
+   "name": "Tools, centre, 2 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "circle",
+   "icons": [],
+   "text": {
+    "size": 20,
+    "weight": 700,
+    "spans": [
+     {
+      "text": "Tools",
+      "bold": false,
+      "italic": false,
+      "x": 14.5,
+      "y": 51
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n2",
+   "x": 160.5,
+   "y": 0,
+   "w": 120,
+   "h": 34,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Hand tools, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Hand tools",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 121,
+    "y": 17,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n3",
+   "x": 312,
+   "y": -44,
+   "w": 71,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Trowel, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Trowel",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n4",
+   "x": 323.5,
+   "y": 0,
+   "w": 94,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Hand fork, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Hand fork",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n5",
+   "x": 323.5,
+   "y": 44,
+   "w": 94,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Secateurs, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Secateurs",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n6",
+   "x": -170.5,
+   "y": 0,
+   "w": 140,
+   "h": 34,
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Long handles, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Long handles",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": -1,
+    "y": 17,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n7",
+   "x": -328,
+   "y": -44,
+   "w": 63,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Spade, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Spade",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n8",
+   "x": -324,
+   "y": 0,
+   "w": 55,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Rake, level 2",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Rake",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n9",
+   "x": -320.5,
+   "y": 44,
+   "w": 48,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Hoe, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Hoe",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  }
+ ],
+ "rels": []
+}

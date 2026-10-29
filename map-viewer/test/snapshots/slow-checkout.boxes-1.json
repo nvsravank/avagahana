@@ -1,0 +1,221 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "shop",
+   "x": -155.9,
+   "y": 0,
+   "w": 209,
+   "h": 216,
+   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Shop system, level 1, 5 children, has a note, a box",
+   "title": {
+    "text": "Shop system",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": {
+    "x": 179,
+    "y": 6,
+    "size": 16
+   },
+   "dot": {
+    "x": 208,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "pay",
+   "x": -155.9,
+   "y": 13,
+   "w": 181,
+   "h": 162,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "name": "Payments, level 2, 2 children, a box",
+   "title": {
+    "text": "Payments",
+    "x": 12,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 180,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "payh",
+   "x": -155.9,
+   "y": -12,
+   "w": 140,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Payment handler, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Payment handler",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "fraud",
+   "x": -155.9,
+   "y": 64,
+   "w": 153,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Fraud check, level 3, has a note",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "square",
+   "icons": [
+    {
+     "code": "hypothesis",
+     "ph": "seal-question",
+     "color": "var(--mmv-icon-purple)",
+     "label": "A guess to test",
+     "size": 15,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Fraud check",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 125.7,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "psp",
+   "x": 191.9,
+   "y": 0,
+   "w": 137,
+   "h": 72,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Card provider, level 1",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph globe",
+     "ph": "globe",
+     "color": null,
+     "label": "Globe",
+     "size": 38,
+     "x": 28.5,
+     "y": 4
+    },
+    {
+     "code": "unsourced",
+     "ph": "seal-warning",
+     "color": "var(--mmv-icon-grey)",
+     "label": "Source not found / not reviewed",
+     "size": 38,
+     "x": 70.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Card provider",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "payh>psp",
+   "d": "M-85.9,-12 L123.4,-12",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 18.75,
+    "y": -8,
+    "text": "retry on timeout",
+    "icons": [
+     "hypothesis"
+    ]
+   },
+   "items": [
+    {
+     "from": "payh",
+     "to": "psp",
+     "label": "retry on timeout",
+     "icons": [
+      "hypothesis"
+     ]
+    }
+   ]
+  }
+ ]
+}

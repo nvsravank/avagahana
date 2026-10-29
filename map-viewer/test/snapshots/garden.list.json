@@ -1,0 +1,825 @@
+[
+ {
+  "kind": "row",
+  "id": "n1",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k0 mmv-l0 mmv-d0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Community",
+     "bold": false,
+     "italic": false
+    }
+   ],
+   [
+    {
+     "text": "garden",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n2",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "ph map-pin"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Site",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n3",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "done"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Sunny corner",
+     "bold": false,
+     "italic": false
+    }
+   ],
+   [
+    {
+     "text": "(six hours of light)",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n4",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph drop"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Water tap nearby",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "n10",
+    "name": "Drip line",
+    "label": "feeds",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n5",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "question"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Soil test",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n6",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Beds",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n7",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0 is-selected",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Raised beds",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "n13",
+    "name": "Green bay",
+    "label": "compost for",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n8",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Cedar boards",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n9",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Hardware cloth base",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n10",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Drip line",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "n4",
+    "name": "Water tap nearby",
+    "label": "feeds",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n11",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "favorite"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Herb spiral",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n12",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Compost bays",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n13",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Green bay",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "n7",
+    "name": "Raised beds",
+    "label": "compost for",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n14",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Brown bay",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n15",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Finished bay",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n16",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k5 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Crops",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n17",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": true
+  },
+  "closed": true,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Spring",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": 7,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "n35",
+    "name": "Weekday rota",
+    "label": "sows",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n25",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Summer",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n26",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k5 mmv-l3 mmv-d2 mmv-p0 is-hit",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "hot"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Tomatoes",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n27",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Courgettes",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n28",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Beans",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n29",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Autumn",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n30",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Garlic",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n31",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Kale",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n32",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "people"
+  ],
+  "runs": [
+   [
+    {
+     "text": "People",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n33",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "person",
+   "thinking"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Coordinator",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n34",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Volunteers",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n35",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Weekday rota",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "n17",
+    "name": "Spring",
+    "label": "sows",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n36",
+  "depth": 3,
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Weekend rota",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n37",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "link"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Neighbours",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n38",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [
+   "money"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Budget",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n39",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Seeds and plants",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n40",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "status-amber"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Timber",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n41",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "flag-red"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Tools",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ }
+]

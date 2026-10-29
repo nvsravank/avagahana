@@ -1,0 +1,964 @@
+{
+ "edges": [
+  {
+   "kind": "edge",
+   "id": "n1>n2",
+   "d": "M96,0 C98.33,0 97,-254 99.33,-254",
+   "cls": "mmv-edge mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n3",
+   "d": "M242.67,-254 C256.33,-254 256.33,-298 270,-298",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n4",
+   "d": "M242.67,-254 C256.33,-254 256.33,-245 270,-245",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n5",
+   "d": "M242.67,-254 C257.71,-254 254.95,-201 270,-201",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n6",
+   "d": "M96,0 C101.5,0 101.5,-13 107,-13",
+   "cls": "mmv-edge mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n7",
+   "d": "M212,-13 C236.2,-13 222.8,-101 247,-101",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n7>n8",
+   "d": "M356,-101 C385.03,-101 382.97,-145 412,-145",
+   "cls": "mmv-edge mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n7>n9",
+   "d": "M356,-101 C384,-101 384,-101 412,-101",
+   "cls": "mmv-edge mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n7>n10",
+   "d": "M356,-101 C385.03,-101 382.97,-57 412,-57",
+   "cls": "mmv-edge mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n11",
+   "d": "M212,-13 C229.5,-13 229.5,-13 247,-13",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n12",
+   "d": "M212,-13 C236.2,-13 222.8,75 247,75",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n12>n13",
+   "d": "M364,75 C393.03,75 390.97,31 420,31",
+   "cls": "mmv-edge mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n12>n14",
+   "d": "M364,75 C392,75 392,75 420,75",
+   "cls": "mmv-edge mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n12>n15",
+   "d": "M364,75 C393.03,75 390.97,119 420,119",
+   "cls": "mmv-edge mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n32",
+   "d": "M96,0 C93.9,0 95.1,241 93,241",
+   "cls": "mmv-edge mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n32>n33",
+   "d": "M268,241 C280.8,241 276.2,175 289,175",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n32>n34",
+   "d": "M268,241 C278.5,241 278.5,241 289,241",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n34>n35",
+   "d": "M390,241 C418,241 418,219 446,219",
+   "cls": "mmv-edge mmv-k3 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n34>n36",
+   "d": "M390,241 C418,241 418,263 446,263",
+   "cls": "mmv-edge mmv-k3 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n32>n37",
+   "d": "M268,241 C280.8,241 276.2,307 289,307",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n16",
+   "d": "M-96,0 C-100.08,0 -99.92,-72 -104,-72",
+   "cls": "mmv-edge mmv-k5 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n16>n17",
+   "d": "M-224,-72 C-246.4,-72 -233.6,-182 -256,-182",
+   "cls": "mmv-edge mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n16>n25",
+   "d": "M-224,-72 C-240,-72 -240,-94 -256,-94",
+   "cls": "mmv-edge mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n25>n26",
+   "d": "M-327,-94 C-356.03,-94 -353.97,-138 -383,-138",
+   "cls": "mmv-edge mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n25>n27",
+   "d": "M-327,-94 C-355,-94 -355,-94 -383,-94",
+   "cls": "mmv-edge mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n25>n28",
+   "d": "M-327,-94 C-356.03,-94 -353.97,-50 -383,-50",
+   "cls": "mmv-edge mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n16>n29",
+   "d": "M-224,-72 C-246.12,-72 -233.87,16 -256,16",
+   "cls": "mmv-edge mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n29>n30",
+   "d": "M-327,16 C-355,16 -355,-6 -383,-6",
+   "cls": "mmv-edge mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n29>n31",
+   "d": "M-327,16 C-355,16 -355,38 -383,38",
+   "cls": "mmv-edge mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n38",
+   "d": "M-96,0 C-94.02,0 -94.98,138 -93,138",
+   "cls": "mmv-edge mmv-k4 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n38>n39",
+   "d": "M-268,138 C-278.89,138 -278.11,94 -289,94",
+   "cls": "mmv-edge mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n38>n40",
+   "d": "M-268,138 C-278.5,138 -278.5,138 -289,138",
+   "cls": "mmv-edge mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n38>n41",
+   "d": "M-268,138 C-278.89,138 -278.11,182 -289,182",
+   "cls": "mmv-edge mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  }
+ ],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "n1",
+   "x": 0,
+   "y": 0,
+   "w": 144,
+   "h": 144,
+   "cls": "mmv-node mmv-k0 mmv-l0 mmv-d0 mmv-p0",
+   "grow": 1.33,
+   "name": "Community garden, centre, 5 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "circle",
+   "icons": [],
+   "text": {
+    "size": 20,
+    "weight": 700,
+    "spans": [
+     {
+      "text": "Community",
+      "bold": false,
+      "italic": false,
+      "x": 18,
+      "y": 66
+     },
+     {
+      "text": "garden",
+      "bold": false,
+      "italic": false,
+      "x": 18,
+      "y": 91
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n2",
+   "x": 171,
+   "y": -254,
+   "w": 86,
+   "h": 34,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1.67,
+   "name": "Site, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [
+    {
+     "code": "ph map-pin",
+     "ph": "map-pin",
+     "color": null,
+     "label": "Map pin",
+     "size": 17,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Site",
+      "bold": true,
+      "italic": false,
+      "x": 35,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 87,
+    "y": 17,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n3",
+   "x": 369.5,
+   "y": -298,
+   "w": 199,
+   "h": 50,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Sunny corner (six hours of light), level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n4",
+   "x": 354.5,
+   "y": -245,
+   "w": 169,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Water tap nearby, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n5",
+   "x": 339,
+   "y": -201,
+   "w": 138,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Soil test, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n6",
+   "x": 159.5,
+   "y": -13,
+   "w": 63,
+   "h": 34,
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1.67,
+   "name": "Beds, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Beds",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 64,
+    "y": 17,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n7",
+   "x": 301.5,
+   "y": -101,
+   "w": 109,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Raised beds, level 2, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n8",
+   "x": 470.5,
+   "y": -145,
+   "w": 117,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Cedar boards, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n9",
+   "x": 497.5,
+   "y": -101,
+   "w": 171,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Hardware cloth base, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n10",
+   "x": 459,
+   "y": -57,
+   "w": 94,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Drip line, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n11",
+   "x": 323.5,
+   "y": -13,
+   "w": 153,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Herb spiral, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n12",
+   "x": 305.5,
+   "y": 75,
+   "w": 117,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Compost bays, level 2, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n13",
+   "x": 467,
+   "y": 31,
+   "w": 94,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Green bay, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n14",
+   "x": 467,
+   "y": 75,
+   "w": 94,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Brown bay, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n15",
+   "x": 478.5,
+   "y": 119,
+   "w": 117,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Finished bay, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n32",
+   "x": 180.5,
+   "y": 241,
+   "w": 105,
+   "h": 34,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1.67,
+   "name": "People, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [
+    {
+     "code": "people",
+     "ph": "users",
+     "color": "var(--mmv-icon-blue)",
+     "label": "People",
+     "size": 17,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "People",
+      "bold": true,
+      "italic": false,
+      "x": 35,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 106,
+    "y": 17,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n33",
+   "x": 374.5,
+   "y": 175,
+   "w": 171,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Coordinator, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n34",
+   "x": 339.5,
+   "y": 241,
+   "w": 101,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Volunteers, level 2, 2 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n35",
+   "x": 504.5,
+   "y": 219,
+   "w": 117,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Weekday rota, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n36",
+   "x": 504.5,
+   "y": 263,
+   "w": 117,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Weekend rota, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n37",
+   "x": 361.5,
+   "y": 307,
+   "w": 145,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Neighbours, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n16",
+   "x": -164,
+   "y": -72,
+   "w": 72,
+   "h": 34,
+   "cls": "mmv-node mmv-k5 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1.67,
+   "name": "Crops, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Crops",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": -1,
+    "y": 17,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n17",
+   "x": -291.5,
+   "y": -182,
+   "w": 71,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Spring, level 2, 7 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n25",
+   "x": -291.5,
+   "y": -94,
+   "w": 71,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Summer, level 2, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n26",
+   "x": -436.5,
+   "y": -138,
+   "w": 107,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Tomatoes, level 3",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n27",
+   "x": -433.5,
+   "y": -94,
+   "w": 101,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Courgettes, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n28",
+   "x": -414.5,
+   "y": -50,
+   "w": 63,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Beans, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n29",
+   "x": -291.5,
+   "y": 16,
+   "w": 71,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Autumn, level 2, 2 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n30",
+   "x": -418.5,
+   "y": -6,
+   "w": 71,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Garlic, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n31",
+   "x": -410.5,
+   "y": 38,
+   "w": 55,
+   "h": 32,
+   "cls": "mmv-node mmv-k5 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Kale, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n38",
+   "x": -180.5,
+   "y": 138,
+   "w": 105,
+   "h": 34,
+   "cls": "mmv-node mmv-k4 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1.67,
+   "name": "Budget, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [
+    {
+     "code": "money",
+     "ph": "money",
+     "color": "var(--mmv-icon-green)",
+     "label": "Money",
+     "size": 17,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Budget",
+      "bold": true,
+      "italic": false,
+      "x": 35,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": -1,
+    "y": 17,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n39",
+   "x": -363,
+   "y": 94,
+   "w": 148,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Seeds and plants, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n40",
+   "x": -335,
+   "y": 138,
+   "w": 92,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Timber, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  },
+  {
+   "kind": "node",
+   "id": "n41",
+   "x": -331,
+   "y": 182,
+   "w": 84,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Tools, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "bar": true
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "n4~n10",
+   "d": "M363.39,-229 Q375.55,-133.66 450.11,-73",
+   "label": {
+    "x": 391.15,
+    "y": -142.33,
+    "text": "feeds"
+   }
+  },
+  {
+   "kind": "rel",
+   "id": "n13~n7",
+   "d": "M446.94,15 Q404.25,-60.08 321.56,-85",
+   "label": {
+    "x": 394.25,
+    "y": -47.54,
+    "text": "compost for"
+   }
+  },
+  {
+   "kind": "rel",
+   "id": "n35~n17",
+   "d": "M472.74,203 Q142.49,-52.95 -259.74,-166",
+   "label": {
+    "x": 124.5,
+    "y": -17.22,
+    "text": "sows"
+   }
+  }
+ ]
+}

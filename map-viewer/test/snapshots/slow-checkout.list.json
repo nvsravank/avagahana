@@ -1,0 +1,450 @@
+[
+ {
+  "kind": "row",
+  "id": "customer",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph user"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Customer",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "ui",
+    "name": "Storefront",
+    "label": null,
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "shop",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Shop system",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "ui",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Storefront",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "customer",
+    "name": "Customer",
+    "label": null,
+    "glyph": "←"
+   },
+   {
+    "dir": "out",
+    "other": "gw",
+    "name": "Gateway",
+    "label": null,
+    "glyph": "→",
+    "icons": [
+     "verified"
+    ]
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "gw",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "verified"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Gateway",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ui",
+    "name": "Storefront",
+    "label": null,
+    "glyph": "←",
+    "icons": [
+     "verified"
+    ]
+   },
+   {
+    "dir": "out",
+    "other": "ord",
+    "name": "Order handler",
+    "label": "order",
+    "glyph": "→",
+    "icons": [
+     "inferred"
+    ]
+   },
+   {
+    "dir": "out",
+    "other": "stock",
+    "name": "Stock check",
+    "label": "stock",
+    "glyph": "→",
+    "icons": [
+     "inferred"
+    ]
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "orders",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Orders service",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "ord",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "inferred"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Order handler",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "gw",
+    "name": "Gateway",
+    "label": "order",
+    "glyph": "←",
+    "icons": [
+     "inferred"
+    ]
+   },
+   {
+    "dir": "out",
+    "other": "payh",
+    "name": "Payment handler",
+    "label": "charge",
+    "glyph": "→",
+    "icons": [
+     "verified"
+    ]
+   },
+   {
+    "dir": "out",
+    "other": "fraud",
+    "name": "Fraud check",
+    "label": "score",
+    "glyph": "→",
+    "icons": [
+     "hypothesis"
+    ]
+   },
+   {
+    "dir": "out",
+    "other": "db",
+    "name": "Orders database",
+    "label": "order rows",
+    "glyph": "→"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "stock",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Stock check",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "gw",
+    "name": "Gateway",
+    "label": "stock",
+    "glyph": "←",
+    "icons": [
+     "inferred"
+    ]
+   },
+   {
+    "dir": "out",
+    "other": "db",
+    "name": "Orders database",
+    "label": "stock levels",
+    "glyph": "→",
+    "icons": [
+     "verified"
+    ]
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "pay",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Payments",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "payh",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Payment handler",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ord",
+    "name": "Order handler",
+    "label": "charge",
+    "glyph": "←",
+    "icons": [
+     "verified"
+    ]
+   },
+   {
+    "dir": "out",
+    "other": "psp",
+    "name": "Card provider",
+    "label": "card token",
+    "glyph": "→",
+    "icons": [
+     "unsourced"
+    ]
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "fraud",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0 is-selected",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "hypothesis"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Fraud check",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ord",
+    "name": "Order handler",
+    "label": "score",
+    "glyph": "←",
+    "icons": [
+     "hypothesis"
+    ]
+   }
+  ],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "db",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph database"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Orders database",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "stock",
+    "name": "Stock check",
+    "label": "stock levels",
+    "glyph": "←",
+    "icons": [
+     "verified"
+    ]
+   },
+   {
+    "dir": "in",
+    "other": "ord",
+    "name": "Order handler",
+    "label": "order rows",
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "psp",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-hit",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph globe",
+   "unsourced"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Card provider",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "payh",
+    "name": "Payment handler",
+    "label": "card token",
+    "glyph": "←",
+    "icons": [
+     "unsourced"
+    ]
+   }
+  ],
+  "note": false
+ }
+]

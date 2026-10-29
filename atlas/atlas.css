@@ -1,0 +1,75 @@
+/* atlas.css — the atlas page. Colours come from the viewer's theme variables
+   (--mmv-*): the picker sits inside the viewer, the screen gets them through applyTheme. */
+html, body { margin: 0; height: 100%; }
+body { background: var(--mmv-bg, #fff); }
+#app { height: 100vh; height: 100dvh; }
+
+.atlas-picker { position: relative; display: flex; }
+.atlas-pill, .atlas-panel {
+  background: var(--mmv-chrome-bg);
+  border: 1px solid var(--mmv-chrome-border);
+  box-shadow: var(--mmv-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  color: var(--mmv-ink);
+}
+.atlas-pill {
+  display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px;
+  font: inherit; font-weight: 600; cursor: pointer; max-width: 46cqw;
+}
+.atlas-pill:hover, .atlas-pill.is-on { background: var(--mmv-chrome-hover); }
+.atlas-pill-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.atlas-ic { flex: none; }
+
+.atlas-panel {
+  position: absolute; top: 42px; left: 0; z-index: 12; padding: 10px;
+  width: min(340px, calc(100cqw - 28px)); max-height: calc(100cqh - 80px); overflow: auto;
+  box-sizing: border-box; font-size: 14px;
+}
+.atlas-filter {
+  box-sizing: border-box; width: 100%; margin-bottom: 6px; padding: 6px 8px;
+  border: 1px solid var(--mmv-chrome-border); border-radius: 7px; outline: none;
+  background: var(--mmv-bg); color: var(--mmv-ink); font: inherit;
+}
+.atlas-filter:focus { border-color: var(--mmv-accent); }
+.atlas-folder, .atlas-map {
+  display: flex; align-items: center; gap: 6px; width: 100%; padding: 4px 6px;
+  border: 0; border-radius: 6px; background: none; color: inherit; font: inherit;
+  text-align: left; cursor: pointer;
+}
+.atlas-folder { font-weight: 600; color: var(--mmv-muted); }
+.atlas-folder:hover, .atlas-map:hover { background: var(--mmv-chrome-hover); }
+.atlas-map.is-on { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
+.atlas-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-chev { display: inline-flex; transition: transform .12s; }
+.atlas-chev.is-closed { transform: rotate(-90deg); }
+.atlas-kids { padding-left: 14px; }
+.atlas-kids.is-closed { display: none; }
+.atlas-empty { padding: 4px 6px; color: var(--mmv-muted); }
+.atlas-message { margin-bottom: 8px; padding: 6px 8px; border-radius: 7px; background: var(--mmv-tint); }
+.atlas-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--mmv-chrome-border);
+  color: var(--mmv-muted); font-size: 13px;
+}
+.atlas-link { border: 0; background: none; padding: 0; color: var(--mmv-accent); font: inherit; cursor: pointer; }
+.atlas-link:hover { text-decoration: underline; }
+
+/* the full-page screen: open a folder, server stopped */
+#screen {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px;
+  background: var(--mmv-bg, #fff); color: var(--mmv-ink, #222);
+  font-family: var(--mmv-font, system-ui, sans-serif);
+}
+#screen[hidden] { display: none; }
+.atlas-card { max-width: 420px; text-align: center; line-height: 1.5; }
+.atlas-card h1 { margin: 0 0 8px; font-size: 22px; }
+.atlas-card p { margin: 0 0 16px; color: var(--mmv-muted, #666); }
+.atlas-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.atlas-btn {
+  height: 36px; padding: 0 14px; border-radius: 10px; cursor: pointer; font: inherit; font-weight: 600;
+  border: 1px solid var(--mmv-chrome-border, #ccc); background: var(--mmv-chrome-bg, #fff); color: inherit;
+}
+.atlas-btn:hover { background: var(--mmv-chrome-hover, #eee); }
+.atlas-btn.is-main { background: var(--mmv-chrome-active, #222); color: var(--mmv-chrome-active-ink, #fff); border-color: transparent; }

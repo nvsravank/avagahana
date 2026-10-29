@@ -1,0 +1,326 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "shop",
+   "x": 0,
+   "y": 0,
+   "w": 767.4,
+   "h": 196,
+   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Shop system, level 1, 6 children, has a note, a box",
+   "title": {
+    "text": "Shop system",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": {
+    "x": 737.4,
+    "y": 6,
+    "size": 16
+   },
+   "dot": {
+    "x": 766.4,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "orders",
+   "x": -293.2,
+   "y": 18.34,
+   "w": 153,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Orders service, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 12,
+     "y": 22.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Orders service",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 34.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 152,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  },
+  {
+   "kind": "node",
+   "id": "queue",
+   "x": -0.6,
+   "y": 18.34,
+   "w": 169,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c11 mmv-p0",
+   "grow": 1,
+   "name": "Event queue, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "subroutine",
+   "outline": "M0,0 H169 V60 H0 Z M8,0 V60 M161,0 V60",
+   "icons": [
+    {
+     "code": "ph tray",
+     "ph": "tray",
+     "color": null,
+     "label": "Tray",
+     "size": 15,
+     "x": 20,
+     "y": 22.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Event queue",
+      "bold": false,
+      "italic": false,
+      "x": 41,
+      "y": 34.3
+     }
+    ]
+   },
+   "note": {
+    "x": 133.7,
+    "y": 22.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "web",
+   "x": 316.2,
+   "y": -28,
+   "w": 107,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c9 mmv-p0",
+   "grow": 1,
+   "name": "Web app, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [
+    {
+     "code": "ph browser",
+     "ph": "browser",
+     "color": null,
+     "label": "Browser",
+     "size": 15,
+     "x": 16,
+     "y": 22.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Web app",
+      "bold": false,
+      "italic": false,
+      "x": 37,
+      "y": 34.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 106,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  },
+  {
+   "kind": "node",
+   "id": "pay",
+   "x": 316.2,
+   "y": 54,
+   "w": 107,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Payments, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 12,
+     "y": 22.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Payments",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 34.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 106,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "orders>queue",
+   "d": "M-216.7,8.34 L-85.1,8.34",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -154.9,
+    "y": 12.34,
+    "text": "order placed"
+   },
+   "items": [
+    {
+     "from": "ord",
+     "to": "queue",
+     "label": "order placed"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "queue>pay",
+   "d": "M83.9,18.34 L238.7,18.34 Q246.7,18.34 246.7,26.34 L246.7,36 Q246.7,44 254.7,44 L262.7,44",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 159.3,
+    "y": 22.34,
+    "text": "charge requested"
+   },
+   "items": [
+    {
+     "from": "queue",
+     "to": "payh",
+     "label": "charge requested"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "pay>queue",
+   "d": "M262.7,64 L244.7,64 Q236.7,64 236.7,56 L236.7,46.34 Q236.7,38.34 228.7,38.34 L83.9,38.34",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 187.5,
+    "y": 42.34,
+    "text": "payment taken"
+   },
+   "items": [
+    {
+     "from": "payh",
+     "to": "queue",
+     "label": "payment taken"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "queue>orders",
+   "d": "M-85.1,28.34 L-216.7,28.34",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -136.7,
+    "y": 32.34,
+    "text": "mark paid"
+   },
+   "items": [
+    {
+     "from": "queue",
+     "to": "ord",
+     "label": "mark paid"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "queue>web",
+   "d": "M83.9,-1.66 L228.7,-1.66 Q236.7,-1.66 236.7,-9.66 L236.7,-20 Q236.7,-28 244.7,-28 L262.7,-28",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 145.7,
+    "y": 2.34,
+    "text": "order status"
+   },
+   "items": [
+    {
+     "from": "queue",
+     "to": "ui",
+     "label": "order status"
+    }
+   ]
+  }
+ ]
+}

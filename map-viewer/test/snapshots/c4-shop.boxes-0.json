@@ -1,0 +1,751 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "shop",
+   "x": -20,
+   "y": 0,
+   "w": 724,
+   "h": 339.6,
+   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Shop system, level 1, 6 children, has a note, a box",
+   "title": {
+    "text": "Shop system",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": {
+    "x": 694,
+    "y": 6,
+    "size": 16
+   },
+   "dot": {
+    "x": 723,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "web",
+   "x": -299.5,
+   "y": 56.8,
+   "w": 137,
+   "h": 198,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c9 mmv-p0",
+   "name": "Web app, level 2, 2 children, a box",
+   "title": {
+    "text": "Web app",
+    "x": 32,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [
+    {
+     "code": "ph browser",
+     "ph": "browser",
+     "color": null,
+     "label": "Browser",
+     "size": 15,
+     "x": 12,
+     "y": 6
+    }
+   ],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 136,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "api",
+   "x": -134,
+   "y": 56.8,
+   "w": 106,
+   "h": 198,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c10 mmv-p0",
+   "name": "API, level 2, 2 children, a box",
+   "title": {
+    "text": "API",
+    "x": 32,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [
+    {
+     "code": "ph door-open",
+     "ph": "door-open",
+     "color": null,
+     "label": "Door open",
+     "size": 15,
+     "x": 12,
+     "y": 6
+    }
+   ],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 105,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "orders",
+   "x": 39.5,
+   "y": 56.8,
+   "w": 153,
+   "h": 198,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "name": "Orders service, level 2, 2 children, a box",
+   "title": {
+    "text": "Orders service",
+    "x": 32,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 12,
+     "y": 6
+    }
+   ],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 152,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "frame",
+   "id": "pay",
+   "x": 244,
+   "y": -30.8,
+   "w": 168,
+   "h": 198,
+   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c1 mmv-p0",
+   "name": "Payments, level 2, 2 children, a box",
+   "title": {
+    "text": "Payments",
+    "x": 32,
+    "y": 18,
+    "size": 14,
+    "weight": 600
+   },
+   "icons": [
+    {
+     "code": "ph gear-six",
+     "ph": "gear-six",
+     "color": null,
+     "label": "Gear six",
+     "size": 15,
+     "x": 12,
+     "y": 6
+    }
+   ],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 167,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "customer",
+   "x": -478.5,
+   "y": 0,
+   "w": 89,
+   "h": 72,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Customer, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph user",
+     "ph": "user",
+     "color": null,
+     "label": "User",
+     "size": 38,
+     "x": 25.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Customer",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "ui",
+   "x": -299.5,
+   "y": 22.8,
+   "w": 101,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c9 mmv-p0",
+   "grow": 1,
+   "name": "Storefront, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Storefront",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "cart",
+   "x": -299.5,
+   "y": 116.8,
+   "w": 109,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c9 mmv-p0",
+   "grow": 1,
+   "name": "Basket page, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Basket page",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "gw",
+   "x": -134,
+   "y": 22.8,
+   "w": 78,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c10 mmv-p0",
+   "grow": 1,
+   "name": "Gateway, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Gateway",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "auth",
+   "x": -134,
+   "y": 116.8,
+   "w": 78,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c10 mmv-p0",
+   "grow": 1,
+   "name": "Sign-in, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Sign-in",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "ord",
+   "x": 39.5,
+   "y": 22.8,
+   "w": 125,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Order handler, level 3",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Order handler",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "stock",
+   "x": 39.5,
+   "y": 116.8,
+   "w": 109,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Stock check, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Stock check",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "payh",
+   "x": 244,
+   "y": -64.8,
+   "w": 140,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Payment handler, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Payment handler",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "fraud",
+   "x": 244,
+   "y": 29.2,
+   "w": 109,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c1 mmv-p0",
+   "grow": 1,
+   "name": "Fraud check, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Fraud check",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "db",
+   "x": 244,
+   "y": 115.2,
+   "w": 161,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
+   "grow": 1,
+   "name": "Orders database, level 2",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "cylinder",
+   "outline": "M0,6 A80.5,6 0 0 1 161,6 V44 A80.5,6 0 0 1 0,44 Z M0,6 A80.5,6 0 0 0 161,6",
+   "icons": [
+    {
+     "code": "ph database",
+     "ph": "database",
+     "color": null,
+     "label": "Database",
+     "size": 15,
+     "x": 12,
+     "y": 20.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Orders database",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 32.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "psp",
+   "x": 454.5,
+   "y": 0,
+   "w": 137,
+   "h": 72,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Card provider, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph globe",
+     "ph": "globe",
+     "color": null,
+     "label": "Globe",
+     "size": 38,
+     "x": 49.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Card provider",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "customer>ui",
+   "d": "M-434,-6 L-406,-6 Q-398,-6 -398,2 L-398,14.8 Q-398,22.8 -390,22.8 L-350,22.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "customer",
+     "to": "ui",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "customer>cart",
+   "d": "M-434,6 L-416,6 Q-408,6 -408,14 L-408,108.8 Q-408,116.8 -400,116.8 L-354,116.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "customer",
+     "to": "cart",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ui>gw",
+   "d": "M-249,22.8 L-206,22.8 Q-203,22.8 -203,19.8 L-203,19.8 Q-203,16.8 -200,16.8 L-173,16.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "ui",
+     "to": "gw",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "cart>gw",
+   "d": "M-245,116.8 L-211,116.8 Q-203,116.8 -203,108.8 L-203,36.8 Q-203,28.8 -195,28.8 L-173,28.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "cart",
+     "to": "gw",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "gw>auth",
+   "d": "M-134,47.8 L-134,91.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "gw",
+     "to": "auth",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "gw>ord",
+   "d": "M-95,22.8 L-23,22.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "gw",
+     "to": "ord",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ord>stock",
+   "d": "M39.5,47.8 L39.5,91.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "ord",
+     "to": "stock",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ord>payh",
+   "d": "M102,16.8 L136,16.8 Q144,16.8 144,8.8 L144,-56.8 Q144,-64.8 152,-64.8 L174,-64.8",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "ord",
+     "to": "payh",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "payh>fraud",
+   "d": "M244,-39.8 L244,4.2",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "payh",
+     "to": "fraud",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "payh>psp",
+   "d": "M314,-64.8 L362,-64.8 Q370,-64.8 370,-56.8 L370,-8 Q370,0 378,0 L386,0",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "payh",
+     "to": "psp",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ord>db",
+   "d": "M102,28.8 L136,28.8 Q144,28.8 144,36.8 L144,101.2 Q144,109.2 152,109.2 L163.5,109.2",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "ord",
+     "to": "db",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "stock>db",
+   "d": "M94,116.8 L141.8,116.8 Q144,116.8 144,119 L144,119 Q144,121.2 146.2,121.2 L163.5,121.2",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "stock",
+     "to": "db",
+     "label": ""
+    }
+   ]
+  }
+ ]
+}

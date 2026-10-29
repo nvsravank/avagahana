@@ -1,0 +1,16 @@
+{
+  "name": "avagahana",
+  "description": "Clear diagrams for AI agents: write a map as text, read it in an interactive viewer.",
+  "author": {
+    "name": "nvsravank"
+  },
+  "repository": "https://github.com/nvsravank/avagahana",
+  "license": "MIT",
+  "keywords": [
+    "diagrams",
+    "mermaid",
+    "mind map",
+    "architecture"
+  ],
+  "displayName": "Avagahana"
+}

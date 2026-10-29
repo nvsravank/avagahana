@@ -1,0 +1,449 @@
+[
+ {
+  "kind": "row",
+  "id": "n1",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k0 mmv-l0 mmv-d0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Node shapes",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n2",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Boxes",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n3",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Rounded",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n4",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Square",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n5",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0 is-hit",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Hexagon",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "_a1",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Plain text",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n6",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Round",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "n7",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Circle",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n8",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0 is-selected",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Bang",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n9",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Cloud",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n10",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Flowchart shapes",
+     "bold": true,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n11",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Rhombus",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n12",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Stadium",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n13",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Subroutine",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n14",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Database",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n15",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Double circle",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n16",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Flag",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n17",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Parallelogram",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n18",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Parallelogram alt",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n19",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Trapezoid",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "n20",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Trapezoid alt",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": true
+ }
+]

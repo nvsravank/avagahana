@@ -1,0 +1,635 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "Fulfilment",
+   "x": 386.3,
+   "y": -48,
+   "w": 120,
+   "h": 224,
+   "cls": "mmv-frame mmv-k9 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Fulfilment, level 1, 2 children, a box",
+   "title": {
+    "text": "Fulfilment",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 119,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "_start1",
+   "x": -693.3,
+   "y": 51.51,
+   "w": 20,
+   "h": 20,
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "start, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-start",
+   "outline": "M1,10 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0",
+   "solid": true,
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Pending",
+   "x": -550.3,
+   "y": 51.51,
+   "w": 178,
+   "h": 74,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Awaiting payment, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Awaiting payment",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Charging",
+   "x": -243,
+   "y": 51.51,
+   "w": 255,
+   "h": 74,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Charging, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Charging",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     },
+     {
+      "text": "entry / call the gateway",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 46.2
+     },
+     {
+      "text": "exit / record the answer",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 66.2
+     }
+    ]
+   },
+   "divider": {
+    "y": 28,
+    "w": 255
+   }
+  },
+  {
+   "kind": "node",
+   "id": "check",
+   "x": -0.7,
+   "y": 26.63,
+   "w": 28,
+   "h": 28,
+   "cls": "mmv-node mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "choice, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-choice",
+   "outline": "M14,0 L28,14 L14,28 L0,14 Z",
+   "mark": true,
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Paid",
+   "x": 178.2,
+   "y": -48,
+   "w": 101,
+   "h": 74,
+   "cls": "mmv-node mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Paid, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Paid",
+      "bold": false,
+      "italic": false,
+      "x": 31,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Retrying",
+   "x": 178.2,
+   "y": 101.26,
+   "w": 101,
+   "h": 74,
+   "cls": "mmv-node mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Retrying, level 1",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Retrying",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "_region4",
+   "x": 352.3,
+   "y": -83,
+   "w": 24,
+   "h": 74,
+   "cls": "mmv-node mmv-k9 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Fulfilment, region, level 2, 3 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": []
+   },
+   "dot": {
+    "x": 23,
+    "y": 1,
+    "closed": true,
+    "count": 3
+   }
+  },
+  {
+   "kind": "node",
+   "id": "_region5",
+   "x": 352.3,
+   "y": 13,
+   "w": 24,
+   "h": 74,
+   "cls": "mmv-node mmv-k9 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Fulfilment, region, level 2, 3 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": []
+   },
+   "dot": {
+    "x": 23,
+    "y": 1,
+    "closed": true,
+    "count": 3
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Failed",
+   "x": 386.3,
+   "y": 123,
+   "w": 107,
+   "h": 74,
+   "cls": "mmv-node mmv-k7 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Failed, level 1, has a note",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Failed",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   },
+   "note": {
+    "x": 77.6,
+    "y": 28.5,
+    "size": 17
+   }
+  },
+  {
+   "kind": "node",
+   "id": "done",
+   "x": 494.8,
+   "y": 14.63,
+   "w": 9,
+   "h": 60,
+   "cls": "mmv-node mmv-k10 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "join, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-bar",
+   "outline": "M0,0 H9 V60 H0 Z",
+   "solid": true,
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  },
+  {
+   "kind": "node",
+   "id": "Shipped",
+   "x": 589.3,
+   "y": 14.63,
+   "w": 92,
+   "h": 74,
+   "cls": "mmv-node mmv-k11 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Shipped, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Shipped",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 42.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "_end2",
+   "x": 691.3,
+   "y": 45.13,
+   "w": 24,
+   "h": 24,
+   "cls": "mmv-node mmv-k8 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "end, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "state-end",
+   "outline": "M1,12 a11,11 0 1 0 22,0 a11,11 0 1 0 -22,0 M6,12 a6,6 0 1 0 12,0 a6,6 0 1 0 -12,0",
+   "mark": true,
+   "innerDot": {
+    "x": 12,
+    "y": 12,
+    "r": 3
+   },
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": []
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "_start1>Pending",
+   "d": "M-683.3,51.51 L-639.3,51.51",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "_start1",
+     "to": "Pending",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Pending>Charging",
+   "d": "M-461.3,51.51 L-370.5,51.51",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -419.9,
+    "y": 55.51,
+    "text": "submit"
+   },
+   "items": [
+    {
+     "from": "Pending",
+     "to": "Charging",
+     "label": "submit"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Charging>check",
+   "d": "M-115.5,26.63 L-14.7,26.63",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -74.1,
+    "y": 30.63,
+    "text": "answer"
+   },
+   "items": [
+    {
+     "from": "Charging",
+     "to": "check",
+     "label": "answer"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "check>Paid",
+   "d": "M13.3,18.63 L103.7,18.63 Q111.7,18.63 111.7,10.63 L111.7,-40 Q111.7,-48 119.7,-48 L127.7,-48",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 41.1,
+    "y": 22.63,
+    "text": "ok"
+   },
+   "items": [
+    {
+     "from": "check",
+     "to": "Paid",
+     "label": "ok"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "check>Retrying",
+   "d": "M13.3,34.63 L103.7,34.63 Q111.7,34.63 111.7,42.63 L111.7,83.26 Q111.7,91.26 119.7,91.26 L127.7,91.26",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 61.5,
+    "y": 38.63,
+    "text": "declined"
+   },
+   "items": [
+    {
+     "from": "check",
+     "to": "Retrying",
+     "label": "declined"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Retrying>Charging",
+   "d": "M127.7,111.26 L116.7,111.26 Q111.7,111.26 111.7,106.26 L111.7,106.26 Q111.7,101.26 106.7,101.26 L-22.7,101.26 Q-30.7,101.26 -30.7,93.26 L-30.7,69.51 Q-30.7,61.51 -38.7,61.51 L-115.5,61.51",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 89.7,
+    "y": 105.26,
+    "text": "retry"
+   },
+   "items": [
+    {
+     "from": "Retrying",
+     "to": "Charging",
+     "label": "retry"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Retrying>Failed",
+   "d": "M228.7,101.26 L332.8,101.26",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 273.5,
+    "y": 105.26,
+    "text": "give up"
+   },
+   "items": [
+    {
+     "from": "Retrying",
+     "to": "Failed",
+     "label": "give up"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Failed>_end2",
+   "d": "M439.8,123 L466.3,123 Q474.3,123 474.3,115 L474.3,83.63 Q474.3,75.63 482.3,75.63 L655.3,75.63 Q663.3,75.63 663.3,67.63 L663.3,59.13 Q663.3,51.13 671.3,51.13 L679.3,51.13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Failed",
+     "to": "_end2",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Paid>Fulfilment",
+   "d": "M228.7,-48 L326.3,-48",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Paid",
+     "to": "Fulfilment",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Fulfilment>done",
+   "d": "M446.3,14.63 L490.3,14.63",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Fulfilment",
+     "to": "done",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "done>Shipped",
+   "d": "M499.3,14.63 L543.3,14.63",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "done",
+     "to": "Shipped",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Shipped>_end2",
+   "d": "M635.3,39.13 L679.3,39.13",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "Shipped",
+     "to": "_end2",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "Retrying>Retrying",
+   "d": "M215.7,64.26 A13,13 0 1 1 237.06,74.22 L228.7,77.26",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "self": true,
+   "label": {
+    "x": 278.3,
+    "y": 55.26,
+    "text": "wait 30 s"
+   },
+   "items": [
+    {
+     "from": "Retrying",
+     "to": "Retrying",
+     "label": "wait 30 s"
+    }
+   ]
+  }
+ ]
+}

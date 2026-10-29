@@ -1,0 +1,457 @@
+# Changelog
+
+All notable changes to Avagahana. Versions are git tags (`vMAJOR.MINOR.PATCH`).
+Changes to a contract (viewer API, map source, server HTTP API, map format) are
+marked **Contract**.
+
+## Unreleased
+
+- The repository is public: installing from GitHub needs no git credentials.
+
+- The cloud icon folders carry their NOTICE.md (source package, vendor page, the
+  vendor's terms as checked), written by `scripts/import_vendor_icons.py`
+  (`--notices` rewrites them alone); `vendor-icons.json` names each set's package.
+  `scripts/check.sh` fails when a vendor folder has no notice.
+
+- **Contract** Switching themes keeps the camera: `viewer.setTheme(id)` and the theme
+  panel no longer re-fit the drawing, so a view a sequence step moved to (or any pan
+  and zoom) stays put. Only the first theme, at mount, fits the drawing.
+
+- **Contract** Cloud icons: `aws <name>`, `azure <name>`, `gcp <name>` draw the official
+  AWS, Azure and Google Cloud architecture icons (SVG only, unchanged, vendor terms in
+  `map-viewer/vendor/<set>/NOTICE.md`), named by product with familiar aliases
+  (`map-viewer/vendor-icons.json`, written by `scripts/import_vendor_icons.py`). They sit
+  centred above a node's name, or at the top right of an open box, titled with the
+  product name. The checker rejects unknown names (`unknown-cloud-icon`) and suggests
+  the nearest; the viewer leaves them out. The reserved `google` namespace is `gcp`.
+- Unknown `ph` names get a nearest-name suggestion from the checker.
+
+- The `map` skill is now `illuminate-concept` (also for a reader struggling with a
+  concept, preferred over generic visualizers when its diagrams fit), with a
+  `trace-architecture` skill for reviewing a project or repository: size the task first, one map file of linked diagrams by
+  default, diagram kinds chosen by purpose and scaled to the scope, layers named for
+  their responsibility with role classes, icons used sparingly, and subagents only as
+  a last resort with the user's approval.
+- The node page scrolls inside its rounded corners, so its scrollbar is never cut.
+
+- The info panel's "Clear changes in this view" marks the current diagram and view
+  as seen, leaving other views' changes. The diagram switcher follows the view picker.
+
+- **Contract** Diagram quick links are grouped by type, preserving authored order
+  within each type across the drawing, list and node page.
+
+- **Contract** Diagram icons are direct quick links to their individual destinations;
+  the note icon opens the node page. Boxed nodes put quick links on a second row,
+  with content and note icons centered vertically on either side. Diagram types use
+  distinct icons with the approved lighter strokes.
+
+- Far zoom keeps flowchart and state boxes, outlines and routed connections fixed;
+  only label text becomes bars. Mind-map branch enlargement no longer affects boxes.
+
+- ER layout preserves its hub-and-spoke arrangement during refinement. Vertical
+  clearance uses label height rather than horizontal channel and label width,
+  preventing small join views from collapsing into widely spaced vertical chains.
+
+- ER channel ordering reduces crossings between parallel relationships. Same-side
+  endpoints share a vertical middle channel when it is free and does not add crossings.
+
+- ER looks are Flat (uniform fill with subtle row dividers) and Zebra (alternating
+  fills). Tables share the widest visible table's width; endpoint channels are allocated
+  per table side across all neighbours, with space reserved by layout.
+
+- **Contract** Phosphor icons use `ph name` in Mermaid icon lines and Markdown
+  sections. The old `ph-name` spelling is rejected; semantic codes stay unchanged.
+
+- **Contract** ER column relationships use stable IDs under `## Relations`; named
+  `## Joins` views reuse connections or define column equalities, including composite
+  pairs. Walks select connection IDs and named views; ambiguous selections fail checking.
+- Fix ER column labels staying as bars after zooming back in.
+- ER tables show all columns through 15, retain PK/grain/FK/connected columns above
+  that threshold, and route connections horizontally into their exact column rows.
+- Share flowchart label clearance and placement with ER; reserve space for parallel
+  connections while keeping straight middle segments and same-side stacked-table ports.
+- Shop platform demonstrates parallel address relationships and separate join views.
+
+- Discard stale navigation and live reload work; enforce symlink containment when listing maps.
+- **Contract** Viewer loads accept optional `{sourceId, signal}` context; source identity
+  isolates reader baselines and an AbortSignal cancels pending loads. Latest load wins.
+- **Contract** Map sources expose `identity()`; built-in folder identities persist per handle.
+  Relay info adds `sourceId`; ping adds effective `config`. Launchers refuse incompatible reuse.
+- **Contract** Show mode validation accepts short lowercase identifiers; the viewer decides
+  which modes its diagram supports, including ER tables.
+- Add full validation command and CI with required browser checks.
+
+- **Contract** Rename the product and plugin to Avagahana. Repository and plugin identifiers
+  use `avagahana`; relay identity is `avagahana-relay`, the maps variable is
+  `AVAGAHANA_MAP_DIR`, browser tests use `AVAGAHANA_CHROME`, and default browser
+  storage keys use `avagahana`. Clean rename before public release; reinstall the
+  plugin and select the existing maps folder again.
+
+- The repository is now the plugin root for Claude Code and Codex, with separate
+  root manifests and catalogs and one shared `skills/map/` skill. Removed duplicated
+  deployment bundles, the bundle generator, and target templates. The full format
+  reference is read directly from `docs/map-format.md`.
+- **Contract** Plugin maps-folder setup uses `AVAGAHANA_MAP_DIR` or a single absolute
+  path in `~/.config/avagahana/maps-dir`, replacing Claude-only installation options.
+  The skill asks and saves that path on first use. Standalone relay options are unchanged.
+
+- **Contract** In a state diagram, a link in a state's note to another diagram of the
+  file (`[t](#anchor)`) links the state to it as a flowchart `click` does (icon on the
+  box, thumbnail on its page): how a state opens a sub-machine (WO-14).
+
+- **Contract** State diagrams (WO-14): a `stateDiagram-v2` (or `stateDiagram`) block is
+  a box diagram type (`state`). Start and end dots, choice, fork / join bar,
+  descriptions as a compartment, composite states with concurrent regions (dashed),
+  notes, classes, self transitions as a corner loop. Warnings for states no path from
+  the start reaches (`state-unreachable`) and states with no way out
+  (`state-dead-end`), marked on the drawing. Example `examples/maps/order-states.md`.
+- **Contract** ER diagrams (WO-14): an `erDiagram` block is a diagram type (`er`, mode
+  `tables`). Tables show their name, primary key and grain columns (the comment
+  `"grain"`), the rest behind `+ N columns`; crow's-foot ends, cardinality in words;
+  hub-and-spoke layout refined against crossings, shared widths, alignment. Colour by
+  Role (fact, dimension, bridge: built-in classes, else inferred) or Class. Selecting a
+  fact table states its grain. The node page lists the columns. Example
+  `examples/maps/sales-warehouse.md`.
+- **Contract** Walks (WO-14): `## Walks: <name>` after a state or ER diagram, steps
+  `- A --> B : text`, played over the diagram by the sequence player; ER steps to a
+  many side say "rows multiply here". New problem codes `walks-not-here`, `walk-empty`,
+  `walk-syntax`, `walk-not-step`, `walk-gap`, `walk-twice`.
+- **Contract** Problem codes for state and ER blocks (`state-*`, `er-*`), all in
+  `format/problems.json` with a sample each.
+- **Contract** Atlas links keep any well-formed `mode` (the viewer checks it against the
+  map's type), so new diagram types need no atlas change.
+- The checker is split into modules beside `format/check_map.py`: `check_common.py`,
+  `check_state.py`, `check_er.py`, `check_walks.py`.
+- Diagram types may bring their own node geometry, node painting, page sections,
+  colour categories and icons (hooks in `map-viewer/diagrams/index.js`); `boxes: true`
+  replaces the viewer's checks for the flowchart type by name.
+- Shop platform example: an order lifecycle (state, with a walk) and the orders data
+  (ER, with a join walk), linked from the Orders service and the Orders database.
+
+- Sequence player over a view: a message to itself loops round a top corner of its box
+  (the one with less in the way), its number and label on a card like other messages.
+- Sequences: a `par` block reads "parallel" on screen (timeline bracket, lifelines block
+  title, step captions); the map keeps Mermaid's `par`.
+- **Contract** Planned changes (WO-13): built-in classes `added`, `changed`, `removed` on
+  nodes and arrows (by id), flowing down like a class but apart from a node's own class.
+  A "Changes" colour-by (`changes`) colours them good / warn / bad, the rest muted;
+  offered only when the diagram has planned changes, never where a map starts by itself
+  and never kept. New problem codes `plan-class-twice`, `plan-class-reserved` (warnings).
+  Example `examples/maps/shop-plan.md`.
+- **Contract** `viewer.setPrefs({appearance, colourBy, look})`; `POST /api/show` and the
+  `show` event take `colourBy`; `show.py --colour-by`; atlas links and shows apply it.
+- **Contract** Changes since you looked (WO-13): the viewer keeps, per map and reader,
+  what was seen (`<storageKey>-seen` in the browser) and marks what is new (sparkle) or
+  changed (pencil) when a map is rewritten or opened again; what arrives glows, what
+  goes shrinks out red, live reloads glide. Removals are listed on the parent's page and
+  in the info panel's "Since you looked" section. Marks roll up to closed boxes, linked
+  diagrams, crumbs, the view picker and the play button, and clear when the thing is
+  opened. Not exported or printed. New CSS classes `mmv-p*`, `mmv-change`, `is-glow`,
+  `is-gone`, `has-changes`.
+- **Contract** Sequence diagrams (WO-12): a `sequenceDiagram` block is a diagram type.
+  Participants (`participant`, `actor`, `box`), Mermaid's message arrows, `loop`, `alt`,
+  `opt`, `par`, `critical`, `break`, `rect` blocks and notes. Calls are numbered in
+  order; a reply takes the number of the call it answers (`3↩`). Shown as lifelines or
+  a list of numbered steps. Example `examples/maps/job-race.md`.
+- **Contract** The file opens to its first block, whatever its type: a file may be only
+  a sequence.
+- **Contract** `%% id: <id>` before a message names it; its details are a `## Details`
+  entry keyed by the id.
+- **Contract** `## Plays over` after a sequence links it to box diagram views
+  (`- #<anchor> : <view>`). Every participant must be a node the view shows and every
+  message must run along one of its arrows (either way). The viewer plays a linked
+  sequence over the view: a play button by the view picker, a step bar (timeline with
+  block brackets, back, play / pause, forward, stop, a switch to the lifelines), a side
+  panel with each step's details, the view greyed until reached, numbered calls and
+  replies in their own colours, a dot from sender to receiver, a camera that follows
+  (a reader's pan pauses it). The node page lists "In sequences".
+  `examples/maps/shop-layers.md` has a Checkout sequence over "Checkout (synchronous)".
+- **Contract** Every further diagram must be reachable from the first by links (a
+  `click`, a note link, a `## Plays over`). An unreachable one is a problem
+  (`diagram-unreachable`); the viewer lists it in the view picker under "Not linked".
+- **Contract** New problem codes: `diagram-unreachable`, `sequence-line-syntax`,
+  `message-id-twice`, `message-id-no-message`, `plays-over-syntax`,
+  `plays-over-unknown`, `plays-over-not-sequence`, `sequence-not-in-view`,
+  `sequence-no-arrow`, each with a sample. `diagram-type` now names `sequenceDiagram`.
+- **Contract** Viewer state gains `seq` (the sequence playing, by anchor, `main` for the
+  first diagram) and `step` (from 1); mode `lifelines`. The atlas URL carries both.
+- **Contract** `POST /api/show` (and `show.py --seq --step`) takes `seq` and `step`, and
+  mode `lifelines`.
+- **Contract** Themes: four optional roles for the player, `idle`, `idleLine`, `call`,
+  `reply`, filled in quietly when a theme leaves them out.
+- Sequence player over a view: the view's own arrow labels give way to the messages'.
+  Each arrow the sequence uses gets room for two lines (the boxes glide apart while it
+  plays): the latest call, numbered, and under it its return. The dot from sender to
+  receiver now runs (it never started). The toolbars' menus and pop-ups (icon filter,
+  theme) are no longer covered by the step panel.
+- **Contract** A speed control on the sequence player's step bar: 5 to 2 seconds a
+  step, in half seconds, kept with the reader's preferences (`stepSeconds`). Viewer
+  option `sequenceStepSeconds` sets where it starts for a reader with no choice yet
+  (same range, 3 by default).
+- Keys while a sequence plays: left and right arrows step, space plays or pauses,
+  Escape stops.
+- **Contract** Trust marks: four named icon codes, `verified`, `inferred`, `hypothesis`,
+  `unsourced` (Phosphor seals), with their meanings as key labels ("Checked in the
+  source", "Reasoned from what was read", "A guess to test", "Source not found / not
+  reviewed"). A node whose class
+  brings an icon keeps it beside its marks.
+- **Contract** Icons on arrows: `## Node icons` takes arrow ids (`- e7 : hypothesis`), in
+  every view and diagram type. Drawn after the label; merged arrows show shared icons;
+  the icon filter, the key, the arrow popover, list mode and the node page cover them.
+  A `## Node icons` line naming no node and no arrow id is a warning.
+- Example `examples/maps/slow-checkout.md`: an investigation marked with trust marks.
+- **Contract** Map checker `format/check_map.py` (Python 3.9+, standard library), ported
+  and brought up to the whole format. Strict: invalid Mermaid (brackets that are no
+  Mermaid shape, duplicate ids; a shape of either diagram type is fine in both), invalid extension sections and any
+  unresolved reference fail it. Valid Mermaid the viewer ignores (`style`, `linkStyle`,
+  `click` callbacks, `id@{ ... }` arrow settings, a mind map node with no id) is a
+  warning. Sample maps in
+  `format/samples/` hold the checker and the viewer to the same answers;
+  `scripts/check.sh` runs the checker over the examples and the samples.
+- `garden.md` drops its link to a missing node.
+- **Contract** Map problem codes: one list, `format/problems.json`, shared by the viewer
+  (`map-<code>`) and the checker. Renamed viewer codes: `map-not-mindmap` is
+  `map-diagram-type`, `map-empty` is `map-diagram-empty`, `map-large` is
+  `map-large-map`, `map-cross-missing` is `map-cross-map-missing`; `map-note-anchor`,
+  `map-relation`, `map-icon-legend` and the catch-all `map-warning` are split into
+  finer codes. The parsed map has `problems` (`{code, message}`); `warnings` is unchanged.
+  `format/samples/` holds a map per code; `scripts/check_samples.py` and the browser
+  tests check both sides against them.
+- Repo skeleton: `map-viewer/`, `atlas/`, `relay-server/`, `format/`, `examples/`, `docs/`.
+- **Contract** First written: `docs/map-viewer-api.md`, `docs/map-source.md`,
+  `docs/relay-server-api.md`, `docs/map-format.md`.
+- `scripts/check.sh`: dependency rule between components and the clean check.
+- MIT licence.
+- **Map viewer** (`map-viewer/`), ported from the Simple Mind Maps viewer into an
+  embeddable library: `mount(element, options)` from `map-viewer/index.js`. No server, no
+  `location`, no ids; two viewers on one page work independently; `destroy()` cleans up.
+  Every existing feature kept: mind map, org and list modes, semantic zoom and bars,
+  drill-down with crumbs, search, icon filter, notes and pinning, related and cross-map
+  links, expand states, looks, SVG/PNG export, print, keyboard shortcuts, live reload.
+- **Contract** `docs/map-viewer-api.md` rewritten to what is built. Changes from the first
+  draft: `options.theme` is a theme **id** (was: a name or a CSS URL); themes are objects
+  (`options.themes`, `defaultTheme`, `addTheme`, `setTheme`, `applyTheme`); added
+  `options.prefs` (`{theme, appearance, colourBy, look}`), `options.storageKey`, `options.showProblems`, `viewer.slot`,
+  `viewer.ready`, `viewer.problems`, the `load` and `warning` events; the `error` event
+  carries a problem object; note links always go to `host.openExternal`.
+- Themes: data objects (colours as values, font as bytes) turned into CSS variables. A
+  theme supplies palettes (category, level), roles and a font; each diagram type says
+  what colour means ("Colour by": a mind map offers Branch and Level), so new diagram
+  types need nothing new in themes. Theme, appearance, colour-by and look switches
+  restyle without repainting. New built-in theme "Avagahana": light and dark, 13 category
+  colours, six blues by level (each step lighter, so they read as an order), Atkinson Hyperlegible Next (OFL), loaded on demand.
+  No work colours.
+- **Contract** `docs/map-format.md`: named icon codes are coloured by theme swatches.
+- Performance: shared text-width cache, single-line fast path, icons as shared
+  `<symbol>`s, wheel and drag once per frame, colour by class. `map-viewer/test/perf.html`.
+- **Relay server** (`relay-server/`), ported from the Simple Mind Maps server: same
+  start-up line (`STATUS=… URL=…`), reuse of a running copy, background start, idle
+  stop, `--maps-dir`, hidden-path filtering. New: `GET /api/info`,
+  `GET /api/events` (Server-Sent Events: `tree`, `show`), `POST /api/show` and
+  `relay-server/show.py` (the agent's "look here"), `--no-open` / `--no-shutdown`,
+  `--atlas-dir` / `--viewer-dir` (served at `/` and `/map-viewer/`; the API works
+  without them), the `AVAGAHANA_MAP_DIR` environment variable as the default maps folder
+  (replaces `MINDMAPS_DIR`; no folder beside the code, none created: without one it
+  refuses to start), a 10 s timeout for stalled requests. `relay-server/test_server.py`.
+- **Contract** `docs/relay-server-api.md` rewritten to what is built. Changes from the
+  first draft: capabilities are `tree, map, events, show, open, shutdown`; `POST
+  /api/show` answers `{delivered}`; the atlas is served at `/` (not `/atlas/`).
+- `map-viewer/test/index.html` (contract checks), `examples/embed.html`,
+  `examples/two-viewers.html`, `examples/maps/`.
+- **Atlas** (`atlas/`): the first page. Lists maps from a map source, hosts one viewer,
+  owns the URL. Served by the relay server: maps from its API, live reload over
+  Server-Sent Events (polling as a fallback), the agent's "look here" (`show` event),
+  the power button, links opened in the default browser. Served by any static server:
+  "Open folder" (File System Access API, Chromium), remembered between visits, polled
+  for changes; no power button. The map picker (filter and folder tree) sits in the
+  viewer's toolbar slot. Links keep the old `#/<path>?mode=&focus=&node=` shape, add
+  `view=` and `env=`, and old `theme=` / `scheme=` / `look=` still set the looks.
+  Same-host map links open in place. `atlas/test/index.html`.
+- **Contract** `docs/map-source.md`: `detectServer(baseUrl)`; `serverSource(baseUrl, info)`
+  takes the server's `/api/info`; `folderSource(handle)` takes the picked folder; new
+  optional `onShow(fn)` for "look here".
+- Map viewer: colouring by Level now colours each line with the level colour of the node
+  it leads to (it was one line colour for the whole map, left over from the old
+  three-blues scheme).
+- **Contract** Themes: `lines` is gone. `lines.edge` was used only by the old one-colour
+  level lines; `lines.relation` is now the role `roles.link` (CSS variable `--mmv-link`,
+  was `--mmv-relation`): the colour of a link drawn over the diagram, such as a mind
+  map's related links. A theme that still sets `lines` gets a warning.
+- Map viewer: lines are solid (they were 80% opaque, which left seams and dark patches
+  where lines overlap), one colour end to end (the colour of the node they lead to), and
+  one path from box to box (the separate short joins at each end left a hairline seam).
+  Mind map curves adapt to the drop: an even S for a short one (control points at 0.5
+  of the gap, as before), blending smoothly to 0.7 for a drop of three child box heights
+  or more, so long lines leave and reach their boxes level instead of at a slant.
+- **Contract** The class `mmv-stub` is gone (no more joins); lines are `mmv-edge` only.
+- **Map viewer, scene stage (WO-05).** Drawing is now parse > layout > scene > paint:
+  `diagrams/mindmap/scene.js` turns the laid-out map and the view state into plain
+  shapes (`{kind, id, x, y, w, h, cls, ...}`, no DOM), and `paint.js` only turns a scene
+  into SVG, layer by layer (lines, nodes, related links) with the same partial repaints
+  as before. The drawing is unchanged (checked against the old SVG for every example map
+  and mode) and a little faster. Text measuring can be swapped, so tests use a fixed one.
+- Accessibility: the drawing is named after the map and says what it shows; each node
+  has a spoken name (label, level, children, collapsed, note); lines are hidden from
+  screen readers.
+- `map-viewer/test/scene.html`: scene snapshots of every example map in mind map (near
+  and zoomed out), org and list mode, compared with `map-viewer/test/snapshots/`. The
+  contract checks moved into `map-viewer/test/contract.js`.
+- `scripts/browser_tests.py`: runs the viewer, scene and atlas test pages in headless
+  Chrome (Python standard library only); `--update` writes new snapshots.
+- New example maps: `examples/maps/shapes.md` (every node shape, left pins, long labels,
+  icon legend, notes, related links) and `examples/maps/node-shapes.md` (one node per
+  shape, each with a note showing how to write it).
+- **Contract** `docs/map-format.md`: labels at most 150 characters a line and 1,000 in
+  all (longer ones are shortened with "...", with a `map-long-label` warning); maps over
+  5,000 nodes draw in full with a `map-large` warning that drawing may be slow.
+- Map viewer: node shapes drawn as Mermaid draws them. A circle is a true circle (its
+  diameter fits the label, which sits in the middle; selection and search marks are
+  rings), a cloud a ring of outward round bumps, a bang a ring of inward curves meeting
+  in sharp tips, its corners cut by one more curve. All three were pills before. Cloud
+  and bang bumps sit at uneven gaps (seeded by the node's id, so a node keeps its
+  shape), more of them for a longer label and bigger ones for a long node, with a
+  minimum width so a short label still gets a full shape. Lines meet a bump or tip at
+  the middle of each side.
+- Map viewer: a node line with brackets that are not a mindmap shape (a flowchart
+  rhombus `n5{"Decide"}`, `n6>"Flag"]`) keeps its id and label and is drawn as a plain
+  node, with no viewer warning (it used to show the whole line as the label). The
+  checker (WO-16) is to report it.
+- **Contract** `docs/map-format.md`: the viewer draws Mermaid's flowchart shapes too
+  (rhombus, stadium, subroutine, database cylinder, double circle, flag, parallelograms,
+  trapezoids); not valid in a Mermaid mindmap, so the checker (WO-16) is to warn. Brackets
+  that are no Mermaid shape draw a plain node. Node ids are strictly a letter, then
+  letters, digits, `_` or `-` (as the format already said). `examples/maps/node-shapes.md`
+  shows every shape.
+- **Box diagrams (WO-06, with the graph layout).** A map whose Mermaid block is a `flowchart` is a
+  box diagram: `subgraph`s are boxes inside boxes, nodes take any Mermaid shape, and the
+  block's arrows (Mermaid's kinds: solid, dotted, thick, no head, both ends, circle,
+  cross; labels either way; chains and `&`) are drawn as written. Modes: boxes and list.
+  A layered layout per open box, inside out (ranks along the arrows, crossings cut by
+  neighbour averages, loose boxes stacked), direction from the block or a box's own
+  `direction`. `examples/maps/c4-shop.md`: a C4 container diagram with three views.
+- **Relation views** in any map: `## Relations` is the default view, `## Relations:
+  <name>` adds one (a box diagram's own arrows are its default). A view picker shows
+  when a map has more than one. In a box diagram each view is its own picture: only the
+  boxes its arrows use and the boxes round them, laid out for it, animated between
+  views. Arrows to hidden things go to the nearest box shown; several on one pair merge
+  into one, labelled with a count, and clicking an arrow lists the relations behind it.
+- Generic diagram types: `map-viewer/diagrams/index.js` lists them; each declares its
+  parser, modes, colour-by, layout and scene. Shared parts moved to `map-viewer/model/`
+  (labels, shapes, notes and sections, relations and views, the tree), `geometry.js`
+  (node sizes and shapes) and `list.js` (list mode). Mind maps draw exactly as before.
+- **Contract** `docs/map-format.md`: `flowchart` blocks (box diagrams), relation views,
+  Mermaid's arrow kinds in relation lines, `## Node icons`. `docs/map-viewer-api.md`:
+  modes per diagram type (`boxes` for flowcharts), `state.view` is live, `viewer.views`,
+  `data-diagram` on the root, classes `mmv-frame`, `mmv-flow`.
+- Scene snapshots cover every view of `c4-shop`, open and with its boxes closed; the
+  contract tests cover flowchart parsing, views and the viewer following both.
+- Map viewer: a double-click on an open / close dot or a related-links dot acts once
+  (it used to open and close again). Atlas links keep a box diagram's `mode=boxes`.
+- Box diagrams: a view's arrows no longer stack see-through fills in the outline look
+  (fills mix with the background, so nested boxes stay readable in dark and light).
+- List mode: a box diagram's outline starts at its top-level items (no row repeating
+  the title), and each row's relations in the current view follow it, one per line,
+  indented: an arrow for direction and kind (→ ← solid, ⇢ ⇠ dotted, ⇒ ⇐ thick,
+  ↔ both), the node at the other end and the label; clicking one goes there. A
+  collapsed branch says "N more" (was "+N"). The first crumb of a box diagram is
+  "Whole map".
+- SVG export for editors such as Illustrator: arrowheads use `orient="auto"` (with
+  mirrored tail markers) instead of SVG 2's `auto-start-reverse`; text names one
+  font, the theme font's real family (an editor reports every name of a CSS fallback
+  list it lacks), and the embedded font carries that name; no `role`, `aria-*` or
+  `data-*` attributes.
+- SVG export: an arrow's wide invisible click line is left out (an editor drew it as a
+  black line over the arrow), and colours are plain `rgb()` with any transparency as
+  `fill-opacity` / `stroke-opacity`.
+- SVG export: no markers. Every arrowhead, circle or cross end is drawn as plain shapes
+  at the line's end, turned and scaled as the marker would be (editors such as
+  Illustrator handle SVG markers poorly).
+- **Classes** (`model/classes.js`): a class names what a node is; the theme colours it,
+  the same colour by class name in every view, drill and map. Built in: `person`,
+  `database`, `external` (muted, as C4 draws external systems), each with a default
+  icon; a map adds or changes classes in a `## Classes` section (icon and label). Box
+  diagrams colour by class to start with (Class, Group, Depth), with a colour key in the
+  info panel; Group and Depth count from the map's top, so drilling in never recolours.
+  Opening another diagram type starts on its own colour-by. `c4-shop` uses classes.
+- **Contract** `docs/map-format.md`: classes and `## Classes`. `docs/map-viewer-api.md`:
+  colour class `mmv-c<n>`; colour-by `class` for box diagrams.
+- Classes: the classes of one map always get different colours (a class takes the slot
+  its name gives, or the next free one, by name order); the built-in person and database
+  slots stay theirs on every map. An open box shows its icons (its class's) in its title
+  strip. `c4-shop`: web-app, api-gateway and business-service classes.
+- Classes flow down: everything inside a box (or under a branch) has the box's class
+  until a node names its own; the colour flows, the default icon stays on the nodes
+  that name the class.
+- Box diagrams have no "colour by" choice: the map decides (by class when it uses
+  classes, else by its top-level boxes), with a colour key for either. Depth colouring is
+  gone for box diagrams; mind maps keep Branch and Level. The info panel's markers leave
+  out the mind map's related-links rows in a box diagram.
+- **Contract** Box diagrams: the direction inside boxes alternates by depth (the top level
+  and the inside of its boxes follow `flowchart LR` / `TB`, each level further in turns
+  90 degrees); a box's own
+  `direction` line still wins, and the boxes inside it turn from there.
+- Box diagrams: arrows are routed by the layout and never cross a box or a box's title.
+  An arrow is cut at each box border it crosses; each leg runs in the gaps between
+  ranks on a track of its own (gaps grow to fit), passing ranks through lanes kept
+  for it; arrows sharing a side of a box are spread along it. Straight runs with
+  rounded corners.
+- Box diagrams: arrow labels get room in their gap and sit on the arrow's own straight
+  run, as near its start as fits, clear of boxes, box titles and borders, arrow heads
+  and each other. Arrows turn near the far side of a gap, so no two runs share a line.
+- Mind maps: related links lifted onto the same pair of drawn nodes merge into one,
+  labelled with their count; click it to list them (as in box diagrams).
+- SVG export leaves out screen-only controls: open / close dots, note icons and
+  related-links dots.
+- **Contract** Map format: `person` and `external` nodes are drawn as figures (no
+  border, a large icon, the label under it); their icon can still be changed.
+- **Contract** Map format: a `classDef`'s `stroke-dasharray`, `stroke-width` and
+  `opacity` shape the outline of the nodes and boxes that name the class. Its colour
+  and font styles stay ignored.
+- **Contract** Map format: a file may hold several Mermaid blocks, each under its own
+  heading; a flowchart node links into one with `click <id> "#<heading anchor>"`. The
+  viewer marks such a node with the target's type icon and opens it on click; crumbs
+  lead back.
+- **Contract** Viewer API: state field `part` (which of the file's diagrams is shown);
+  box diagrams gain the `layers` mode. Atlas URLs carry `part=`.
+- **Contract** Relay HTTP API (addition): `POST /api/show` takes `part`; `show.py --part`.
+  `mode` accepts `boxes` and `layers`.
+- Box diagrams: `layers` mode, the top level as equal-width bands stacked top to bottom.
+- **Contract** Map format: a `classDef` with `stroke-width: 0` removes the box (no
+  border, no fill).
+- Box diagrams: drilled into a box, its neighbours (the outside ends of the view's
+  arrows, lifted to the outermost box outside it) are drawn faded round it, their arrows
+  routed across its border.
+- Box diagrams: plain boxes share one height (the tallest label, or the room their
+  busiest side's arrows need); boxes in a rank are placed by their neighbours, so
+  connected boxes line up and arrows run straight; ports slide into line with the
+  other end; arrows with labels on one side sit a label's height apart, so labels stack
+  and a gap needs only the widest label. Minimum gap between ranks 44 (was 64).
+- Shapes: the rhombus is a square turned 45 degrees, as Mermaid draws it.
+- Fix: the info and warnings panels close on a click outside them, like the other menus.
+- Layers mode: bands are ranked by their arrows; bands with none between them share a row, every row as wide as the widest.
+- **Contract** Map format: the inside of top-level boxes (the main system) runs left to right whatever the map's line (was: follows the map's line); `LR` maps unchanged.
+- Box diagrams: children with no arrows between them line up across the way their box's arrows travel (its parent's flow), so each faces those arrows: a stack in an LR map, a row in a TB one.
+- Box diagrams: in top-to-bottom gaps a labelled arrow's label sits on its sideways turn (those tracks a label's height apart), so labels no longer stack down the gap.
+- Box diagrams: in a box running across, plain boxes in one column share the column's width.
+- Box diagrams: open boxes side by side in a row share the row's height, their contents centred.
+- **Contract** Map format: a class only a `classDef` names (not built in, not in `## Classes`) is a style: it shapes outlines but has no meaning, colour or key row.
+- Info panel: sections fold open and closed (remembered per browser; Markers closed at first); a class's icon sits in its colour-key row, and "Icons on this map" lists only icons no class explains; "No class" counts plain boxes only.
+- **Contract** Map format: coloured lines. Mermaid 11 arrow ids (`a e1@--> b`) with `class e1 <name>`, or `:::<name>` at the end of a view's relation line; a line class with a meaning takes a theme colour (line and ends) and a "Lines" row in the key; a `classDef` shapes it. Unclassed lines are unchanged.
+- Search in a box diagram counts hits other views show ("5 found, 2 in other views"); going to one opens the first view that shows it, so views stay as written.
+- **Contract** Map format: relation notes. A relation line may carry an arrow id (`- a e7@--> b : label`, Mermaid 11's form); a `## Details` note keyed by an arrow id is that relation's note (a note mark on the arrow; click to read). Merged arrows show no notes.
+- **Contract** Map format: a node may link to several diagrams of the file (one `click <id> "#<anchor>"` line each); each gets its type icon.
+- Node page: the note icon and a linked-diagram icon both open the node's page, grown from the node in its own outline over the faded drawing (note in full, arrows in and out with their notes, children, a thumbnail per linked diagram; no zoom or pan). A thumbnail grows into its diagram; going back runs the motion in reverse and returns to the view left. Hovering the note icon still shows the note. Retired: the click popover for notes, pinning and docking (the `pinned` preference is gone).
+- **Contract** Viewer: below 320 × 360 pixels the viewer shows a "too small" message and nothing else.
+- Notes: lines next to each other make one paragraph (or one list item, when indented under it), as in Markdown.
+- Node page: thumbnails draw every label, like an export, fitted to the card; cards three across and two rows to the page's height; no "Opens" heading.
+- Expand button: cycles one level, two levels, default, all (the map opens in default); a one-level state in every diagram type, with the same icons (a mind map's main branches, a box diagram's top-level boxes, closed); boxes or branches opened or closed by hand bring the button back, offering to open everything.
+- Box diagrams, drilled in: the neighbours are the real ends of the arrows (Stock database, not Data), each inside faded frames of its outer boxes that hold only the linked ends; arrows between two neighbours are not drawn. Replaces lifting to the outermost box.
+- Animation: drilling in or out, opening or closing a box or branch and the expand button and switching between drawn modes (mind map and org, boxes and layers) glide every box from where it was on screen to its new place (what leaves shrinks into the view's bottom left corner, what arrives grows out of it); then the lines, their ends and labels fade in together. Mind maps too. Double-clicking a drilled-in neighbour walks to it.
+- Fix: a glide that changed the zoom level (labels to lines, or back) was cut short by a redraw; the drawing is now made at the zoom it will be seen at (fit first), so the first view of a map also has the right level of detail.
+- Notes: a link to `#<heading anchor>` opens that diagram of the file (from the node's page with the thumbnail's motion); one to no diagram is plain text. Mind map related links with a note show a note mark.
+- **Contract** Viewer state `page` (the node whose page is open), in the atlas URL (`&page=`) and the relay's `/api/show` and `show.py --page`. The node's page is a step of the crumbs: back from a diagram it opened stops at the page; the step into another diagram of the file is marked `#`.
+- **Contract** Map format: deployments. `## Deployment: <env>[, <env>]` with a flowchart block of its own places the diagram's nodes (bare ids, with what is inside them) in infrastructure (new ids); unnamed nodes stay, emptied boxes go; arrows only between infrastructure. Warnings for unknown ids and for nodes placed in some environments but not others.
+- **Contract** Viewer state `env`: the deployment shown (was always `null`). Deployments are views in the view picker, under "Where it runs"; `view` is `null` while one is shown. The node's page lists where the node runs in each environment.
+- Node page: "In views" lists every relation view the node takes part in (the shown one marked); a click shows the node in that view. Search still opens the first view that shows a hit; the page reaches the rest.
+- Node page as pictures: a connections strip (the node as on the map, what reaches it and what it reaches, labels, line styles and note marks; a box's parts drawn inside with the arrows landing on them; a mind map's parent, children and related links; top to bottom on a phone), then Opens, In views (real thumbnails, the node marked) and Runs on (nested frames side by side). Replaces the In / Out, Runs on and In views lists.
+- Fix: the power button stays while a node page is open, on the info button's row (only zoom and expand hide).

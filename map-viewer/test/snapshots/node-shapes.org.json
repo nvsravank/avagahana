@@ -1,0 +1,902 @@
+{
+ "edges": [
+  {
+   "kind": "edge",
+   "id": "n2>n3",
+   "d": "M-265.5,265 V289 H-254.5",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n4",
+   "d": "M-265.5,265 V329 H-254.5",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n5",
+   "d": "M-265.5,265 V369 H-254.5",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>_a1",
+   "d": "M-265.5,265 V409 H-254.5",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n2",
+   "d": "M0,187 V209 H-228 V231",
+   "cls": "mmv-edge mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n7",
+   "d": "M-102.5,265 V321 H-91.5",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n8",
+   "d": "M-102.5,265 V402 H-91.5",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n6>n9",
+   "d": "M-102.5,265 V466 H-91.5",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n6",
+   "d": "M0,187 V209 H-77.5 V231",
+   "cls": "mmv-edge mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n11",
+   "d": "M70.5,265 V332.5 H81.5",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n12",
+   "d": "M70.5,265 V416 H81.5",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n13",
+   "d": "M70.5,265 V456 H81.5",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n14",
+   "d": "M70.5,265 V505 H81.5",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n15",
+   "d": "M70.5,265 V618.5 H81.5",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n16",
+   "d": "M70.5,265 V723 H92.17",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n17",
+   "d": "M70.5,265 V763 H87.1",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n18",
+   "d": "M70.5,265 V803 H87.1",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n19",
+   "d": "M70.5,265 V843 H87.1",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n10>n20",
+   "d": "M70.5,265 V883 H87.1",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n10",
+   "d": "M0,187 V209 H161 V231",
+   "cls": "mmv-edge mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  }
+ ],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "n1",
+   "x": 0,
+   "y": 93.5,
+   "w": 187,
+   "h": 187,
+   "cls": "mmv-node mmv-k0 mmv-l0 mmv-d0 mmv-p0",
+   "grow": 1,
+   "name": "Node shapes, centre, 3 children, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "circle",
+   "icons": [],
+   "text": {
+    "size": 20,
+    "weight": 700,
+    "spans": [
+     {
+      "text": "Node shapes",
+      "bold": false,
+      "italic": false,
+      "x": 13,
+      "y": 100
+     }
+    ]
+   },
+   "note": {
+    "x": 153,
+    "y": 83,
+    "size": 21
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n2",
+   "x": -228,
+   "y": 248,
+   "w": 97,
+   "h": 34,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Boxes, level 1, 4 children, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Boxes",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "note": {
+    "x": 68,
+    "y": 8.5,
+    "size": 17
+   },
+   "dot": {
+    "x": 48.5,
+    "y": 35,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n3",
+   "x": -204,
+   "y": 289,
+   "w": 101,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Rounded, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Rounded",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 73.9,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n4",
+   "x": -207.5,
+   "y": 329,
+   "w": 94,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Square, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Square",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 66.2,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n5",
+   "x": -204,
+   "y": 369,
+   "w": 101,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Hexagon, level 2, has a note",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "hexagon",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Hexagon",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 73.9,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "_a1",
+   "x": -204,
+   "y": 409,
+   "w": 101,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Plain text, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Plain text",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n6",
+   "x": -77.5,
+   "y": 248,
+   "w": 72,
+   "h": 34,
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Round, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Round",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 36,
+    "y": 35,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n7",
+   "x": -43.5,
+   "y": 321,
+   "w": 96,
+   "h": 96,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Circle, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "circle",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Circle",
+      "bold": false,
+      "italic": false,
+      "x": 13.4,
+      "y": 52.3
+     }
+    ]
+   },
+   "note": {
+    "x": 67.6,
+    "y": 40.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n8",
+   "x": -44.5,
+   "y": 402,
+   "w": 94,
+   "h": 50,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Bang, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "bang",
+   "outline": "M12.1,0 Q23.04,14 33.98,0 Q40.49,8.33 47,0 Q56.51,12.17 66.02,0 Q73.96,10.16 81.9,0 Q80.21,13.79 94,12.1 Q85.74,18.55 94,25 Q85.74,31.45 94,37.9 Q80.21,36.21 81.9,50 Q77.24,44.04 72.58,50 Q59.79,33.63 47,50 Q34.29,33.73 21.59,50 Q16.84,43.93 12.1,50 Q13.79,36.21 0,37.9 Q8.26,31.45 0,25 Q8.26,18.55 0,12.1 Q13.79,13.79 12.1,0 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Bang",
+      "bold": false,
+      "italic": false,
+      "x": 20.1,
+      "y": 28.97
+     }
+    ]
+   },
+   "note": {
+    "x": 58.9,
+    "y": 17.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n9",
+   "x": -36,
+   "y": 466,
+   "w": 111,
+   "h": 62,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Cloud, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "cloud",
+   "outline": "M18.7,18.7 A12.35,12.35 0 0 1 43.4,18.7 A13.26,13.26 0 1 1 67.6,18.7 A12.35,12.35 0 0 1 92.3,18.7 A13.4,13.4 0 1 1 92.3,43.3 A12.35,12.35 0 0 1 67.6,43.3 A13.26,13.26 0 1 1 43.4,43.3 A12.35,12.35 0 0 1 18.7,43.3 A13.4,13.4 0 1 1 18.7,18.7 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Cloud",
+      "bold": false,
+      "italic": false,
+      "x": 24.75,
+      "y": 35
+     }
+    ]
+   },
+   "note": {
+    "x": 71.25,
+    "y": 23.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n10",
+   "x": 161,
+   "y": 248,
+   "w": 203,
+   "h": 34,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Flowchart shapes, level 1, 10 children, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Flowchart shapes",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "note": {
+    "x": 173.6,
+    "y": 8.5,
+    "size": 17
+   },
+   "dot": {
+    "x": 101.5,
+    "y": 35,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n11",
+   "x": 141,
+   "y": 332.5,
+   "w": 119,
+   "h": 119,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Rhombus, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rhombus",
+   "outline": "M59.5,0 L119,59.5 L59.5,119 L0,59.5 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Rhombus",
+      "bold": false,
+      "italic": false,
+      "x": 21.05,
+      "y": 63.8
+     }
+    ]
+   },
+   "note": {
+    "x": 82.95,
+    "y": 52,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n12",
+   "x": 140,
+   "y": 416,
+   "w": 117,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Stadium, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "stadium",
+   "outline": "M16,0 H101 A16,16 0 0 1 101,32 H16 A16,16 0 0 1 16,0 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Stadium",
+      "bold": false,
+      "italic": false,
+      "x": 20.05,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 81.95,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n13",
+   "x": 151.5,
+   "y": 456,
+   "w": 140,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Subroutine, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "subroutine",
+   "outline": "M0,0 H140 V32 H0 Z M8,0 V32 M132,0 V32",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Subroutine",
+      "bold": false,
+      "italic": false,
+      "x": 20,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 105,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n14",
+   "x": 136,
+   "y": 505,
+   "w": 109,
+   "h": 50,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Database, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "cylinder",
+   "outline": "M0,6 A54.5,6 0 0 1 109,6 V44 A54.5,6 0 0 1 0,44 Z M0,6 A54.5,6 0 0 0 109,6",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Database",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 32.3
+     }
+    ]
+   },
+   "note": {
+    "x": 81.6,
+    "y": 17.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n15",
+   "x": 162,
+   "y": 618.5,
+   "w": 161,
+   "h": 161,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Double circle, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "doublecircle",
+   "outline": "M0,80.5 a80.5,80.5 0 1 0 161,0 a80.5,80.5 0 1 0 -161,0 M5,80.5 a75.5,75.5 0 1 0 151,0 a75.5,75.5 0 1 0 -151,0",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Double circle",
+      "bold": false,
+      "italic": false,
+      "x": 18.95,
+      "y": 84.8
+     }
+    ]
+   },
+   "note": {
+    "x": 127.05,
+    "y": 73,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n16",
+   "x": 126,
+   "y": 723,
+   "w": 89,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Flag, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "asymmetric",
+   "outline": "M0,0 H89 V32 H0 L10.67,16 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Flag",
+      "bold": false,
+      "italic": false,
+      "x": 22.67,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 61.47,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n17",
+   "x": 163.5,
+   "y": 763,
+   "w": 164,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Parallelogram, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "parallelogram",
+   "outline": "M11.2,0 H164 L152.8,32 H0 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Parallelogram",
+      "bold": false,
+      "italic": false,
+      "x": 20.45,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 128.55,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n18",
+   "x": 179,
+   "y": 803,
+   "w": 195,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Parallelogram alt, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "parallelogram-alt",
+   "outline": "M0,0 H183.8 L195,32 H11.2 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Parallelogram alt",
+      "bold": false,
+      "italic": false,
+      "x": 20.55,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 159.45,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n19",
+   "x": 148.5,
+   "y": 843,
+   "w": 134,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Trapezoid, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "trapezoid",
+   "outline": "M11.2,0 H122.8 L134,32 H0 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Trapezoid",
+      "bold": false,
+      "italic": false,
+      "x": 20.85,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 98.15,
+    "y": 8.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n20",
+   "x": 163.5,
+   "y": 883,
+   "w": 164,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Trapezoid alt, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "trapezoid-alt",
+   "outline": "M0,0 H164 L152.8,32 H11.2 Z",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Trapezoid alt",
+      "bold": false,
+      "italic": false,
+      "x": 20.45,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 128.55,
+    "y": 8.5,
+    "size": 15
+   }
+  }
+ ],
+ "rels": []
+}

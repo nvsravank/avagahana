@@ -1,0 +1,1102 @@
+{
+ "edges": [
+  {
+   "kind": "edge",
+   "id": "n2>n3",
+   "d": "M-505.5,200 V222 H-752 V244",
+   "cls": "mmv-edge mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n4",
+   "d": "M-505.5,200 V222 H-606 V244",
+   "cls": "mmv-edge mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n5>n6",
+   "d": "M-514,276 V300 H-503",
+   "cls": "mmv-edge mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n5>n7",
+   "d": "M-514,276 V340 H-503",
+   "cls": "mmv-edge mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n5>n8",
+   "d": "M-514,276 V398 H-503",
+   "cls": "mmv-edge mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n2>n5",
+   "d": "M-505.5,200 V222 H-464 V244",
+   "cls": "mmv-edge mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n2",
+   "d": "M0,122 V144 H-505.5 V166",
+   "cls": "mmv-edge mmv-k4 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n9>n10",
+   "d": "M-143,200 V224 H-132",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n9>n11",
+   "d": "M-143,200 V264 H-132",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n9>n12",
+   "d": "M-143,200 V313 H-132",
+   "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n9",
+   "d": "M0,122 V144 H-118 V166",
+   "cls": "mmv-edge mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n13>n14",
+   "d": "M310,200 V222 H140.5 V244",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n17>n18",
+   "d": "M261.5,428 V452 H272.5",
+   "cls": "mmv-edge mmv-k2 mmv-l5 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n17>n19",
+   "d": "M261.5,428 V492 H272.5",
+   "cls": "mmv-edge mmv-k2 mmv-l5 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n16>n17",
+   "d": "M300.5,352 V374 H289.5 V396",
+   "cls": "mmv-edge mmv-k2 mmv-l4 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n15>n16",
+   "d": "M300.5,276 V298 H300.5 V320",
+   "cls": "mmv-edge mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n13>n15",
+   "d": "M310,200 V222 H300.5 V244",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n13>n20",
+   "d": "M310,200 V222 H470 V244",
+   "cls": "mmv-edge mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n13",
+   "d": "M0,122 V144 H310 V166",
+   "cls": "mmv-edge mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  },
+  {
+   "kind": "edge",
+   "id": "n21>n22",
+   "d": "M612,200 V224 H623",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n21>n23",
+   "d": "M612,200 V273 H623",
+   "cls": "mmv-edge mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "width": 2.5
+  },
+  {
+   "kind": "edge",
+   "id": "n1>n21",
+   "d": "M0,122 V144 H632.5 V166",
+   "cls": "mmv-edge mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "width": 3.2
+  }
+ ],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "n1",
+   "x": 0,
+   "y": 61,
+   "w": 122,
+   "h": 122,
+   "cls": "mmv-node mmv-k0 mmv-l0 mmv-d0 mmv-p0",
+   "grow": 1,
+   "name": "Weather station, centre, 4 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "circle",
+   "icons": [],
+   "text": {
+    "size": 20,
+    "weight": 700,
+    "spans": [
+     {
+      "text": "Weather",
+      "bold": false,
+      "italic": false,
+      "x": 19,
+      "y": 55
+     },
+     {
+      "text": "station",
+      "bold": false,
+      "italic": false,
+      "x": 19,
+      "y": 80
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n2",
+   "x": -505.5,
+   "y": 183,
+   "w": 92,
+   "h": 34,
+   "cls": "mmv-node mmv-k4 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Sensors, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Sensors",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 46,
+    "y": 35,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n3",
+   "x": -752,
+   "y": 260,
+   "w": 130,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Thermometer, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [
+    {
+     "code": "ph thermometer",
+     "ph": "thermometer",
+     "color": null,
+     "label": "Thermometer",
+     "size": 15,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Thermometer",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n4",
+   "x": -606,
+   "y": 260,
+   "w": 122,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Rain gauge, level 2",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [
+    {
+     "code": "ph drop",
+     "ph": "drop",
+     "color": null,
+     "label": "Drop",
+     "size": 15,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Rain gauge",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n5",
+   "x": -464,
+   "y": 260,
+   "w": 122,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Anemometer, level 2, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [
+    {
+     "code": "ph wind",
+     "ph": "wind",
+     "color": "#0b7285",
+     "label": "Wind",
+     "size": 15,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Anemometer",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 20.3
+     }
+    ]
+   },
+   "relDot": {
+    "x": 121,
+    "y": 1,
+    "on": true
+   },
+   "dot": {
+    "x": 61,
+    "y": 33,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n6",
+   "x": -475.5,
+   "y": 300,
+   "w": 55,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Cups, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Cups",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n7",
+   "x": -475.5,
+   "y": 340,
+   "w": 55,
+   "h": 32,
+   "cls": "mmv-node mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Vane, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Vane",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n8",
+   "x": -348.5,
+   "y": 398,
+   "w": 309,
+   "h": 68,
+   "cls": "mmv-node mmv-k4 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Reed switch that counts each turn of the cups and sends a pulse to the logger, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Reed switch that counts each turn of ",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     },
+     {
+      "text": "the cups and sends a pulse to the ",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 38.3
+     },
+     {
+      "text": "logger",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 56.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n9",
+   "x": -118,
+   "y": 183,
+   "w": 72,
+   "h": 34,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Power, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Power",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 36,
+    "y": 35,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n10",
+   "x": -58,
+   "y": 224,
+   "w": 148,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Solar panel, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "hexagon",
+   "icons": [
+    {
+     "code": "ph sun",
+     "ph": "sun",
+     "color": null,
+     "label": "Sun",
+     "size": 15,
+     "x": 12,
+     "y": 8.5
+    },
+    {
+     "code": "done",
+     "ph": "check-circle",
+     "color": "var(--mmv-icon-green)",
+     "label": "Done / in place",
+     "size": 15,
+     "x": 30,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Solar panel",
+      "bold": false,
+      "italic": false,
+      "x": 51,
+      "y": 20.3
+     }
+    ]
+   },
+   "relDot": {
+    "x": 147,
+    "y": 1,
+    "on": true
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n11",
+   "x": -82.5,
+   "y": 264,
+   "w": 99,
+   "h": 32,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Battery, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "hexagon",
+   "icons": [
+    {
+     "code": "status-amber",
+     "ph": "circle",
+     "color": "var(--mmv-icon-orange)",
+     "label": "Status: amber",
+     "size": 15,
+     "x": 12,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Battery",
+      "bold": false,
+      "italic": false,
+      "x": 33,
+      "y": 20.3
+     }
+    ]
+   },
+   "relDot": {
+    "x": 98,
+    "y": 1,
+    "on": true
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n12",
+   "x": -56.5,
+   "y": 313,
+   "w": 151,
+   "h": 50,
+   "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Brown-out, level 2, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "bang",
+   "outline": "M12.1,0 Q28.05,20.41 43.99,0 Q50.94,8.9 57.9,0 Q66.7,11.27 75.5,0 Q80.98,7.01 86.45,0 Q107.02,26.32 127.58,0 Q133.24,7.25 138.9,0 Q137.21,13.79 151,12.1 Q142.74,18.55 151,25 Q142.74,31.45 151,37.9 Q137.21,36.21 138.9,50 Q119.6,25.29 100.29,50 Q94.01,41.96 87.73,50 Q81.62,42.17 75.5,50 Q59.59,29.63 43.68,50 Q34.38,38.11 25.09,50 Q18.6,41.69 12.1,50 Q13.79,36.21 0,37.9 Q8.26,31.45 0,25 Q8.26,18.55 0,12.1 Q13.79,13.79 12.1,0 Z",
+   "icons": [
+    {
+     "code": "flag-red",
+     "ph": "flag",
+     "color": "var(--mmv-icon-red)",
+     "label": "Red flag",
+     "size": 15,
+     "x": 18.85,
+     "y": 17.17
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Brown-out",
+      "bold": false,
+      "italic": false,
+      "x": 39.85,
+      "y": 28.97
+     }
+    ]
+   },
+   "note": {
+    "x": 117.15,
+    "y": 17.5,
+    "size": 15
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n13",
+   "x": 310,
+   "y": 183,
+   "w": 63,
+   "h": 34,
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Data, level 1, 3 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Data",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 31.5,
+    "y": 35,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n14",
+   "x": 140.5,
+   "y": 275,
+   "w": 163,
+   "h": 62,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Cloud upload, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "cloud",
+   "outline": "M18.7,18.7 A12.98,12.98 0 0 1 44.66,18.7 A12.37,12.37 0 0 1 69.4,18.7 A13.26,13.26 0 1 1 93.6,18.7 A8.1,8.1 0 0 1 109.8,18.7 A17.25,17.25 0 0 1 144.3,18.7 A13.4,13.4 0 1 1 144.3,43.3 A10.19,10.19 0 0 1 123.92,43.3 A15.16,15.16 0 0 1 93.6,43.3 A13.26,13.26 0 1 1 69.4,43.3 A17.72,17.72 0 0 1 33.95,43.3 A7.63,7.63 0 0 1 18.7,43.3 A13.4,13.4 0 1 1 18.7,18.7 Z",
+   "icons": [
+    {
+     "code": "ph cloud-arrow-up",
+     "ph": "cloud-arrow-up",
+     "color": "#1971c2",
+     "label": "Upload",
+     "size": 15,
+     "x": 24.8,
+     "y": 23.2
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Cloud upload",
+      "bold": false,
+      "italic": false,
+      "x": 45.8,
+      "y": 35
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n15",
+   "x": 300.5,
+   "y": 260,
+   "w": 94,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Logger, level 2, 1 child, has a note",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Logger",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   },
+   "note": {
+    "x": 66.2,
+    "y": 8.5,
+    "size": 15
+   },
+   "relDot": {
+    "x": 93,
+    "y": 1,
+    "on": true
+   },
+   "dot": {
+    "x": 47,
+    "y": 33,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n16",
+   "x": 300.5,
+   "y": 336,
+   "w": 117,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Every minute, level 3, 1 child",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Every minute",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   },
+   "relDot": {
+    "x": 116,
+    "y": 1,
+    "on": true
+   },
+   "dot": {
+    "x": 58.5,
+    "y": 33,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n17",
+   "x": 289.5,
+   "y": 412,
+   "w": 78,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l4 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Average, level 4, 2 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Average",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 39,
+    "y": 33,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n18",
+   "x": 311.5,
+   "y": 452,
+   "w": 78,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l5 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Minimum, level 5",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Minimum",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n19",
+   "x": 311.5,
+   "y": 492,
+   "w": 78,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l5 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Maximum, level 5",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Maximum",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n20",
+   "x": 470,
+   "y": 260,
+   "w": 182,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Local display, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [
+    {
+     "code": "idea",
+     "ph": "lightbulb",
+     "color": "var(--mmv-icon-orange)",
+     "label": "Idea / vendor",
+     "size": 15,
+     "x": 12,
+     "y": 8.5
+    },
+    {
+     "code": "favorite",
+     "ph": "heart",
+     "color": "var(--mmv-icon-red)",
+     "label": "Favourite",
+     "size": 15,
+     "x": 30,
+     "y": 8.5
+    },
+    {
+     "code": "question",
+     "ph": "question",
+     "color": "var(--mmv-icon-purple)",
+     "label": "Question",
+     "size": 15,
+     "x": 48,
+     "y": 8.5
+    }
+   ],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Local display",
+      "bold": false,
+      "italic": false,
+      "x": 69,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n21",
+   "x": 632.5,
+   "y": 183,
+   "w": 63,
+   "h": 34,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Site, level 1, 2 children",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Site",
+      "bold": true,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   },
+   "dot": {
+    "x": 31.5,
+    "y": 35,
+    "closed": false,
+    "count": null
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n22",
+   "x": 720,
+   "y": 224,
+   "w": 194,
+   "h": 32,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Two metres above grass, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Two metres above grass",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "n23",
+   "x": 693,
+   "y": 273,
+   "w": 140,
+   "h": 50,
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-p0",
+   "grow": 1,
+   "name": "Away from walls and trees, level 2",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "rounded",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Away from walls",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     },
+     {
+      "text": "and trees",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 38.3
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "n10~n11",
+   "d": "M-67.8,240 Q-71.85,243.02 -72.7,248",
+   "label": {
+    "x": -71.05,
+    "y": 243.51,
+    "text": "charges"
+   }
+  },
+  {
+   "kind": "rel",
+   "id": "n11~n15",
+   "d": "M-33,263.48 Q110.85,319.29 253.5,260.49",
+   "label": {
+    "x": 110.55,
+    "y": 290.64,
+    "text": "powers"
+   }
+  },
+  {
+   "kind": "rel",
+   "id": "n5~n16",
+   "d": "M-403,266.06 Q-88.41,377.73 242,330.18",
+   "label": {
+    "x": -84.46,
+    "y": 337.93,
+    "text": "feeds"
+   }
+  }
+ ]
+}

@@ -1,0 +1,153 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "shop",
+   "x": -155.9,
+   "y": 0,
+   "w": 155,
+   "h": 86,
+   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Shop system, level 1, 5 children, has a note, a box",
+   "title": {
+    "text": "Shop system",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": {
+    "x": 125,
+    "y": 6,
+    "size": 16
+   },
+   "dot": {
+    "x": 154,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "pay",
+   "x": -176.4,
+   "y": 13,
+   "w": 86,
+   "h": 32,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Payments, level 2, 2 children, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Payments",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 20.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 85,
+    "y": 1,
+    "closed": true,
+    "count": 2
+   }
+  },
+  {
+   "kind": "node",
+   "id": "psp",
+   "x": 164.9,
+   "y": 0,
+   "w": 137,
+   "h": 72,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Card provider, level 1",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph globe",
+     "ph": "globe",
+     "color": null,
+     "label": "Globe",
+     "size": 38,
+     "x": 28.5,
+     "y": 4
+    },
+    {
+     "code": "unsourced",
+     "ph": "seal-warning",
+     "color": "var(--mmv-icon-grey)",
+     "label": "Source not found / not reviewed",
+     "size": 38,
+     "x": 70.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Card provider",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "pay>psp",
+   "d": "M-133.4,13 L96.4,13",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -8,
+    "y": 17,
+    "text": "retry on timeout",
+    "icons": [
+     "hypothesis"
+    ]
+   },
+   "items": [
+    {
+     "from": "payh",
+     "to": "psp",
+     "label": "retry on timeout",
+     "icons": [
+      "hypothesis"
+     ]
+    }
+   ]
+  }
+ ]
+}

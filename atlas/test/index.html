@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas: tests</title>
+<style>
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; }
+  #out { padding: 10px 14px; }
+  .pass { color: #2b8a3e; } .fail { color: #c92a2a; font-weight: 600; }
+  #slot { position: relative; height: 0; overflow: hidden; }
+</style>
+<!-- the checks live in a file, so the page also runs under the relay server's CSP -->
+<script type="module" src="test.js"></script>
+</head>
+<body>
+<div id="out">Running…</div>
+<div id="slot"></div>
+</body>
+</html>

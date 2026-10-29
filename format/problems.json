@@ -1,0 +1,462 @@
+{
+ "about": "Every problem a map can have, by code: what the viewer (map-viewer/model, reported as map-<code>) and the checker (format/check_map.py) say. level: what the checker does (error fails, warning passes); the viewer shows both as warnings. side: who reports it in a plain parse (both, checker, viewer). sample: false when no sample map can show it (format/samples/ shows every other). scripts/check.sh and the browser tests hold both sides to this list.",
+ "problems": {
+  "no-diagram": {
+   "level": "error",
+   "side": "both",
+   "what": "No ```mermaid block"
+  },
+  "block-not-closed": {
+   "level": "error",
+   "side": "checker",
+   "what": "A ```mermaid block is not closed"
+  },
+  "title-missing": {
+   "level": "error",
+   "side": "checker",
+   "what": "No # title line before the first diagram"
+  },
+  "diagram-type": {
+   "level": "error",
+   "side": "both",
+   "what": "A block that is not a Mermaid mindmap, flowchart or sequenceDiagram"
+  },
+  "diagram-empty": {
+   "level": "error",
+   "side": "both",
+   "what": "A diagram with no nodes"
+  },
+  "block-no-heading": {
+   "level": "error",
+   "side": "both",
+   "what": "A further Mermaid block with no heading of its own right above it"
+  },
+  "diagram-heading-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "Two diagrams under the same heading"
+  },
+  "section-unknown": {
+   "level": "error",
+   "side": "checker",
+   "what": "A ## heading that is no section of the format and starts no diagram"
+  },
+  "section-twice": {
+   "level": "error",
+   "side": "checker",
+   "what": "A section that may appear once appears twice"
+  },
+  "emoji": {
+   "level": "error",
+   "side": "both",
+   "what": "An emoji in a label (icons go in ::icon or ## Node icons)"
+  },
+  "long-label": {
+   "level": "error",
+   "side": "both",
+   "what": "A label over 150 characters a line or 1,000 in all (the viewer shortens it)"
+  },
+  "large-map": {
+   "level": "warning",
+   "side": "both",
+   "what": "Over 5,000 nodes: drawing may be slow",
+   "sample": false
+  },
+  "node-no-id": {
+   "level": "warning",
+   "side": "checker",
+   "what": "A mind map node written as bare text: valid, drawn, but nothing can refer to it"
+  },
+  "shape-unknown": {
+   "level": "error",
+   "side": "both",
+   "what": "Flowchart: brackets that are no Mermaid shape"
+  },
+  "mindmap-shape-unknown": {
+   "level": "error",
+   "side": "checker",
+   "what": "Mind map: brackets that are no Mermaid shape (the viewer draws a plain node)"
+  },
+  "mindmap-orphan-line": {
+   "level": "error",
+   "side": "checker",
+   "what": "An ::icon or ::: line before any node"
+  },
+  "mindmap-second-root": {
+   "level": "error",
+   "side": "both",
+   "what": "A second centre in a mind map"
+  },
+  "mindmap-duplicate-id": {
+   "level": "error",
+   "side": "checker",
+   "what": "Two mind map nodes with one id (the viewer renames the second)"
+  },
+  "pin-side": {
+   "level": "error",
+   "side": "both",
+   "what": "A :::left / :::right pin on a node that is no main branch, or both pins"
+  },
+  "direction-unknown": {
+   "level": "error",
+   "side": "checker",
+   "what": "A flowchart direction other than LR, RL, TB, TD, BT"
+  },
+  "flowchart-node-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A flowchart node that cannot be read"
+  },
+  "flowchart-line-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A flowchart line that cannot be read"
+  },
+  "subgraph-no-name": {
+   "level": "error",
+   "side": "both",
+   "what": "A subgraph with no name"
+  },
+  "subgraph-end-extra": {
+   "level": "error",
+   "side": "both",
+   "what": "An end with no subgraph open"
+  },
+  "subgraph-not-closed": {
+   "level": "error",
+   "side": "both",
+   "what": "A subgraph not closed with end"
+  },
+  "arrow-settings": {
+   "level": "warning",
+   "side": "checker",
+   "what": "An arrow's id@{ ... } settings: valid Mermaid, ignored"
+  },
+  "style-ignored": {
+   "level": "warning",
+   "side": "checker",
+   "what": "style or linkStyle: valid Mermaid, ignored (use classes and classDef)"
+  },
+  "click-callback": {
+   "level": "warning",
+   "side": "checker",
+   "what": "click with a callback: valid Mermaid, ignored (a map never runs code)"
+  },
+  "click-link-ignored": {
+   "level": "warning",
+   "side": "checker",
+   "what": "A click link that is not http(s), mailto or #<diagram>: ignored"
+  },
+  "click-unknown-node": {
+   "level": "error",
+   "side": "checker",
+   "what": "click on an id that is no node"
+  },
+  "click-no-diagram": {
+   "level": "error",
+   "side": "both",
+   "what": "click \"#anchor\" naming no other diagram in the file"
+  },
+  "arrow-id-twice": {
+   "level": "error",
+   "side": "checker",
+   "what": "One arrow id on two arrows in a block"
+  },
+  "arrow-id-several": {
+   "level": "error",
+   "side": "checker",
+   "what": "An arrow id on an & arrow (it would name several)"
+  },
+  "arrow-id-is-node": {
+   "level": "error",
+   "side": "both",
+   "what": "An arrow id that is also a node's id"
+  },
+  "class-unknown-id": {
+   "level": "error",
+   "side": "checker",
+   "what": "class on an id that is no node or arrow"
+  },
+  "class-unknown": {
+   "level": "error",
+   "side": "checker",
+   "what": "A line class with no meaning (## Classes, built in) and no classDef: it does nothing"
+  },
+  "unknown-cloud-icon": {
+   "level": "error",
+   "side": "checker",
+   "what": "An aws, azure or gcp icon name not in vendor-icons.json (the viewer leaves it out; the checker names the nearest)"
+  },
+  "unknown-icon": {
+   "level": "error",
+   "side": "both",
+   "what": "An icon code not in icons.json, the bundled Phosphor set or the map legend"
+  },
+  "icon-legend-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "An ## Icons line that cannot be read"
+  },
+  "icon-legend-name": {
+   "level": "error",
+   "side": "checker",
+   "what": "An ## Icons name that is a named code or starts with ph-"
+  },
+  "icon-legend-unknown": {
+   "level": "error",
+   "side": "checker",
+   "what": "An ## Icons line naming an unknown icon"
+  },
+  "class-line-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Classes line that cannot be read"
+  },
+  "plan-class-twice": {
+   "level": "warning",
+   "side": "both",
+   "what": "A node or arrow given two different planned-change classes (added, changed, removed): the later is used"
+  },
+  "plan-class-reserved": {
+   "level": "warning",
+   "side": "both",
+   "what": "A ## Classes line or classDef named added, changed or removed: those are built-in planned-change classes; the line is ignored"
+  },
+  "relation-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A relation line that cannot be read"
+  },
+  "relation-unknown-node": {
+   "level": "error",
+   "side": "both",
+   "what": "A relation from or to a node that does not exist"
+  },
+  "cross-map-missing": {
+   "level": "error",
+   "side": "checker",
+   "what": "A relation to another map that is not found, or to a node not in it (the viewer reports it when its host can read maps)"
+  },
+  "view-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "Two relation views with one name"
+  },
+  "view-empty": {
+   "level": "error",
+   "side": "both",
+   "what": "A named relation view with no relations"
+  },
+  "note-no-anchor": {
+   "level": "error",
+   "side": "both",
+   "what": "A ### note with no <a id> anchor"
+  },
+  "note-unknown-id": {
+   "level": "error",
+   "side": "both",
+   "what": "A note for an id that is no node or arrow"
+  },
+  "note-twice": {
+   "level": "error",
+   "side": "checker",
+   "what": "Two notes for one id"
+  },
+  "node-icons-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Node icons line that cannot be read"
+  },
+  "node-icons-unknown-id": {
+   "level": "error",
+   "side": "both",
+   "what": "Node icons for an id that is no node or arrow"
+  },
+  "deployment-no-block": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Deployment: heading with no Mermaid block"
+  },
+  "deployment-no-name": {
+   "level": "error",
+   "side": "checker",
+   "what": "A ## Deployment: heading naming no environment"
+  },
+  "deployment-type": {
+   "level": "error",
+   "side": "both",
+   "what": "A deployment's block that is not a flowchart"
+  },
+  "deployment-not-flowchart": {
+   "level": "error",
+   "side": "both",
+   "what": "Deployments under a diagram that is not a flowchart"
+  },
+  "deployment-view-name": {
+   "level": "error",
+   "side": "both",
+   "what": "An environment with the name of a relation view"
+  },
+  "deployment-unknown-id": {
+   "level": "error",
+   "side": "both",
+   "what": "A bare id in a deployment that is no node of the diagram"
+  },
+  "deployment-arrow-on-node": {
+   "level": "error",
+   "side": "both",
+   "what": "A deployment's arrow touching the diagram's nodes"
+  },
+  "deployment-out-of-step": {
+   "level": "error",
+   "side": "both",
+   "what": "A node placed in some environments and not others"
+  },
+  "deployment-inside-itself": {
+   "level": "error",
+   "side": "viewer",
+   "what": "A deployment placing a box inside itself (defensive: regrouping moves each box first)",
+   "sample": false
+  },
+  "diagram-unreachable": {
+   "level": "error",
+   "side": "both",
+   "what": "A further diagram no link leads to from the first (a click, a note link, a Plays over line); the viewer lists it as a view under Not linked"
+  },
+  "sequence-line-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A sequenceDiagram line that is not understood, or a block or box not closed"
+  },
+  "message-id-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "A message id (%% id:) used twice"
+  },
+  "message-id-no-message": {
+   "level": "error",
+   "side": "both",
+   "what": "A %% id: line not followed by a message"
+  },
+  "plays-over-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Plays over line that is not \"- #<diagram anchor> : <view name>\""
+  },
+  "plays-over-unknown": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Plays over line naming no box diagram of the file, or no relation view of it"
+  },
+  "plays-over-not-sequence": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Plays over section after a diagram that is no sequence"
+  },
+  "sequence-not-in-view": {
+   "level": "error",
+   "side": "both",
+   "what": "A participant of a sequence that is no node the view it plays over shows"
+  },
+  "sequence-no-arrow": {
+   "level": "error",
+   "side": "both",
+   "what": "A message of a sequence with no arrow, either way, between its two ends in the view it plays over"
+  },
+  "state-line-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A state diagram line that cannot be read"
+  },
+  "state-close-extra": {
+   "level": "error",
+   "side": "both",
+   "what": "A \"}\" with no composite state open"
+  },
+  "state-not-closed": {
+   "level": "error",
+   "side": "both",
+   "what": "A composite state not closed with \"}\""
+  },
+  "state-region-top": {
+   "level": "error",
+   "side": "both",
+   "what": "\"--\" (a concurrent region) outside a composite state"
+  },
+  "state-mark-unknown": {
+   "level": "error",
+   "side": "both",
+   "what": "<<...>> that is not choice, fork or join"
+  },
+  "state-note-unknown": {
+   "level": "error",
+   "side": "both",
+   "what": "A note on a state that does not exist"
+  },
+  "state-note-open": {
+   "level": "error",
+   "side": "both",
+   "what": "A note not closed with \"end note\""
+  },
+  "state-unreachable": {
+   "level": "warning",
+   "side": "both",
+   "what": "A state no path from the start [*] reaches (only when the diagram has a start at the top)"
+  },
+  "state-dead-end": {
+   "level": "warning",
+   "side": "both",
+   "what": "A state no transition leaves (nor a composite round it) that is no end [*]"
+  },
+  "er-line-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "An ER diagram line that cannot be read"
+  },
+  "er-attr-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "An entity's column that cannot be read (type name [PK, FK, UK] [\"comment\"])"
+  },
+  "er-not-closed": {
+   "level": "error",
+   "side": "both",
+   "what": "An entity's columns not closed with \"}\""
+  },
+  "er-attr-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "A column named twice in one entity"
+  },
+  "walks-not-here": {
+   "level": "warning",
+   "side": "both",
+   "what": "A ## Walks: section after a diagram that is no state or ER diagram: not read"
+  },
+  "walk-empty": {
+   "level": "error",
+   "side": "both",
+   "what": "A walk with no steps"
+  },
+  "walk-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A walk step that cannot be read (want \"- A --> B : what happens\")"
+  },
+  "walk-not-step": {
+   "level": "error",
+   "side": "both",
+   "what": "A walk step that is no transition (state) or relationship (ER) of the diagram"
+  },
+  "walk-gap": {
+   "level": "warning",
+   "side": "both",
+   "what": "A walk step that does not start where the step before ended"
+  },
+  "walk-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "Two walks of one diagram with the same name"
+  }
+ }
+}

@@ -1,0 +1,1017 @@
+{
+ "frames": [],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "ORDER_LINE",
+   "x": 808.94,
+   "y": 299.2,
+   "w": 240,
+   "h": 265,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k1 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Order line, level 1, has a note, fact table, 12 columns",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "title": {
+    "text": "Order line",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "order_line_key",
+     "type": "bigint",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "order_id",
+     "type": "int",
+     "mark": "grain",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "line_no",
+     "type": "int",
+     "mark": "grain",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 90,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "date_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 109,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "product_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 128,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "customer_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 147,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "store_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 166,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "quantity",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 185,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "net_amount",
+     "type": "decimal",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 204,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "discount",
+     "type": "decimal",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 223,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "tax",
+     "type": "decimal",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 242,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "currency",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null,
+   "note": {
+    "x": 218,
+    "y": 7,
+    "size": 16
+   },
+   "caption": {
+    "text": "One row per order and line no",
+    "x": 120,
+    "y": 283
+   }
+  },
+  {
+   "kind": "node",
+   "id": "STOCK_LEVEL",
+   "x": 1632.94,
+   "y": 267.5,
+   "w": 240,
+   "h": 151,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Stock level, level 1, fact table, 6 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Stock level",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "stock_key",
+     "type": "bigint",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "date_key",
+     "type": "int",
+     "mark": "grain",
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "product_key",
+     "type": "int",
+     "mark": "grain",
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 90,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "warehouse_key",
+     "type": "int",
+     "mark": "grain",
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 109,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "on_hand",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 128,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "on_order",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "CUSTOMER",
+   "x": 193.06,
+   "y": 916.79,
+   "w": 240,
+   "h": 113,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Customer, level 1, dimension table, 4 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Customer",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "customer_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "region_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "email",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 90,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "segment",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "STORE",
+   "x": 808.94,
+   "y": 47,
+   "w": 240,
+   "h": 94,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Store, level 1, dimension table, 3 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Store",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "store_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "region_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "name",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "WAREHOUSE",
+   "x": 2084.18,
+   "y": 239,
+   "w": 240,
+   "h": 94,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k7 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Warehouse, level 1, dimension table, 3 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Warehouse",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "warehouse_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "name",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "city",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "PRODUCT",
+   "x": 1632.94,
+   "y": 66,
+   "w": 240,
+   "h": 132,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Product, level 1, dimension table, 5 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Product",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "product_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "sku",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "name",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 90,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "category",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 109,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "brand",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "DATE",
+   "x": 808.94,
+   "y": 602.1,
+   "w": 240,
+   "h": 151,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Date, level 1, dimension table, 6 columns",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "title": {
+    "text": "Date",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "date_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "calendar_date",
+     "type": "date",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "fiscal_week",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 90,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "fiscal_month",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 109,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "fiscal_year",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 128,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "is_holiday",
+     "type": "bool",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "REGION",
+   "x": 120,
+   "y": 435.6,
+   "w": 240,
+   "h": 94,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k8 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Region, level 1, dimension table, 3 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Region",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "region_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "name",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "country",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "PRODUCT_TAG",
+   "x": 1632.94,
+   "y": 427.6,
+   "w": 240,
+   "h": 78,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k9 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Product tag, level 1, bridge table, 2 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Product tag",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "product_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "tag_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": true,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "TAG",
+   "x": 1251.74,
+   "y": 564.1,
+   "w": 240,
+   "h": 75,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k10 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "Tag, level 1, dimension table, 2 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Tag",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "tag_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "label",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "ORDER_LINE>DATE",
+   "d": "M928.94,181.7 L988.94,181.7 L956.94,541.6 L928.94,541.6",
+   "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Order line ordered on exactly one Date. Each Date goes with zero or more Order line.",
+   "label": {
+    "x": 987.93,
+    "y": 197.08,
+    "text": "ordered on"
+   },
+   "items": [
+    {
+     "from": "ORDER_LINE",
+     "to": "DATE",
+     "label": "ordered on",
+     "words": "Each Order line ordered on exactly one Date. Each Date goes with zero or more Order line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ORDER_LINE>PRODUCT",
+   "d": "M928.94,181.7 L956.94,181.7 L1484.94,15 L1512.94,15",
+   "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Order line sells exactly one Product. Each Product goes with zero or more Order line.",
+   "label": {
+    "x": 1059.81,
+    "y": 153.22,
+    "text": "sells"
+   },
+   "items": [
+    {
+     "from": "ORDER_LINE",
+     "to": "PRODUCT",
+     "label": "sells",
+     "words": "Each Order line sells exactly one Product. Each Product goes with zero or more Order line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ORDER_LINE>CUSTOMER",
+   "d": "M688.94,181.7 L660.94,181.7 L341.06,875.29 L313.06,875.29",
+   "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Order line bought by exactly one Customer. Each Customer goes with zero or more Order line.",
+   "label": {
+    "x": 551.22,
+    "y": 423.61,
+    "text": "bought by"
+   },
+   "items": [
+    {
+     "from": "ORDER_LINE",
+     "to": "CUSTOMER",
+     "label": "bought by",
+     "words": "Each Order line bought by exactly one Customer. Each Customer goes with zero or more Order line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ORDER_LINE>STORE",
+   "d": "M928.94,181.7 L972.94,181.7 L972.94,15 L928.94,15",
+   "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Order line sold at exactly one Store. Each Store goes with zero or more Order line.",
+   "label": {
+    "x": 972.94,
+    "y": 152.58,
+    "text": "sold at"
+   },
+   "items": [
+    {
+     "from": "ORDER_LINE",
+     "to": "STORE",
+     "label": "sold at",
+     "words": "Each Order line sold at exactly one Store. Each Store goes with zero or more Order line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "STOCK_LEVEL>DATE",
+   "d": "M1512.94,207 L1484.94,207 L972.94,541.6 L928.94,541.6",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Stock level counted on exactly one Date. Each Date goes with zero or more Stock level.",
+   "label": {
+    "x": 1453.95,
+    "y": 231.25,
+    "text": "counted on"
+   },
+   "items": [
+    {
+     "from": "STOCK_LEVEL",
+     "to": "DATE",
+     "label": "counted on",
+     "words": "Each Stock level counted on exactly one Date. Each Date goes with zero or more Stock level."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "STOCK_LEVEL>PRODUCT",
+   "d": "M1752.94,207 L1780.94,207 L1780.94,15 L1752.94,15",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Stock level counts exactly one Product. Each Product goes with zero or more Stock level.",
+   "label": {
+    "x": 1780.94,
+    "y": 173.67,
+    "text": "counts"
+   },
+   "items": [
+    {
+     "from": "STOCK_LEVEL",
+     "to": "PRODUCT",
+     "label": "counts",
+     "words": "Each Stock level counts exactly one Product. Each Product goes with zero or more Stock level."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "STOCK_LEVEL>WAREHOUSE",
+   "d": "M1752.94,207 L1796.94,207 L1936.18,207 L1964.18,207",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Stock level held in exactly one Warehouse. Each Warehouse goes with zero or more Stock level.",
+   "label": {
+    "x": 1839.35,
+    "y": 211,
+    "text": "held in"
+   },
+   "items": [
+    {
+     "from": "STOCK_LEVEL",
+     "to": "WAREHOUSE",
+     "label": "held in",
+     "words": "Each Stock level held in exactly one Warehouse. Each Warehouse goes with zero or more Stock level."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "CUSTOMER>REGION",
+   "d": "M313.06,875.29 L357.06,875.29 L357.06,403.6 L240,403.6",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Customer lives in exactly one Region. Each Region goes with zero or more Customer.",
+   "label": {
+    "x": 357.06,
+    "y": 795.34,
+    "text": "lives in"
+   },
+   "items": [
+    {
+     "from": "CUSTOMER",
+     "to": "REGION",
+     "label": "lives in",
+     "words": "Each Customer lives in exactly one Region. Each Region goes with zero or more Customer."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "STORE>REGION",
+   "d": "M688.94,15 L660.94,15 L268,403.6 L240,403.6",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Store stands in exactly one Region. Each Region goes with zero or more Store.",
+   "label": {
+    "x": 638.94,
+    "y": 40.75,
+    "text": "stands in"
+   },
+   "items": [
+    {
+     "from": "STORE",
+     "to": "REGION",
+     "label": "stands in",
+     "words": "Each Store stands in exactly one Region. Each Region goes with zero or more Store."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "PRODUCT>PRODUCT_TAG",
+   "d": "M1752.94,15 L1796.94,15 L1796.94,403.6 L1752.94,403.6",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-zero-many",
+   "tail": "er-one",
+   "hint": "Each Product tagged by zero or more Product tag. Each Product tag goes with exactly one Product.",
+   "label": {
+    "x": 1796.94,
+    "y": 275.4,
+    "text": "tagged by"
+   },
+   "items": [
+    {
+     "from": "PRODUCT",
+     "to": "PRODUCT_TAG",
+     "label": "tagged by",
+     "words": "Each Product tagged by zero or more Product tag. Each Product tag goes with exactly one Product."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "TAG>PRODUCT_TAG",
+   "d": "M1371.74,541.6 L1399.74,541.6 L1484.94,403.6 L1512.94,403.6",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-zero-many",
+   "tail": "er-one",
+   "hint": "Each Tag tags zero or more Product tag. Each Product tag goes with exactly one Tag.",
+   "label": {
+    "x": 1408.45,
+    "y": 531.49,
+    "text": "tags"
+   },
+   "items": [
+    {
+     "from": "TAG",
+     "to": "PRODUCT_TAG",
+     "label": "tags",
+     "words": "Each Tag tags zero or more Product tag. Each Product tag goes with exactly one Tag."
+    }
+   ]
+  }
+ ],
+ "relsBehind": true
+}

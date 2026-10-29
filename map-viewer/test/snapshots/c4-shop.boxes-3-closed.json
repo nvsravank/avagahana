@@ -1,0 +1,400 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "aws",
+   "x": -91.8,
+   "y": 0,
+   "w": 522.6,
+   "h": 226.19,
+   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "name": "AWS us-east-1, level 1, 4 children, a box",
+   "title": {
+    "text": "AWS us-east-1",
+    "x": 12,
+    "y": 18,
+    "size": 15,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "note": null,
+   "dot": {
+    "x": 521.6,
+    "y": 1,
+    "closed": false,
+    "count": null
+   }
+  }
+ ],
+ "edges": [],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "customer",
+   "x": -505.2,
+   "y": 0,
+   "w": 89,
+   "h": 72,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Customer, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph user",
+     "ph": "user",
+     "color": null,
+     "label": "User",
+     "size": 38,
+     "x": 25.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Customer",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "eks",
+   "x": -273.1,
+   "y": 36.09,
+   "w": 132,
+   "h": 52,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "EKS cluster, level 2, 3 children, collapsed, has a note",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "EKS cluster",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 30.3
+     }
+    ]
+   },
+   "note": {
+    "x": 104.7,
+    "y": 18.5,
+    "size": 15
+   },
+   "dot": {
+    "x": 131,
+    "y": 1,
+    "closed": true,
+    "count": 9
+   }
+  },
+  {
+   "kind": "node",
+   "id": "pci",
+   "x": -41,
+   "y": -0.91,
+   "w": 117,
+   "h": 52,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "PCI cluster, level 2, 1 child, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "PCI cluster",
+      "bold": false,
+      "italic": false,
+      "x": 16,
+      "y": 30.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 116,
+    "y": 1,
+    "closed": true,
+    "count": 3
+   }
+  },
+  {
+   "kind": "node",
+   "id": "rds",
+   "x": -41,
+   "y": 73.09,
+   "w": 117,
+   "h": 52,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "RDS Postgres, level 2, 1 child, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "RDS Postgres",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 30.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 116,
+    "y": 1,
+    "closed": true,
+    "count": 1
+   }
+  },
+  {
+   "kind": "node",
+   "id": "mq",
+   "x": 108.5,
+   "y": -47.09,
+   "w": 94,
+   "h": 52,
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Amazon MQ, level 2, 1 child, collapsed",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Amazon MQ",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 30.3
+     }
+    ]
+   },
+   "dot": {
+    "x": 93,
+    "y": 1,
+    "closed": true,
+    "count": 1
+   }
+  },
+  {
+   "kind": "node",
+   "id": "psp",
+   "x": 403.2,
+   "y": -42,
+   "w": 137,
+   "h": 72,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "grow": 1,
+   "name": "Card provider, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "figure",
+   "icons": [
+    {
+     "code": "ph globe",
+     "ph": "globe",
+     "color": null,
+     "label": "Globe",
+     "size": 38,
+     "x": 49.5,
+     "y": 4
+    }
+   ],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Card provider",
+      "bold": false,
+      "italic": false,
+      "x": 6.1,
+      "y": 63.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "snap",
+   "x": 403.2,
+   "y": 42,
+   "w": 293,
+   "h": 52,
+   "cls": "mmv-node mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Nightly snapshots, us-west-2, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "cylinder",
+   "outline": "M0,6 A146.5,6 0 0 1 293,6 V46 A146.5,6 0 0 1 0,46 Z M0,6 A146.5,6 0 0 0 293,6",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Nightly snapshots, us-west-2",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 34.2
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "customer>eks",
+   "d": "M-460.7,0 L-377.1,0 Q-369.1,0 -369.1,8 L-369.1,28.09 Q-369.1,36.09 -361.1,36.09 L-339.1,36.09",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -415.9,
+    "y": 4,
+    "text": "2 links"
+   },
+   "items": [
+    {
+     "from": "customer",
+     "to": "ui",
+     "label": ""
+    },
+    {
+     "from": "customer",
+     "to": "cart",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "eks>pci",
+   "d": "M-207.1,26.09 L-123.5,26.09 Q-115.5,26.09 -115.5,18.09 L-115.5,7.09 Q-115.5,-0.91 -107.5,-0.91 L-99.5,-0.91",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "ord",
+     "to": "payh",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "pci>psp",
+   "d": "M17.5,2.91 L232.7,2.91 Q240.7,2.91 240.7,-5.09 L240.7,-34 Q240.7,-42 248.7,-42 L334.7,-42",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "payh",
+     "to": "psp",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "eks>rds",
+   "d": "M-207.1,46.09 L-123.5,46.09 Q-115.5,46.09 -115.5,54.09 L-115.5,65.09 Q-115.5,73.09 -107.5,73.09 L-99.5,73.09",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -162.3,
+    "y": 50.09,
+    "text": "2 links"
+   },
+   "items": [
+    {
+     "from": "ord",
+     "to": "db",
+     "label": ""
+    },
+    {
+     "from": "stock",
+     "to": "db",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "rds>snap",
+   "d": "M17.5,69.28 L232.7,69.28 Q240.7,69.28 240.7,61.28 L240.7,50 Q240.7,42 248.7,42 L256.7,42",
+   "cls": "mmv-flow is-dotted mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 52.1,
+    "y": 73.28,
+    "text": "copy"
+   },
+   "items": [
+    {
+     "from": "rds",
+     "to": "snap",
+     "label": "copy"
+    }
+   ]
+  }
+ ]
+}

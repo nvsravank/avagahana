@@ -1,0 +1,355 @@
+{
+ "frames": [
+  {
+   "kind": "frame",
+   "id": "_g0",
+   "x": 330.3,
+   "y": 288,
+   "w": 687.6,
+   "h": 120,
+   "cls": "mmv-frame mmv-seq-group",
+   "name": "parallel block",
+   "title": {
+    "text": "parallel: both mark it",
+    "x": 12,
+    "y": 18,
+    "size": 12,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {},
+   "note": null,
+   "dot": null
+  },
+  {
+   "kind": "frame",
+   "id": "_g1",
+   "x": 372.9,
+   "y": 441,
+   "w": 772.8,
+   "h": 162,
+   "cls": "mmv-frame mmv-seq-group",
+   "name": "loop block",
+   "title": {
+    "text": "loop: each item in job 7",
+    "x": 12,
+    "y": 18,
+    "size": 12,
+    "weight": 600
+   },
+   "icons": [],
+   "marks": {},
+   "note": null,
+   "dot": null
+  },
+  {
+   "kind": "frame",
+   "id": "_n0",
+   "x": 330.3,
+   "y": 541,
+   "w": 599.6,
+   "h": 30,
+   "cls": "mmv-frame mmv-seq-note",
+   "name": "note",
+   "title": {
+    "text": "Both process job 7: every item is sent twice",
+    "x": 8,
+    "y": 19,
+    "size": 12,
+    "weight": 400
+   },
+   "icons": [],
+   "marks": {},
+   "note": null,
+   "dot": null
+  }
+ ],
+ "edges": [
+  {
+   "d": "M50.5,34 V584",
+   "cls": "mmv-seq-life mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "width": 1.5
+  },
+  {
+   "d": "M330.3,34 V584",
+   "cls": "mmv-seq-life mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "width": 1.5
+  },
+  {
+   "d": "M610.1,34 V584",
+   "cls": "mmv-seq-life mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "width": 1.5
+  }
+ ],
+ "nodes": [
+  {
+   "kind": "node",
+   "id": "a",
+   "x": 50.5,
+   "y": 17,
+   "w": 101,
+   "h": 34,
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Worker A, level 1",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Worker A",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "db",
+   "x": 330.3,
+   "y": 17,
+   "w": 120,
+   "h": 34,
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Jobs table, level 1",
+   "marks": {
+    "hit": false,
+    "sel": true
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Jobs table",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
+   "id": "b",
+   "x": 610.1,
+   "y": 17,
+   "w": 101,
+   "h": 34,
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-p0",
+   "grow": 1,
+   "name": "Worker B, level 1",
+   "marks": {
+    "hit": true,
+    "sel": false
+   },
+   "shape": "default",
+   "icons": [],
+   "text": {
+    "size": 16,
+    "weight": 600,
+    "spans": [
+     {
+      "text": "Worker B",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 22.2
+     }
+    ]
+   }
+  }
+ ],
+ "rels": [
+  {
+   "kind": "rel",
+   "id": "m0",
+   "d": "M50.5,68 H328.3",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-call",
+   "head": "arrow",
+   "tail": null,
+   "tint": "call",
+   "label": {
+    "x": 198.4,
+    "y": 61,
+    "text": "SELECT job WHERE status = pending",
+    "note": true
+   },
+   "badge": {
+    "x": 36.5,
+    "y": 68,
+    "text": "1",
+    "reply": false,
+    "cls": ""
+   },
+   "msg": 0
+  },
+  {
+   "kind": "rel",
+   "id": "m1",
+   "d": "M330.3,108 H52.5",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-reply is-dotted",
+   "head": "arrow",
+   "tail": null,
+   "tint": "reply",
+   "label": {
+    "x": 182.4,
+    "y": 101,
+    "text": "job 7"
+   },
+   "badge": {
+    "x": 344.3,
+    "y": 108,
+    "text": "1↩",
+    "reply": true,
+    "cls": ""
+   },
+   "msg": 1
+  },
+  {
+   "kind": "rel",
+   "id": "m2",
+   "d": "M610.1,148 H332.3",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-call",
+   "head": "arrow",
+   "tail": null,
+   "tint": "call",
+   "label": {
+    "x": 462.2,
+    "y": 141,
+    "text": "SELECT job WHERE status = pending"
+   },
+   "badge": {
+    "x": 624.1,
+    "y": 148,
+    "text": "2",
+    "reply": false,
+    "cls": ""
+   },
+   "msg": 2
+  },
+  {
+   "kind": "rel",
+   "id": "m3",
+   "d": "M330.3,188 H608.1",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-reply is-dotted",
+   "head": "arrow",
+   "tail": null,
+   "tint": "reply",
+   "label": {
+    "x": 478.2,
+    "y": 181,
+    "text": "job 7"
+   },
+   "badge": {
+    "x": 316.3,
+    "y": 188,
+    "text": "2↩",
+    "reply": true,
+    "cls": ""
+   },
+   "msg": 3
+  },
+  {
+   "kind": "rel",
+   "id": "m4",
+   "d": "M50.5,268 H328.3",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-call",
+   "head": "arrow",
+   "tail": null,
+   "tint": "call",
+   "label": {
+    "x": 198.4,
+    "y": 261,
+    "text": "UPDATE job 7 SET status = running"
+   },
+   "badge": {
+    "x": 36.5,
+    "y": 268,
+    "text": "3",
+    "reply": false,
+    "cls": ""
+   },
+   "msg": 4
+  },
+  {
+   "kind": "rel",
+   "id": "m5",
+   "d": "M610.1,308 H332.3",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-call",
+   "head": "arrow",
+   "tail": null,
+   "tint": "call",
+   "label": {
+    "x": 462.2,
+    "y": 301,
+    "text": "UPDATE job 7 SET status = running"
+   },
+   "badge": {
+    "x": 624.1,
+    "y": 308,
+    "text": "4",
+    "reply": false,
+    "cls": ""
+   },
+   "msg": 5
+  },
+  {
+   "kind": "rel",
+   "id": "m6",
+   "d": "M50.5,400 H80.5 V418 H53.5",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-call",
+   "head": "arrow",
+   "tail": null,
+   "tint": "call",
+   "label": {
+    "x": 136.1,
+    "y": 413,
+    "text": "process item"
+   },
+   "badge": {
+    "x": 36.5,
+    "y": 400,
+    "text": "5",
+    "reply": false,
+    "cls": ""
+   },
+   "msg": 6
+  },
+  {
+   "kind": "rel",
+   "id": "m7",
+   "d": "M610.1,458 H640.1 V476 H613.1",
+   "cls": "mmv-flow mmv-seq-msg is-kind mmv-seq-call",
+   "head": "arrow",
+   "tail": null,
+   "tint": "call",
+   "label": {
+    "x": 695.7,
+    "y": 471,
+    "text": "process item"
+   },
+   "badge": {
+    "x": 596.1,
+    "y": 458,
+    "text": "6",
+    "reply": false,
+    "cls": ""
+   },
+   "msg": 7
+  }
+ ]
+}

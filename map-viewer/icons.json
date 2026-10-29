@@ -1,0 +1,194 @@
+{
+ "about": "The named icon codes. Maps write them as ::icon(code code) on the line under a node. Each code is a Phosphor duotone icon (vendor/phosphor, MIT) coloured by a theme swatch (red, orange, yellow, green, blue, purple, grey). Any other Phosphor icon can be used as ph <name> (e.g. ph database), drawn in the node's colour. Never an OS emoji font.",
+ "swatches": [
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "grey"
+ ],
+ "codes": {
+  "idea": {
+   "label": "Idea / vendor",
+   "swatch": "orange",
+   "ph": "lightbulb"
+  },
+  "favorite": {
+   "label": "Favourite",
+   "swatch": "red",
+   "ph": "heart"
+  },
+  "done": {
+   "label": "Done / in place",
+   "swatch": "green",
+   "ph": "check-circle"
+  },
+  "warning": {
+   "label": "Warning",
+   "swatch": "yellow",
+   "ph": "warning"
+  },
+  "question": {
+   "label": "Question",
+   "swatch": "purple",
+   "ph": "question"
+  },
+  "info": {
+   "label": "Info",
+   "swatch": "blue",
+   "ph": "info"
+  },
+  "star": {
+   "label": "Star",
+   "swatch": "yellow",
+   "ph": "star"
+  },
+  "flag-red": {
+   "label": "Red flag",
+   "swatch": "red",
+   "ph": "flag"
+  },
+  "flag-orange": {
+   "label": "Orange flag",
+   "swatch": "orange",
+   "ph": "flag"
+  },
+  "flag-yellow": {
+   "label": "Yellow flag",
+   "swatch": "yellow",
+   "ph": "flag"
+  },
+  "flag-green": {
+   "label": "Green flag",
+   "swatch": "green",
+   "ph": "flag"
+  },
+  "flag-blue": {
+   "label": "Blue flag",
+   "swatch": "blue",
+   "ph": "flag"
+  },
+  "flag-purple": {
+   "label": "Purple flag",
+   "swatch": "purple",
+   "ph": "flag"
+  },
+  "priority-1": {
+   "label": "Priority 1",
+   "swatch": "red",
+   "ph": "number-circle-one"
+  },
+  "priority-2": {
+   "label": "Priority 2",
+   "swatch": "orange",
+   "ph": "number-circle-two"
+  },
+  "priority-3": {
+   "label": "Priority 3",
+   "swatch": "blue",
+   "ph": "number-circle-three"
+  },
+  "no": {
+   "label": "No / blocked",
+   "swatch": "red",
+   "ph": "prohibit"
+  },
+  "pin": {
+   "label": "Pin",
+   "swatch": "purple",
+   "ph": "push-pin"
+  },
+  "link": {
+   "label": "Link",
+   "swatch": "blue",
+   "ph": "link"
+  },
+  "lock": {
+   "label": "Lock",
+   "swatch": "grey",
+   "ph": "lock"
+  },
+  "date": {
+   "label": "Date",
+   "swatch": "blue",
+   "ph": "calendar-blank"
+  },
+  "money": {
+   "label": "Money",
+   "swatch": "green",
+   "ph": "money"
+  },
+  "person": {
+   "label": "Person",
+   "swatch": "blue",
+   "ph": "user"
+  },
+  "people": {
+   "label": "People",
+   "swatch": "blue",
+   "ph": "users"
+  },
+  "target": {
+   "label": "Target",
+   "swatch": "red",
+   "ph": "target"
+  },
+  "hot": {
+   "label": "Hot",
+   "swatch": "orange",
+   "ph": "fire"
+  },
+  "up": {
+   "label": "Up / growing",
+   "swatch": "green",
+   "ph": "trend-up"
+  },
+  "down": {
+   "label": "Down / shrinking",
+   "swatch": "red",
+   "ph": "trend-down"
+  },
+  "status-red": {
+   "label": "Status: red",
+   "swatch": "red",
+   "ph": "circle"
+  },
+  "status-amber": {
+   "label": "Status: amber",
+   "swatch": "orange",
+   "ph": "circle"
+  },
+  "status-green": {
+   "label": "Status: green",
+   "swatch": "green",
+   "ph": "circle"
+  },
+  "verified": {
+   "label": "Checked in the source",
+   "swatch": "green",
+   "ph": "seal-check"
+  },
+  "inferred": {
+   "label": "Reasoned from what was read",
+   "swatch": "blue",
+   "ph": "seal"
+  },
+  "hypothesis": {
+   "label": "A guess to test",
+   "swatch": "purple",
+   "ph": "seal-question"
+  },
+  "unsourced": {
+   "label": "Source not found / not reviewed",
+   "swatch": "grey",
+   "ph": "seal-warning"
+  },
+  "unknown": {
+   "label": "Unknown icon",
+   "swatch": "grey",
+   "ph": "circle-dashed"
+  }
+ }
+}

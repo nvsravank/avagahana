@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avagahana: two viewers</title>
+<style>
+  html, body { margin: 0; height: 100%; font: 13px/1.4 system-ui, sans-serif; }
+  body { display: grid; grid-template-rows: 1fr 150px; height: 100vh; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; min-height: 0; background: #e9ecef; }
+  .pair > div { min-height: 0; border-radius: 8px; overflow: hidden; }
+  #log { margin: 0; padding: 6px 10px; overflow: auto; background: #f8f9fa; border-top: 1px solid #ccc; }
+  .host-btn { height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--mmv-chrome-border); background: var(--mmv-chrome-bg); color: var(--mmv-ink); font: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="pair">
+  <div id="left"></div>
+  <div id="right"></div>
+</div>
+<pre id="log"></pre>
+<script type="module">
+  import { mount } from '../map-viewer/index.js';
+
+  const logEl = document.getElementById('log');
+  const log = (who, what, data) => {
+    logEl.textContent = `${who}: ${what} ${data === undefined ? '' : JSON.stringify(data)}\n` + logEl.textContent;
+  };
+  // This page is the host: it reads map files itself. The viewer never fetches maps.
+  const readMap = (path) => fetch(`maps/${path}`).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); });
+
+  // Left: the built-in theme, every host callback.
+  const left = mount(document.getElementById('left'), {
+    storageKey: 'avagahana-example-left',
+    host: {
+      openExternal: (url) => log('left', 'openExternal', url),
+      openMap: async (path, at) => { log('left', 'openMap', { path, ...at }); await left.load(await readMap(path), path); if (at.focus) left.setState({ focus: at.focus }); },
+      readMap,
+      shutdown: () => log('left', 'shutdown'),
+    },
+  });
+  // the host's own button in the viewer's toolbar slot
+  const back = Object.assign(document.createElement('button'), { className: 'host-btn', textContent: 'Garden' });
+  back.addEventListener('click', async () => left.load(await readMap('garden.md'), 'garden.md'));
+  left.slot.appendChild(back);
+
+  // Right: no built-in theme; one host theme passed as data, its font as bytes.
+  // Only a regular face is given, so the viewer borrows it for 600 / 700 and
+  // reports that (showProblems: 'all' puts theme problems on screen too).
+  const fontBytes = await fetch('../map-viewer/themes/default/fonts/AtkinsonHyperlegibleNext-Regular.woff2').then((r) => r.arrayBuffer());
+  const paper = {
+    id: 'paper',
+    label: 'Paper',
+    font: { family: 'Paper Sans', faces: [{ weight: 400, style: 'normal', data: fontBytes }] },
+    appearances: {
+      light: {
+        bg: '#fbf7ef', ink: '#2b2118', muted: '#6d5f50', accent: '#8a4b0f', center: '#2b2118', centerInk: '#fbf7ef',
+        category: ['#8a4b0f', '#2f5d50', '#6b3e75', '#a33b2a', '#3b5a85', '#6a6a1f'],   // inks
+        level: ['#2b2118', '#6d4c2f', '#8a6a46', '#a2896a'],                             // sepia
+        roles: { link: '#a33b2a' },
+      },
+    },
+  };
+  const right = mount(document.getElementById('right'), {
+    defaultTheme: false,
+    themes: [paper],
+    storageKey: null,
+    showProblems: 'all',
+    host: { readMap },
+  });
+
+  for (const [name, v] of [['left', left], ['right', right]]) {
+    v.on('state', (s) => log(name, 'state', s));
+    v.on('load', (e) => log(name, 'load', { path: e.path, title: e.title }));
+    v.on('warning', (p) => log(name, 'warning', p.message));
+    v.on('error', (p) => log(name, 'error', p.message));
+  }
+  left.load(await readMap('garden.md'), 'garden.md');
+  right.load(await readMap('garden.md'), 'garden.md');
+  window.viewers = { left, right };
+</script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+[
+ {
+  "kind": "row",
+  "id": "ORDER_LINE",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-selected",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Order line",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "DATE",
+    "name": "Date",
+    "label": "ordered on",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "PRODUCT",
+    "name": "Product",
+    "label": "sells",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "CUSTOMER",
+    "name": "Customer",
+    "label": "bought by",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "STORE",
+    "name": "Store",
+    "label": "sold at",
+    "glyph": "↔"
+   }
+  ],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "DATE",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-hit",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Date",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ORDER_LINE",
+    "name": "Order line",
+    "label": "ordered on",
+    "glyph": "↔"
+   },
+   {
+    "dir": "in",
+    "other": "STOCK_LEVEL",
+    "name": "Stock level",
+    "label": "counted on",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "PRODUCT",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Product",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ORDER_LINE",
+    "name": "Order line",
+    "label": "sells",
+    "glyph": "↔"
+   },
+   {
+    "dir": "in",
+    "other": "STOCK_LEVEL",
+    "name": "Stock level",
+    "label": "counts",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "PRODUCT_TAG",
+    "name": "Product tag",
+    "label": "tagged by",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "CUSTOMER",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Customer",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ORDER_LINE",
+    "name": "Order line",
+    "label": "bought by",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "REGION",
+    "name": "Region",
+    "label": "lives in",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "STORE",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Store",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ORDER_LINE",
+    "name": "Order line",
+    "label": "sold at",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "REGION",
+    "name": "Region",
+    "label": "stands in",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "STOCK_LEVEL",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Stock level",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "DATE",
+    "name": "Date",
+    "label": "counted on",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "PRODUCT",
+    "name": "Product",
+    "label": "counts",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "WAREHOUSE",
+    "name": "Warehouse",
+    "label": "held in",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "WAREHOUSE",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k7 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Warehouse",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "STOCK_LEVEL",
+    "name": "Stock level",
+    "label": "held in",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "REGION",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k8 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Region",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "CUSTOMER",
+    "name": "Customer",
+    "label": "lives in",
+    "glyph": "↔"
+   },
+   {
+    "dir": "in",
+    "other": "STORE",
+    "name": "Store",
+    "label": "stands in",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "PRODUCT_TAG",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k9 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Product tag",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "PRODUCT",
+    "name": "Product",
+    "label": "tagged by",
+    "glyph": "↔"
+   },
+   {
+    "dir": "in",
+    "other": "TAG",
+    "name": "Tag",
+    "label": "tags",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "TAG",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k10 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Tag",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "PRODUCT_TAG",
+    "name": "Product tag",
+    "label": "tags",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ }
+]

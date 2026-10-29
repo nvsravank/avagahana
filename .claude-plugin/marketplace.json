@@ -1,0 +1,14 @@
+{
+  "name": "avagahana",
+  "description": "Avagahana: clear diagrams for AI agents.",
+  "owner": {
+    "name": "nvsravank"
+  },
+  "plugins": [
+    {
+      "name": "avagahana",
+      "source": "./",
+      "description": "Write a map as text, read it in an interactive viewer."
+    }
+  ]
+}

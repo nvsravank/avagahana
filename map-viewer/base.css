@@ -1,0 +1,544 @@
+/* base.css — the viewer's structure. Every rule is scoped under .mmv (the mount
+   root); no rules on html or body. Colours come only from theme variables
+   (--mmv-*, set by themes/theme.js) and the per-node --n / --n-ink. */
+
+.mmv {
+  --mmv-font-fallback: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  background: var(--mmv-bg, #fff);
+  color: var(--mmv-ink, #222);
+  font: 14px/1.4 var(--mmv-font, var(--mmv-font-fallback));
+  -webkit-font-smoothing: antialiased;
+  isolation: isolate;
+}
+.mmv *, .mmv *::before, .mmv *::after { box-sizing: border-box; }
+.mmv button, .mmv input { font: inherit; color: inherit; }
+.mmv [hidden] { display: none !important; }
+.mmv:focus { outline: none; }
+.mmv :focus-visible { outline: 2px solid var(--mmv-accent); outline-offset: 1px; }
+
+/* ---- the drawing ---- */
+.mmv-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; user-select: none; }
+.mmv-canvas.is-panning { cursor: grabbing; }
+.mmv-canvas text { font-family: var(--mmv-font, var(--mmv-font-fallback)); }
+.mmv-hit { fill: transparent; stroke: none; }
+.mmv-node, .mmv-dot, .mmv-rel-dot, .mmv-note-ic, .mmv-inner-ic { cursor: pointer; }
+.mmv-inner-ic { color: var(--mmv-ink); }
+.mmv-node.is-context, .mmv-frame.is-context { opacity: 0.55; }
+.mmv-node.is-context:hover { opacity: 0.85; }
+.mmv .is-dim { opacity: 0.22; }
+.mmv-rels { pointer-events: none; }
+.mmv-ghosts { pointer-events: none; }
+
+/* nodes: colour by category (mmv-k<n>) or level (mmv-l<n>), from the theme's rules */
+.mmv-node { color: var(--mmv-ink); }
+.mmv-label { fill: currentColor; }
+.mmv-shape { stroke-width: 3; }
+.mmv[data-look="fade"] .mmv-node.mmv-d0 { color: var(--n-ink); }
+.mmv[data-look="fade"] .mmv-node.mmv-d0 > .mmv-shape { fill: var(--n); stroke: none; }
+.mmv[data-look="fade"] .mmv-node.mmv-d1 > .mmv-shape { fill: var(--mmv-bg); stroke: var(--n); }
+.mmv[data-look="fade"] .mmv-node.mmv-d2 > .mmv-shape { display: none; }
+.mmv[data-look="outline"] .mmv-shape { fill: color-mix(in srgb, var(--n) var(--mmv-tint), transparent); stroke: var(--n); }
+.mmv[data-look="outline"] .mmv-node.mmv-d0 > .mmv-shape { stroke-width: 3.5; }
+.mmv-icon { color: var(--n); fill: currentColor; }
+.mmv[data-look="fade"] .mmv-node.mmv-d0 .mmv-icon:not([style]) { color: var(--n-ink); }
+.mmv-note-ic g { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
+.mmv-note-ic:hover g { opacity: 1; }
+.mmv-inner-ic g { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.mmv-inner-ic:hover g { opacity: 0.75; }
+.mmv-bar { fill: var(--n); opacity: 0.5; }
+.mmv-bar.is-marked { opacity: 1; }
+
+/* box diagrams: open boxes are frames; every node keeps its border, whatever the look.
+   Fills are mixed with the background, never with transparent: boxes nest, and
+   see-through fills would stack (lighter and lighter in dark, darker in light) until
+   labels cannot be read. */
+.mmv-frame > .mmv-shape { fill: color-mix(in srgb, var(--n) 6%, var(--mmv-bg)); stroke: var(--n); stroke-width: 2; }
+.mmv[data-boxes][data-look="outline"] .mmv-frame > .mmv-shape { fill: color-mix(in srgb, var(--n) 9%, var(--mmv-bg)); }
+.mmv[data-boxes][data-look="outline"] .mmv-node > .mmv-shape { fill: color-mix(in srgb, var(--n) var(--mmv-tint), var(--mmv-bg)); }
+.mmv-frame-title { fill: var(--n); }
+.mmv[data-boxes][data-look="fade"] .mmv-node > .mmv-shape { display: inline; fill: var(--mmv-bg); stroke: var(--n); }
+/* a box diagram's centre (a box drilled into with nothing inside) is outlined like the
+   rest: its label and icon keep their colours, never the filled centre's ink */
+.mmv[data-boxes] .mmv-node, .mmv[data-boxes] .mmv-node.mmv-d0 { color: var(--mmv-ink); }
+/* a state diagram's marks (start and end dots, fork / join bar) are solid in the line colour; a description sits under a rule; regions are dashed parts of their composite */
+.mmv[data-look] .mmv-node > .mmv-shape.is-solid { display: inline; fill: var(--mmv-ink); fill-opacity: 0.8; stroke: none; }
+.mmv[data-look] .mmv-node > .mmv-shape.is-mark { display: inline; fill: var(--mmv-bg); stroke: var(--mmv-ink); stroke-opacity: 0.8; stroke-width: 2; }
+.mmv-warn circle { fill: var(--mmv-bad); }
+.mmv-warn text { fill: var(--mmv-bg); }
+.mmv-divider { stroke: var(--n); stroke-width: 1; stroke-opacity: 0.6; }
+.mmv[data-look] .mmv-frame.is-region > .mmv-shape { fill: none; stroke: var(--mmv-muted); stroke-width: 1.2; stroke-dasharray: 6 4; }
+
+.mmv[data-boxes] .mmv-node .mmv-icon:not([style]), .mmv[data-boxes] .mmv-node.mmv-d0 .mmv-icon:not([style]) { color: var(--n); }
+[data-mmv="edges"], [data-mmv="rels"] { transition: opacity 0.18s; }
+.mmv-flow { fill: none; stroke: var(--mmv-ink); stroke-opacity: 0.72; stroke-width: 1.8; }
+
+/* sequences: heads like boxes, dashed lifelines, blocks and notes as frames, numbered
+   messages (calls and replies in the theme's call and reply colours) */
+.mmv[data-diagram="sequence"][data-look] .mmv-node > .mmv-shape { display: inline; fill: color-mix(in srgb, var(--n) var(--mmv-tint), var(--mmv-bg)); stroke: var(--n); }
+.mmv[data-diagram="sequence"] .mmv-node { color: var(--mmv-ink); }
+.mmv-seq-life { fill: none; stroke: var(--n); stroke-opacity: 0.55; stroke-dasharray: 4 4; }
+.mmv[data-diagram="sequence"][data-look] .mmv-seq-group > .mmv-shape { fill: none; stroke: var(--mmv-muted); stroke-width: 1.2; stroke-dasharray: 6 4; }
+.mmv-seq-group .mmv-frame-title { fill: var(--mmv-muted); }
+.mmv[data-diagram="sequence"][data-look] .mmv-seq-group.is-now > .mmv-shape { stroke: var(--mmv-call); stroke-width: 1.8; }
+.mmv[data-diagram="sequence"][data-look] .mmv-seq-note > .mmv-shape { fill: color-mix(in srgb, var(--mmv-highlight) 14%, var(--mmv-bg)); stroke: color-mix(in srgb, var(--mmv-highlight) 55%, var(--mmv-bg)); stroke-width: 1; }
+.mmv-seq-note .mmv-frame-title { fill: var(--mmv-ink); }
+.mmv[data-diagram="sequence"][data-look] .mmv-seq-box > .mmv-shape { fill: color-mix(in srgb, var(--n) 5%, var(--mmv-bg)); stroke-opacity: 0.5; }
+.mmv-seq-call { --n: var(--mmv-call); }
+.mmv-seq-reply { --n: var(--mmv-reply); }
+.mmv-seq-idle { --n: var(--mmv-idleLine); }
+.mmv-flow.mmv-seq-msg { stroke-opacity: 1; }
+.mmv-seq-badge rect { fill: var(--n); stroke: var(--n); stroke-width: 1.5; }
+.mmv-seq-badge text { fill: var(--mmv-bg); }
+.mmv-seq-badge.is-reply rect { fill: var(--mmv-bg); }
+.mmv-seq-badge.is-reply text { fill: var(--n); }
+/* while a sequence plays: not reached yet grey, played at 60%, the step in colour */
+.mmv :is(.mmv-node, .mmv-frame).is-idle > .mmv-shape { fill: var(--mmv-idle); stroke: var(--mmv-idleLine); }
+.mmv :is(.mmv-node, .mmv-frame).is-idle { --n: var(--mmv-idleLine); color: var(--mmv-muted); }
+.mmv :is(.mmv-node, .mmv-frame).is-idle :is(.mmv-label, .mmv-frame-title) { fill: var(--mmv-muted); }
+.mmv :is(.mmv-node, .mmv-seq-msg, .mmv-seq-badge, .mmv-flow-label, .mmv-seq-life, .mmv-seq-note).is-past { opacity: 0.6; }
+.mmv-seq-life.is-idle { stroke: var(--mmv-idleLine); }
+.mmv-flow-label.is-idle { fill: var(--mmv-muted); }
+.mmv .mmv-node.is-now > .mmv-shape { stroke-width: 3; }
+.mmv .mmv-seq-msg.is-now { stroke-width: 2.6; }
+.mmv-flow.is-dotted { stroke-dasharray: 5 4; }
+.mmv-flow.is-thick { stroke-width: 3.4; }
+.mmv-flow-note { color: var(--mmv-muted); }
+.mmv-flow-note-bg { fill: var(--mmv-bg); }
+.mmv-flow-end { fill: var(--mmv-ink); fill-opacity: 0.72; }
+.mmv-flow-x { stroke: var(--mmv-ink); stroke-opacity: 0.72; stroke-width: 1.8; fill: none; }
+.mmv-flow.is-kind { stroke: var(--n); stroke-opacity: 1; }
+marker.is-kind .mmv-flow-end { fill: var(--n); fill-opacity: 1; }
+marker.is-kind .mmv-flow-x { stroke: var(--n); stroke-opacity: 1; }
+/* colour by Changes: planned arrows in their change's colour, the rest step back */
+.mmv[data-colour-by="changes"] .mmv-flow:not(.mmv-p0) { stroke: var(--n); stroke-opacity: 1; stroke-width: 2.4; }
+.mmv[data-colour-by="changes"] .mmv-flow.mmv-p0 { stroke: var(--mmv-muted); stroke-opacity: 0.55; }
+.mmv[data-colour-by="changes"] marker.is-plan .mmv-flow-end { fill: var(--n); fill-opacity: 1; }
+.mmv[data-colour-by="changes"] marker.is-plan .mmv-flow-x { stroke: var(--n); stroke-opacity: 1; }
+.mmv[data-colour-by="changes"] marker:not(.is-plan) .mmv-flow-end { fill: var(--mmv-muted); fill-opacity: 0.55; }
+.mmv[data-colour-by="changes"] marker:not(.is-plan) .mmv-flow-x { stroke: var(--mmv-muted); stroke-opacity: 0.55; }
+.mmv-flow-hit { fill: none; stroke: transparent; stroke-width: 14; pointer-events: stroke; cursor: pointer; }
+.mmv-flow-label { fill: var(--mmv-muted); stroke: var(--mmv-bg); stroke-width: 4; paint-order: stroke; }
+
+/* edges: one solid path each, in the colour of the node they lead to, by branch or by level alike */
+.mmv-edge { fill: none; stroke: var(--n); }
+
+/* markers on nodes */
+.mmv-dot circle { fill: var(--mmv-bg); stroke: var(--n); stroke-width: 2; }
+.mmv-dot.is-closed circle { fill: var(--n); }
+.mmv-dot text { fill: var(--n-ink); }
+/* changes since you looked (seen.js): a badge at a box's top-left, sparkle new, pencil
+   changed, an outlined sparkle for a change inside; per reader, so never exported */
+.mmv-change circle { fill: var(--mmv-highlight); stroke: var(--mmv-bg); stroke-width: 2; }
+.mmv-change use { color: var(--mmv-bg); }
+.mmv-change.is-inside circle { fill: var(--mmv-bg); stroke: var(--mmv-highlight); stroke-width: 1.8; }
+.mmv-change.is-inside use { color: var(--mmv-highlight); }
+.mmv.mmv-printing .mmv-change { display: none; }
+/* just arrived: one glow; just removed: it leaves in red */
+.mmv-node.is-glow > :is(.mmv-shape, .mmv-bar), .mmv-frame.is-glow > rect, .mmv-flow.is-glow { animation: mmv-glow 1.2s ease-in-out 0.45s; }
+@keyframes mmv-glow { 40% { stroke: var(--mmv-highlight); stroke-width: 5; stroke-opacity: 1; filter: drop-shadow(0 0 6px var(--mmv-highlight)); } }
+.is-gone :is(.mmv-shape, rect:not(.mmv-hit)) { stroke: var(--mmv-bad) !important; fill: color-mix(in srgb, var(--mmv-bad) 22%, var(--mmv-bg)) !important; }
+@media (prefers-reduced-motion: reduce) { .mmv-node.is-glow > :is(.mmv-shape, .mmv-bar), .mmv-frame.is-glow > rect, .mmv-flow.is-glow { animation: none; } }
+/* a control that leads to changes since you looked: a small outlined ring */
+.mmv :is(.mmv-pill, .mmv-crumbs button, .mmv-menu-item).has-changes { position: relative; }
+.mmv :is(.mmv-pill, .mmv-crumbs button).has-changes::after { content: ""; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--mmv-chrome-bg, var(--mmv-bg)); border: 2px solid var(--mmv-highlight); }
+.mmv .mmv-menu-item.has-changes::after { content: ""; flex: none; align-self: center; width: 7px; height: 7px; border-radius: 50%; border: 2px solid var(--mmv-highlight); }
+.mmv-lchange { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-right: 4px; border-radius: 50%; flex: none;
+  background: var(--mmv-highlight); color: var(--mmv-bg); vertical-align: middle; }
+.mmv-lchange.is-inside { background: none; color: var(--mmv-highlight); box-shadow: inset 0 0 0 1.5px var(--mmv-highlight); }
+.mmv-lchange .mmv-inline-ic { width: 12px; height: 12px; }
+.mmv-since { margin: 2px 0 8px; color: var(--mmv-highlight); font-weight: 600; font-size: 13px; }
+.mmv-since-gone { margin: 2px 0 8px; }
+.mmv-legend-since { padding: 2px 8px 6px; }
+.mmv-clear-seen { margin: 4px 8px 8px; padding: 7px 10px; border: 1px solid var(--mmv-chrome-border); border-radius: 7px; background: var(--mmv-chrome-bg); color: var(--mmv-ink); font: inherit; cursor: pointer; }
+.mmv-clear-seen:hover:not(:disabled) { background: var(--mmv-chrome-hover); }
+.mmv-clear-seen:disabled { opacity: 0.5; cursor: default; }
+.mmv-rel-dot circle:not(.mmv-hit) { fill: var(--mmv-bg); stroke: var(--mmv-link); stroke-width: 2; }
+.mmv-rel-dot.is-on circle:not(.mmv-hit) { fill: var(--mmv-link); }
+.mmv-mark { fill: none; }
+.mmv-mark-hit { stroke: var(--mmv-highlight); stroke-width: 2.5; }
+.mmv-mark-sel { stroke: var(--mmv-ink); stroke-width: 1.5; stroke-dasharray: 4 3; }
+
+/* relations */
+.mmv-rel { fill: none; stroke: var(--mmv-link); stroke-width: 2; stroke-dasharray: 6 4; }
+.mmv-rel-label { fill: var(--mmv-link); stroke: var(--mmv-bg); stroke-width: 4; paint-order: stroke; font-style: italic; }
+.mmv-arrow { fill: var(--mmv-link); }
+
+.mmv-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--mmv-muted); }
+.mmv-errorbar { position: absolute; left: 50%; top: 60px; transform: translateX(-50%); z-index: 13; max-width: min(560px, calc(100% - 28px));
+  padding: 8px 12px; border-radius: 10px; background: var(--mmv-chrome-bg); border: 1px solid var(--mmv-bad); color: var(--mmv-ink); box-shadow: var(--mmv-shadow); }
+.mmv-errorbar strong { color: var(--mmv-bad); margin-right: 6px; }
+
+/* ---- floating chrome ---- */
+.mmv-float { position: absolute; display: flex; gap: 8px; align-items: center; z-index: 10; }
+.mmv-tl { top: 14px; left: 14px; }
+.mmv-tr { top: 14px; right: 14px; }
+/* a toolbar in use rises over the panels, so its menus and pop-ups are never covered */
+.mmv-float:is(:hover, :focus-within) { z-index: 14; }
+.mmv-tc { bottom: 14px; left: 50%; transform: translateX(-50%); }
+.mmv-br { bottom: 14px; right: 14px; flex-direction: column; align-items: flex-end; }
+.mmv-bl { bottom: 14px; left: 14px; }
+.mmv-exit:hover { color: var(--mmv-bad); }
+
+.mmv-pill, .mmv-seg, .mmv-panel, .mmv-note, .mmv-crumbs, .mmv-search {
+  background: var(--mmv-chrome-bg);
+  border: 1px solid var(--mmv-chrome-border);
+  box-shadow: var(--mmv-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+}
+.mmv-pill { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; cursor: pointer; max-width: 46cqw; }
+button.mmv-pill:hover { background: var(--mmv-chrome-hover); }
+.mmv-pill.mmv-icon { padding: 0 9px; }
+.mmv { container-type: size; }
+.mmv-slot { display: contents; }
+.mmv-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; cursor: default; }
+.mmv-title:empty, .mmv-slot:has(> :not(.mmv-title)) > .mmv-title { display: none; }
+.mmv-warn { color: var(--mmv-warn); }
+.mmv-warn.is-error { color: var(--mmv-bad); }
+
+.mmv-seg { display: inline-flex; padding: 3px; gap: 2px; }
+.mmv-seg.mmv-vertical { flex-direction: column; }
+.mmv-seg button { border: 0; background: transparent; height: 28px; min-width: 28px; padding: 0 6px; border-radius: 7px; cursor: pointer; display: grid; place-items: center; }
+.mmv-seg button:hover { background: var(--mmv-chrome-hover); }
+.mmv-seg button.is-on { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
+.mmv-seg.mmv-small { box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; flex-wrap: wrap; }
+.mmv-seg.mmv-small button { padding: 0 10px; font-size: 13px; }
+
+.mmv-ic { display: inline-grid; place-items: center; width: 16px; height: 16px; }
+.mmv-ic svg { width: 16px; height: 16px; }
+
+.mmv-search { display: inline-flex; align-items: center; height: 34px; padding: 0; }
+.mmv-search .mmv-pill { border: 0; box-shadow: none; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* search is an icon until hovered, focused, or holding text */
+.mmv-search input { border: 0; outline: none; background: transparent; width: 0; padding: 0; transition: width .15s ease; }
+.mmv-search:hover input, .mmv-search:focus-within input, .mmv-search.has-value input { width: min(200px, 30cqw); padding-right: 4px; }
+.mmv-search-count { font-size: 12px; color: var(--mmv-muted); white-space: nowrap; }
+.mmv-search-count:not(:empty) { padding: 0 8px 0 2px; }
+
+/* layout modes: only the current one shows until hovered; it stays first */
+.mmv-modes:not(:hover):not(:focus-within) button:not(.is-on) { display: none; }
+.mmv-modes button.is-on { order: -1; }
+
+/* hover-to-open panels (export, theme) */
+.mmv-hov { position: relative; }
+.mmv-hov .mmv-drop { display: none; position: absolute; top: 40px; right: 0; width: min(320px, calc(100cqw - 28px)); }
+.mmv-hov:hover .mmv-drop, .mmv-hov:focus-within .mmv-drop { display: block; }
+.mmv-hov::after { content: ""; position: absolute; left: 0; right: 0; top: 34px; height: 8px; }
+.mmv-hov .mmv-drop.mmv-left-drop { left: 0; right: auto; width: auto; min-width: 190px; padding: 6px; }
+
+button.mmv-pill.is-active { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
+
+/* icon filter: one icon; the chips open on hover */
+.mmv-filter { position: relative; }
+.mmv-filter .mmv-iconbar { display: none; position: absolute; top: 40px; right: 0; width: min(400px, calc(100cqw - 28px)); }
+.mmv-filter:hover .mmv-iconbar, .mmv-filter:focus-within .mmv-iconbar { display: flex; }
+.mmv-filter::after { content: ""; position: absolute; left: 0; right: 0; top: 34px; height: 8px; }
+.mmv-filter-count:not(:empty) { font-size: 12px; font-weight: 600; }
+
+.mmv-panel { position: absolute; z-index: 11; padding: 10px; }
+.mmv-tl-panel { top: 56px; left: 14px; width: min(340px, calc(100cqw - 28px)); max-height: calc(100cqh - 80px); overflow: auto; }
+.mmv-bl-panel { bottom: 56px; left: 14px; width: min(320px, calc(100cqw - 28px)); max-height: calc(100cqh - 80px); overflow: auto; }
+.mmv-bl-panel hr, .mmv-problems hr { border: 0; border-top: 1px solid var(--mmv-chrome-border); margin: 8px 0; }
+.mmv-legend-head { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--mmv-muted); margin: 2px 0 4px; }
+.mmv-legend-sec + .mmv-legend-sec { border-top: 1px solid var(--mmv-chrome-border); margin-top: 6px; padding-top: 6px; }
+summary.mmv-legend-head { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; }
+summary.mmv-legend-head::-webkit-details-marker { display: none; }
+summary.mmv-legend-head::before { content: '›'; display: inline-block; transition: transform .15s; font-size: 14px; line-height: 1; }
+details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
+.mmv-legend-row svg + svg { margin-left: -4px; }
+.mmv-legend-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; }
+.mmv-legend-row svg { flex: none; width: 16px; height: 16px; }
+.mmv-legend-code { margin-left: auto; color: var(--mmv-muted); font-size: 12px; }
+.mmv-legend-empty { color: var(--mmv-muted); font-size: 13px; }
+.mmv-panel .mmv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0; }
+.mmv-panel .mmv-row > span { color: var(--mmv-muted); font-size: 13px; flex: none; }
+.mmv-problems { font-size: 13px; }
+.mmv-problem { padding: 3px 0; border-bottom: 1px solid var(--mmv-chrome-border); }
+.mmv-problem.is-error::before { content: "Error: "; font-weight: 600; color: var(--mmv-bad); }
+
+.mmv-iconbar { flex-wrap: wrap; gap: 6px; }
+.mmv-chip { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--mmv-chrome-border); background: transparent; border-radius: 999px; padding: 2px 8px 2px 4px; cursor: pointer; font-size: 12px; text-align: left; }
+.mmv-chip.is-on { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
+.mmv-chip svg { width: 16px; height: 16px; }
+
+.mmv-crumbs { display: flex; align-items: center; gap: 2px; padding: 3px 6px; max-width: 60cqw; overflow: hidden; }
+.mmv-crumbs button { border: 0; background: none; padding: 4px 6px; border-radius: 6px; cursor: pointer; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.mmv-crumbs button:hover { background: var(--mmv-chrome-hover); }
+.mmv-crumbs .mmv-sep { color: var(--mmv-muted); }
+.mmv-crumbs .mmv-sep.is-diagram { font-weight: 700; padding: 0 2px; }
+.mmv-crumbs button:last-child { font-weight: 600; }
+
+.mmv-menu-item { display: flex; justify-content: space-between; gap: 14px; width: 100%; border: 0; background: none; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
+.mmv-menu-item span { font-weight: 400; color: var(--mmv-muted); font-size: 12px; }
+.mmv-menu-item:hover { background: var(--mmv-chrome-hover); }
+.mmv-menu-item .mmv-mi-label { display: inline-flex; align-items: center; gap: 6px; font-size: inherit; font-weight: 600; color: inherit; }
+.mmv-menu-sep { border: 0; border-top: 1px solid var(--mmv-chrome-border); margin: 4px 2px; }
+.mmv-menu-head { padding: 4px 8px 2px; font-size: 11px; color: var(--mmv-muted); text-transform: uppercase; letter-spacing: .04em; }
+
+/* ---- note: a popover (a peek at a note, an arrow's relations, related links) ---- */
+.mmv-note { position: absolute; z-index: 12; width: min(340px, calc(100cqw - 20px)); max-height: 50cqh; display: flex; flex-direction: column; }
+.mmv-note-head { display: flex; align-items: center; gap: 4px; padding: 8px 8px 6px 12px; border-bottom: 1px solid var(--mmv-chrome-border); }
+.mmv-note-title { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mmv-icon-btn { border: 0; background: none; width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; cursor: pointer; color: var(--mmv-muted); }
+.mmv-icon-btn:hover { background: var(--mmv-chrome-hover); }
+.mmv-icon-btn.is-on { color: var(--mmv-accent); }
+.mmv-note-body { padding: 8px 12px 12px; overflow: auto; }
+.mmv-note-body p { margin: 4px 0; }
+.mmv-note-body ul { margin: 4px 0; padding-left: 18px; }
+.mmv-note-body a { color: var(--mmv-accent); word-break: break-all; }
+.mmv-note-body .mmv-muted { color: var(--mmv-muted); }
+.mmv-note-body h4 { margin: 10px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--mmv-muted); }
+.mmv-note-body .mmv-relrow { display: block; border: 0; background: none; color: var(--mmv-accent); cursor: pointer; padding: 2px 0; text-align: left; }
+.mmv-note-body span.mmv-relrow { color: var(--mmv-ink); cursor: default; }
+.mmv-note-body .mmv-missing { color: var(--mmv-bad); font-size: 12px; margin-left: 4px; }
+.mmv-note-body code { font: 12px/1.3 ui-monospace, Menlo, Consolas, monospace; background: var(--mmv-chrome-hover); padding: 1px 4px; border-radius: 4px; }
+/* cloud icons with a dark twin: the one for the appearance shown */
+.mmv[data-appearance="dark"] .mmv-vendor-ic.is-light, .mmv[data-appearance="dark"] .mmv-vendor-ic .is-light,
+.mmv:not([data-appearance="dark"]) .mmv-vendor-ic.is-dark, .mmv:not([data-appearance="dark"]) .mmv-vendor-ic .is-dark { display: none; }
+.mmv-inline-ic { display: inline-block; width: 15px; height: 15px; vertical-align: -2px; margin-right: 3px; }
+.mmv-rel-ic { margin-left: 4px; }
+.mmv-rel-ic .mmv-inline-ic { margin-right: 0; }
+.mmv-arrow-marks { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0 0 6px; font-size: 13px; }
+
+/* ---- list mode ---- */
+.mmv-list { position: absolute; inset: 0; overflow: auto; padding: 70px 16px 40px; }
+.mmv-list-inner { max-width: 820px; margin: 0 auto; }
+.mmv-lrow { display: flex; align-items: flex-start; gap: 6px; padding: 3px 6px; border-radius: 6px; cursor: pointer; }
+.mmv-lrow:hover { background: var(--mmv-chrome-hover); }
+.mmv-lrow.is-selected { outline: 2px solid var(--mmv-accent); }
+.mmv-lrow.is-hit { box-shadow: inset 3px 0 0 var(--mmv-highlight); }
+.mmv-lrow.is-dim { opacity: .3; }
+.mmv-ltoggle { flex: none; width: 18px; height: 22px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; padding: 0; color: var(--n); }
+.mmv-ltoggle i { display: block; width: 9px; height: 9px; border-radius: 50%; border: 2px solid currentColor; }
+.mmv-ltoggle.is-closed i { background: currentColor; }
+.mmv-lbar { flex: none; width: 4px; align-self: stretch; border-radius: 2px; background: var(--n); }
+.mmv-llabel { flex: 1; padding: 1px 0; }
+.mmv-llabel .mmv-d0 { font-size: 20px; font-weight: 700; }
+.mmv-llabel .mmv-d1 { font-size: 16px; font-weight: 600; }
+.mmv-lcount { color: var(--mmv-muted); font-size: 12px; margin-left: 6px; }
+.mmv-lrel { display: block; width: 100%; text-align: left; color: var(--mmv-ink); font-size: 13px; border: 0; background: none; padding: 1px 0; font-family: inherit; cursor: pointer; }
+.mmv-lrel:hover { color: var(--mmv-accent); }
+.mmv-lrel-arrow { color: var(--mmv-muted); display: inline-block; width: 1.2em; }
+.mmv-lrel-label { color: var(--mmv-muted); }
+.mmv-lnote-ic { display: inline-grid; vertical-align: -3px; margin-left: 6px; color: var(--mmv-accent); cursor: pointer; padding: 2px; border-radius: 4px; }
+.mmv-lnote-ic:hover { background: var(--mmv-chrome-hover); }
+
+/* the theme panel */
+.mmv-theme-panel .mmv-row { align-items: flex-start; }
+
+/* print happens in a hidden iframe (export.js) */
+.mmv-print-frame { position: fixed; width: 0; height: 0; border: 0; visibility: hidden; }
+.mmv-printing { height: auto; overflow: visible; container-type: normal; min-height: 0; }
+.mmv-printing .mmv-list { position: static; overflow: visible; padding: 0; }
+.mmv-printing .mmv-list-inner { max-width: none; }
+.mmv-printing .mmv-lrow { break-inside: avoid; }
+.mmv-printing .mmv-lrow.is-selected { outline: none; }
+.mmv-printing .mmv-lrow.is-hit { box-shadow: none; }
+
+/* ---- a node's page (page.js): the box grown to the clear area, in its own outline; the drawing fades behind ---- */
+.mmv-canvas, .mmv-list { transition: opacity .25s ease; }
+.mmv.is-faded > .mmv-canvas, .mmv.is-faded > .mmv-list { opacity: .35; }
+.mmv.is-paged > .mmv-canvas, .mmv.is-paged > .mmv-list { pointer-events: none; }
+/* zoom and expand mean nothing on the page; the power button stays, on the info button's row */
+.mmv.is-paged > .mmv-br > :not(.mmv-exit) { display: none; }
+.mmv-page, .mmv-ghost { position: absolute; z-index: 11; border-radius: 12px;
+  background: var(--mmv-bg); border: 2px solid var(--mmv-chrome-border); box-shadow: var(--mmv-shadow); }
+.mmv-page { overflow: hidden; container-type: size; }
+/* the body scrolls, held clear of the rounded corners so its scrollbar is never cut;
+   the side padding keeps the content at most 1200px wide, centred */
+.mmv-page-body { position: absolute; inset: 10px 0; overflow: auto; padding: 10px max(22px, calc(50% - 578px)) 16px; }
+.mmv-page-note, .mmv-page-rel { max-width: 75ch; }
+.mmv-page-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.mmv-page-head h2 { margin: 0; font-size: 22px; }
+.mmv-page-kind { font-size: 12px; color: var(--mmv-muted); border: 1px solid var(--mmv-chrome-border); border-radius: 999px; padding: 1px 8px; }
+.mmv-page-note { margin-top: 10px; line-height: 1.5; }
+.mmv-page-note p, .mmv-page-relnote p { margin: 6px 0; }
+.mmv-page-note ul, .mmv-page-relnote ul { margin: 6px 0; padding-left: 20px; }
+.mmv-page a { color: var(--mmv-accent); word-break: break-all; }
+.mmv-page h4 { margin: 18px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--mmv-muted); }
+.mmv-page-rel { padding: 3px 0; }
+.mmv-page .mmv-relrow { display: block; border: 0; background: none; color: var(--mmv-accent); cursor: pointer; padding: 2px 0; text-align: left; }
+.mmv-page span.mmv-relrow { color: var(--mmv-ink); cursor: default; }
+.mmv-page-relnote { margin: 2px 0 4px 18px; padding-left: 10px; border-left: 2px solid var(--mmv-chrome-border); color: var(--mmv-muted); font-size: 13px; }
+/* three across, two rows to the page's height */
+.mmv-page-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(220px, calc((100% - 24px) / 3)), 1fr)); gap: 12px; margin-top: 18px; }
+.mmv-page-thumb { display: flex; flex-direction: column; gap: 6px; padding: 6px; border: 1px solid var(--mmv-chrome-border); border-radius: 10px; background: none; cursor: pointer; text-align: left; }
+.mmv-page-thumb:hover { background: var(--mmv-chrome-hover); }
+.mmv-thumb { position: relative; height: clamp(130px, calc(30cqh - 30px), 220px); border-radius: 6px; overflow: hidden; pointer-events: none; }
+.mmv-page-cap { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.mmv-page-cap svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+/* a thumbnail that marks one node (a node page's views): the rest fades */
+.mmv.is-spot :is(.mmv-node, .mmv-frame):not(:has(> .mmv-mark-sel)) { opacity: .6; }
+.mmv.is-spot :is(.mmv-flow, .mmv-edge, .mmv-rel, .mmv-flow-label, .mmv-rel-label) { opacity: .65; }
+.mmv.is-spot :is(.mmv-node, .mmv-frame):has(> .mmv-mark-sel) > .mmv-shape { stroke-width: 4; fill: color-mix(in srgb, var(--n) 40%, var(--mmv-bg)); }
+/* the node's page as pictures (aspects.js) */
+.mmv-strip { margin-top: 16px; }
+.mmv-strip-svg { display: block; overflow: visible; }
+.mmv-strip-me > .mmv-shape { stroke-width: 2.5; }
+.mmv-strip-kind { fill: var(--mmv-muted); }
+.mmv-strip-part, .mmv-strip-far { cursor: pointer; }
+.mmv-strip-part:hover > .mmv-shape, .mmv-strip-far:hover > .mmv-shape { stroke-width: 2.5; }
+.mmv-strip-more { fill: var(--mmv-accent); cursor: pointer; }
+.mmv-strip-tree { fill: none; stroke: var(--n); stroke-width: 2; }
+.mmv-strip .mmv-note-ic { cursor: pointer; }
+.mmv-strip-note { margin: 8px auto 0; max-width: 60ch; padding: 10px 14px; border: 1px solid var(--mmv-chrome-border); border-radius: 10px; background: var(--mmv-chrome-bg, var(--mmv-bg)); font-size: 13px; }
+.mmv-strip-note h5 { margin: 0 0 4px; font-size: 12px; }
+.mmv-strip-note p { margin: 4px 0; }
+.mmv-aspect.is-on { border: 2px solid var(--mmv-ink); cursor: default; }
+.mmv-aspect.is-on:hover { background: none; }
+.mmv-runs .mmv-thumb { height: auto; min-height: 120px; }
+.mmv-runs-pic { display: flex; padding: 6px; }
+.mmv-runs-frame { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 12px 12px; border: 1.5px solid var(--n); border-radius: 9px; background: color-mix(in srgb, var(--n) 7%, var(--mmv-bg)); }
+.mmv-runs-title { position: absolute; left: 9px; top: 4px; font-size: 11px; font-weight: 600; color: var(--n); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 18px); }
+.mmv-runs-me { padding: 7px 12px; border: 2px solid var(--n); border-radius: 7px; background: color-mix(in srgb, var(--n) 14%, var(--mmv-bg)); font-size: 12px; font-weight: 600; text-align: center; }
+.mmv-runs-me.is-none { border-style: dashed; color: var(--mmv-muted); font-weight: 400; }
+.mmv-page-kids { display: flex; flex-wrap: wrap; gap: 6px; }
+.mmv-page-kid { border: 1px solid var(--mmv-chrome-border); background: none; border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.mmv-page-kid:hover:not(:disabled) { background: var(--mmv-chrome-hover); }
+.mmv-page-kid.is-on { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); border-color: transparent; cursor: default; }
+
+/* a thumbnail viewer: the drawing only */
+.mmv.is-thumb { min-height: 0; }
+.mmv.is-thumb .mmv-float, .mmv.is-thumb .mmv-panel, .mmv.is-thumb .mmv-note, .mmv.is-thumb .mmv-errorbar,
+.mmv.is-thumb .mmv-empty, .mmv.is-thumb .mmv-tl-panel, .mmv.is-thumb .mmv-bl-panel { display: none !important; }
+
+/* too small: only the message */
+.mmv-too-small { display: none; }
+.mmv.is-small > :not(.mmv-too-small) { visibility: hidden; }
+.mmv.is-small > .mmv-too-small { display: grid; place-items: center; position: absolute; inset: 0; padding: 16px; text-align: center; color: var(--mmv-muted); }
+
+
+/* ---------- the sequence player (player.js) ---------- */
+/* one sequence: the play button plays it (no list on hover) */
+.mmv-hov.is-single .mmv-drop { display: none !important; }
+/* over a view: what the sequence has not reached is grey, the view's own arrows too */
+.mmv.is-playing[data-boxes] .mmv-rels .mmv-flow { stroke: var(--mmv-idleLine); stroke-opacity: 1; }
+/* its labels, icons and note marks give way to the messages' labels */
+.mmv.is-playing[data-boxes] .mmv-rels :is(.mmv-flow-label, .mmv-rel-label, .mmv-flow-icon, .mmv-flow-note) { display: none; }
+.mmv.is-playing marker:not([class*="mmv-seq-"]) .mmv-flow-end { fill: var(--mmv-idleLine); fill-opacity: 1; }
+.mmv.is-playing marker:not([class*="mmv-seq-"]) .mmv-flow-x { stroke: var(--mmv-idleLine); }
+.mmv.is-playing :is(.mmv-node, .mmv-frame) { transition: opacity 0.3s; }
+.mmv.is-playing .mmv-frame.is-past { opacity: 1; }
+/* the messages played over the view: the step's in full, those before at 60% */
+.mmv-play-path { fill: none; stroke: var(--n); stroke-width: 3; stroke-linecap: round; }
+.mmv-play-path.is-dotted { stroke-dasharray: 7 5; }
+.mmv-play-msg.is-past { opacity: 0.6; }
+.mmv-play-msg.is-past .mmv-play-path { stroke-width: 2.2; }
+.mmv-play-label { fill: var(--n); font-weight: 600; paint-order: stroke; stroke: var(--mmv-bg); stroke-width: 4px; stroke-linejoin: round; }
+/* an arrow's two lines (the call, its return under it) on a card over the arrow */
+.mmv-play-card { fill: var(--mmv-bg); fill-opacity: 0.88; stroke: var(--mmv-chrome-border); stroke-width: 1; }
+.mmv-play-line.is-past { opacity: 0.6; }
+.mmv-play-dot { fill: var(--n); stroke: var(--mmv-bg); stroke-width: 2; }
+.mmv-play-msg.is-pulse .mmv-play-path { animation: mmv-pulse 0.5s ease-in-out 2; }
+@keyframes mmv-pulse { 50% { stroke-width: 6; } }
+@media (prefers-reduced-motion: reduce) { .mmv-play-msg.is-pulse .mmv-play-path { animation: none; } }
+
+/* the step bar: a timeline over the controls, bottom centre (above the crumbs) */
+.mmv-stepbar { left: 50%; bottom: 14px; transform: translateX(-50%); flex-direction: column; align-items: stretch; gap: 6px;
+  padding: 8px 10px; width: min(560px, calc(100cqw - 132px)); background: var(--mmv-chrome-bg); border: 1px solid var(--mmv-chrome-border);
+  border-radius: 12px; box-shadow: var(--mmv-shadow); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.mmv-crumbs:not([hidden]) ~ .mmv-stepbar { bottom: 58px; }
+.mmv-step-row { display: flex; align-items: center; gap: 10px; }
+.mmv-step-row .mmv-seg { box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.mmv-step-row .mmv-seg button:disabled { opacity: 0.35; cursor: default; background: transparent; }
+.mmv-step-count { font-size: 13px; color: var(--mmv-muted); flex: 1; white-space: nowrap; }
+.mmv-step-row .mmv-pill { height: 30px; box-shadow: none; font-size: 13px; }
+.mmv-count-short { display: none; }
+.mmv-speed { display: inline-flex; align-items: center; gap: 4px; color: var(--mmv-muted); flex: none; }
+.mmv-speed input { width: 64px; margin: 0; accent-color: var(--mmv-call); cursor: pointer; }
+.mmv-timeline { display: grid; grid-template-columns: repeat(var(--steps), minmax(0, 1fr)); grid-auto-rows: auto; gap: 3px 2px; overflow: hidden; }
+.mmv-tl-tick { height: 20px; border: 0; border-radius: 5px; padding: 0; font: inherit; font-size: 10px; font-weight: 700; cursor: pointer;
+  background: var(--mmv-idle); color: var(--mmv-muted); min-width: 0; overflow: hidden; }
+.mmv-tl-tick.is-past { background: color-mix(in srgb, var(--mmv-call) 45%, var(--mmv-bg)); color: var(--mmv-bg); }
+.mmv-tl-tick.is-reply.is-past { background: color-mix(in srgb, var(--mmv-reply) 45%, var(--mmv-bg)); }
+.mmv-tl-tick.is-now { background: var(--mmv-call); color: var(--mmv-bg); }
+.mmv-tl-tick.is-reply.is-now { background: var(--mmv-reply); }
+.mmv-tl-tick.is-repeat { font-size: 12px; }
+.mmv-tl-tick:focus-visible { outline: 2px solid var(--mmv-accent); outline-offset: 1px; }
+.mmv-tl-bracket { font-size: 10px; line-height: 14px; height: 15px; padding: 0 4px; color: var(--mmv-muted); border: 1.5px solid var(--mmv-idleLine);
+  border-bottom: 0; border-radius: 5px 5px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mmv-tl-bracket.is-now { color: var(--mmv-call); border-color: var(--mmv-call); }
+.mmv-tl-bracket.is-loop::before { content: "↻ "; }
+.mmv-tl-bracket.is-par::before { content: "⇉ "; }
+.mmv-tl-bracket:is(.is-loop, .is-par).is-tight { text-overflow: clip; text-align: center; }
+.mmv-tl-bracket:is(.is-loop, .is-par).is-tight .mmv-tl-word { display: none; }
+
+/* the side panel: the step in words */
+.mmv-seq-panel { top: 62px; right: 14px; width: min(300px, calc(100cqw - 28px)); max-height: calc(100cqh - 200px); overflow: auto; font-size: 13px; line-height: 1.45; padding: 12px 14px; }
+.mmv-seq-head { font-size: 12px; color: var(--mmv-muted); margin-bottom: 6px; }
+.mmv-seq-cap { font-size: 12px; color: var(--mmv-call); margin: 2px 0; }
+.mmv-seq-msg-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.mmv-seq-label { font-size: 14px; }
+.mmv-seq-who { color: var(--mmv-muted); margin: 2px 0 4px; }
+.mmv-seq-chip { flex: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; display: inline-grid; place-items: center;
+  font-size: 11px; font-weight: 700; background: var(--n); color: var(--mmv-bg); border: 1.5px solid var(--n); box-sizing: border-box; }
+.mmv-seq-chip.is-reply { background: var(--mmv-bg); color: var(--n); }
+.mmv-seq-panel .mmv-note-body { padding: 4px 0; }
+.mmv-seq-arrow { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--mmv-chrome-border); }
+.mmv-seq-arrow-head { display: flex; align-items: center; gap: 6px; color: var(--mmv-muted); font-size: 12px; }
+.mmv-seq-arrow-head svg { width: 16px; height: 16px; }
+.mmv-seq-notes { margin-top: 10px; padding: 6px 8px; border-radius: 6px; background: color-mix(in srgb, var(--mmv-highlight) 14%, var(--mmv-bg)); }
+/* narrow: the panel under the drawing, above the step bar */
+@container (max-width: 719px) {
+  /* the step bar beside the zoom column (bottom right), the info button gives way */
+  .mmv-stepbar { left: 14px; transform: none; width: calc(100cqw - 78px); }
+  .mmv.is-playing .mmv-bl { display: none; }
+  .mmv-step-row .mmv-pill span { display: none; }
+  .mmv-step-row { gap: 6px; }
+  .mmv-speed svg, .mmv-count-long { display: none; }
+  .mmv-count-short { display: inline; }
+  .mmv-speed input { width: 52px; }
+  .mmv-seq-panel { top: auto; bottom: calc(var(--mmv-stepbar-h, 110px) + 24px); left: 14px; right: 64px; width: auto; max-height: 30cqh; }
+}
+.mmv.is-thumb :is(.mmv-stepbar, .mmv-seq-panel) { display: none !important; }
+/* a sequence's list: numbered steps under their blocks */
+.mmv-lseq .mmv-lblock { font-size: 12px; color: var(--mmv-muted); padding: 8px 10px 2px; }
+.mmv-lseq .mmv-lstep { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; background: none; color: var(--mmv-ink);
+  font: inherit; text-align: left; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+.mmv-lseq .mmv-lstep:hover { background: var(--mmv-chrome-hover); }
+.mmv-lseq .mmv-lstep.is-now { background: color-mix(in srgb, var(--mmv-call) 16%, var(--mmv-bg)); }
+.mmv-lseq .mmv-lstep.is-past { opacity: 0.6; }
+.mmv-lseq .mmv-lstep.is-repeat .mmv-seq-chip { background: none; color: var(--mmv-muted); border-color: var(--mmv-idleLine); }
+.mmv-lseq .mmv-lseq-note { margin: 2px 10px; padding: 4px 8px; border-radius: 6px; font-size: 13px; background: color-mix(in srgb, var(--mmv-highlight) 14%, var(--mmv-bg)); }
+
+/* ER diagrams (diagrams/er): tables over their lines, semi-transparent so the lines show
+   through. Flat tints the whole table with row dividers; Zebra alternates row fills */
+.mmv[data-diagram="er"] .mmv-table > .mmv-table-body { fill: color-mix(in srgb, var(--n) 10%, transparent); stroke: var(--n); stroke-width: 1.6; }
+.mmv[data-diagram="er"][data-look="outline"] .mmv-table > .mmv-table-body { fill: color-mix(in srgb, color-mix(in srgb, var(--n) 22%, var(--mmv-bg)) 82%, transparent); }
+.mmv[data-diagram="er"][data-look="fade"] .mmv-table > .mmv-table-body { fill: color-mix(in srgb, var(--mmv-bg) 80%, transparent); }
+.mmv-table-row { fill: transparent; }
+.mmv-table-divider { display: none; fill: none; stroke: var(--n); stroke-opacity: 0.24; stroke-width: 0.7; }
+.mmv[data-diagram="er"][data-look="outline"] .mmv-table-divider { display: inline; }
+.mmv[data-diagram="er"][data-look="fade"] .mmv-table-row { fill: color-mix(in srgb, var(--n) 16%, transparent); }
+.mmv-table-head { fill: color-mix(in srgb, var(--n) 85%, transparent); }
+.mmv[data-diagram="er"] .mmv-table .mmv-table-title { fill: var(--n-ink, var(--mmv-bg)); }
+.mmv[data-diagram="er"] .mmv-table .mmv-table-col { fill: var(--mmv-ink); }
+.mmv-table-type, .mmv-table-more text { fill: var(--mmv-muted); }
+.mmv-table-fk { fill: var(--n); }
+.mmv-key { color: #c9a227; fill: currentColor; }
+.mmv-grain path { fill: var(--n); }
+.mmv-table-more { cursor: pointer; }
+.mmv-table-more:hover text { fill: var(--mmv-ink); text-decoration: underline; }
+.mmv-table-caption text { fill: var(--mmv-ink); paint-order: stroke; stroke: var(--mmv-bg); stroke-width: 4px; }
+.mmv-er-end { fill: none; stroke: var(--mmv-ink); stroke-opacity: 0.72; stroke-width: 1.5; }
+.mmv-er-o { fill: var(--mmv-bg); }
+marker.is-kind .mmv-er-end { stroke: var(--n); stroke-opacity: 1; }
+.mmv-flow.mmv-er-line.is-lit { stroke-width: 3; stroke-opacity: 1; }
+.mmv-arrow-words { margin: 0 0 8px; }
+/* an ER table a walk has not reached (player.js): grey, as other nodes are */
+.mmv .mmv-table.is-idle > .mmv-table-body { fill: color-mix(in srgb, var(--mmv-idle) 85%, transparent); stroke: var(--mmv-idleLine); }
+.mmv .mmv-table.is-idle > .mmv-table-head { fill: var(--mmv-idleLine); }
+.mmv .mmv-table.is-idle :is(.mmv-table-title, .mmv-table-col, .mmv-table-fk, .mmv-table-type) { fill: var(--mmv-muted); }
+.mmv .mmv-table.is-idle .mmv-key { color: var(--mmv-muted); }
+.mmv.is-playing[data-diagram="er"] .mmv-er-end { stroke: var(--mmv-idleLine); }
+.mmv-columns { border-collapse: collapse; font-size: 13px; width: 100%; max-width: 640px; }
+.mmv-columns th { text-align: left; font-weight: 600; color: var(--mmv-muted); padding: 4px 10px 4px 0; border-bottom: 1px solid var(--mmv-idleLine); }
+.mmv-columns td { padding: 3px 10px 3px 0; border-bottom: 1px solid color-mix(in srgb, var(--mmv-idleLine) 40%, transparent); }
+.mmv-table-about { margin: 0 0 8px; }
