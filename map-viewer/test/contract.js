@@ -50,7 +50,16 @@ try {
     const v = mount(host, { storageKey: null, themes: [ink] });
     await v.load('```mermaid\nflowchart LR\n  a[Start] --> b[Middle] --> c[End]\n  b --> d[Side]\n```', 'camera.md');
     const camera = () => host.querySelector('[data-mmv=viewport]').getAttribute('transform');
-    const settle = () => new Promise((r) => setTimeout(r, 400));
+    // wait until the camera stops moving (a glide can outlast a fixed wait on a slow runner)
+    const settle = async () => {
+      let last = null;
+      for (let i = 0; i < 40; i++) {
+        await new Promise((r) => setTimeout(r, 150));
+        const now = camera();
+        if (i >= 2 && now === last) return;
+        last = now;
+      }
+    };
     for (let i = 0; i < 5; i++) host.querySelector('[data-mmv=zoomIn]').click();
     await settle();
     const zoomed = camera();
@@ -68,11 +77,22 @@ try {
     await settle();
     const fitted = camera();
     s.setState({ seq: 'checkout', step: 3 });
+    // the step's glide can start late: wait for the camera to leave the fitted view, then to stop
+    for (let i = 0; i < 40 && camera() === fitted; i++) await new Promise((r) => setTimeout(r, 100));
     await settle();
     const framed = camera();
     await s.setTheme('ink-test');
     await settle();
     check('setTheme keeps a view a sequence step moved to', framed !== fitted && camera() === framed, `${fitted} / ${framed} → ${camera()}`);
+    // a stop in the same call as other fields: the sequence stops and the rest applies
+    s.setState({ seq: null, view: 'Events (asynchronous)' });
+    check('setState seq null with a view: stops the sequence and shows the view', s.state.seq === null && s.state.view === 'Events (asynchronous)'
+      && !host.querySelector('.mmv').classList.contains('is-playing'), JSON.stringify(s.state));
+    s.setState({ seq: 'checkout', step: 2 });
+    s.setState({ seq: null, part: 'orders-data' });
+    check('setState seq null with a part: stops the sequence and opens that diagram', s.state.seq === null && s.state.part === 'orders-data', JSON.stringify(s.state));
+    s.setState({ seq: 'checkout', step: 2, view: 'Events (asynchronous)' });
+    check('setState with a sequence to play still lets it choose its view', s.state.seq === 'checkout' && s.state.view !== 'Events (asynchronous)', JSON.stringify(s.state));
     s.destroy();
   }
   // Concurrent public loads: only the latest one may emit or mutate the map.

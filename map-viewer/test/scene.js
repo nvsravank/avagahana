@@ -12,6 +12,7 @@ import { buildListScene } from '../list.js';
 import { buildSequenceRows } from '../diagrams/sequence/list.js';
 import { loadIconIndex, iconDef } from '../icons.js';
 
+const FIXTURES = ['node-shapes'];
 const MAPS = ['garden', 'tools', 'shapes', 'node-shapes', 'c4-shop', 'slow-checkout', 'job-race', 'shop-plan', 'order-states', 'sales-warehouse'];
 // per map: a node to select, a search hit, so marks and related links are covered
 const PICK = { garden: { selected: 'n7', hits: ['n26'] }, tools: { selected: 'n2', hits: ['n8'] }, shapes: { selected: 'n15', hits: ['n4'] }, 'node-shapes': { selected: 'n8', hits: ['n5'] }, 'c4-shop': { selected: 'ord', hits: ['db'] }, 'slow-checkout': { selected: 'fraud', hits: ['psp'] }, 'job-race': { selected: 'db', hits: ['b'] }, 'shop-plan': { selected: 'charge', hits: ['payh'] }, 'order-states': { selected: 'Retrying', hits: ['Failed'] }, 'sales-warehouse': { selected: 'ORDER_LINE', hits: ['DATE'] } };
@@ -108,7 +109,9 @@ const written = {};
 try {
   await loadIconIndex();
   for (const name of MAPS) {
-    const text = await fetch(`../../examples/maps/${name}.md`, { cache: 'no-store' }).then((r) => r.text());
+    // fixtures/ holds maps that test the viewer rather than show it off (not .md, so GitHub leaves them alone)
+    const src = FIXTURES.includes(name) ? `fixtures/${name}.txt` : `../../examples/maps/${name}.md`;
+    const text = await fetch(src, { cache: 'no-store' }).then((r) => r.text());
     const map = parseMap(text, `${name}.md`);
     map.file = name;
     check(`${name}: parses with no warnings`, map.root && !map.warnings.length, map.warnings.join('; '));

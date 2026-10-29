@@ -51,9 +51,52 @@
  },
  {
   "kind": "row",
+  "id": "STOCK_LEVEL",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Stock level",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "DATE",
+    "name": "Date",
+    "label": "counted on",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "PRODUCT",
+    "name": "Product",
+    "label": "counts",
+    "glyph": "↔"
+   },
+   {
+    "dir": "out",
+    "other": "WAREHOUSE",
+    "name": "Warehouse",
+    "label": "held in",
+    "glyph": "↔"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
   "id": "DATE",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-hit",
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-hit",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -89,7 +132,7 @@
   "kind": "row",
   "id": "PRODUCT",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -119,7 +162,7 @@
     "glyph": "↔"
    },
    {
-    "dir": "out",
+    "dir": "in",
     "other": "PRODUCT_TAG",
     "name": "Product tag",
     "label": "tagged by",
@@ -132,7 +175,7 @@
   "kind": "row",
   "id": "CUSTOMER",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -168,7 +211,7 @@
   "kind": "row",
   "id": "STORE",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -195,49 +238,6 @@
     "other": "REGION",
     "name": "Region",
     "label": "stands in",
-    "glyph": "↔"
-   }
-  ],
-  "note": false
- },
- {
-  "kind": "row",
-  "id": "STOCK_LEVEL",
-  "depth": 0,
-  "cls": "mmv-lrow mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-  "toggle": null,
-  "closed": false,
-  "icons": [],
-  "runs": [
-   [
-    {
-     "text": "Stock level",
-     "bold": false,
-     "italic": false
-    }
-   ]
-  ],
-  "count": null,
-  "rels": [
-   {
-    "dir": "out",
-    "other": "DATE",
-    "name": "Date",
-    "label": "counted on",
-    "glyph": "↔"
-   },
-   {
-    "dir": "out",
-    "other": "PRODUCT",
-    "name": "Product",
-    "label": "counts",
-    "glyph": "↔"
-   },
-   {
-    "dir": "out",
-    "other": "WAREHOUSE",
-    "name": "Warehouse",
-    "label": "held in",
     "glyph": "↔"
    }
   ],
@@ -328,14 +328,14 @@
   "count": null,
   "rels": [
    {
-    "dir": "in",
+    "dir": "out",
     "other": "PRODUCT",
     "name": "Product",
     "label": "tagged by",
     "glyph": "↔"
    },
    {
-    "dir": "in",
+    "dir": "out",
     "other": "TAG",
     "name": "Tag",
     "label": "tags",
@@ -364,7 +364,7 @@
   "count": null,
   "rels": [
    {
-    "dir": "out",
+    "dir": "in",
     "other": "PRODUCT_TAG",
     "name": "Product tag",
     "label": "tags",

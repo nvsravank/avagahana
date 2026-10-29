@@ -4,17 +4,6 @@ Two fact tables, order lines and stock levels, share the date and product dimens
 
 ```mermaid
 erDiagram
-  ORDER_LINE }o--|| DATE : "ordered on"
-  ORDER_LINE }o--|| PRODUCT : sells
-  ORDER_LINE }o--|| CUSTOMER : "bought by"
-  ORDER_LINE }o--|| STORE : "sold at"
-  STOCK_LEVEL }o--|| DATE : "counted on"
-  STOCK_LEVEL }o--|| PRODUCT : counts
-  STOCK_LEVEL }o--|| WAREHOUSE : "held in"
-  CUSTOMER }o--|| REGION : "lives in"
-  STORE }o--|| REGION : "stands in"
-  PRODUCT ||--o{ PRODUCT_TAG : "tagged by"
-  TAG ||--o{ PRODUCT_TAG : tags
   ORDER_LINE["Order line"] {
     bigint order_line_key PK
     int order_id "grain"
@@ -83,12 +72,39 @@ erDiagram
   }
 ```
 
+## Relations
+
+- ORDER_LINE.date_key line-date@}o--|| DATE.date_key : ordered on
+- ORDER_LINE.product_key line-product@}o--|| PRODUCT.product_key : sells
+- ORDER_LINE.customer_key line-customer@}o--|| CUSTOMER.customer_key : bought by
+- ORDER_LINE.store_key line-store@}o--|| STORE.store_key : sold at
+- STOCK_LEVEL.date_key stock-date@}o--|| DATE.date_key : counted on
+- STOCK_LEVEL.product_key stock-product@}o--|| PRODUCT.product_key : counts
+- STOCK_LEVEL.warehouse_key stock-warehouse@}o--|| WAREHOUSE.warehouse_key : held in
+- CUSTOMER.region_key customer-region@}o--|| REGION.region_key : lives in
+- STORE.region_key store-region@}o--|| REGION.region_key : stands in
+- PRODUCT_TAG.product_key tag-product@}o--|| PRODUCT.product_key : tagged by
+- PRODUCT_TAG.tag_key tag-tag@}o--|| TAG.tag_key : tags
+
+## Joins: Sales against stock
+
+- line-date
+- line-product
+- stock-date
+- stock-product
+- ORDER_LINE.(date_key,product_key) sales-stock@--- STOCK_LEVEL.(date_key,product_key) : same day and product
+
 ## Details
 
 ### <a id="ORDER_LINE"></a>Order line
 
 One row per line of an order. Amounts are in the order's currency; the reporting
 currency comes from the daily rate table, which is not drawn.
+
+### <a id="sales-stock"></a>Same day and product
+
+Drilling across the two facts: an order line meets the stock count for the same day
+and product, through the shared date and product dimensions.
 
 ## Walks: Revenue by region
 

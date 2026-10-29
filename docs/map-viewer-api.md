@@ -40,7 +40,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | Member | What it does |
 |---|---|
 | `viewer.load(text, path, context?)` | Show a map; returns a promise. The same `path` again is a live reload: the viewer keeps the user's place (focus, selection, open branches). |
-| `viewer.setState(partial)` | Change state from outside, e.g. to point at a node. |
+| `viewer.setState(partial)` | Change state from outside, e.g. to point at a node. With `seq: null` the sequence stops first and the other fields still apply (`{seq: null, view: 'Events'}` stops and switches view). With a sequence to play, the sequence chooses its diagram and view, so only `seq` and `step` are read. |
 | `viewer.state` | The current state (a copy). |
 | `viewer.on(type, fn)` | Subscribe to an event; returns an unsubscribe function. |
 | `viewer.ready` | Resolves when themes, stylesheet and font are ready. |

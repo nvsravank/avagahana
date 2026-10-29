@@ -3,7 +3,7 @@
 
     python3 scripts/check_samples.py
 
-- Every example map (examples/maps/) has no errors.
+- Every example map (examples/maps/) and test fixture map (map-viewer/test/fixtures/) has no errors.
 - Every sample (format/samples/) gets exactly the codes its first line expects
   (`<!-- expect: code code -->`; none for a clean map), of those the checker reports
   (side both or checker), and fails exactly when one of them is an error.
@@ -30,7 +30,8 @@ def expected(path):
 
 def main():
     bad = []
-    for f in sorted((ROOT / "examples" / "maps").glob("*.md")):
+    maps = sorted((ROOT / "examples" / "maps").glob("*.md")) + sorted((ROOT / "map-viewer" / "test" / "fixtures").glob("*.txt"))
+    for f in maps:
         errors = [p for p in check_map.check(f) if p[2] == "error"]
         for line, code, _, msg in errors:
             bad.append(f"example {f.name}:{line}: {code}: {msg}")

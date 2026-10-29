@@ -1645,8 +1645,12 @@ export function mount(element, options = {}) {
 
   function setState(partial = {}) {
     if (!S.map?.root) return;
+    // a stop (seq null) comes first and the rest of the call still applies; a sequence to
+    // play chooses its own diagram and view, so the call ends there
+    const stop = 'seq' in partial && (partial.seq === null || partial.seq === '');
+    if (stop) player.close();
     if ('part' in partial) goPart(partial.part);
-    if ('seq' in partial || 'step' in partial) { playState(partial); emitState(); return; }
+    if (!stop && ('seq' in partial || 'step' in partial)) { playState(partial); emitState(); return; }
     if ('mode' in partial) setMode(partial.mode);
     if (partial.env != null) setView(partial.env);
     else if ('view' in partial || 'env' in partial) setView(partial.view == null ? S.map.views[0]?.name : partial.view);

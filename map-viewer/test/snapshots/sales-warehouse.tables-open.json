@@ -178,7 +178,7 @@
    "h": 151,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-table mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Stock level, level 1, fact table, 6 columns",
    "marks": {
     "hit": false,
@@ -269,7 +269,7 @@
    "h": 113,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-table mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Customer, level 1, dimension table, 4 columns",
    "marks": {
     "hit": false,
@@ -338,7 +338,7 @@
    "h": 94,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-table mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Store, level 1, dimension table, 3 columns",
    "marks": {
     "hit": false,
@@ -454,7 +454,7 @@
    "h": 132,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-table mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Product, level 1, dimension table, 5 columns",
    "marks": {
     "hit": false,
@@ -534,7 +534,7 @@
    "h": 151,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-table mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Date, level 1, dimension table, 6 columns",
    "marks": {
     "hit": true,
@@ -772,21 +772,22 @@
  "rels": [
   {
    "kind": "rel",
-   "id": "ORDER_LINE>DATE",
-   "d": "M928.94,181.7 L988.94,181.7 L956.94,541.6 L928.94,541.6",
+   "id": "line-date",
+   "d": "M928.94,266.2 L988.94,266.2 L988.94,567.6 L928.94,567.6",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line ordered on exactly one Date. Each Date goes with zero or more Order line.",
    "label": {
-    "x": 987.93,
-    "y": 197.08,
+    "x": 988.94,
+    "y": 373.33,
     "text": "ordered on"
    },
    "items": [
     {
      "from": "ORDER_LINE",
      "to": "DATE",
+     "eid": "line-date",
      "label": "ordered on",
      "words": "Each Order line ordered on exactly one Date. Each Date goes with zero or more Order line."
     }
@@ -794,21 +795,22 @@
   },
   {
    "kind": "rel",
-   "id": "ORDER_LINE>PRODUCT",
-   "d": "M928.94,181.7 L956.94,181.7 L1484.94,15 L1512.94,15",
+   "id": "line-product",
+   "d": "M928.94,285.2 L956.94,285.2 L1484.94,41 L1512.94,41",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line sells exactly one Product. Each Product goes with zero or more Order line.",
    "label": {
-    "x": 1059.81,
-    "y": 153.22,
+    "x": 1059.06,
+    "y": 241.97,
     "text": "sells"
    },
    "items": [
     {
      "from": "ORDER_LINE",
      "to": "PRODUCT",
+     "eid": "line-product",
      "label": "sells",
      "words": "Each Order line sells exactly one Product. Each Product goes with zero or more Order line."
     }
@@ -816,21 +818,22 @@
   },
   {
    "kind": "rel",
-   "id": "ORDER_LINE>CUSTOMER",
-   "d": "M688.94,181.7 L660.94,181.7 L341.06,875.29 L313.06,875.29",
+   "id": "line-customer",
+   "d": "M688.94,304.2 L660.94,304.2 L341.06,901.29 L313.06,901.29",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line bought by exactly one Customer. Each Customer goes with zero or more Order line.",
    "label": {
-    "x": 551.22,
-    "y": 423.61,
+    "x": 550.56,
+    "y": 514.24,
     "text": "bought by"
    },
    "items": [
     {
      "from": "ORDER_LINE",
      "to": "CUSTOMER",
+     "eid": "line-customer",
      "label": "bought by",
      "words": "Each Order line bought by exactly one Customer. Each Customer goes with zero or more Order line."
     }
@@ -838,21 +841,22 @@
   },
   {
    "kind": "rel",
-   "id": "ORDER_LINE>STORE",
-   "d": "M928.94,181.7 L972.94,181.7 L972.94,15 L928.94,15",
+   "id": "line-store",
+   "d": "M928.94,323.2 L972.94,323.2 L972.94,41 L928.94,41",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line sold at exactly one Store. Each Store goes with zero or more Order line.",
    "label": {
     "x": 972.94,
-    "y": 152.58,
+    "y": 230.47,
     "text": "sold at"
    },
    "items": [
     {
      "from": "ORDER_LINE",
      "to": "STORE",
+     "eid": "line-store",
      "label": "sold at",
      "words": "Each Order line sold at exactly one Store. Each Store goes with zero or more Order line."
     }
@@ -860,21 +864,22 @@
   },
   {
    "kind": "rel",
-   "id": "STOCK_LEVEL>DATE",
-   "d": "M1512.94,207 L1484.94,207 L972.94,541.6 L928.94,541.6",
+   "id": "stock-date",
+   "d": "M1512.94,253.5 L1484.94,253.5 L956.94,567.6 L928.94,567.6",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Stock level counted on exactly one Date. Each Date goes with zero or more Stock level.",
    "label": {
-    "x": 1453.95,
-    "y": 231.25,
+    "x": 1375.39,
+    "y": 322.67,
     "text": "counted on"
    },
    "items": [
     {
      "from": "STOCK_LEVEL",
      "to": "DATE",
+     "eid": "stock-date",
      "label": "counted on",
      "words": "Each Stock level counted on exactly one Date. Each Date goes with zero or more Stock level."
     }
@@ -882,21 +887,22 @@
   },
   {
    "kind": "rel",
-   "id": "STOCK_LEVEL>PRODUCT",
-   "d": "M1752.94,207 L1780.94,207 L1780.94,15 L1752.94,15",
+   "id": "stock-product",
+   "d": "M1752.94,272.5 L1780.94,272.5 L1780.94,41 L1752.94,41",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Stock level counts exactly one Product. Each Product goes with zero or more Stock level.",
    "label": {
     "x": 1780.94,
-    "y": 173.67,
+    "y": 196.67,
     "text": "counts"
    },
    "items": [
     {
      "from": "STOCK_LEVEL",
      "to": "PRODUCT",
+     "eid": "stock-product",
      "label": "counts",
      "words": "Each Stock level counts exactly one Product. Each Product goes with zero or more Stock level."
     }
@@ -904,21 +910,22 @@
   },
   {
    "kind": "rel",
-   "id": "STOCK_LEVEL>WAREHOUSE",
-   "d": "M1752.94,207 L1796.94,207 L1936.18,207 L1964.18,207",
+   "id": "stock-warehouse",
+   "d": "M1752.94,291.5 L1796.94,291.5 L1936.18,233 L1964.18,233",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Stock level held in exactly one Warehouse. Each Warehouse goes with zero or more Stock level.",
    "label": {
-    "x": 1839.35,
-    "y": 211,
+    "x": 1838.37,
+    "y": 278.09,
     "text": "held in"
    },
    "items": [
     {
      "from": "STOCK_LEVEL",
      "to": "WAREHOUSE",
+     "eid": "stock-warehouse",
      "label": "held in",
      "words": "Each Stock level held in exactly one Warehouse. Each Warehouse goes with zero or more Stock level."
     }
@@ -926,21 +933,22 @@
   },
   {
    "kind": "rel",
-   "id": "CUSTOMER>REGION",
-   "d": "M313.06,875.29 L357.06,875.29 L357.06,403.6 L240,403.6",
+   "id": "customer-region",
+   "d": "M313.06,921.79 L357.06,921.79 L357.06,429.6 L240,429.6",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Customer lives in exactly one Region. Each Region goes with zero or more Customer.",
    "label": {
     "x": 357.06,
-    "y": 795.34,
+    "y": 917.79,
     "text": "lives in"
    },
    "items": [
     {
      "from": "CUSTOMER",
      "to": "REGION",
+     "eid": "customer-region",
      "label": "lives in",
      "words": "Each Customer lives in exactly one Region. Each Region goes with zero or more Customer."
     }
@@ -948,21 +956,22 @@
   },
   {
    "kind": "rel",
-   "id": "STORE>REGION",
-   "d": "M688.94,15 L660.94,15 L268,403.6 L240,403.6",
+   "id": "store-region",
+   "d": "M688.94,61.5 L660.94,61.5 L268,429.6 L240,429.6",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Store stands in exactly one Region. Each Region goes with zero or more Store.",
    "label": {
-    "x": 638.94,
-    "y": 40.75,
+    "x": 637.99,
+    "y": 87,
     "text": "stands in"
    },
    "items": [
     {
      "from": "STORE",
      "to": "REGION",
+     "eid": "store-region",
      "label": "stands in",
      "words": "Each Store stands in exactly one Region. Each Region goes with zero or more Store."
     }
@@ -970,45 +979,47 @@
   },
   {
    "kind": "rel",
-   "id": "PRODUCT>PRODUCT_TAG",
-   "d": "M1752.94,15 L1796.94,15 L1796.94,403.6 L1752.94,403.6",
+   "id": "tag-product",
+   "d": "M1752.94,429.6 L1796.94,429.6 L1796.94,41 L1752.94,41",
    "cls": "mmv-flow mmv-er-line mmv-p0",
-   "head": "er-zero-many",
-   "tail": "er-one",
-   "hint": "Each Product tagged by zero or more Product tag. Each Product tag goes with exactly one Product.",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Product tag tagged by exactly one Product. Each Product goes with zero or more Product tag.",
    "label": {
     "x": 1796.94,
-    "y": 275.4,
+    "y": 425.6,
     "text": "tagged by"
    },
    "items": [
     {
-     "from": "PRODUCT",
-     "to": "PRODUCT_TAG",
+     "from": "PRODUCT_TAG",
+     "to": "PRODUCT",
+     "eid": "tag-product",
      "label": "tagged by",
-     "words": "Each Product tagged by zero or more Product tag. Each Product tag goes with exactly one Product."
+     "words": "Each Product tag tagged by exactly one Product. Each Product goes with zero or more Product tag."
     }
    ]
   },
   {
    "kind": "rel",
-   "id": "TAG>PRODUCT_TAG",
-   "d": "M1371.74,541.6 L1399.74,541.6 L1484.94,403.6 L1512.94,403.6",
+   "id": "tag-tag",
+   "d": "M1512.94,451.6 L1484.94,451.6 L1399.74,567.6 L1371.74,567.6",
    "cls": "mmv-flow mmv-er-line mmv-p0",
-   "head": "er-zero-many",
-   "tail": "er-one",
-   "hint": "Each Tag tags zero or more Product tag. Each Product tag goes with exactly one Tag.",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Product tag tags exactly one Tag. Each Tag goes with zero or more Product tag.",
    "label": {
-    "x": 1408.45,
-    "y": 531.49,
+    "x": 1474.61,
+    "y": 469.67,
     "text": "tags"
    },
    "items": [
     {
-     "from": "TAG",
-     "to": "PRODUCT_TAG",
+     "from": "PRODUCT_TAG",
+     "to": "TAG",
+     "eid": "tag-tag",
      "label": "tags",
-     "words": "Each Tag tags zero or more Product tag. Each Product tag goes with exactly one Tag."
+     "words": "Each Product tag tags exactly one Tag. Each Tag goes with zero or more Product tag."
     }
    ]
   }

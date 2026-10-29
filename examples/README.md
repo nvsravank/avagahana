@@ -1,8 +1,7 @@
 # examples
 
 - `maps/`: neutral sample maps (`garden.md` uses every format feature; `tools.md` is
-  the target of its cross-map links; `node-shapes.md` shows every node shape (either
-  diagram type's, in a mind map), with how to write it in each node's note; `shapes.md`
+  the target of its cross-map links; `shapes.md`
   puts every shape, pins and long labels
   in one realistic map; `c4-shop.md` a box diagram with views and deployments;
   `slow-checkout.md` trust marks on boxes and arrows; `shop-plan.md` a plan's added,

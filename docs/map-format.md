@@ -75,7 +75,7 @@ mindmap
   `[["…"]]` subroutine, `[("…")]` database, `((("…")))` double circle, `>"…"]` flag,
   `[/"…"/]` and `[\"…"\]` parallelograms, `[/"…"\]` and `[\"…"/]` trapezoids); they are
   Mermaid's own mindmap does not have them, but the viewer and the checker accept them
-  (see `examples/maps/node-shapes.md`). Brackets that are no Mermaid shape draw a plain
+  (see `map-viewer/test/fixtures/node-shapes.txt`). Brackets that are no Mermaid shape draw a plain
   node; the checker rejects them.
 - **Label**: plain text. `**bold**` is allowed (main branches are bold by convention),
   `<br>` breaks a line. No other markup, no emoji, no links: a URL in a label is plain text.

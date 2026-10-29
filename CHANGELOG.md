@@ -6,6 +6,14 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** `setState({seq: null, …})` stops the sequence and then applies the other
+  fields of the same call (`part`, `view`, `env`, `focus`, `node`, `page`, `mode`, `rels`);
+  before, it stopped the sequence and ignored the rest. Playing a sequence is unchanged.
+
+- Examples: `sales-warehouse.md` draws its foreign keys column to column (`## Relations`)
+  and adds a `Sales against stock` join view. `node-shapes.md`, a test of every node
+  shape rather than an example, moves to `map-viewer/test/fixtures/node-shapes.txt`.
+
 - The repository is public: installing from GitHub needs no git credentials.
 
 - The cloud icon folders carry their NOTICE.md (source package, vendor page, the
