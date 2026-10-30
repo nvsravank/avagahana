@@ -1,7 +1,8 @@
 // bar.js — the atlas's contents bar, one row above the viewer: the logo (opens the map
-// list), then a scroller with the word mark, the map title and a chip for each diagram,
-// view, deployment and play the viewer lists (viewer.contents()). No scroll bar: a soft
-// fade and a small arrow on an edge say there is more that way.
+// list), then a scroller with the word mark, the label "Quick links" and a chip for each
+// diagram, view, deployment and play the viewer lists (viewer.contents()). The first
+// diagram's chip is "Overview" (the map's title is already the viewer's own name pill).
+// No scroll bar: a soft fade and a small arrow on an edge say there is more that way.
 import { applyTheme } from '../map-viewer/index.js';
 
 const GROUPS = [
@@ -10,6 +11,7 @@ const GROUPS = [
   ['Deployments', ['deployment']],
   ['Plays', ['sequence', 'walk']],
 ];
+const FIRST = 'Overview';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // The Avagahana mark (brand/mark.svg, as on the website): a rose and an olive wave that
 // meet toward the ends, blended (atlas.css: screen on dark, multiply on light).
@@ -49,7 +51,7 @@ function chevron(d) {
 }
 
 // mount: the bar element; onLogo(event): the logo was clicked; onPick(state): a chip was clicked.
-// -> {setTitle(t), setContents(list), setState(state), setTheme({id, appearance}), setLogo(on)}
+// -> {setContents(list), setState(state), setTheme({id, appearance}), setLogo(on)}
 export function contentsBar(mount, { onLogo, onPick, logo = true }) {
   mount.classList.add('atlas-bar');
   mount.setAttribute('role', 'navigation');
@@ -75,9 +77,9 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
   }
   // the word mark, set as on the website: lower case, the theme's font, semibold
   const wordmark = el('span', 'atlas-wordmark', 'avagahana');
-  const title = el('span', 'atlas-title');
+  const label = el('span', 'atlas-label', 'Quick links');
   const chips = el('div', 'atlas-chips');
-  scroller.append(wordmark, title, chips);
+  scroller.append(wordmark, label, chips);
   wrap.append(left, scroller, right);
   mount.append(logoBtn, wrap);
 
@@ -111,12 +113,18 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
   function render() {
     chips.replaceChildren();
     buttons = [];
-    // one diagram and nothing else: no chips; the word mark and title stay
+    // one diagram and nothing else: no chips and no label; the word mark stays
     const many = items.length > 1;
+    const diagrams = items.filter((x) => x.kind === 'diagram' || x.kind === 'sequence');
+    const nameOf = (x) => (x.first ? FIRST : x.label);
+    const ownerName = (x) => (x.part == null ? FIRST : x.diagram);
+    // a diagram's chip opens it at its default view, so with the diagram chips shown its
+    // default view needs no chip of its own
+    const dup = (x) => diagrams.length > 1 && x.kind === 'view' && x.state.view == null;
     // views and deployments of more than one diagram say which diagram they belong to
     const owned = (x) => ['view', 'join', 'deployment'].includes(x.kind);
     const owners = new Set(items.filter(owned).map((x) => x.part));
-    const groups = GROUPS.map(([name, kinds]) => [name, items.filter((x) => kinds.includes(x.kind))])
+    const groups = GROUPS.map(([name, kinds]) => [name, items.filter((x) => kinds.includes(x.kind) && !dup(x))])
       .filter(([name, list]) => list.length && (name !== 'Diagrams' || list.length > 1));
     for (const [name, list] of many ? groups : []) {
       if (chips.childElementCount) chips.appendChild(el('span', 'atlas-sep')).setAttribute('aria-hidden', 'true');
@@ -124,7 +132,7 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
       g.setAttribute('role', 'group');
       g.setAttribute('aria-label', name);
       for (const x of list) {
-        const b = el('button', `atlas-chip${x.unlinked ? ' is-unlinked' : ''}`, owners.size > 1 && owned(x) ? `${x.diagram} · ${x.label}` : x.label);
+        const b = el('button', `atlas-chip${x.unlinked ? ' is-unlinked' : ''}`, owners.size > 1 && owned(x) ? `${ownerName(x)} · ${x.label}` : nameOf(x));
         b.type = 'button';
         if (x.unlinked) b.title = 'Not linked from the first diagram';
         b.addEventListener('click', () => onPick(x.state));
@@ -133,8 +141,9 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
       }
       chips.appendChild(g);
     }
-    // a new list starts at its start (the word mark and title); only a change of the
-    // current chip after that brings it into view
+    label.hidden = !buttons.length;
+    // a new list starts at its start (the word mark); only a change of the current chip
+    // after that brings it into view
     shown = currentItem();
     scroller.scrollLeft = 0;
     mark();
@@ -148,7 +157,10 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
     const here = items.filter((x) => (x.part ?? null) === (state.part ?? null) && x.kind !== 'sequence' && x.kind !== 'walk');
     if (state.env) return here.find((x) => x.kind === 'deployment' && x.state.env === state.env) || null;
     const views = here.filter((x) => x.kind === 'view' || x.kind === 'join');
-    if (views.length) return views.find((x) => (x.state.view ?? null) === (state.view ?? null)) || null;
+    const view = views.find((x) => (x.state.view ?? null) === (state.view ?? null));
+    // the default view without a chip of its own: its diagram's chip
+    if (view && buttons.some(([, x]) => x === view)) return view;
+    if (view?.state.view != null) return null;
     return here.find((x) => x.kind === 'diagram') || null;
   }
   function mark() {
@@ -166,7 +178,6 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
   setLogo(logo);
 
   return {
-    setTitle(t) { title.textContent = t || ''; edges(); },
     setContents(list) { items = Array.isArray(list) ? list : []; render(); },
     setState(s) { state = s || {}; mark(); },
     // the frame colours of the viewer's theme and appearance (theme.js frame)

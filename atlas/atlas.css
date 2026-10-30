@@ -114,7 +114,8 @@ html, body { background: var(--mmv-bg, #fff); }
 .atlas-arrow.is-right { right: 0; }
 .atlas-arrow[hidden] { display: none; }
 .atlas-wordmark { flex: none; font-weight: 600; font-size: 19px; line-height: 1; color: var(--mmv-frame-ink); }
-.atlas-title { flex: none; font-weight: 600; font-size: 15px; color: var(--mmv-frame-muted); white-space: nowrap; }
+.atlas-label { flex: none; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mmv-frame-muted); white-space: nowrap; }
+.atlas-label[hidden] { display: none; }
 .atlas-chips { display: flex; align-items: center; gap: 10px; }
 .atlas-chips:empty { display: none; }
 .atlas-group { display: flex; align-items: center; gap: 6px; }

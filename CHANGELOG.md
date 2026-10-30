@@ -17,8 +17,10 @@ marked **Contract**.
   page, search, player). Its heading and state name stay `Relations`; `setState`
   takes either.
 - Atlas: a contents bar above the viewer (44 px): the logo (opens the map list), the
-  word mark, the map title and a chip for each diagram, view, deployment and play, in
-  a scroller with fades and arrows instead of a scroll bar. `?logo=0` hides the logo.
+  word mark, "Quick links" and a chip for each diagram, view, deployment and play, in
+  a scroller with fades and arrows instead of a scroll bar. The first diagram's chip is
+  "Overview"; a diagram's default view gets no chip of its own beside its diagram's,
+  which opens it. The map title shows once, in the viewer's toolbar. `?logo=0` hides the logo.
   The bar uses the website's mark (rose and olive waves, `atlas/brand/mark.svg`, also the
   page icon) and word mark.
 - The return mark of a reply is a drawn icon, not the character U+21A9, which iPhone

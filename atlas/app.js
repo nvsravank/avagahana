@@ -61,7 +61,6 @@ viewer.on('load', ({ path, title }) => {
   const m = maps.find((x) => x.path === path);
   shown = { path, mtime: m?.mtime, size: m?.size };
   picker.setCurrent(path, title);
-  bar.setTitle(title);
   bar.setState(viewer.state);
   document.title = `${title} · Avagahana`;
   // the viewer reports state only when it differs, and the last map's may match
