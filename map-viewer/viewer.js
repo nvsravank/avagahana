@@ -17,6 +17,7 @@ import { createPage } from './page.js';
 import { createPlayer } from './player.js';
 import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml } from './icons.js';
 import { createSeen } from './seen.js';
+import { summarize } from './model/changes.js';
 import { renderNoteBody } from './notes.js';
 import { problemList, mapProblems } from './problems.js';
 import { checkTheme, acquire, release, loadFont } from './themes/theme.js';
@@ -24,7 +25,7 @@ import { clearMeasureCache } from './measure.js';
 
 const BASE = new URL('.', import.meta.url);
 const LOOKS = ['fade', 'outline'];
-const CHANGE_ICONS = ['ph sparkle', 'ph pencil-simple'];   // new, changed (seen.js)
+const CHANGE_ICONS = ['ph sparkle'];   // new or changed (seen.js)
 const FRESH_MS = 2500;   // how long what a load brought counts as just arrived (it glows)
 const APPEARANCES = ['light', 'dark', 'auto'];
 const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'look', 'rels', 'infoClosed', 'stepSeconds'];
@@ -102,8 +103,14 @@ export function mount(element, options = {}) {
   }
   const problems = problemList((type, p) => emit(type, p), () => scheduleProblemsUi());
   const hostProblem = (code, message) => problems.add('host', [{ level: 'warning', code, message }]);
-  // changes since this reader last looked (seen.js); a thumbnail neither reads nor keeps them
-  const seen = options.thumbnail ? null : createSeen({ storageKey, problem: hostProblem });
+  // changes since this reader last looked (seen.js); a thumbnail neither reads nor keeps
+  // them, marks: false shows none. since: an older map text every reader is compared
+  // with instead (nothing kept)
+  const sinceText = options.since == null ? null : String(options.since);
+  const sinceBase = sinceText == null || options.thumbnail || options.marks === false ? null : summarize(parseMap(sinceText, 'since.md'));
+  const seen = options.thumbnail || options.marks === false ? null : createSeen({ storageKey, base: sinceBase, problem: hostProblem });
+  // the words after "New", "Changed", "Removed": since you looked, or since the version
+  const sinceWords = sinceText == null ? 'since you looked' : `since ${options.sinceLabel || 'the earlier version'}`;
 
   // ---------- state ----------
   const S = {
@@ -183,6 +190,7 @@ export function mount(element, options = {}) {
       try { painter.draw(S.layout); fn(); } finally { S.exporting = false; painter.draw(S.layout); }
     },
   };
+  v.sinceWords = sinceWords;
   const painter = createPainter(v);
   const stage = createStage(v, {
     onLod: () => painter.lod(),
@@ -271,18 +279,25 @@ export function mount(element, options = {}) {
   const partKey = () => S.part || '';
   const envName = () => (viewNamed(S.relView)?.deploy ? viewNamed(S.relView).name : null);
   const shownView = () => viewNamed(S.relView) || S.map?.views[0] || null;
-  // A drawn node's mark: its own ('new', 'changed'), else 'inside' for a change under a
-  // closed box or collapsed branch, or in a diagram it opens. open: drawn as a frame;
-  // closed: known closed (a list row), else closed when none of its children is drawn.
-  v.changeOf = (id, open = false, closedRow = null) => {
-    const n = seen && S.map?.byId[id];
-    if (!n) return null;
-    const own = seen.nodeMark(partKey(), id, envName());
-    if (own) return own;
-    const closed = closedRow ?? (!open && n.children.length && !n.children.some((k) => S.layout?.pos.has(k)));
-    if (closed && seen.inside(partKey(), n, envName())) return 'inside';
-    return (n.inners || []).some((x) => seen.partMarked(x.anchor)) ? 'inside' : null;
-  };
+  // A drawn node's mark ('new', 'changed'), only its own: a change inside a closed box
+  // marks the expand button, one in a diagram it opens that diagram's icon.
+  v.changeOf = (id) => (seen && S.map?.byId[id] ? seen.nodeMark(partKey(), id, envName()) : null);
+  // a diagram with anything new or changed in it (or new as a whole): its icon's small sparkle
+  v.partChanged = (anchor) => !!seen?.partMarked(anchor || '');
+  // a closed box in the picture hides a mark: the expand button's small sparkle
+  function markExpandBtn() {
+    let hidden = false;
+    if (seen && S.map?.root) {
+      (function walk(n) {
+        if (hidden) return;
+        if (S.collapsed.has(n.id) && n.children.length) { hidden = seen.inside(partKey(), n, envName()); return; }
+        n.children.forEach(walk);
+      })(viewRoot());
+    }
+    $.expandBtn.classList.toggle('has-marks', hidden);
+    const title = EXPAND_TITLE[EXPAND_ICON[S.expandNext]];
+    if (title) $.expandBtn.title = hidden ? `${title} (closed boxes hide changes ${sinceWords})` : title;
+  }
   // the view's relations behind a drawn arrow (its shape lists copies)
   const relsOf = (shape) => (shownView()?.relations || []).filter((r) => shape.items.some((i) => i.from === r.from && i.to === r.to && i.label === r.label));
   v.arrowChange = (shape) => (seen && shownView() ? seen.arrowMark(partKey(), shownView(), relsOf(shape)) : null);
@@ -296,10 +311,10 @@ export function mount(element, options = {}) {
     if (!seen?.ack(keys)) return;
     if (S.mode === 'list') renderList(v, listHandlers);
     else painter.paintChanges();
-    renderCrumbs();
-    buildViews();
+    markExpandBtn();
     markInfoBtn();
     if (!$.infoPanel.hidden) renderInfo();
+    emitContents();
   }
   const markInfoBtn = () => $.infoBtn.classList.toggle('has-changes', !!seen?.any());
 
@@ -421,7 +436,7 @@ export function mount(element, options = {}) {
     $.empty.hidden = !!S.map?.root || !$.errorbar.hidden;
     renderCrumbs();
     if (!S.map?.root) { $.frames.replaceChildren(); $.edges.replaceChildren(); $.nodes.replaceChildren(); $.rels.replaceChildren(); S.layout = null; return; }
-    if (list) { S.layout = null; renderList(v, listHandlers); return; }
+    if (list) { S.layout = null; renderList(v, listHandlers); markExpandBtn(); return; }
     layout();
     // fit first (it needs only the layout), so the drawing is made at the zoom it will
     // be seen at: labels or lines, never redrawn in the middle of a glide
@@ -429,6 +444,7 @@ export function mount(element, options = {}) {
     if (fit) stage.fitView(fit === 'levels', true);
     painter.draw(S.layout, view0);
     stage.applyView(true);
+    markExpandBtn();
   }
   const paintMarks = () => { if (!painter.paintMarks()) render(false); };
   const paintRels = () => { applyChrome(); if (!painter.paintRels()) render(false); };
@@ -666,6 +682,7 @@ export function mount(element, options = {}) {
     const next = S.expandNext;
     btn.innerHTML = `<span class="mmv-ic">${uiSvg(EXPAND_ICON[next])}</span>`;
     btn.title = EXPAND_TITLE[EXPAND_ICON[next]];
+    markExpandBtn();
   }
   $.expandBtn.addEventListener('click', () => {
     setExpand(S.expandNext);
@@ -891,20 +908,14 @@ export function mount(element, options = {}) {
     const name = (n) => (n.synthetic ? 'Whole map' : n.plain);
     S.trail.forEach((e, k) => {
       const m = mapFor(e.anchor);
-      // the step back to a diagram with changes since you looked gets a ring: its top
-      // (the first diagram's), or its title (a further one's, the step before)
-      const top = k === 0 ? items.length : items.length - 1;
       // a further diagram's top is its title, already the step before
       pathTo(m, e.focus).forEach((n, i) => { if (k === 0 || i > 0) items.push([name(n), () => backTo(k, n === m.root ? null : n.id), '›']); });
       const opener = m.byId[e.node];
       if (opener && opener.id !== e.focus) items.push([opener.plain, () => backTo(k), '›']);
       const level = k + 1;
       items.push([mapFor(S.trail[level]?.anchor ?? S.part).title, () => (level === S.trail.length ? drill(S.map.root.id) : backTo(level, null)), '#']);
-      if (seen?.partMarked(e.anchor || '') && items[top]) items[top][3] = true;
     });
-    // a step back gets a ring when a change lies under it, outside where the reader is
-    const outside = (n) => !!seen && n.id !== S.focus && n.children.some((k) => !k.id || k === S.map.byId[S.focus] ? false : !holds(k, S.focus) && (seen.nodeMark(partKey(), k.id, envName()) || seen.inside(partKey(), k, envName())));
-    pathTo(S.map, S.focus).forEach((n, i) => { if (!S.trail.length || i > 0) items.push([name(n), () => drill(n.id), '›', outside(n)]); });
+    pathTo(S.map, S.focus).forEach((n, i) => { if (!S.trail.length || i > 0) items.push([name(n), () => drill(n.id), '›']); });
     // the node's page, while open: the last step; every step before it closes it first
     if (page.isOpen()) {
       items.forEach((it) => { const go = it[1]; it[1] = () => { page.close({ instant: true }); go(); }; });
@@ -912,12 +923,11 @@ export function mount(element, options = {}) {
       if (last) last[1] = () => page.close();
       items.push([page.label(), () => {}, '›']);
     }
-    items.forEach(([label, go, sep, marked], i) => {
+    items.forEach(([label, go, sep], i) => {
       if (i) c.appendChild(Object.assign(document.createElement('span'), { className: `mmv-sep${sep === '#' ? ' is-diagram' : ''}`, textContent: sep }));
       const b = document.createElement('button');
       b.textContent = label;
-      b.title = marked ? `${label}: changes here since you looked` : label;
-      if (marked) b.classList.add('has-changes');
+      b.title = label;
       b.addEventListener('click', go);
       c.appendChild(b);
     });
@@ -1231,7 +1241,6 @@ export function mount(element, options = {}) {
     // diagrams no link leads to (a map problem): still shown, from the first diagram's picker
     const lost = !S.part && !S.thumb ? (S.file?.unlinked || []).map((a) => S.file.parts.get(a)).filter(Boolean) : [];
     $.viewWrap.hidden = views.length < 2 && !lost.length;
-    $.viewBtn.classList.remove('has-changes');
     if (views.length < 2 && !lost.length) return;
     const current = viewNamed(S.relView) || views[0];
     $.viewName.textContent = labelOf(current) || 'Views';
@@ -1241,17 +1250,12 @@ export function mount(element, options = {}) {
       return b;
     };
     const heading = (text) => [Object.assign(document.createElement('hr'), { className: 'mmv-menu-sep' }), Object.assign(document.createElement('div'), { className: 'mmv-menu-head', textContent: text })];
-    // views with changes since you looked that this one does not draw: a ring on each,
-    // and on the picker
-    const marked = (x) => x !== current && !!seen?.viewMarked(partKey(), x.name);
-    $.viewBtn.classList.toggle('has-changes', views.some(marked) || lost.some((p) => seen?.partMarked(p.anchor)));
     $.viewMenu.replaceChildren(...(views.length < 2 ? [] : views).flatMap((x, k) => {
       const b = item(labelOf(x), x === current, () => setView(x.name));
-      if (marked(x)) b.classList.add('has-changes');
       // the deployments after the relation views, under their own heading
       if (!x.deploy || views[k - 1]?.deploy) return [b];
       return [...heading('Where it runs'), b];
-    }), ...(lost.length ? [...(views.length < 2 ? heading('Not linked').slice(1) : heading('Not linked')), ...lost.map((p) => { const b = item(p.title, false, () => enterPart(p.anchor, null)); if (seen?.partMarked(p.anchor)) b.classList.add('has-changes'); return b; })] : []));
+    }), ...(lost.length ? [...(views.length < 2 ? heading('Not linked').slice(1) : heading('Not linked')), ...lost.map((p) => item(p.title, false, () => enterPart(p.anchor, null)))] : []));
   }
   // The play button: the sequences linked to the view shown (a box diagram), or the
   // sequence shown (as lifelines). One plays at a click; several are a short list.
@@ -1266,11 +1270,8 @@ export function mount(element, options = {}) {
     $.playWrap.hidden = !list.length;
     $.playWrap.classList.toggle('is-single', list.length === 1);
     $.playBtn.title = list.length === 1 ? `Play "${list[0].title}"` : 'Play a sequence';
-    // a sequence whose steps changed since you looked: a ring on the button and its row
-    const marked = (x) => !!seen?.partMarked(x.anchor || '');
-    $.playBtn.classList.toggle('has-changes', list.some(marked));
     $.playMenu.replaceChildren(...list.map((x) => {
-      const b = Object.assign(document.createElement('button'), { className: `mmv-menu-item${marked(x) ? ' has-changes' : ''}`, textContent: x.title });
+      const b = Object.assign(document.createElement('button'), { className: 'mmv-menu-item', textContent: x.title });
       b.addEventListener('click', () => { b.blur(); player.open(x.anchor); });
       return b;
     }));
@@ -1364,9 +1365,9 @@ export function mount(element, options = {}) {
     const swatchOf = (cls) => `<svg viewBox="0 0 18 18" width="18" height="18" class="${cls}" aria-hidden="true"><rect x="2" y="3" width="14" height="12" rx="3" style="fill:color-mix(in srgb, var(--n) 25%, var(--mmv-bg));stroke:var(--n);stroke-width:2"/></svg>`;
     // changes since you looked (seen.js): how many, and the names of what went
     if (seen?.any()) {
-      section('since', 'Since you looked');
+      section('since', sinceWords[0].toUpperCase() + sinceWords.slice(1));
       const c = seen.counts();
-      const parts = [c.new && `${c.new} new`, c.changed && `${c.changed} changed`, c.removed && `${c.removed} removed`].filter(Boolean);
+      const parts = [c.diagrams && `${c.diagrams} new ${c.diagrams === 1 ? 'diagram' : 'diagrams'}`, c.new && `${c.new} new`, c.changed && `${c.changed} changed`, c.removed && `${c.removed} removed`].filter(Boolean);
       box.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-legend-since', textContent: parts.join(', ') || 'Changes inside' }));
       const gone = seen.removedNames();
       if (gone.length) box.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-legend-since', textContent: `Removed: ${gone.join(', ')}` }));
@@ -1613,6 +1614,8 @@ export function mount(element, options = {}) {
     if (S.play && map !== mapFor(S.play.seq) && !(mapFor(S.play.seq)?.playsOver || []).some((l) => mapFor(l.anchor) === map)) player.close(false);
     S.map = map;
     map.base ||= { root: map.root, byId: map.byId };   // the diagram's own tree (a deployment view swaps it)
+    // a whole new diagram opened: seen in one go (nothing inside it is marked)
+    if (seen?.partNew(partKey()) && seen.ack(seen.partKeys(partKey()))) { markInfoBtn(); queueMicrotask(emitContents); }
     // the diagram type decides the modes and the colour-by choices
     const d = diagram();
     if (!modeIds().includes(S.mode)) S.mode = d.modes[0].id;
@@ -1708,8 +1711,9 @@ export function mount(element, options = {}) {
   // first, under its label "Overview"; an ER join view as kind join), its deployments
   // and its walks. type: the diagram's type (mindmap, flowchart, sequence, ...).
   // state: what setState takes to open it (a sequence or walk opens
-  // playing at step 1; anything else stops a sequence that plays). Built from this
-  // viewer's model, never from the file's headings.
+  // playing at step 1; anything else stops a sequence that plays). changed: something
+  // in it is new or changed (seen.js; a view: its own arrows or places). Built from
+  // this viewer's model, never from the file's headings.
   function contents() {
     const f = S.file;
     if (!f?.root || options.thumbnail) return [];
@@ -1719,13 +1723,15 @@ export function mount(element, options = {}) {
       if (!m.root) continue;
       const part = m === f ? null : m.anchor;
       const mark = { ...(m === f ? { first: true } : {}), ...(part && unlinked.has(part) ? { unlinked: true } : {}) };
-      if (m.type === 'sequence') { out.push({ kind: 'sequence', label: m.title, part, type: m.type, state: { seq: part || 'main', step: 1 }, ...mark }); continue; }
-      out.push({ kind: 'diagram', label: m.title, part, type: m.type, state: { seq: null, part, view: null }, ...mark });
+      const changed = !!seen?.partMarked(part || '');
+      if (m.type === 'sequence') { out.push({ kind: 'sequence', label: m.title, part, type: m.type, state: { seq: part || 'main', step: 1 }, changed, ...mark }); continue; }
+      out.push({ kind: 'diagram', label: m.title, part, type: m.type, state: { seq: null, part, view: null }, changed, ...mark });
       const own = { part, type: m.type, diagram: m.title };
+      const viewChanged = (x) => !!seen?.viewMarked(part || '', x.name);
       const views = (m.views || []).filter((x) => !x.deploy);
-      if (views.length > 1) for (const x of views) out.push({ kind: x.join ? 'join' : 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name } });
-      for (const x of m.views || []) if (x.deploy) out.push({ kind: 'deployment', label: x.name, ...own, state: { seq: null, part, env: x.name } });
-      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 } });
+      if (views.length > 1) for (const x of views) out.push({ kind: x.join ? 'join' : 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name }, changed: viewChanged(x) });
+      for (const x of m.views || []) if (x.deploy) out.push({ kind: 'deployment', label: x.name, ...own, state: { seq: null, part, env: x.name }, changed: viewChanged(x) });
+      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 }, changed: !!seen?.partMarked(w.anchor) });
     }
     return out;
   }

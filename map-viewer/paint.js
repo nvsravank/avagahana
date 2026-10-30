@@ -7,7 +7,7 @@
 // colour-by or look restyles without a repaint. Only geometry (layout, zoom level of
 // detail, collapse) repaints; selection and search repaint only the marks, related
 // links only their own layer and dots.
-import { UI, RETURN_PATH, RETURN_W } from './chrome.js';
+import { UI, RETURN_PATH, RETURN_W, SPARKLE_PATH } from './chrome.js';
 import { picture } from './icons.js';
 import { diagramOf } from './diagrams/index.js';
 import { measure } from './measure.js';
@@ -260,6 +260,8 @@ export function createPainter(v) {
       svgEl('rect', { class: 'mmv-hit', x: -5, y: -5, width: inner.size + 10, height: inner.size + 10 }, ig);
       svgEl('g', { transform: `scale(${inner.size / 24})` }, ig).innerHTML = UI[diagramOf({ type: inner.type }).modes[0].icon] || UI.list;
       svgEl('title', {}, ig).textContent = `${inner.title} (${diagramOf({ type: inner.type }).label.toLowerCase()})`;
+      // something in it new or changed: a small sparkle on the icon (seen.js)
+      if (v.partChanged?.(inner.anchor)) drawSpark(ig, inner.size);
     }
     if (s.warn) {
       const wg = svgEl('g', { class: 'mmv-warn', transform: `translate(${s.warn.x},${s.warn.y})` }, g);
@@ -420,16 +422,20 @@ export function createPainter(v) {
 
   // ---------- changes since you looked (seen.js, viewer.js) ----------
   // A change mark: a badge at a box's top-left corner (the top-right holds the
-  // open/close dot): sparkle for new, pencil for changed, an outlined sparkle for a
-  // change inside (a closed box, a collapsed branch, a diagram it opens).
-  const CHANGE = { new: ['sparkle', 'New since you looked'], changed: ['pencil-simple', 'Changed since you looked'], inside: ['sparkle', 'Changes inside since you looked'] };
+  // open/close dot), one sparkle for new or changed. A change inside a closed box
+  // marks the expand button; one in a diagram a node opens, that diagram's icon.
   function drawChange(parent, kind, x, y) {
-    const [ph, title] = CHANGE[kind];
     const g = svgEl('g', { class: `mmv-change is-${kind}`, transform: `translate(${x},${y})` }, parent);
     svgEl('circle', { r: 9 }, g);
-    svgEl('use', { href: v.symbols.href(ph), x: -6, y: -6, width: 12, height: 12 }, g);
-    svgEl('title', {}, g).textContent = title;
+    svgEl('use', { href: v.symbols.href('sparkle'), x: -6, y: -6, width: 12, height: 12 }, g);
+    svgEl('title', {}, g).textContent = `${kind === 'new' ? 'New' : 'Changed'} ${v.sinceWords}`;
     return g;
+  }
+  // the small sparkle on a diagram icon of the given size (its top-right corner)
+  function drawSpark(parent, size) {
+    const g = svgEl('g', { class: 'mmv-change mmv-spark', transform: `translate(${size - 3},-4) scale(${8 / 240})` }, parent);
+    svgEl('path', { d: SPARKLE_PATH, transform: 'translate(-16,-8)' }, g);
+    svgEl('title', {}, g).textContent = `Changes in this diagram ${v.sinceWords}`;
   }
   // (a node too small to read, a bar: at the bar's start)
   function markNode(g, open) {

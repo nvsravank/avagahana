@@ -135,26 +135,32 @@ marker.is-kind .mmv-flow-x { stroke: var(--n); stroke-opacity: 1; }
 .mmv-dot circle { fill: var(--mmv-bg); stroke: var(--n); stroke-width: 2; }
 .mmv-dot.is-closed circle { fill: var(--n); }
 .mmv-dot text { fill: var(--n-ink); }
-/* changes since you looked (seen.js): a badge at a box's top-left, sparkle new, pencil
-   changed, an outlined sparkle for a change inside; per reader, so never exported */
+/* changes since you looked (seen.js): a badge at a box's top-left, one sparkle for new
+   or changed, and a small sparkle on a diagram's icon for changes in it; per reader, so
+   never exported */
 .mmv-change circle { fill: var(--mmv-highlight); stroke: var(--mmv-bg); stroke-width: 2; }
 .mmv-change use { color: var(--mmv-bg); }
-.mmv-change.is-inside circle { fill: var(--mmv-bg); stroke: var(--mmv-highlight); stroke-width: 1.8; }
-.mmv-change.is-inside use { color: var(--mmv-highlight); }
+.mmv-change.mmv-spark path { fill: var(--mmv-highlight); stroke: var(--mmv-bg); stroke-width: 40; paint-order: stroke; }
+.mmv .has-spark { position: relative; }
+.mmv .has-spark > .mmv-spark { position: absolute; color: var(--mmv-highlight); fill: currentColor; stroke: none; }
+.mmv .mmv-lnote-ic.has-spark > .mmv-spark { top: -2px; right: -3px; }
+.mmv .mmv-page-cap.has-spark > .mmv-spark { top: -4px; left: 11px; }
 .mmv.mmv-printing .mmv-change { display: none; }
 /* just arrived: one glow; just removed: it leaves in red */
 .mmv-node.is-glow > :is(.mmv-shape, .mmv-bar), .mmv-frame.is-glow > rect, .mmv-flow.is-glow { animation: mmv-glow 1.2s ease-in-out 0.45s; }
 @keyframes mmv-glow { 40% { stroke: var(--mmv-highlight); stroke-width: 5; stroke-opacity: 1; filter: drop-shadow(0 0 6px var(--mmv-highlight)); } }
 .is-gone :is(.mmv-shape, rect:not(.mmv-hit)) { stroke: var(--mmv-bad) !important; fill: color-mix(in srgb, var(--mmv-bad) 22%, var(--mmv-bg)) !important; }
 @media (prefers-reduced-motion: reduce) { .mmv-node.is-glow > :is(.mmv-shape, .mmv-bar), .mmv-frame.is-glow > rect, .mmv-flow.is-glow { animation: none; } }
-/* a control that leads to changes since you looked: a small outlined ring */
-.mmv :is(.mmv-pill, .mmv-crumbs button, .mmv-menu-item).has-changes { position: relative; }
-.mmv :is(.mmv-pill, .mmv-crumbs button).has-changes::after { content: ""; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
+/* the info button while there are changes: a small ring */
+.mmv .mmv-pill.has-changes { position: relative; }
+.mmv .mmv-pill.has-changes::after { content: ""; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
   background: var(--mmv-chrome-bg, var(--mmv-bg)); border: 2px solid var(--mmv-highlight); }
-.mmv .mmv-menu-item.has-changes::after { content: ""; flex: none; align-self: center; width: 7px; height: 7px; border-radius: 50%; border: 2px solid var(--mmv-highlight); }
+/* the expand button while closed boxes hide changes: the small sparkle */
+.mmv .mmv-pill.has-marks { position: relative; }
+.mmv .mmv-pill.has-marks::after { content: ""; position: absolute; top: -4px; right: -4px; width: 11px; height: 11px; background: var(--mmv-highlight);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2216 8 240 232%22%3E%3Cpath d=%22M194.82,151.43l-55.09,20.3-20.3,55.09a7.92,7.92,0,0,1-14.86,0l-20.3-55.09-55.09-20.3a7.92,7.92,0,0,1,0-14.86l55.09-20.3,20.3-55.09a7.92,7.92,0,0,1,14.86,0l20.3,55.09,55.09,20.3A7.92,7.92,0,0,1,194.82,151.43ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z%22/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2216 8 240 232%22%3E%3Cpath d=%22M194.82,151.43l-55.09,20.3-20.3,55.09a7.92,7.92,0,0,1-14.86,0l-20.3-55.09-55.09-20.3a7.92,7.92,0,0,1,0-14.86l55.09-20.3,20.3-55.09a7.92,7.92,0,0,1,14.86,0l20.3,55.09,55.09,20.3A7.92,7.92,0,0,1,194.82,151.43ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z%22/%3E%3C/svg%3E") center / contain no-repeat; }
 .mmv-lchange { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-right: 4px; border-radius: 50%; flex: none;
   background: var(--mmv-highlight); color: var(--mmv-bg); vertical-align: middle; }
-.mmv-lchange.is-inside { background: none; color: var(--mmv-highlight); box-shadow: inset 0 0 0 1.5px var(--mmv-highlight); }
 .mmv-lchange .mmv-inline-ic { width: 12px; height: 12px; }
 .mmv-since { margin: 2px 0 8px; color: var(--mmv-highlight); font-weight: 600; font-size: 13px; }
 .mmv-since-gone { margin: 2px 0 8px; }

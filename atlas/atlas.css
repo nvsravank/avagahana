@@ -128,3 +128,6 @@ html, body { background: var(--mmv-bg, #fff); }
 .atlas-chip:hover { color: var(--mmv-frame-ink); background: color-mix(in srgb, var(--mmv-frame-ink) 6%, var(--mmv-frame-chip)); }
 .atlas-chip[aria-current="true"] { background: var(--mmv-frame-chip-active); border-color: var(--mmv-frame-accent); color: var(--mmv-frame-chip-active-ink); }
 .atlas-chip.is-unlinked { border-style: dashed; }
+/* something in it new or changed since the reader looked: the viewer's small sparkle */
+.atlas-chip.has-spark { position: relative; }
+.atlas-chip > .mmv-spark { position: absolute; top: -4px; right: -3px; color: var(--mmv-highlight, var(--mmv-frame-accent)); }

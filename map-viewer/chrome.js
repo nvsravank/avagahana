@@ -52,6 +52,11 @@ export const uiSvg = (name, size = 16) => `<svg viewBox="0 0 24 24" width="${siz
 export const RETURN_PATH = 'M168,80H88V40a8,8,0,0,0-13.66-5.66l-48,48a8,8,0,0,0,0,11.32l48,48A8,8,0,0,0,88,136V96h80a48,48,0,0,1,0,96H80a8,8,0,0,0,0,16h88a64,64,0,0,0,0-128ZM72,116.69,43.31,88,72,59.31Z';
 export const RETURN_W = 9;   // the mark's width beside a number on a badge
 export const returnSvg = (size = 11) => `<svg class="mmv-ret" viewBox="0 0 256 256" width="${size}" height="${size}" fill="currentColor" role="img" aria-label="return"><path d="${RETURN_PATH}"/></svg>`;
+// The small sparkle on a diagram's icon when something in it is new or changed (seen.js;
+// the atlas's chips too, through index.js): Phosphor sparkle (vendor/phosphor, MIT),
+// filled, drawn as a path.
+export const SPARKLE_PATH = 'M194.82,151.43l-55.09,20.3-20.3,55.09a7.92,7.92,0,0,1-14.86,0l-20.3-55.09-55.09-20.3a7.92,7.92,0,0,1,0-14.86l55.09-20.3,20.3-55.09a7.92,7.92,0,0,1,14.86,0l20.3,55.09,55.09,20.3A7.92,7.92,0,0,1,194.82,151.43ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z';
+export const sparkleSvg = (size = 9, cls = 'mmv-spark') => `<svg class="${cls}" viewBox="16 8 240 232" width="${size}" height="${size}" fill="currentColor" role="img" aria-label="changed"><path d="${SPARKLE_PATH}"/></svg>`;
 // A message's number into an element: the number, and the return mark after it for a return.
 export function putNumber(el, num, back) {
   el.textContent = String(num);

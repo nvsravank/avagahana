@@ -6,6 +6,19 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Change marks (WO-31): one sparkle for new or changed (the pencil is
+  gone); only the topmost new thing is marked; no outlined sparkle anywhere (closed
+  boxes, crumbs, view picker and play button lose theirs). A diagram with changes has a
+  small sparkle on its icon (a node's link icon, its page thumbnail); the expand button
+  has one while closed boxes hide changes. A whole new diagram is marked on its icon only
+  and clears when opened; selecting a new node clears everything inside it. The info
+  panel counts new diagrams apart.
+- **Contract** `viewer.contents()` entries gain `changed`; the `contents` event also
+  fires when marks clear. `changeMarkSvg(size)` from `map-viewer/index.js` draws the
+  small sparkle for a host; the atlas chips use it.
+- **Contract** Viewer options `since` (an older map text to compare with, the same for
+  every reader, nothing kept), `sinceLabel` ("Since <label>", default "the earlier
+  version") and `marks: false` (no marks).
 - **Contract** `viewer.contents()` lists every diagram, relation view, join view,
   deployment, sequence and walk of the map with the state that opens it, from the
   viewer's model; the `contents` event fires when the list changes. A `theme` event

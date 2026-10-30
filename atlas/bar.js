@@ -3,7 +3,7 @@
 // diagram, view, deployment and play the viewer lists (viewer.contents()). The first
 // diagram's chip is "Overview" (the map's title is already the viewer's own name pill).
 // No scroll bar: a soft fade and a small arrow on an edge say there is more that way.
-import { applyTheme } from '../map-viewer/index.js';
+import { applyTheme, changeMarkSvg } from '../map-viewer/index.js';
 
 const GROUPS = [
   ['Diagrams', ['diagram']],
@@ -136,6 +136,7 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
         b.type = 'button';
         if (x.unlinked) b.title = 'Not linked from the first diagram';
         b.addEventListener('click', () => onPick(x.state));
+        spark(b, x);
         g.appendChild(b);
         buttons.push([b, x]);
       }
@@ -174,11 +175,31 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
     if (on && !mount.contains(document.activeElement)) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
+  // something in it new or changed (the viewer's marks): the viewer's small sparkle
+  function spark(b, x) {
+    b.querySelector(':scope > .mmv-spark')?.remove();
+    b.classList.toggle('has-spark', !!x.changed);
+    if (x.changed) b.insertAdjacentHTML('beforeend', changeMarkSvg(9));
+  }
+
   function setLogo(on) { logoBtn.hidden = !on; }
   setLogo(logo);
 
   return {
-    setContents(list) { items = Array.isArray(list) ? list : []; render(); },
+    setContents(list) {
+      const next = Array.isArray(list) ? list : [];
+      // only the marks changed: the chips stay where they are (no scroll back)
+      const bare = (l) => JSON.stringify(l.map(({ changed, ...x }) => x));
+      const same = bare(next) === bare(items);
+      items = next;
+      if (!same) { render(); return; }
+      buttons = buttons.map(([b, x]) => {
+        const y = items.find((z) => z.kind === x.kind && JSON.stringify(z.state) === JSON.stringify(x.state)) || x;
+        spark(b, y);
+        return [b, y];
+      });
+      shown = currentItem();
+    },
     setState(s) { state = s || {}; mark(); },
     // the frame colours of the viewer's theme and appearance (theme.js frame)
     setTheme({ id, appearance }) {

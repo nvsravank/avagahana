@@ -6,6 +6,9 @@ import { checkTheme, acquire, release, loadFont, registered } from './themes/the
 
 export { mount } from './viewer.js';
 export { checkTheme } from './themes/theme.js';
+// the small sparkle a viewer puts on a diagram's icon when something in it changed
+// (contents() entries' changed), for a host's own chips: an <svg> string
+export { sparkleSvg as changeMarkSvg } from './chrome.js';
 
 // Style a host's own element (e.g. atlas's panels) with a theme, so it matches
 // the viewer: the element gets the theme's CSS variables (--mmv-*) and font.

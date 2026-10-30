@@ -1,7 +1,7 @@
 // list.js — any diagram as an indented outline (list mode): the list scene (rows,
 // pure data) and its painting. Rows carry the mmv-k / mmv-l classes like drawn
 // nodes, so the theme colours them.
-import { uiSvg } from './chrome.js';
+import { uiSvg, sparkleSvg } from './chrome.js';
 import { toneClass } from './geometry.js';
 import { diagramOf } from './diagrams/index.js';
 
@@ -101,9 +101,9 @@ export function renderList(v, on) {
       }
     });
     // changed since you looked (seen.js): the drawing's badge before the label
-    const change = v.changeOf?.(s.id, !s.closed, s.closed);
-    if (change) label.appendChild(Object.assign(document.createElement('span'), { className: `mmv-lchange is-${change}`, title: change === 'new' ? 'New since you looked' : change === 'changed' ? 'Changed since you looked' : 'Changes inside since you looked',
-      innerHTML: v.iconHtml(change === 'changed' ? 'ph pencil-simple' : 'ph sparkle', legend, 'mmv-inline-ic', 'currentColor') }));
+    const change = v.changeOf?.(s.id);
+    if (change) label.appendChild(Object.assign(document.createElement('span'), { className: `mmv-lchange is-${change}`, title: `${change === 'new' ? 'New' : 'Changed'} ${v.sinceWords}`,
+      innerHTML: v.iconHtml('ph sparkle', legend, 'mmv-inline-ic', 'currentColor') }));
     label.appendChild(text);
     if (s.count != null) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lcount', textContent: `${s.count} more` }));
     row.appendChild(label);
@@ -119,6 +119,8 @@ export function renderList(v, on) {
     for (const x of s.inners || []) {
       const di = Object.assign(document.createElement('span'), { className: 'mmv-lnote-ic', title: x.title });
       di.innerHTML = uiSvg(diagramOf({ type: x.type }).modes[0].icon, 16);
+      // something in it new or changed: a small sparkle on the icon (seen.js)
+      if (v.partChanged?.(x.anchor)) { di.classList.add('has-spark'); di.insertAdjacentHTML('beforeend', sparkleSvg()); }
       di.addEventListener('click', (e) => { e.stopPropagation(); on.openDiagram(x.anchor, s.id); });
       label.appendChild(di);
     }

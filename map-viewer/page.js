@@ -6,7 +6,7 @@
 // outside: the page shrinks into the box again. Opening a thumbnail grows it into that
 // diagram; coming back runs the same motion the other way (page.back).
 import { renderNoteBody } from './notes.js';
-import { UI } from './chrome.js';
+import { UI, sparkleSvg } from './chrome.js';
 import { diagramOf } from './diagrams/index.js';
 import { createAspects } from './aspects.js';
 
@@ -98,7 +98,7 @@ export function createPage(v, h) {
     body.appendChild(head);
     // changed since this reader last looked (seen.js): a line, and what went from under it
     const since = h.since?.(n.id);
-    if (since?.kind) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: since.kind === 'new' ? 'New since you looked.' : 'Changed since you looked.' }));
+    if (since?.kind) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: `${since.kind === 'new' ? 'New' : 'Changed'} ${v.sinceWords}.` }));
     if (n.note) {
       const note = document.createElement('div');
       note.className = 'mmv-page-note';
@@ -125,6 +125,8 @@ export function createPage(v, h) {
         const cap = document.createElement('span');
         cap.className = 'mmv-page-cap';
         cap.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">${UI[diagramOf({ type: inner.type }).modes[0].icon] || UI.list}</svg>`;
+        // something in it new or changed: a small sparkle on its icon (seen.js)
+        if (v.partChanged?.(inner.anchor)) { cap.classList.add('has-spark'); cap.insertAdjacentHTML('beforeend', sparkleSvg()); }
         cap.append(inner.title);
         b.append(pic, cap);
         b.addEventListener('click', () => h.openDiagram(inner.anchor, n.id));
@@ -140,7 +142,7 @@ export function createPage(v, h) {
     const runs = aspects.runsOn(n);
     if (runs) body.append(section('Runs on'), runs);
     if (since?.removed.length) {
-      body.appendChild(section('Removed since you looked'));
+      body.appendChild(section(`Removed ${v.sinceWords}`));
       body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since-gone', textContent: since.removed.join(', ') }));
     }
     // its children, when the strip does not draw them: each opens its own page here

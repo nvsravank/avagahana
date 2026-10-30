@@ -24,6 +24,9 @@ const viewer = mount(element, {
   prefs: { … },         // starting looks from a link: {theme, appearance, colourBy, look}; not saved
   storageKey: 'avagahana-viewer-prefs',   // where preferences are kept, and (as `<key>-seen`) what
                                        // the reader has seen of each map; null keeps none
+  since: null,          // an older map text: mark what changed since it (below); nothing kept
+  sinceLabel: 'the earlier version',   // with since: "Since <label>" in the info panel
+  marks: true,          // false: no change marks at all
   showProblems: 'map',  // 'map' | 'all' | 'none': which problems show on screen
   sequenceStepSeconds: 3,   // a sequence's step while playing: 2 to 5 s, by halves
 });
@@ -136,27 +139,36 @@ a sequence shown as itself has one too. Playing:
 The viewer remembers, per map path and per reader, what the reader has seen (in the
 browser, under `<storageKey>-seen`, the 50 maps opened last), and marks what differs
 when a map is rewritten (a live reload) or opened again. The agent writes nothing for
-this and learns nothing back. (WO-13.)
+this and learns nothing back. (WO-13, WO-31.)
 
 - The first look at a map marks nothing.
-- New nodes and arrows get a sparkle badge, changed ones (label, place, class, icons,
-  note, links, a deployment's place) a pencil badge, at a box's top-left (an arrow's:
-  before its label, else at its middle). What a load brought glows once; what it took
-  away shrinks out in red. Live reloads glide.
-- A removed node or arrow marks the node it was under (an arrow: its start) with a
-  pencil; that node's page lists "Removed since you looked". The info panel's "Since
-  you looked" section counts new, changed and removed and names what went; the info
+- One mark: a sparkle badge at a box's top-left (an arrow's: before its label, else at
+  its middle) for anything new or changed (label, place, class, icons, note, links, a
+  deployment's place). What a load brought glows once; what it took away shrinks out in
+  red. Live reloads glide.
+- Only the topmost new thing is marked: inside a new node nothing is (its children, its
+  arrows, its places are new with it). Changed things keep their own marks.
+- A removed node or arrow marks the node it was under (an arrow: its start); that
+  node's page lists "Removed since you looked". The info panel's "Since you looked"
+  section counts new diagrams, new, changed and removed and names what went; the info
   button has a ring while there are any.
-- Marks roll up as an outlined sparkle: on a closed box or collapsed branch with a
-  change inside, on a node whose linked diagram has changes, on crumbs (changes outside
-  the drilled-in box, or in a diagram back along the trail), and as a ring on the view
-  picker and each view (or deployment) with changes this one does not draw, and on the
-  play button for a sequence whose steps changed (marked as a whole).
+- Only what is drawn is marked: a closed box or collapsed branch with a change inside
+  has no mark; the expand button has a small sparkle while one hides a change.
+- A diagram with anything new or changed in it (closed boxes too) has a small sparkle on
+  its icon: on the link icon of a node that opens it and that node's page thumbnail, and
+  in `contents()` (`changed`). A whole new diagram has no marks inside; it is marked on
+  its icon only, and opening it clears it in one go.
 - A mark stays until the reader opens the thing: selects the node or opens its page
-  (its removals and its deployment places too), opens the arrow's note, plays the
-  sequence; closing the info panel clears removals at the top of a diagram. Marks build
-  up over several rewrites until then; a change undone before the reader looks leaves
-  none.
+  (its removals and its deployment places too; a new node: everything inside it),
+  opens the arrow's note, plays the sequence, opens a whole new diagram; closing the info
+  panel clears removals at the top of a diagram; the info panel's "Clear changes in this
+  view" clears what the view shows. Marks build up over several rewrites until then; a
+  change undone before the reader looks leaves none. A diagram's small sparkle goes when
+  the last mark in it clears.
+- `since: <older map text>` compares with that text instead of what the reader saw: the
+  marks are the same for every reader, nothing is kept (clearing lasts for the visit),
+  and the wording reads "since <sinceLabel>" ("Since the earlier version" by default).
+- `marks: false` shows no marks at all (`changed` is always false).
 - `storageKey: null` keeps nothing: marks then last for the visit only. A map with more
   than 2,000 things to compare is compared for the visit only (a host problem says so).
   Thumbnails never mark.
@@ -168,7 +180,7 @@ this and learns nothing back. (WO-13.)
 |---|---|
 | `state` | The full state, after any change. |
 | `load` | `{path, title, warnings}` after a map is shown. |
-| `contents` | `viewer.contents()`, after a load or live reload that changes it. |
+| `contents` | `viewer.contents()`, after a load or live reload that changes it, and when change marks clear (`changed`). |
 | `theme` | `{id, appearance}` (`light` / `dark`) when the theme or the appearance shown changes, so a host can style its own frame to match (`applyTheme(el, id, {appearance})`). |
 | `warning` | A problem of level `warning`, when it first appears. |
 | `error` | A problem of level `error`, when it first appears. |
@@ -191,8 +203,12 @@ Each viewer has its own list. Entries, in file order:
 Every entry has `kind`, `label`, `part` (the diagram's anchor, `null` for the first) and
 `type` (the diagram's type); views, deployments and walks also `diagram` (its title).
 The first diagram has `first: true`; a diagram no link reaches ("Not linked") has
-`unlinked: true`, and its `state` still opens it. Entries may gain fields later; a host
-ignores those it does not know. The `contents` event fires when the list changes.
+`unlinked: true`, and its `state` still opens it. Every entry has `changed`: something
+in it is new or changed since the reader looked (a diagram, sequence or walk: anything in
+it; a view or deployment: its own arrows or places). A host draws it with
+`changeMarkSvg(size)` from `map-viewer/index.js` (an `<svg>` string, `currentColor`).
+Entries may gain fields later; a host ignores those it does not know. The `contents`
+event fires when the list changes, `changed` included.
 
 ## Problems
 
@@ -315,7 +331,8 @@ Root: `.mmv` with `data-theme`, `data-appearance`, `data-colour-by`, `data-look`
 `mmv-mark-hit`, `mmv-mark-sel`. Colour classes: `mmv-c<n>` (a node's class: its slot, `mmv-cm` external, `mmv-c0` none; box diagrams), `mmv-k<n>` (category, 0 = centre),
 `mmv-l<n>` (level), `mmv-d0|1|2` (depth band), `mmv-pa|pc|pr|p0` (planned change: added,
 changed, removed, none; WO-13). Changes since you looked: `mmv-change` (`is-new`,
-`is-changed`, `is-inside`), `is-glow`, `is-gone`, `has-changes` on controls. States: `is-dim`, `is-closed`,
+`is-changed`), `mmv-spark` (a diagram icon's small sparkle), `is-glow`, `is-gone`,
+`has-changes` on the info button, `has-marks` on the expand button. States: `is-dim`, `is-closed`,
 `is-on`, `is-selected`, `is-hit`. Per node, `--n` and `--n-ink` hold its colour and
 the text colour on it.
 

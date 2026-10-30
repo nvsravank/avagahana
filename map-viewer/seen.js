@@ -1,19 +1,25 @@
-// seen.js — changes since this reader last looked (WO-13), for one viewer: the
+// seen.js — changes since this reader last looked (WO-13, WO-31), for one viewer: the
 // baseline (what the reader has seen, model/changes.js) per map, kept in the browser,
-// and the marks the drawing, the node page, the crumbs, the view picker and the info
-// panel show. The agent knows nothing of this: the viewer compares on its own.
+// and the marks the drawing, the node page, the diagram icons, the expand button and
+// the info panel show. The agent knows nothing of this: the viewer compares on its own.
+//
+// Only the topmost new thing is marked: what is inside a new node (its children, its
+// arrows, its places) is new with it, and a whole new diagram is marked only on its
+// icon (partMarked). The marks behind are kept: they clear with what they are in.
 //
 // Stored under `<storageKey>-seen`: {maps: {path: {t, items}}}, the 50 maps opened
 // last. storageKey null keeps nothing: marks then last only for the visit (live
 // reloads). A map of more than MAX_ITEMS items is compared for the visit only.
+// base (a summary, the viewer's `since` option): the baseline every map starts from
+// instead of the stored one; nothing is kept, and clearing lasts for the visit.
 import { summarize, diff, acknowledge, arrowKeys, parseKey } from './model/changes.js';
 
 const KEEP_MAPS = 50;
 export const MAX_ITEMS = 2000;
 
-// opts: {storageKey, problem(code, message)}
+// opts: {storageKey, base, problem(code, message)}
 export function createSeen(opts) {
-  const key = opts.storageKey == null ? null : `${opts.storageKey}-seen`;
+  const key = opts.storageKey == null || opts.base ? null : `${opts.storageKey}-seen`;
   const memory = new Map();   // path -> baseline, for the visit
   let path = null;
   let summary = null;
@@ -45,7 +51,7 @@ export function createSeen(opts) {
     path = newPath;
     summary = summarize(file);
     const size = Object.keys(summary.items).length;
-    baseline = memory.get(path) || (size <= MAX_ITEMS ? readStore().maps?.[path] : null) || null;
+    baseline = memory.get(path) || (opts.base ? { items: opts.base.items } : null) || (size <= MAX_ITEMS ? readStore().maps?.[path] : null) || null;
     if (baseline?.items) baseline = { items: baseline.items };
     if (size > MAX_ITEMS && key) opts.problem('seen-large-map', `Changes since you looked are kept for this visit only: the map has more than ${MAX_ITEMS} things to compare.`);
     if (!baseline) {
@@ -102,38 +108,87 @@ export function createSeen(opts) {
   }
 
   // ---- what to show ----
+  // a diagram the baseline has nothing of: new as a whole (marked on its icon only)
+  const partNew = (part) => !!baseline && !Object.keys(baseline.items).some((k) => k.startsWith(`${part}|`))
+    && Object.keys(summary?.items || {}).some((k) => k.startsWith(`${part}|`));
+  // a node, or a box round it, is new (in the diagram's own tree)
+  function newish(part, id) {
+    const visited = new Set();
+    while (id && !visited.has(id)) {
+      if (marks.get(`${part}|n|${id}`) === 'new') return true;
+      visited.add(id);
+      id = summary.items[`${part}|n|${id}`]?.[2];
+    }
+    return false;
+  }
+  // a mark the drawing shows: not in a whole new diagram, not inside a new thing
+  function shown(k) {
+    const kind = marks.get(k);
+    if (!kind) return null;
+    const p = parseKey(k);
+    if (partNew(p.part)) return null;
+    if (kind !== 'new') return kind;
+    const item = summary.items[k];
+    if (p.type === 'n') return item[2] && newish(p.part, item[2]) ? null : kind;
+    if (p.type === 'e') return item[2] && marks.get(`${p.part}|e|${p.view}|${item[2]}`) === 'new' ? null : kind;
+    if (p.type === 'a') return newish(p.part, item[2]) || newish(p.part, item[3]) ? null : kind;
+    return kind;
+  }
   // a node's own mark in a diagram (part), in a deployment view (env) its place there
-  // too; a parent of something removed reads as changed. -> 'new' | 'changed' | null
+  // too, as stored (its page says it). -> 'new' | 'changed' | null
   const ownMark = (part, id, env = null) => marks.get(`${part}|n|${id}`) || (env ? marks.get(`${part}|e|${env}|${id}`) : null) || null;
+  // the mark the drawing shows on a node; a parent of something removed reads as changed
   function nodeMark(part, id, env = null) {
-    const own = ownMark(part, id, env);
+    const own = shown(`${part}|n|${id}`) || (env ? shown(`${part}|e|${env}|${id}`) : null);
     if (own) return own;
+    if (partNew(part)) return null;
     return removed.some((r) => r.parent === id && r.key.startsWith(`${part}|`) && keyFits(r.key, env)) ? 'changed' : null;
   }
   // a removal shows in the view it was in: a node's anywhere, an arrow's or a place's in its view
   const keyFits = (k, env) => { const p = parseKey(k); return p.type === 'n' || p.type === 's' || (p.type === 'e' && p.view === env) || p.type === 'a'; };
   // the keys behind a node's mark (what opening its page acknowledges)
-  // (its place in every deployment too: one look at the node is enough)
+  // (its place in every deployment too: one look at the node is enough). A new node:
+  // everything new with it too (what is under it, its arrows, their places).
   function nodeKeys(part, id) {
-    const out = [`${part}|n|${id}`];
+    const under = new Set([id]);
+    if (marks.get(`${part}|n|${id}`) === 'new') {
+      for (const k of marks.keys()) {
+        const p = parseKey(k);
+        if (p.part === part && p.type === 'n' && holdsNode(part, id, p.id)) under.add(p.id);
+      }
+    }
+    const out = [...under].map((x) => `${part}|n|${x}`);
     for (const k of [...marks.keys(), ...removed.map((r) => r.key)]) {
       const p = parseKey(k);
-      if (p.part === part && p.type === 'e' && p.id === id) out.push(k);
+      if (p.part === part && p.type === 'e' && under.has(p.id)) out.push(k);
+      if (under.size > 1 && p.part === part && p.type === 'a' && marks.get(k) === 'new' && (under.has(summary.items[k][2]) || under.has(summary.items[k][3]))) out.push(k);
     }
     for (const r of removed) if (r.parent === id && r.key.startsWith(`${part}|`)) out.push(r.key);
     return out;
   }
+  // node top holds node id (or is it), in the diagram's own tree now
+  function holdsNode(part, top, id) {
+    const visited = new Set();
+    while (id && !visited.has(id)) {
+      if (id === top) return true;
+      visited.add(id);
+      id = summary.items[`${part}|n|${id}`]?.[2];
+    }
+    return false;
+  }
+  // every key of a diagram with a mark (a whole new diagram opened clears them all)
+  const partKeys = (part) => [...marks.keys(), ...removed.map((r) => r.key)].filter((k) => k.startsWith(`${part}|`));
   // an arrow's relations in a view -> their keys
   function relationKeys(part, view, rels) {
     const keys = arrowKeys(view);
     return rels.map((r) => keys.get(r)).filter(Boolean).map((k) => `${part}|a|${view.name}|${k}`);
   }
   function arrowMark(part, view, rels) {
-    const ms = relationKeys(part, view, rels).map((k) => marks.get(k)).filter(Boolean);
+    const ms = relationKeys(part, view, rels).map(shown).filter(Boolean);
     return ms.includes('changed') ? 'changed' : ms.length ? 'new' : null;
   }
-  // something marked under a node (a closed box, a collapsed branch): its descendants'
-  // marks, or a removal under one of them
+  // something marked under a node (a closed box, a collapsed branch: the expand
+  // button says so): its descendants' marks, or a removal under one of them
   function inside(part, node, env = null) {
     for (const k of node.children || []) {
       if (nodeMark(part, k.id, env) || inside(part, k, env)) return true;
@@ -153,7 +208,8 @@ export function createSeen(opts) {
   const removedNames = () => [...new Set(removed.map((r) => r.label))];
   // removals at the top of a diagram (no parent left to report them)
   const removedTop = () => removed.filter((r) => !r.parent || r.parent === '_map');
-  // counts for the info panel: each node and arrow once (deployments repeat them)
+  // counts for the info panel: each node and arrow once (deployments repeat them), only
+  // the marks shown; whole new diagrams apart
   function counts() {
     const once = (list) => {
       const seen = new Map();
@@ -164,14 +220,16 @@ export function createSeen(opts) {
       }
       return [...seen.values()];
     };
-    const m = once([...marks]);
+    const m = once([...marks].map(([k]) => [k, shown(k)]).filter(([, kind]) => kind));
+    const parts = new Set([...marks.keys()].map((k) => parseKey(k).part));
     return {
       new: m.filter((x) => x === 'new').length,
       changed: m.filter((x) => x === 'changed').length,
-      removed: once(removed.map((r) => [r.key, 'removed'])).length,
+      removed: once(removed.filter((r) => !partNew(parseKey(r.key).part)).map((r) => [r.key, 'removed'])).length,
+      diagrams: [...parts].filter(partNew).length,
     };
   }
   const any = () => marks.size > 0 || removed.length > 0;
 
-  return { load, ack, scopeKeys, ownMark, nodeMark, nodeKeys, relationKeys, arrowMark, inside, partMarked, viewMarked, removedUnder, removedTop, removedNames, counts, any };
+  return { load, ack, scopeKeys, ownMark, nodeMark, nodeKeys, partKeys, partNew, relationKeys, arrowMark, inside, partMarked, viewMarked, removedUnder, removedTop, removedNames, counts, any };
 }

@@ -10,7 +10,8 @@
 //   `<part>|s`                   a sequence's steps (marked as a whole)
 // Each item is [hash, label, parent]: a short hash of what the reader sees of it, the
 // label to name it once removed (60 characters at most) and the node it sits under
-// (an arrow: its start), where its removal is reported.
+// (an arrow: its start), where its removal is reported. An arrow adds its end:
+// [hash, label, from, to].
 //
 // The baseline is the summary of what the reader has seen, item by item: an item
 // opened (its node page, its arrow note) takes its current hash; a removed item
@@ -67,7 +68,7 @@ export function summarize(file) {
       for (const [r, key] of arrowKeys(v)) {
         const seen = [r.from, r.to, kindOf(r), r.label || '', r.cls || '', [...(r.icons || [])].sort().join(' '), r.note?.body ?? ''].join('\u0001');
         const name = r.label ? `${r.label} (${tree[r.from]?.plain || r.from} to ${tree[r.to]?.plain || r.to})` : `${tree[r.from]?.plain || r.from} to ${tree[r.to]?.plain || r.to}`;
-        items[`${part}|a|${v.name}|${key}`] = [hash(seen), cut(name), r.from];
+        items[`${part}|a|${v.name}|${key}`] = [hash(seen), cut(name), r.from, r.to];
       }
       if (v.deploy) {
         for (const n of Object.values(v.deploy.byId)) {

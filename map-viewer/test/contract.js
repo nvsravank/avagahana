@@ -4,6 +4,7 @@
 import { testErConnections } from './er-connections.js';
 import { testDiagramLinks } from './diagram-links.js';
 import { testContents } from './contents.js';
+import { testChangeMarks } from './change-marks.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
@@ -25,6 +26,7 @@ try {
   await testErConnections(check);
   await testDiagramLinks(check);
   await testContents(check);
+  await testChangeMarks(check, wait);
   // Zoom changes label detail, never box geometry or the precomputed routes.
   for (const [kind, body] of [
     ['flowchart', 'flowchart LR\n  a[Top level] --> b{Decision}\n  subgraph group[Group]\n    c[Nested label] --> d[Another label]\n  end\n  b --> c'],
@@ -914,12 +916,11 @@ try {
     check('a removal marks where it was (the box it was in, the arrow\'s start)', m.pay === 'changed' && m.payh === 'changed', JSON.stringify(m));
     check('what just arrived glows', q('.mmv-node[data-id="risk"]').classList.contains('is-glow') && !q('.mmv-node[data-id="ord"]').classList.contains('is-glow'));
     check('the info button says there are changes', q('[data-mmv=infoBtn]').classList.contains('has-changes'));
-    check('the view picker rings views with changes this one does not draw (a deployment\'s places)', q('[data-mmv=viewBtn]').classList.contains('has-changes')
-      && [...document.querySelectorAll('#a [data-mmv=viewMenu] .has-changes')].some((x) => x.textContent === 'Production'));
+    check('contents() marks views with changes (a deployment\'s places); the picker has no rings (WO-31)', !q('[data-mmv=viewBtn]').classList.contains('has-changes')
+      && sv.contents().find((x) => x.kind === 'deployment' && x.label === 'Production')?.changed === true && !document.querySelector('#a [data-mmv=viewMenu] .has-changes'));
     sv.setState({ focus: 'pay' });
     await wait(50);
-    const rung = [...document.querySelectorAll('#a [data-mmv=crumbs] button.has-changes')].map((x) => x.textContent);
-    check('drilled in, a crumb rings changes outside the box', rung.includes('Shop system'), rung.join());
+    check('drilled in, no crumb has a ring (WO-31)', !document.querySelector('#a [data-mmv=crumbs] .has-changes') && !!document.querySelector('#a [data-mmv=crumbs] button'));
     sv.setState({ focus: null });
     q('[data-mmv=infoBtn]').click();
     await wait(50);
@@ -939,12 +940,13 @@ try {
     await wait(300);
     // the expand button's levels: one of them shows the system as a closed box
     let closed = null;
-    for (let k = 0; k < 5 && !closed; k++) {
+    for (let k = 0; k < 5 && !q('.mmv-node[data-id="shop"]'); k++) {
       q('[data-mmv=expandBtn]').click();
       await wait(30);
       closed = q('.mmv-node[data-id="shop"] .mmv-change');
     }
-    check('a closed box with a change inside shows the outlined mark', closed?.classList.contains('is-inside'), closed?.getAttribute('class'));
+    check('a closed box with a change inside: no mark on it, a small sparkle on the expand button (WO-31)', !closed && q('.mmv-node[data-id="shop"]') && q('[data-mmv=expandBtn]').classList.contains('has-marks'),
+      closed?.getAttribute('class'));
     sv.destroy();
     const sv2 = mount(document.getElementById('a'), { storageKey: 'avagahana-test-seen' });
     await sv2.load(edited, 'shop.md');
@@ -976,7 +978,7 @@ try {
     clear?.click();
     await wait(50);
     check('clearing marks this view seen and leaves other views\' changes', !Object.keys(marks()).length
-      && q('[data-mmv=viewBtn]').classList.contains('has-changes'), JSON.stringify(marks()));
+      && sv6.contents().find((x) => x.kind === 'deployment' && x.label === 'Production')?.changed === true, JSON.stringify(marks()));
     sv6.destroy();
     localStorage.removeItem('avagahana-test-seen-seen');
     localStorage.removeItem('avagahana-test-seen');
