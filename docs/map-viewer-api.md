@@ -263,7 +263,7 @@ mounts with `marks: false` and selects nothing).
 | `touching` | `[{a, b, gap, at}]`: two lines closer than `minGap` px at the output's scale. Lines that share an end meet there by design: the first 24 drawing units from that end do not count, and two lines running together into one end (two keys to one column) are one line until they part. |
 | `minGap` | 2 (px). |
 | `smallestText` | `{px, id}`: the smallest text at the output width. |
-| `colours` | Per box `{id, label, fill, why}`: its fill as `#rrggbb` and why, from the colour-by: `category 3`, `level 2`, `class database`, `change added`, `centre`. |
+| `colours` | Per box `{id, label, fill, stroke, why}`: its fill and its outline as `#rrggbb` (a class or theme may colour either, so read both) and why, from the colour-by: `category 3`, `level 2`, `class database`, `change added`, `centre`. |
 
 ## Problems
 

@@ -1,6 +1,6 @@
 ---
 name: trace-architecture
-description: Review a project, repository or codebase and explain it as an Avagahana map, one Markdown file holding the set of diagrams the project needs (structure, layers, key flows, lifecycles, data). Use when the user asks to review, survey, document or map a project or repo, or to build diagrams or an architecture overview of a codebase. Builds on the illuminate-concept skill.
+description: Review a project, repository or codebase and explain it as an Avagahana map, one Markdown file holding the set of diagrams the project needs (structure, layers, key flows, lifecycles, data), read in an interactive viewer or rendered to SVG or PNG for a document. Use when the user asks to review, survey, document or map a project or repo, or to build diagrams or an architecture overview of a codebase. Builds on the illuminate-concept skill.
 ---
 
 # Diagram a codebase

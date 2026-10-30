@@ -6,6 +6,14 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Map format: an underscore inside a word is just an underscore in a label
+  (`ORDER_SUPERVISION_TRIGGER`, release ids, constants); before, a pair of them made the
+  text between italic and the underscores vanished. `\_` and `\*` keep the mark, and
+  text in backticks is taken as written (WO-32 follow-up).
+- **Contract** The layout report's `colours` gives each box's `stroke` beside its `fill`:
+  a class that colours only the outline showed as plain white before.
+- The skill and plugin descriptions say a map can also be rendered to SVG or PNG for a
+  document, slide or PDF in your brand's theme, so agents load the skill for that.
 - **Contract** Viewer `viewer.export({format, width | scale, background, crop, report})`
   returns the picture (SVG text or a PNG Blob) instead of downloading it; the toolbar
   buttons use it (WO-32).

@@ -52,7 +52,7 @@ writes `<file>.report.json` beside the picture:
   smaller picture (`--crop`, `--expand`) helps.
 - `smallestText.px`: under about 9 px the text will not read in the document; give a
   larger `--width` or a smaller picture.
-- `colours`: each box's colour and why (`category 3`, `class database`), to describe
+- `colours`: each box's fill and outline (`stroke`) and why (`category 3`, `class database`), to describe
   the picture in the text ("the databases in teal").
 
 ## For a document

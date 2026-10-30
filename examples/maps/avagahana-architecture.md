@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-10-30 for the contents bar (WO-30), change marks (WO-31) and rendering for documents, the layout report and the maps folder's themes (WO-32). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-10-30 for the contents bar (WO-30), change marks (WO-31) and rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -268,7 +268,7 @@ Validates theme objects, fills defaults, manages shared CSS and FontFace data. C
 
 ### <a id="ex"></a>export.js
 
-viewer.export() returns SVG text or PNG bytes (the toolbar's buttons download them); print uses the same drawing. Files name what they show (role img, a root title; data-id and a title on every node, box and line), hold no links, and leave out change marks, selection and controls. With report: true, report.js reads the drawing for cut labels, overlaps, crossings, lines under 2 px apart, the smallest text and each box's colour and why. Picture state (expand, close, highlight, crop) shapes what is drawn. Evidence: export.js, report.js; docs/map-viewer-api.md.
+viewer.export() returns SVG text or PNG bytes (the toolbar's buttons download them); print uses the same drawing. Files name what they show (role img, a root title; data-id and a title on every node, box and line), hold no links, and leave out change marks, selection and controls. With report: true, report.js reads the drawing for cut labels, overlaps, crossings, lines under 2 px apart, the smallest text and each box's fill, outline and why. Picture state (expand, close, highlight, crop) shapes what is drawn. Evidence: export.js, report.js; docs/map-viewer-api.md.
 
 
 ### <a id="nt"></a>notes.js and icons.js

@@ -3,6 +3,7 @@
 // themes, and the built-in theme used when the host's themes cannot be.
 import { mount, checkTheme } from '../index.js';
 import { layoutReport } from '../report.js';
+import { inlineRuns } from '../model/labels.js';
 
 const EXAMPLES = ['c4-shop', 'garden', 'job-race', 'order-states', 'sales-warehouse', 'shapes', 'shop-layers', 'shop-plan', 'slow-checkout', 'tools', 'avagahana-architecture'];
 const host = () => document.getElementById('a');
@@ -32,6 +33,12 @@ function labelProblems(svg, live) {
 }
 
 export async function testRender(check) {
+  // ---- labels: an underscore inside a word is an underscore (code names, release ids) ----
+  const runs = (t) => inlineRuns(t).map((r) => (r.bold ? 'B:' : r.italic ? 'I:' : '') + r.text).join('|');
+  check('labels: underscores inside words stay', runs('ORDER_SUPERVISION_TRIGGER') === 'ORDER_SUPERVISION_TRIGGER' && runs('Release RLSE0051851_NOV06_GOLIVE') === 'Release RLSE0051851_NOV06_GOLIVE' && runs('a__b__c') === 'a__b__c');
+  check('labels: a backslash keeps the mark, backticks keep the text', runs('ORDER\\_SUPERVISION\\_TRIGGER') === 'ORDER_SUPERVISION_TRIGGER' && runs('a\\*b\\*c') === 'a*b*c' && runs('`*x*` and *y*') === '*x* and |I:y');
+  check('labels: emphasis round words still works', runs('a _b_ c') === 'a |I:b| c' && runs('__bold__ x') === 'B:bold| x' && runs('**b** and *i*') === 'B:b| and |I:i');
+
   // ---- every example's every diagram: labelled, no links ----
   {
     const missing = [];
@@ -165,7 +172,7 @@ export async function testRender(check) {
     const v = mount(host(), { storageKey: null, marks: false });
     await v.load(SHOP, 'c4-shop.md');
     const real = (await v.export({ format: 'svg', report: true })).report;
-    check('report: from a real drawing, with colours as #rrggbb', real.nodes > 10 && real.colours.every((x) => x.fill === null || /^#[0-9a-f]{6}$/.test(x.fill)) && real.colours.find((x) => x.id === 'web')?.why.startsWith('class'), JSON.stringify(real.colours[1]));
+    check('report: from a real drawing, with colours as #rrggbb', real.nodes > 10 && real.colours.every((x) => [x.fill, x.stroke].every((c) => c === null || /^#[0-9a-f]{6}$/.test(c))) && real.colours.some((x) => x.stroke && x.stroke !== x.fill) && real.colours.find((x) => x.id === 'web')?.why.startsWith('class'), JSON.stringify(real.colours[1]));
     v.destroy();
   }
 

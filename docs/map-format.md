@@ -79,6 +79,8 @@ mindmap
   node; the checker rejects them.
 - **Label**: plain text. `**bold**` is allowed (main branches are bold by convention),
   `<br>` breaks a line. No other markup, no emoji, no links: a URL in a label is plain text.
+  An underscore inside a word is just an underscore (`ORDER_SUPERVISION_TRIGGER`), so code
+  names, constants and release ids need no escaping; `\_` and `\*` also keep the mark.
 - **Length**: at most 150 characters a line (between `<br>`s) and 1,000 in all. A longer
   line is shown as its first 147 characters and `...`, a longer label as its first 997
   and `...`, with a warning. Put more in the node's note.

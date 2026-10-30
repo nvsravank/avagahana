@@ -13,7 +13,7 @@
 //              that run is one line, joined, and where they part counts as where they meet.
 //   minGap     the gap asked for (2 px at the output's scale)
 //   smallestText {px, id}: the smallest text as it comes out at the output width
-//   colours    per node: {id, label, fill, why} ("category 3", "class database", ...)
+//   colours    per node: {id, label, fill, stroke, why} ("category 3", "class database", ...)
 
 const SAMPLE = 3;          // a line is read as points this far apart
 const END_NEAR = 6;        // near a line's own end: where it meets its box, not a finding
@@ -87,6 +87,7 @@ export function collectFacts(v) {
       box: boxIn(shape, vp),
       label: label && label.textContent ? boxIn(label, vp) : null,
       fill: fillEl ? hexOf(getComputedStyle(fillEl).fill) : null,
+      stroke: fillEl ? hexOf(getComputedStyle(fillEl).stroke) : null,
       why: whyOf(g, S.colourBy, n),
     });
   }
@@ -230,6 +231,6 @@ export function layoutReport(facts, opts = {}) {
     touching,
     minGap: opts.minGapPx ?? MIN_GAP,
     smallestText: smallest ? { px: r1(smallest.size * scale), id: smallest.id } : null,
-    colours: nodes.filter((n) => !n.frame || n.fill).map((n) => ({ id: n.id, label: n.name, fill: n.fill, why: n.why })),
+    colours: nodes.filter((n) => !n.frame || n.fill).map((n) => ({ id: n.id, label: n.name, fill: n.fill, stroke: n.stroke, why: n.why })),
   };
 }

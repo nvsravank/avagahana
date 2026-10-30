@@ -45,18 +45,26 @@ export function labelToRuns(node, warnings) {
   node.plain = node.runs.map((r) => r.map((s) => s.text).join('')).join(' ').trim();
 }
 
+// Emphasis as in Markdown: **bold**, __bold__, *italic*, _italic_. An underscore inside a
+// word is just an underscore (ORDER_SUPERVISION_TRIGGER, RLSE_NOV06_GOLIVE). A backslash
+// keeps the next \\ ` * or _ as itself; text in `backticks` is taken as written.
+const KEEP = 0xE000;   // private-use characters stand for kept text while emphasis is read
 export function inlineRuns(line) {
+  const kept = [];
+  const keep = (text) => String.fromCharCode(KEEP + kept.push(text) - 1);
+  const marked = line.replace(/\\([\\`*_])|`([^`]+)`/g, (m, ch, code) => keep(ch ?? code));
+  const restore = (s) => decode(s.replace(/[\uE000-\uF8FF]/g, (c) => kept[c.charCodeAt(0) - KEEP] ?? c));
   const out = [];
-  const re = /(\*\*([^*]+)\*\*|__([^_]+)__|\*([^*]+)\*|_([^_]+)_)/g;
+  const re = /(\*\*([^*]+)\*\*|(?<![\p{L}\p{N}_])__([^_]+)__(?![\p{L}\p{N}_])|\*([^*]+)\*|(?<![\p{L}\p{N}_])_([^_]+)_(?![\p{L}\p{N}_]))/gu;
   let pos = 0;
   let m;
-  while ((m = re.exec(line))) {
-    if (m.index > pos) out.push({ text: decode(line.slice(pos, m.index)), bold: false, italic: false });
-    if (m[2] || m[3]) out.push({ text: decode(m[2] || m[3]), bold: true, italic: false });
-    else out.push({ text: decode(m[4] || m[5]), bold: false, italic: true });
+  while ((m = re.exec(marked))) {
+    if (m.index > pos) out.push({ text: restore(marked.slice(pos, m.index)), bold: false, italic: false });
+    if (m[2] || m[3]) out.push({ text: restore(m[2] || m[3]), bold: true, italic: false });
+    else out.push({ text: restore(m[4] || m[5]), bold: false, italic: true });
     pos = re.lastIndex;
   }
-  if (pos < line.length) out.push({ text: decode(line.slice(pos)), bold: false, italic: false });
+  if (pos < marked.length) out.push({ text: restore(marked.slice(pos)), bold: false, italic: false });
   return out.filter((r) => r.text);
 }
 

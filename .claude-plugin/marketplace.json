@@ -8,7 +8,7 @@
     {
       "name": "avagahana",
       "source": "./",
-      "description": "Write a map as text, read it in an interactive viewer."
+      "description": "Write a map as text, read it in an interactive viewer or render it for a document."
     }
   ]
 }

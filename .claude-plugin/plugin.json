@@ -1,6 +1,6 @@
 {
   "name": "avagahana",
-  "description": "Clear diagrams for AI agents: write a map as text, read it in an interactive viewer.",
+  "description": "Clear diagrams for AI agents: write a map as text, read it in an interactive viewer or render it to SVG or PNG for a document, in your own brand theme.",
   "author": {
     "name": "nvsravank"
   },
