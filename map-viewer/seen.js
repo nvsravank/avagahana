@@ -151,7 +151,8 @@ export function createSeen(opts) {
   // everything new with it too (what is under it, its arrows, their places).
   function nodeKeys(part, id) {
     const under = new Set([id]);
-    if (marks.get(`${part}|n|${id}`) === 'new') {
+    const isNew = marks.get(`${part}|n|${id}`) === 'new';
+    if (isNew) {
       for (const k of marks.keys()) {
         const p = parseKey(k);
         if (p.part === part && p.type === 'n' && holdsNode(part, id, p.id)) under.add(p.id);
@@ -161,7 +162,7 @@ export function createSeen(opts) {
     for (const k of [...marks.keys(), ...removed.map((r) => r.key)]) {
       const p = parseKey(k);
       if (p.part === part && p.type === 'e' && under.has(p.id)) out.push(k);
-      if (under.size > 1 && p.part === part && p.type === 'a' && marks.get(k) === 'new' && (under.has(summary.items[k][2]) || under.has(summary.items[k][3]))) out.push(k);
+      if (isNew && p.part === part && p.type === 'a' && marks.get(k) === 'new' && (under.has(summary.items[k][2]) || under.has(summary.items[k][3]))) out.push(k);
     }
     for (const r of removed) if (r.parent === id && r.key.startsWith(`${part}|`)) out.push(r.key);
     return out;

@@ -116,8 +116,31 @@ export async function testChangeMarks(check, wait) {
   await openAll();
   m = marks();
   check('selecting a new box clears it and what is inside it', !m.extra && !m.x1 && !m.x2 && m.a === 'changed', JSON.stringify(m));
+  check('selecting a new box leaves no sparkle on its arrows', !host.querySelector('[data-mmv=rels] .mmv-change'));
   off?.();
   v.destroy();
+
+  // a new single node: selecting it clears its arrows too (they were new with it)
+  {
+    const solo = '# Solo\n\n```mermaid\nflowchart LR\n  a[Alpha] --> b[Beta]\n```\n';
+    localStorage.removeItem(`${key}-seen`);
+    const s = mount(host, { storageKey: key });
+    await s.load(solo, 'solo.md');
+    await s.load(solo.replace('  a[Alpha] --> b[Beta]\n', '  a[Alpha] --> b[Beta]\n  n[Newbie] --> b\n'), 'solo.md');
+    await wait(30);
+    const before = marks();
+    const relMark = () => !!host.querySelector('[data-mmv=rels] .mmv-change');
+    check('a new node carries the sparkle; its arrow does not', before.n === 'new' && !relMark(), JSON.stringify(before));
+    const smode = s.state.mode;
+    s.setState({ mode: 'list' });
+    await wait(30);
+    q('.mmv-lrow[data-id="n"]')?.click();
+    await wait(30);
+    s.setState({ mode: smode });
+    await wait(30);
+    check('selecting a new node clears it and its arrow', !marks().n && !relMark(), JSON.stringify(marks()));
+    s.destroy();
+  }
 
   // since: the same marks for every reader, nothing saved
   localStorage.removeItem(`${key}-seen`);
