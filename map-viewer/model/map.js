@@ -32,7 +32,7 @@ export const anchorOf = (heading) => heading.toLowerCase().trim().replace(/[^\w\
 // is not is a problem, and is listed in `unlinked` so the viewer can still show it.
 // -> the first diagram's map, with `parts: Map(anchor -> map)` (each with anchor, title),
 //    `unlinked: [anchor]`; a box diagram gets `sequences: [{anchor, view}]` (anchor
-//    null: the first diagram), a sequence `playsOver: [{anchor, view}]` (the valid ones)
+//    null: the first diagram), a sequence `playsOver: [{anchor, view, viewLabel}]` (the valid ones)
 export function parseMap(text, fileName) {
   const src = text.replace(/\r\n?/g, '\n');
   const fences = [...src.matchAll(/^```mermaid[^\n]*\n[\s\S]*?\n```/gm)];
@@ -257,7 +257,8 @@ const isBoxes = (m) => !!DIAGRAMS.find((d) => d.type === m.type)?.boxes;
 
 // Each walk of a state or ER diagram (model/walks.js) becomes a further diagram of the
 // file: a sequence over the diagram's own view, anchored `<diagram anchor>-walk-<name>`,
-// marked walk: true (the player and the lists name it a walk).
+// marked walk: true (the player and the lists name it a walk), with walkOf (its
+// diagram's anchor, null for the first) and walkName.
 function addWalks(main, fileName) {
   const mainAnchor = anchorOf(main.title);
   for (const m of [main, ...main.parts.values()]) {
@@ -273,6 +274,8 @@ function addWalks(main, fileName) {
       if (!part.root) continue;
       part.anchor = anchor;
       part.walk = true;
+      part.walkOf = m === main ? null : m.anchor;
+      part.walkName = walk.name;
       part.sequence.messages.forEach((msg, i) => { msg.connectionId = steps[i]?.rel.eid; });
       part.walkVerb = m.type === 'state' ? 'moves to' : 'joins';
       main.parts.set(anchor, part);
@@ -309,11 +312,11 @@ function linkSequences(main) {
         if (msg.self || !shown(msg.from) || !shown(msg.to)) continue;
         if (rels.some((r) => (r.from === msg.from && r.to === msg.to) || (r.from === msg.to && r.to === msg.from))) continue;
         bad = true;
-        sq.warnings.push(problem('sequence-no-arrow', `Message ${msg.num}${msg.back ? '↩' : ''} (${msg.from} to ${msg.to}) has no arrow between them in the view "${view.name}" of "${target.title}".`));
+        sq.warnings.push(problem('sequence-no-arrow', `Message ${msg.num}${msg.back ? ' (return)' : ''} (${msg.from} to ${msg.to}) has no arrow between them in the view "${view.name}" of "${target.title}".`));
       }
       if (bad) continue;
       const at = target === main ? null : target.anchor;
-      ok.push({ anchor: at, view: view.name });
+      ok.push({ anchor: at, view: view.name, viewLabel: view.label || view.name });
       target.sequences.push({ anchor: sq === main ? null : sq.anchor, view: view.name, title: sq.title });
     }
     sq.playsOverAll = sq.playsOver || [];

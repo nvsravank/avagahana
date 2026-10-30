@@ -79,7 +79,7 @@ export function buildScene(input) {
 }
 
 // One arrow a row; a message to itself loops out to the right and back. The number sits
-// at the arrow's start: a call's filled, a reply's (with ↩) outlined.
+// at the arrow's start: a call's filled, a reply's (with the return mark) outlined.
 export function relationShapes(input, play = playState(input.layout.seq, input.play?.step)) {
   const { layout: L } = input;
   const out = [];
@@ -88,7 +88,7 @@ export function relationShapes(input, play = playState(input.layout.seq, input.p
     const tint = st.includes('is-idle') ? 'idle' : m.reply ? 'reply' : 'call';
     const cls = `mmv-flow mmv-seq-msg is-kind mmv-seq-${tint}${m.line === 'dotted' ? ' is-dotted' : ''}${st}`;
     const head = m.head === 'open' ? null : m.head === 'cross' ? 'cross' : 'arrow';
-    const num = `${m.num}${m.back ? '↩' : ''}`;
+    const num = String(m.num);
     let d;
     let label;
     let badge;
@@ -106,7 +106,7 @@ export function relationShapes(input, play = playState(input.layout.seq, input.p
     out.push({
       kind: 'rel', id: `m${m.i}`, d, cls, head, tail: m.both ? head : null, tint,
       label: m.label || m.note ? { ...label, ...(m.note ? { note: true } : {}) } : null,
-      badge: { ...badge, text: num, reply: !!m.back || m.reply, cls: st.trim() },
+      badge: { ...badge, text: num, ...(m.back ? { back: true } : {}), reply: !!m.back || m.reply, cls: st.trim() },
       msg: m.i,
     });
   }

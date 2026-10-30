@@ -4,7 +4,7 @@
 // The viewer never touches location, document.title or a server: map text comes
 // in through load(), and links, cross-map navigation and shutdown go out through
 // the host callbacks. A missing callback hides its feature.
-import { chromeHtml, collect, uiSvg, UI, SHORTCUT, IS_MAC } from './chrome.js';
+import { chromeHtml, collect, uiSvg, opensSvg, UI, SHORTCUT, IS_MAC } from './chrome.js';
 import { parseMap } from './model/map.js';
 import { placeIn } from './model/deployments.js';
 import { categoryOf as branchCategory } from './model/tree.js';
@@ -382,7 +382,7 @@ export function mount(element, options = {}) {
     if (views.length < 2 || !m) return [];
     const holds = (id) => { for (let c = S.map.base.byId[id]; c; c = c.parent) if (c === m) return true; return false; };
     const shown = viewNamed(S.relView) || S.map.views[0];
-    return views.filter((x) => x.relations.some((r) => holds(r.from) || (!r.cross && holds(r.to)))).map((x) => ({ name: x.name, on: x === shown }));
+    return views.filter((x) => x.relations.some((r) => holds(r.from) || (!r.cross && holds(r.to)))).map((x) => ({ name: x.name, label: labelOf(x), on: x === shown }));
   }
   // Where a diagram node runs, environment by environment: [{envs, path}], those with
   // the same place together (path [] = not placed there); [] when no deployment
@@ -606,7 +606,8 @@ export function mount(element, options = {}) {
   function goPart(anchor) {
     if ((anchor || null) === S.part) return;
     if (!anchor) { if (S.trail.length) backTo(0, null); return; }
-    const t = trailFor(anchor);
+    // a diagram no link leads to (listed as "Not linked") opens from the first one
+    const t = trailFor(anchor) || (S.file?.unlinked?.includes(anchor) ? [{ anchor: null, focus: null, node: null }] : null);
     if (!t) return;
     S.trail = t;
     S.part = anchor;
@@ -741,7 +742,8 @@ export function mount(element, options = {}) {
     const canOpen = typeof host.openMap === 'function';
     const el = document.createElement(canOpen ? 'button' : 'span');
     el.className = 'mmv-relrow';
-    el.textContent = `${text}${canOpen ? ' ↗' : ''}`;
+    el.textContent = text;
+    if (canOpen) el.insertAdjacentHTML('beforeend', ` ${opensSvg()}`);
     if (canOpen) {
       el.addEventListener('click', () => {
         Promise.resolve().then(() => host.openMap(file, { focus: node || null, node: null })).catch((x) => {
@@ -760,7 +762,8 @@ export function mount(element, options = {}) {
         const target = node ? m?.byId?.[node] : m?.root;
         const arrow = r.from === n.id ? '→' : '←';
         if (m?.root && target) {
-          el.textContent = `${arrow} ${target.plain}${r.label ? ` (${r.label})` : ''}${canOpen ? ' ↗' : ''}`;
+          el.textContent = `${arrow} ${target.plain}${r.label ? ` (${r.label})` : ''}`;
+          if (canOpen) el.insertAdjacentHTML('beforeend', ` ${opensSvg()}`);
           el.title = otherId;
         } else {
           markMissing(el, 'not found');
@@ -957,7 +960,7 @@ export function mount(element, options = {}) {
       renderInfo();
       painter.animateNext();
     }
-    $.searchCount.textContent = `${S.hitIdx + 1} / ${S.hits.length}${other ? ` · ${other.name}` : ''}`;
+    $.searchCount.textContent = `${S.hitIdx + 1} / ${S.hits.length}${other ? ` · ${labelOf(other)}` : ''}`;
     jumpTo(S.hits[S.hitIdx], true);
   }
   function clearSearch() {
@@ -1050,10 +1053,14 @@ export function mount(element, options = {}) {
     painter.clearSizes();
     if (S.map?.root) render(!keepView && S.layout && !S.userMoved && S.lastFit ? S.lastFit : false);
   }
+  let lastLook = null;
   function applyChrome() {
     const t = currentTheme();
     if (t) {
       Object.assign(root.dataset, { theme: t.id, appearance: effectiveAppearance(t), colourBy: S.colourBy });
+      // a host styling its own frame to match (applyTheme) follows the theme and appearance
+      const look = JSON.stringify([t.id, root.dataset.appearance]);
+      if (look !== lastLook) { lastLook = look; emit('theme', { id: t.id, appearance: root.dataset.appearance }); }
       root.dataset.diagram = diagram().type;
       if (diagram().boxes) root.dataset.boxes = ''; else delete root.dataset.boxes;
     }
@@ -1191,7 +1198,9 @@ export function mount(element, options = {}) {
   // (dots, popovers, list counts, the icon index) follows the view. A deployment
   // (model/deployments.js) is a view that also brings its own tree: its root and byId
   // become the map's while it is shown (map.base keeps the diagram's).
-  const viewNamed = (name) => S.map?.views.find((x) => x.name === name) || null;
+  // a view by its name, or by the label it is shown with (the default's "Overview")
+  const viewNamed = (name) => S.map?.views.find((x) => x.name === name) || S.map?.views.find((x) => x.label === name) || null;
+  const labelOf = (x) => x?.label || x?.name;
   // A box diagram's view draws the ends of its arrows and the boxes round them (every
   // node when it has none). viewFor: the first view that draws a node the current
   // view leaves out, or null (drawn here, or in no view).
@@ -1225,7 +1234,7 @@ export function mount(element, options = {}) {
     $.viewBtn.classList.remove('has-changes');
     if (views.length < 2 && !lost.length) return;
     const current = viewNamed(S.relView) || views[0];
-    $.viewName.textContent = current?.name || 'Views';
+    $.viewName.textContent = labelOf(current) || 'Views';
     const item = (text, on, fn) => {
       const b = Object.assign(document.createElement('button'), { className: `mmv-menu-item${on ? ' is-on' : ''}`, textContent: text });
       b.addEventListener('click', () => { b.blur(); fn(); });
@@ -1237,7 +1246,7 @@ export function mount(element, options = {}) {
     const marked = (x) => x !== current && !!seen?.viewMarked(partKey(), x.name);
     $.viewBtn.classList.toggle('has-changes', views.some(marked) || lost.some((p) => seen?.partMarked(p.anchor)));
     $.viewMenu.replaceChildren(...(views.length < 2 ? [] : views).flatMap((x, k) => {
-      const b = item(x.name, x === current, () => setView(x.name));
+      const b = item(labelOf(x), x === current, () => setView(x.name));
       if (marked(x)) b.classList.add('has-changes');
       // the deployments after the relation views, under their own heading
       if (!x.deploy || views[k - 1]?.deploy) return [b];
@@ -1592,6 +1601,7 @@ export function mount(element, options = {}) {
     }
     markInfoBtn();
     emit('load', { path, title: file.title, warnings: file.warnings.slice() });
+    emitContents();
     emitState();
   }
 
@@ -1692,6 +1702,42 @@ export function mount(element, options = {}) {
     player.open(key, { step, play: false });
   }
 
+  // ---------- contents ----------
+  // Everything a reader can open in the file, in file order: each diagram (a sequence
+  // as kind sequence), then its relation views when it has more than one (the default
+  // first, under its label "Overview"; an ER join view as kind join), its deployments
+  // and its walks. type: the diagram's type (mindmap, flowchart, sequence, ...).
+  // state: what setState takes to open it (a sequence or walk opens
+  // playing at step 1; anything else stops a sequence that plays). Built from this
+  // viewer's model, never from the file's headings.
+  function contents() {
+    const f = S.file;
+    if (!f?.root || options.thumbnail) return [];
+    const out = [];
+    const unlinked = new Set(f.unlinked || []);
+    for (const m of [f, ...[...f.parts.values()].filter((p) => !p.walk)]) {
+      if (!m.root) continue;
+      const part = m === f ? null : m.anchor;
+      const mark = { ...(m === f ? { first: true } : {}), ...(part && unlinked.has(part) ? { unlinked: true } : {}) };
+      if (m.type === 'sequence') { out.push({ kind: 'sequence', label: m.title, part, type: m.type, state: { seq: part || 'main', step: 1 }, ...mark }); continue; }
+      out.push({ kind: 'diagram', label: m.title, part, type: m.type, state: { seq: null, part, view: null }, ...mark });
+      const own = { part, type: m.type, diagram: m.title };
+      const views = (m.views || []).filter((x) => !x.deploy);
+      if (views.length > 1) for (const x of views) out.push({ kind: x.join ? 'join' : 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name } });
+      for (const x of m.views || []) if (x.deploy) out.push({ kind: 'deployment', label: x.name, ...own, state: { seq: null, part, env: x.name } });
+      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 } });
+    }
+    return out;
+  }
+  let lastContents = null;
+  function emitContents() {
+    const list = contents();
+    const key = JSON.stringify(list);
+    if (key === lastContents) return;
+    lastContents = key;
+    emit('contents', list);
+  }
+
   // ---------- start ----------
   let destroyed = false;
   const ready = (async () => {
@@ -1721,6 +1767,7 @@ export function mount(element, options = {}) {
     get problems() { return problems.all(); },
     get title() { return S.map?.title || null; },
     get views() { return (S.map?.views || []).map((x) => x.name); },
+    contents,
     get themes() { return [...themes.values()].map((t) => ({ id: t.id, label: t.label })); },
     ready,
     slot: $.slot,

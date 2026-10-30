@@ -7,7 +7,7 @@
 // colour-by or look restyles without a repaint. Only geometry (layout, zoom level of
 // detail, collapse) repaints; selection and search repaint only the marks, related
 // links only their own layer and dots.
-import { UI } from './chrome.js';
+import { UI, RETURN_PATH, RETURN_W } from './chrome.js';
 import { picture } from './icons.js';
 import { diagramOf } from './diagrams/index.js';
 import { measure } from './measure.js';
@@ -76,7 +76,8 @@ export function createPainter(v) {
     let over = false;
     const tick = (now) => {
       if (over) return;
-      const k = Math.min(1, (now - start) / ms);
+      // a frame's time can be a little before start: never run backwards
+      const k = Math.max(0, Math.min(1, (now - start) / ms));
       step(ease(k));
       if (k < 1) { requestAnimationFrame(tick); return; }
       over = true;
@@ -465,9 +466,12 @@ export function createPainter(v) {
   // a step number on a sequence's arrow (lifelines here, the player's over a view)
   function badge(b, tint, parent) {
     const g = svgEl('g', { class: `mmv-seq-badge mmv-seq-${tint || (b.reply ? 'reply' : 'call')}${b.reply ? ' is-reply' : ''}${b.cls ? ` ${b.cls}` : ''}`, transform: `translate(${b.x},${b.y})` }, parent);
-    const w = Math.max(18, b.text.length * 6.5 + 8);
+    // a return: the number, then the return mark drawn as a path (chrome.js), never a glyph
+    const ret = b.back ? RETURN_W : 0;
+    const w = Math.max(18, b.text.length * 6.5 + 8 + ret);
     svgEl('rect', { x: -w / 2, y: -9, width: w, height: 18, rx: 9 }, g);
-    svgEl('text', { 'text-anchor': 'middle', y: 4, 'font-size': 11, 'font-weight': 700 }, g).textContent = b.text;
+    svgEl('text', { 'text-anchor': 'middle', x: -ret / 2, y: 4, 'font-size': 11, 'font-weight': 700 }, g).textContent = b.text;
+    if (ret) svgEl('path', { class: 'mmv-ret', d: RETURN_PATH, transform: `translate(${(b.text.length * 6.5) / 2 - ret / 2 + 1},-4.5) scale(${ret / 256})` }, g);
     return g;
   }
 

@@ -8,6 +8,7 @@ import { parseHash, buildHash, ownMapLink } from '../hash.js';
 import { detectServer, serverSource, folderSource } from '../sources.js';
 import { mapPanel } from '../tree.js';
 import { navigationTests } from './navigation.js';
+import { contentsBar } from '../bar.js';
 
 // A folder handle in memory, with the part of the File System Access API that
 // folderSource and these tests use.
@@ -262,6 +263,49 @@ try {
   document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
   check('panel: a click elsewhere closes it', !panel.isOpen);
   panel.destroy();
+  // ---- contents bar ----
+  const barEl = document.createElement('header');
+  barEl.style.width = '420px';
+  document.body.appendChild(barEl);
+  const picks = [];
+  const bar = contentsBar(barEl, { onLogo() {}, onPick: (s) => picks.push(s) });
+  bar.setTitle('Shop');
+  const items = [
+    { kind: 'diagram', label: 'Shop', part: null, first: true, state: { seq: null, part: null, view: null } },
+    { kind: 'view', label: 'Overview', part: null, diagram: 'Shop', state: { seq: null, part: null, view: null } },
+    { kind: 'view', label: 'Data flow', part: null, diagram: 'Shop', state: { seq: null, part: null, view: 'Data flow' } },
+    { kind: 'deployment', label: 'Production', part: null, diagram: 'Shop', state: { seq: null, part: null, env: 'Production' } },
+    { kind: 'diagram', label: 'Orders', part: 'orders', state: { seq: null, part: 'orders', view: null } },
+    { kind: 'join', label: 'Lines', part: 'orders', diagram: 'Orders', state: { seq: null, part: 'orders', view: 'Lines' } },
+    { kind: 'walk', label: 'Pay then ship', part: 'orders', diagram: 'Orders', state: { seq: 'orders-walk-pay-then-ship', step: 1 } },
+    { kind: 'sequence', label: 'Checkout', part: 'checkout', unlinked: true, state: { seq: 'checkout', step: 1 } },
+  ];
+  bar.setContents(items);
+  const chipText = () => [...barEl.querySelectorAll('.atlas-chip')].map((b) => b.textContent);
+  check('bar: chips in groups Diagrams | Views | Deployments | Plays', show([...barEl.querySelectorAll('.atlas-group')].map((g) => g.getAttribute('aria-label'))) === show(['Diagrams', 'Views', 'Deployments', 'Plays']) && barEl.querySelectorAll('.atlas-sep').length === 3);
+  check('bar: views of several diagrams name their diagram; plays do not', show(chipText()) === show(['Shop', 'Orders', 'Shop · Overview', 'Shop · Data flow', 'Orders · Lines', 'Shop · Production', 'Pay then ship', 'Checkout']), show(chipText()));
+  const current = () => barEl.querySelector('.atlas-chip[aria-current=true]')?.textContent;
+  bar.setState({ part: null, view: null });
+  check('bar: the current view is marked, not its diagram', current() === 'Shop · Overview', current());
+  bar.setState({ part: null, env: 'Production' });
+  check('bar: a deployment is marked', current() === 'Shop · Production', current());
+  bar.setState({ part: 'orders', view: 'Lines' });
+  check('bar: a join view is marked', current() === 'Orders · Lines', current());
+  bar.setState({ part: null, seq: 'orders-walk-pay-then-ship', step: 3 });
+  check('bar: a play is marked while it plays', current() === 'Pay then ship', current());
+  [...barEl.querySelectorAll('.atlas-chip')].find((b) => b.textContent === 'Shop · Data flow').click();
+  check('bar: a chip hands over its state', show(picks.at(-1)) === show({ seq: null, part: null, view: 'Data flow' }), show(picks));
+  check('bar: an unlinked diagram is marked so', barEl.querySelector('.atlas-chip.is-unlinked')?.textContent === 'Checkout');
+  check('bar: chips are buttons the keyboard reaches', [...barEl.querySelectorAll('.atlas-chip')].every((b) => b.tagName === 'BUTTON' && b.tabIndex === 0));
+  check('bar: no scroll bar; more beyond the edge shows an arrow', getComputedStyle(barEl.querySelector('.atlas-scroll')).overflowX === 'auto' && !barEl.querySelector('.atlas-arrow.is-right').hidden && barEl.querySelector('.atlas-arrow.is-left').hidden);
+  bar.setContents([items[0]]);
+  check('bar: one diagram and nothing else: no chips, title stays', !barEl.querySelector('.atlas-chip') && barEl.querySelector('.atlas-title').textContent === 'Shop');
+  check('bar: nothing more, no arrows', barEl.querySelector('.atlas-arrow.is-right').hidden && barEl.querySelector('.atlas-arrow.is-left').hidden);
+  bar.setLogo(false);
+  check('bar: the logo can be hidden; the word mark stays', barEl.querySelector('.atlas-logo').hidden && barEl.querySelector('.atlas-wordmark')?.textContent === 'avagahana');
+  check('bar: the mark is the website\'s two waves', barEl.querySelectorAll('.atlas-logo .atlas-wave').length === 2);
+  barEl.remove();
+
   await navigationTests(check);
   check('panel: destroy removes it', !slot.childElementCount);
 } catch (e) {

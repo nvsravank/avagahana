@@ -289,7 +289,7 @@ export function createAspects(v, h) {
     if (!list.length) return null;
     const g = grid();
     for (const x of list) {
-      const { b, pic } = card(x.on ? `${x.name} · shown` : x.name, x.on, x.on ? null : () => h.showIn(x.name, n.id));
+      const { b, pic } = card(x.on ? `${x.label} · shown` : x.label, x.on, x.on ? null : () => h.showIn(x.name, n.id));
       g.appendChild(b);
       track(h.thumb(pic, { view: x.name, node: n.id }));
     }

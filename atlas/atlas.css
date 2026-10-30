@@ -1,8 +1,9 @@
 /* atlas.css — the atlas page. Colours come from the viewer's theme variables
    (--mmv-*): the picker sits inside the viewer, the screen gets them through applyTheme. */
-html, body { margin: 0; height: 100%; }
-body { background: var(--mmv-bg, #fff); }
-#app { height: 100vh; height: 100dvh; }
+html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+/* the page itself takes the viewer's background (app.js themes <html>), so no white edge
+   shows behind the bar and viewer: an elastic bounce, a phone's safe areas, the first paint */
+html, body { background: var(--mmv-bg, #fff); }
 
 .atlas-picker { position: relative; display: flex; }
 .atlas-pill, .atlas-panel {
@@ -73,3 +74,56 @@ body { background: var(--mmv-bg, #fff); }
 }
 .atlas-btn:hover { background: var(--mmv-chrome-hover, #eee); }
 .atlas-btn.is-main { background: var(--mmv-chrome-active, #222); color: var(--mmv-chrome-active-ink, #fff); border-color: transparent; }
+
+/* the contents bar (bar.js): one 44px row above the viewer, in the theme's frame
+   colours (--mmv-frame-*, applyTheme on the bar) */
+#app { height: calc(100vh - 44px); height: calc(100dvh - 44px); }
+.atlas-bar {
+  box-sizing: border-box; display: flex; align-items: center; gap: 4px; height: 44px; padding: 0 6px 0 2px;
+  background: var(--mmv-frame-bg); color: var(--mmv-frame-ink); font-family: var(--mmv-font, system-ui, sans-serif);
+  border-bottom: 1px solid color-mix(in srgb, var(--mmv-frame-ink) 12%, var(--mmv-frame-bg));
+}
+.atlas-bar button:focus-visible { outline: 2px solid var(--mmv-frame-accent); outline-offset: 1px; }
+.atlas-logo {
+  flex: none; display: grid; place-items: center; width: 42px; height: 42px; padding: 0;
+  border: 0; border-radius: 10px; background: none; cursor: pointer;
+}
+.atlas-logo svg { display: block; overflow: visible; }
+/* the website's mark: the two waves meet in gold on dark, in brown on light */
+.atlas-waves { isolation: isolate; }
+.atlas-wave { mix-blend-mode: multiply; }
+.atlas-bar[data-appearance="dark"] .atlas-wave { mix-blend-mode: screen; }
+.atlas-logo:hover { background: color-mix(in srgb, var(--mmv-frame-ink) 7%, transparent); }
+.atlas-logo[hidden] { display: none; }
+.atlas-scroll-wrap { position: relative; flex: 1; min-width: 0; height: 100%; }
+.atlas-scroll {
+  display: flex; align-items: center; gap: 10px; height: 100%; padding: 0 6px;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none; overscroll-behavior-x: contain;
+  -webkit-mask-image: linear-gradient(to right, var(--atlas-fade-l, #000) 0, #000 36px, #000 calc(100% - 36px), var(--atlas-fade-r, #000) 100%);
+  mask-image: linear-gradient(to right, var(--atlas-fade-l, #000) 0, #000 36px, #000 calc(100% - 36px), var(--atlas-fade-r, #000) 100%);
+}
+.atlas-scroll::-webkit-scrollbar { display: none; }
+.atlas-scroll-wrap.has-left .atlas-scroll { --atlas-fade-l: transparent; }
+.atlas-scroll-wrap.has-right .atlas-scroll { --atlas-fade-r: transparent; }
+.atlas-arrow {
+  position: absolute; top: 50%; z-index: 1; display: grid; place-items: center; width: 26px; height: 26px; padding: 0;
+  transform: translateY(-50%); border: 1px solid var(--mmv-frame-chip-edge); border-radius: 50%;
+  background: var(--mmv-frame-chip); color: var(--mmv-frame-chip-ink); cursor: pointer;
+}
+.atlas-arrow.is-left { left: 0; }
+.atlas-arrow.is-right { right: 0; }
+.atlas-arrow[hidden] { display: none; }
+.atlas-wordmark { flex: none; font-weight: 600; font-size: 19px; line-height: 1; color: var(--mmv-frame-ink); }
+.atlas-title { flex: none; font-weight: 600; font-size: 15px; color: var(--mmv-frame-muted); white-space: nowrap; }
+.atlas-chips { display: flex; align-items: center; gap: 10px; }
+.atlas-chips:empty { display: none; }
+.atlas-group { display: flex; align-items: center; gap: 6px; }
+.atlas-sep { flex: none; width: 1px; height: 20px; background: var(--mmv-frame-muted); opacity: .5; }
+.atlas-chip {
+  flex: none; height: 28px; padding: 0 11px; border: 1px solid var(--mmv-frame-chip-edge); border-radius: 14px;
+  background: var(--mmv-frame-chip); color: var(--mmv-frame-chip-ink); font: inherit; font-size: 13px; font-weight: 600;
+  white-space: nowrap; cursor: pointer;
+}
+.atlas-chip:hover { color: var(--mmv-frame-ink); background: color-mix(in srgb, var(--mmv-frame-ink) 6%, var(--mmv-frame-chip)); }
+.atlas-chip[aria-current="true"] { background: var(--mmv-frame-chip-active); border-color: var(--mmv-frame-accent); color: var(--mmv-frame-chip-active-ink); }
+.atlas-chip.is-unlinked { border-style: dashed; }

@@ -50,7 +50,7 @@ export function buildListScene(input) {
 
 // An arrow for a relation, seen from one of its ends: direction and line kind.
 function glyphOf(r, out) {
-  if (r.head && r.tail) return '↔';
+  if (r.head && r.tail) return '⇄';
   const g = { solid: ['→', '←'], dotted: ['⇢', '⇠'], thick: ['⇒', '⇐'] }[r.line || 'solid'] || ['→', '←'];
   return out ? g[0] : g[1];
 }

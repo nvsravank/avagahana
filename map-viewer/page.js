@@ -18,7 +18,7 @@ const settle = (anim, t) => Promise.race([anim.finished.catch(() => {}), new Pro
 
 // v: viewer internals. h: {wireLink(a), crossRow(r, n, text), jumpTo(id),
 //   openDiagram(anchor, nodeId), thumb(el, anchor | {view, node}) -> destroy(), changed(),
-//   placements(nodeId) -> [{envs, path}], showIn(env, nodeId), viewsOf(nodeId) -> [{name, on}],
+//   placements(nodeId) -> [{envs, path}], showIn(env, nodeId), viewsOf(nodeId) -> [{name, label, on}],
 //   sequencesOf(nodeId) -> [{anchor, title, steps}], play(anchor, step)}
 export function createPage(v, h) {
   const { S, $, root } = v;

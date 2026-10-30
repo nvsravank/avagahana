@@ -213,7 +213,8 @@
    "badge": {
     "x": 344.3,
     "y": 108,
-    "text": "1↩",
+    "text": "1",
+    "back": true,
     "reply": true,
     "cls": "is-past"
    },
@@ -257,7 +258,8 @@
    "badge": {
     "x": 316.3,
     "y": 188,
-    "text": "2↩",
+    "text": "2",
+    "back": true,
     "reply": true,
     "cls": "is-past"
    },

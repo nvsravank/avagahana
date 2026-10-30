@@ -1,6 +1,6 @@
 // list.js — a sequence's List mode: its steps, numbered as on the arrows, under their
 // blocks; a click plays from that step (the shared list.js hands over to this).
-import { uiSvg } from '../../chrome.js';
+import { uiSvg, putNumber } from '../../chrome.js';
 import { playState } from './scene.js';
 
 // A sequence's list: its steps, numbered as on the arrows, each under the blocks it is
@@ -20,7 +20,7 @@ export function buildSequenceRows(seq, byId, step) {
     if (st.repeat) { rows.push({ kind: 'step', step: k, depth: caps.length, cls: `mmv-lstep is-repeat${state}`, num: '↻', text: st.captions.at(-1) }); return; }
     for (const m of st.msgs) {
       rows.push({
-        kind: 'step', step: k, depth: caps.length, cls: `mmv-lstep${m.reply ? ' is-reply' : ''}${state}`, num: `${m.num}${m.back ? '↩' : ''}`,
+        kind: 'step', step: k, depth: caps.length, cls: `mmv-lstep${m.reply ? ' is-reply' : ''}${state}`, num: String(m.num), ...(m.back ? { back: true } : {}),
         text: m.self ? `${name(m.from)}, to itself` : `${name(m.from)} ${m.reply ? '⇠' : '→'} ${name(m.to)}`, label: m.label || null, note: !!m.note,
       });
     }
@@ -36,7 +36,7 @@ export function renderSequenceList(v, on) {
     row.className = r.kind === 'block' ? 'mmv-lblock' : r.kind === 'note' ? 'mmv-lseq-note' : r.cls;
     row.style.paddingLeft = `${10 + r.depth * 22}px`;
     if (r.kind === 'step') {
-      row.append(Object.assign(document.createElement('span'), { className: `mmv-seq-chip mmv-seq-${r.cls.includes('is-reply') ? 'reply is-reply' : 'call'}`, textContent: r.num }), ` ${r.text}`);
+      row.append(putNumber(Object.assign(document.createElement('span'), { className: `mmv-seq-chip mmv-seq-${r.cls.includes('is-reply') ? 'reply is-reply' : 'call'}` }), r.num, r.back), ` ${r.text}`);
       if (r.label) row.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lrel-label', textContent: ` · ${r.label}` }));
       if (r.note) row.insertAdjacentHTML('beforeend', `<span class="mmv-lnote-ic" title="Has details">${uiSvg('note', 14)}</span>`);
       row.title = `Step ${r.step + 1}: play from here`;

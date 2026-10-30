@@ -45,7 +45,8 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.on(type, fn)` | Subscribe to an event; returns an unsubscribe function. |
 | `viewer.ready` | Resolves when themes, stylesheet and font are ready. |
 | `viewer.title` | The current map's title, or `null`. |
-| `viewer.views` | The names of the map's relation views, the default first (`[]` when it has none). |
+| `viewer.views` | The names of the map's relation views, the default first (`[]` when it has none). The default's name is `Relations`; readers see it as "Overview", and `setState({view})` takes either. |
+| `viewer.contents()` | Everything a reader can open in the map, in file order (below). A new array each call. |
 | `viewer.problems` | The current problems, below. |
 | `viewer.themes` | `[{id, label}]` of the registered themes. |
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
@@ -167,8 +168,31 @@ this and learns nothing back. (WO-13.)
 |---|---|
 | `state` | The full state, after any change. |
 | `load` | `{path, title, warnings}` after a map is shown. |
+| `contents` | `viewer.contents()`, after a load or live reload that changes it. |
+| `theme` | `{id, appearance}` (`light` / `dark`) when the theme or the appearance shown changes, so a host can style its own frame to match (`applyTheme(el, id, {appearance})`). |
 | `warning` | A problem of level `warning`, when it first appears. |
 | `error` | A problem of level `error`, when it first appears. |
+
+## Contents
+
+`viewer.contents()` lists what the loaded map holds, for a host's own contents row (the
+atlas bar, the website gallery), built from the viewer's model, never from headings.
+Each viewer has its own list. Entries, in file order:
+
+| `kind` | One per | `state` (what `setState` takes to open it) |
+|---|---|---|
+| `diagram` | box, mind map, state or ER diagram | `{seq: null, part, view: null}` |
+| `sequence` | sequence diagram | `{seq: part or 'main', step: 1}` (plays from step 1) |
+| `view` | relation view of a diagram with more than one, the default first (label "Overview") | `{seq: null, part, view: name or null}` |
+| `join` | ER join view (`## Joins: <name>`) | as `view` |
+| `deployment` | environment | `{seq: null, part, env}` |
+| `walk` | walk of a state or ER diagram | `{seq: anchor, step: 1}` |
+
+Every entry has `kind`, `label`, `part` (the diagram's anchor, `null` for the first) and
+`type` (the diagram's type); views, deployments and walks also `diagram` (its title).
+The first diagram has `first: true`; a diagram no link reaches ("Not linked") has
+`unlinked: true`, and its `state` still opens it. Entries may gain fields later; a host
+ignores those it does not know. The `contents` event fires when the list changes.
 
 ## Problems
 
@@ -237,6 +261,7 @@ loads the font with the `FontFace` API.
       muted, accent, center, centerInk, tint,
       roles: { good, warn, bad, info, highlight, link, idle?, idleLine?, call?, reply? },
       chrome: { bg, border, hover, active, activeInk, shadow },
+      frame: { bg, ink, muted, accent, chip, chipEdge, chipInk, chipActive, chipActiveInk },
       icons: { red, orange, yellow, green, blue, purple, grey },
     },
     dark: { … },
@@ -252,6 +277,10 @@ loads the font with the `FontFace` API.
   contrasts more with it.
 - **Checks** (warnings): palette colours at least 3:1 on the background; text on a
   fill at least 3:1; body text at least 4.5:1.
+- **`frame`** (optional): the colours of a host's bar round the viewer (the atlas
+  contents bar), as `--mmv-frame-*` variables (`--mmv-frame-chip-edge`, …). Left out,
+  it is filled in quietly from `bg`, `ink`, `muted`, `accent` and `chrome`. Warnings:
+  text and chip text under 4.5:1, chip edges under 3:1 on the bar.
 - **Font `data`**: an `ArrayBuffer`, a typed array, a base64 string, or a function
   returning a promise of one of those (for loading on demand).
 - **Incomplete fonts:** a missing weight borrows the nearest face of the same style
@@ -268,7 +297,8 @@ loads the font with the `FontFace` API.
   outline). Choices are saved under `storageKey`.
 
 **Built-in theme** (`id: 'default'`, label "Avagahana"): light and dark; a 13-colour
-category palette; the blue family as the level ramp; font Atkinson Hyperlegible Next
+category palette; the blue family as the level ramp; a `frame` in the Avagahana
+website's colours (its ground, ink and olive accent); font Atkinson Hyperlegible Next
 (OFL). Its font files load only when it is used. `defaultTheme: false` hides it.
 
 ### `applyTheme(element, theme, {appearance})`

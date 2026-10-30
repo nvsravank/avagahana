@@ -227,7 +227,8 @@ diagram they are its arrows.
 A map can have several sets of relations over the same nodes ("calls", "data flow",
 "ownership"). `## Relations` is the default view; each `## Relations: <name>` section
 is a named view, in file order. In a box diagram, the arrows inside the block are the
-default view.
+default view. Readers see the default view as **Overview** (the view picker, the atlas
+bar); its heading stays `## Relations`, and links and `setState` may name it either way.
 
 ```
 ## Relations: Data flow

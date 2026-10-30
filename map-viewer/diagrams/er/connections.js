@@ -1,7 +1,7 @@
 // Column connections live outside Mermaid. Relationships describe the model;
 // named join views describe equality pairs and may reuse relationship IDs.
 import { problem } from '../../model/problem.js';
-import { parseRelations } from '../../model/relations.js';
+import { parseRelations, DEFAULT_VIEW_LABEL } from '../../model/relations.js';
 import { inferRoles } from './roles.js';
 
 const ID = '[A-Za-z_][\\w-]*';
@@ -37,7 +37,7 @@ export function parseConnection(line, byId, warnings, join = false) {
 }
 
 export function parseErViews(sections, byId, warnings, own = []) {
-  const views = [{ name: 'Relations', relations: own.slice() }];
+  const views = [{ name: 'Relations', label: DEFAULT_VIEW_LABEL, relations: own.slice() }];
   const ids = new Map();
   const register = (r) => {
     if (!r) return false;

@@ -15,6 +15,9 @@
 #      format/problems.json has a sample. (The browser tests hold the viewer to the same.)
 #   4. Cloud icon notices: every set in map-viewer/vendor/ other than phosphor has a NOTICE.md
 #      (the vendor's terms; scripts/import_vendor_icons.py writes it).
+#   6. Emoji forms (scripts/check_emoji.py): no character a system may draw as an emoji
+#      in map-viewer/ or atlas/ (test fixtures and vendor/ left out); the check itself
+#      must fail on a planted U+21A9.
 #   5. Plugin layout: both clients use the root package and shared skills/ (illuminate-concept,
 #      trace-architecture).
 set -u
@@ -120,6 +123,14 @@ for d in "$ROOT"/map-viewer/vendor/*/; do
   [ "$set_name" = phosphor ] && continue
   [ -f "$d/NOTICE.md" ] || { echo "notice: map-viewer/vendor/$set_name/ has no NOTICE.md (python3 scripts/import_vendor_icons.py --notices)"; fail=1; }
 done
+
+# ---- 6. emoji forms ----
+python3 -I "$ROOT/scripts/check_emoji.py" || fail=1
+python3 -I "$ROOT/scripts/check_emoji.py" --self-test >/dev/null || { echo "emoji: self-test failed"; fail=1; }
+planted="$(mktemp)"
+printf 'const mark = "\xe2\x86\xa9";\n' > "$planted"
+if python3 -I "$ROOT/scripts/check_emoji.py" "$planted" >/dev/null; then echo "emoji: the check passed a planted U+21A9"; fail=1; fi
+rm -f "$planted"
 
 # ---- 5. plugin layout ----
 python3 -I - "$ROOT" <<'PYPLUGIN' || fail=1

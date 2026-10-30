@@ -6,6 +6,31 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** `viewer.contents()` lists every diagram, relation view, join view,
+  deployment, sequence and walk of the map with the state that opens it, from the
+  viewer's model; the `contents` event fires when the list changes. A `theme` event
+  (`{id, appearance}`) lets a host style its own frame to match.
+- **Contract** Themes gain an optional `frame` colour group (`--mmv-frame-*`) for a
+  host's bar; the built-in theme's takes the website's colours (ground, ink, olive accent). Themes without it get
+  one derived from their other colours.
+- **Contract** The default relation view is shown as "Overview" (view picker, node
+  page, search, player). Its heading and state name stay `Relations`; `setState`
+  takes either.
+- Atlas: a contents bar above the viewer (44 px): the logo (opens the map list), the
+  word mark, the map title and a chip for each diagram, view, deployment and play, in
+  a scroller with fades and arrows instead of a scroll bar. `?logo=0` hides the logo.
+  The bar uses the website's mark (rose and olive waves, `atlas/brand/mark.svg`, also the
+  page icon) and word mark.
+- The return mark of a reply is a drawn icon, not the character U+21A9, which iPhone
+  Safari draws as an emoji. Two-way and opens-elsewhere arrows are drawn or swapped too.
+  `scripts/check_emoji.py` (run by `check.sh`) fails on any character with an emoji form
+  in `map-viewer/` or `atlas/`.
+- A sequence step's camera glide no longer jumps past its start when the first frame's
+  time comes before the glide began, and arrives even when the page gets few frames
+  (a timer finishes it, as box glides already did). Box glides and the message dot are
+  held at their start the same way. The headless browser test "setTheme keeps a view a
+  sequence step moved to" failed on `master` from this.
+
 - **Contract** `setState({seq: null, …})` stops the sequence and then applies the other
   fields of the same call (`part`, `view`, `env`, `focus`, `node`, `page`, `mode`, `rels`);
   before, it stopped the sequence and ignored the rest. Playing a sequence is unchanged.

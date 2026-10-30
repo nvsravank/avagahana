@@ -17,7 +17,7 @@ export async function navigationTests(check) {
   const text = (name) => `# ${name}\n\n\`\`\`mermaid\nmindmap\n  root((${name}))\n\`\`\`\n`;
   try {
     w.document.open();
-    w.document.write(`<base href="${atlas.href}"><title>Starting</title><div id="app" style="height:400px"></div><div id="screen" hidden></div>`);
+    w.document.write(`<base href="${atlas.href}"><title>Starting</title><header id="bar"></header><div id="app" style="height:400px"></div><div id="screen" hidden></div>`);
     w.document.close();
     w.history.replaceState(null, '', new URL('index.html#/a.md', atlas));
     const realFetch = w.fetch.bind(w);
@@ -46,6 +46,11 @@ export async function navigationTests(check) {
     script.src = new URL('app.js', atlas).href;
     w.document.head.append(script);
     await until(() => w.document.title === 'A · Avagahana' && treeEvent);
+    const bar = w.document.getElementById('bar');
+    check('atlas: the contents bar shows the logo, word mark and title', bar.classList.contains('atlas-bar') && !bar.querySelector('.atlas-logo').hidden
+      && bar.querySelector('.atlas-wordmark') && bar.querySelector('.atlas-title').textContent === 'A');
+    check('atlas: one diagram and nothing else: no chips', !bar.querySelector('.atlas-chip'));
+    check('atlas: the bar takes the frame colours of the viewer\'s theme', bar.dataset.theme === 'default' && w.getComputedStyle(bar).getPropertyValue('--mmv-frame-bg').trim() !== '');
 
     deferPath = 'a.md';
     version++;

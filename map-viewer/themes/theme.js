@@ -22,6 +22,9 @@
 //                 muted?, accent?, center?, centerInk?, tint?,
 //                 roles?: {good, warn, bad, info, highlight, link, idle?, idleLine?, call?, reply?},
 //                 chrome?: {bg, border, hover, active, activeInk, shadow},
+//                 frame?: {bg, ink, muted, accent, chip, chipEdge, chipInk, chipActive, chipActiveInk},
+//                   a host's bar round the viewer (the atlas's contents bar); optional,
+//                   derived from bg, ink and chrome when left out
 //                 icons?: {red, orange, yellow, green, blue, purple, grey} }
 
 const APPEARANCES = ['light', 'dark'];
@@ -142,6 +145,24 @@ function fillAppearance(name, src, warn) {
     },
     icons: Object.fromEntries(SWATCHES.map((k) => [k, pick(icons[k], sw[k], `icons.${k}`)])),
   };
+  // a host's frame (the atlas bar): optional, filled in quietly from the colours above
+  const fr = src.frame || {};
+  const quietly = (v, fallback) => (isColour(v) ? v : fallback);
+  app.frame = {
+    bg: quietly(fr.bg, mix(ink, 5, bg)),
+    ink: quietly(fr.ink, ink),
+    muted: quietly(fr.muted, app.muted),
+    accent: quietly(fr.accent, app.accent),
+    chip: quietly(fr.chip, bg),
+    chipEdge: quietly(fr.chipEdge, mix(ink, 45, bg)),
+    chipInk: quietly(fr.chipInk, ink),
+    chipActive: quietly(fr.chipActive, app.chrome.active),
+    chipActiveInk: quietly(fr.chipActiveInk, app.chrome.activeInk),
+  };
+  for (const [a, b, min, what] of [['ink', 'bg', 4.5, 'text'], ['chipInk', 'chip', 4.5, 'chip text'], ['chipActiveInk', 'chipActive', 4.5, 'current chip text'], ['chipEdge', 'bg', 3, 'chip edge']]) {
+    const r = contrast(app.frame[a], app.frame[b]);
+    if (r != null && r < min) warn('contrast-frame', `Appearance "${name}": frame ${what} is ${r.toFixed(1)}:1; ${min}:1 or more reads well.`);
+  }
   const roleDefault = { good: app.icons.green, warn: app.icons.yellow, bad: app.icons.red, info: app.icons.blue, highlight: app.icons.yellow, link: app.icons.red };
   app.roles = Object.fromEntries(ROLES.map((k) => [k, pick(ro[k], roleDefault[k], `roles.${k}`)]));
   // a sequence's player (optional, filled in quietly): what is not played yet (idle box
@@ -192,6 +213,9 @@ function themeCss(t) {
       tint: `${app.tint}%`,
       'chrome-bg': app.chrome.bg, 'chrome-border': app.chrome.border, 'chrome-hover': app.chrome.hover,
       'chrome-active': app.chrome.active, 'chrome-active-ink': app.chrome.activeInk, shadow: app.chrome.shadow,
+      'frame-bg': app.frame.bg, 'frame-ink': app.frame.ink, 'frame-muted': app.frame.muted, 'frame-accent': app.frame.accent,
+      'frame-chip': app.frame.chip, 'frame-chip-edge': app.frame.chipEdge, 'frame-chip-ink': app.frame.chipInk,
+      'frame-chip-active': app.frame.chipActive, 'frame-chip-active-ink': app.frame.chipActiveInk,
       ...app.roles,
       ...Object.fromEntries(SWATCHES.map((k) => [`icon-${k}`, app.icons[k]])),
     };

@@ -19,12 +19,13 @@ export function shortenLabel(label) {
 // Icons come only from ::icon(code) lines. An emoji typed into a label is
 // never drawn with an OS font: it is removed and shown as the 'unknown' icon,
 // with a warning, so it gets fixed in the map.
-const EMOJI_RE = /(?:[0-9#*]️?⃣|\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}️?)*|[\u{1F1E6}-\u{1F1FF}]{2})/gu;
+// (written with escapes: U+FE0F variation selector, U+20E3 keycap, U+200D joiner)
+const EMOJI_RE = /(?:[0-9#*]\u{FE0F}?\u{20E3}|\p{Extended_Pictographic}(?:\u{FE0F}|\u{200D}\p{Extended_Pictographic}\u{FE0F}?)*|[\u{1F1E6}-\u{1F1FF}]{2})/gu;
 
 export function extractEmoji(text, warnings, where) {
   const codes = [];
   const clean = text.replace(EMOJI_RE, (m) => {
-    if ('©®™'.includes(m)) return m;
+    if ('\u00A9\u00AE\u2122'.includes(m)) return m;   // the copyright, registered and trade marks stay text
     codes.push('unknown');
     warnings.push(problem('emoji', `Emoji ${m} in ${where}; use ::icon(code) instead.`));
     return '';

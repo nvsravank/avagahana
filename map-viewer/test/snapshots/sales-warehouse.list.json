@@ -23,28 +23,28 @@
     "other": "DATE",
     "name": "Date",
     "label": "ordered on",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "PRODUCT",
     "name": "Product",
     "label": "sells",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "CUSTOMER",
     "name": "Customer",
     "label": "bought by",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "STORE",
     "name": "Store",
     "label": "sold at",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": true
@@ -73,21 +73,21 @@
     "other": "DATE",
     "name": "Date",
     "label": "counted on",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "PRODUCT",
     "name": "Product",
     "label": "counts",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "WAREHOUSE",
     "name": "Warehouse",
     "label": "held in",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -116,14 +116,14 @@
     "other": "ORDER_LINE",
     "name": "Order line",
     "label": "ordered on",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "in",
     "other": "STOCK_LEVEL",
     "name": "Stock level",
     "label": "counted on",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -152,21 +152,21 @@
     "other": "ORDER_LINE",
     "name": "Order line",
     "label": "sells",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "in",
     "other": "STOCK_LEVEL",
     "name": "Stock level",
     "label": "counts",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "in",
     "other": "PRODUCT_TAG",
     "name": "Product tag",
     "label": "tagged by",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -195,14 +195,14 @@
     "other": "ORDER_LINE",
     "name": "Order line",
     "label": "bought by",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "REGION",
     "name": "Region",
     "label": "lives in",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -231,14 +231,14 @@
     "other": "ORDER_LINE",
     "name": "Order line",
     "label": "sold at",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "REGION",
     "name": "Region",
     "label": "stands in",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -267,7 +267,7 @@
     "other": "STOCK_LEVEL",
     "name": "Stock level",
     "label": "held in",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -296,14 +296,14 @@
     "other": "CUSTOMER",
     "name": "Customer",
     "label": "lives in",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "in",
     "other": "STORE",
     "name": "Store",
     "label": "stands in",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -332,14 +332,14 @@
     "other": "PRODUCT",
     "name": "Product",
     "label": "tagged by",
-    "glyph": "↔"
+    "glyph": "⇄"
    },
    {
     "dir": "out",
     "other": "TAG",
     "name": "Tag",
     "label": "tags",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false
@@ -368,7 +368,7 @@
     "other": "PRODUCT_TAG",
     "name": "Product tag",
     "label": "tags",
-    "glyph": "↔"
+    "glyph": "⇄"
    }
   ],
   "note": false

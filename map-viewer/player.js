@@ -6,7 +6,7 @@
 // arrows (a reply runs back along its call's arrow) in the call or reply colour; steps
 // played stay in colour at 60%. The view's own arrow labels give way: an arrow the
 // sequence uses is laid out with room for two lines (the layout's playLabel), the
-// latest call along it ("3 place order") and under it the latest return ("3↩ ok"),
+// latest call along it ("3 place order") and under it the latest return ("3 ok", with the return mark),
 // each shown once the play reaches it. A dot runs from sender to
 // receiver; the camera frames the step's boxes. A reader's pan or zoom pauses the play;
 // play or a step goes on and the camera follows again. Closed boxes a step needs open
@@ -21,7 +21,7 @@
 // v: the viewer's internals (S, $, root, ...); h: hooks into the viewer (viewer.js),
 // with stepSeconds() and setStepSeconds(s): the time a step shows while playing (the
 // speed control on the step bar; options.sequenceStepSeconds is where it starts).
-import { uiSvg } from './chrome.js';
+import { uiSvg, putNumber, RETURN_W } from './chrome.js';
 import { svgEl } from './paint.js';
 import { playState } from './diagrams/sequence/scene.js';
 import { CAPTION } from './diagrams/sequence/parse.js';
@@ -36,6 +36,8 @@ export function createPlayer(v, h) {
   const reduceMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   let timer = 0;
   let camAnim = 0;
+  let camTimer = 0;
+  let camRun = 0;
   let follow = true;   // false after the reader moved the camera, until the next step or play
 
   // S.play: {seq, step, playing}; seq: the sequence diagram's anchor (null: the first)
@@ -64,7 +66,7 @@ export function createPlayer(v, h) {
   function close(redraw = true) {
     if (!S.play) return;
     stopTimer();
-    cancelAnimationFrame(camAnim);
+    camStop();
     const was = onMap();
     S.play = null;
     v.root.classList.remove('is-playing');
@@ -106,7 +108,7 @@ export function createPlayer(v, h) {
   function userMoved() {
     if (!S.play) return;
     follow = false;
-    cancelAnimationFrame(camAnim);
+    camStop();
     if (S.play.playing) pause();
   }
 
@@ -224,7 +226,8 @@ export function createPlayer(v, h) {
     for (const p of paths) p.setAttribute(a.forward ? 'marker-end' : 'marker-start', h.marker(m.head === 'cross' ? 'cross' : 'arrow', tint));
     return { g, path, len: path.getTotalLength(), forward: a.forward, key: a.key, now };
   }
-  const numOf = (m) => `${m.num}${m.back ? '↩' : ''}`;
+  // a message's badge: its number, and room for the return mark (chrome.js) on a return
+  const badgeW = (m) => Math.max(18, String(m.num).length * 6.5 + 8 + (m.back ? RETURN_W : 0));   // paint.js badge
   // An arrow's label where the layout made room for it, on a card: the call on the upper
   // line, its return on the lower (one line when the sequence runs only one way).
   function drawLines(key, at, ways = {}) {
@@ -234,8 +237,8 @@ export function createPlayer(v, h) {
     const font = v.font();
     const parts = [['fwd', both ? -LINE / 2 : 0], ['back', both ? LINE / 2 : 0]].filter(([w]) => at[w]).map(([w, dy]) => {
       const { m, state } = at[w];
-      const num = numOf(m);
-      const bw = Math.max(18, num.length * 6.5 + 8);   // the badge's width (paint.js badge)
+      const num = String(m.num);
+      const bw = badgeW(m);
       const tw = m.label ? measure(m.label, 12, 600, false, font) : 0;
       return { m, state, num, bw, dy, w: bw + (tw ? tw + 5 : 0) };
     });
@@ -247,7 +250,7 @@ export function createPlayer(v, h) {
       const tint = p.m.reply ? 'reply' : 'call';
       const g = svgEl('g', { class: `mmv-play-line mmv-seq-${tint} ${p.state}` }, card);
       const y = place.y + p.dy;
-      h.painter.badge({ x: x0 + p.bw / 2, y, text: p.num, reply: !!p.m.back || p.m.reply }, tint, g);
+      h.painter.badge({ x: x0 + p.bw / 2, y, text: p.num, back: !!p.m.back, reply: !!p.m.back || p.m.reply }, tint, g);
       if (p.m.label) label(g, x0 + p.bw + 5, y + 4, p.m.label, 'start');
     }
   }
@@ -259,8 +262,8 @@ export function createPlayer(v, h) {
     const p = h.posOf(m.from);
     if (!p) return null;
     const tint = m.reply ? 'reply' : 'call';
-    const num = numOf(m);
-    const bw = Math.max(18, num.length * 6.5 + 8);
+    const num = String(m.num);
+    const bw = badgeW(m);
     const tw = m.label ? measure(m.label, 12, 600, false, v.font()) : 0;
     const cardW = bw + (tw ? tw + 5 : 0) + 10;
     const o = obstacles(p);
@@ -286,7 +289,7 @@ export function createPlayer(v, h) {
     const card = svgEl('g', { class: 'mmv-play-lines' }, $.play);
     svgEl('rect', { class: 'mmv-play-card', x: cx0, y: cy - 12, width: cardW, height: 24, rx: 6 }, card);
     const lg = svgEl('g', { class: `mmv-play-line mmv-seq-${tint} ${state}` }, card);
-    h.painter.badge({ x: cx0 + 5 + bw / 2, y: cy, text: num, reply: false }, tint, lg);
+    h.painter.badge({ x: cx0 + 5 + bw / 2, y: cy, text: num, back: !!m.back, reply: false }, tint, lg);
     if (m.label) label(lg, cx0 + 5 + bw + 5, cy + 4, m.label, 'start');
     return { self: true, g, p };
   }
@@ -326,7 +329,7 @@ export function createPlayer(v, h) {
     const t0 = performance.now();
     const tick = (now) => {
       if (!dot.isConnected) return;
-      const k = Math.min(1, (now - t0) / DOT_MS);
+      const k = Math.max(0, Math.min(1, (now - t0) / DOT_MS));
       const e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
       const p = d.path.getPointAtLength((d.forward ? e : 1 - e) * d.len);
       dot.setAttribute('cx', p.x);
@@ -377,19 +380,32 @@ export function createPlayer(v, h) {
     x0: Math.min(b.x0, p.x - p.w / 2), x1: Math.max(b.x1, p.x + p.w / 2), y0: Math.min(b.y0, p.y - p.h / 2), y1: Math.max(b.y1, p.y + p.h / 2),
   }), { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity });
   const fitK = (b, w, H, pad) => Math.min((w - pad * 2) / Math.max(1, b.x1 - b.x0), (H - pad * 2) / Math.max(1, b.y1 - b.y0));
+  // The camera glides to `to`. A frame's time can be a little before t0 (k is held at
+  // 0, never run backwards past the start); a page given few or no frames (hidden, or a
+  // test's virtual time) still arrives, by a timer just after the glide's end.
   function glideTo(to, animate) {
-    cancelAnimationFrame(camAnim);
+    camStop();
     if (!animate) { S.view = to; h.applyView(); return; }
     const from = { ...S.view };
     const t0 = performance.now();
+    const run = camRun;
     const tick = (now) => {
-      const k = Math.min(1, (now - t0) / CAM_MS);
+      if (run !== camRun) return;
+      const k = Math.max(0, Math.min(1, (now - t0) / CAM_MS));
       const e = 1 - (1 - k) ** 3;
       S.view = { k: from.k + (to.k - from.k) * e, x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e };
       h.applyView();
       if (k < 1) camAnim = requestAnimationFrame(tick);
+      else camStop();
     };
     camAnim = requestAnimationFrame(tick);
+    camTimer = setTimeout(() => tick(t0 + CAM_MS), CAM_MS + 150);
+  }
+  // a glide stops: a new one, the reader moving the camera, the play closing
+  function camStop() {
+    cancelAnimationFrame(camAnim);
+    clearTimeout(camTimer);
+    camRun++;
   }
 
   // ---------- the step bar ----------
@@ -441,7 +457,7 @@ export function createPlayer(v, h) {
     const target = seqMap().playsOver?.[0];
     $.stepSwitch.hidden = onMap() ? false : !target;
     $.stepSwitch.innerHTML = `${uiSvg(onMap() ? 'lifelines' : 'onMap')}<span>${onMap() ? 'Lifelines' : 'On the map'}</span>`;
-    $.stepSwitch.title = onMap() ? 'The same sequence as lifelines' : `Play over "${target?.view}"`;
+    $.stepSwitch.title = onMap() ? 'The same sequence as lifelines' : `Play over "${target?.viewLabel || target?.view}"`;
     for (const t of $.timeline.querySelectorAll('[data-step]')) {
       const k = Number(t.dataset.step);
       t.classList.toggle('is-now', k === S.play.step);
@@ -485,7 +501,8 @@ export function createPlayer(v, h) {
       const first = st.msgs[0];
       t.title = st.repeat ? st.captions.at(-1) : `${k + 1}. ${st.msgs.map((m) => m.label || `${m.from} to ${m.to}`).join(', ')}`;
       t.setAttribute('aria-label', `Step ${k + 1}: ${t.title}`);
-      t.textContent = st.repeat ? '↻' : first ? `${first.num}${first.back ? '↩' : ''}` : '';
+      if (st.repeat) t.textContent = '↻';
+      else if (first) putNumber(t, first.num, first.back);
       if (!st.repeat && first?.reply) t.classList.add('is-reply');
       t.addEventListener('click', () => { t.blur(); pause(); go(k); });
       $.timeline.appendChild(t);
@@ -514,7 +531,7 @@ export function createPlayer(v, h) {
       for (const m of step.msgs) {
         const box = el('div', 'mmv-seq-msg-row');
         const tint = m.reply ? 'reply' : 'call';
-        el('span', `mmv-seq-chip mmv-seq-${tint}${m.back || m.reply ? ' is-reply' : ''}`, `${m.num}${m.back ? '↩' : ''}`, box);
+        putNumber(el('span', `mmv-seq-chip mmv-seq-${tint}${m.back || m.reply ? ' is-reply' : ''}`, null, box), m.num, m.back);
         el('strong', 'mmv-seq-label', m.label || (m.self ? 'to itself' : ''), box);
         // a walk (model/walks.js) says how it moves: a state moves to the next, a table joins one
         const verb = seqMap()?.walkVerb;

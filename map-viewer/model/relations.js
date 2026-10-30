@@ -63,11 +63,13 @@ export function parseRelations(text, byId, warnings) {
 
 // The map's views: `## Relations` (the default, unless the diagram brings its own
 // arrows) and `## Relations: <name>` sections, in file order. `own` is the diagram's
-// own arrows (a flowchart's), which are the default view.
+// own arrows (a flowchart's), which are the default view. The default keeps the name
+// "Relations" (the heading, and the state's view) and is shown as DEFAULT_VIEW_LABEL.
+export const DEFAULT_VIEW_LABEL = 'Overview';
 export function parseViews(sections, byId, warnings, own = null) {
   const views = [];
   const seen = new Set();
-  if (own) { views.push({ name: 'Relations', relations: own }); seen.add('relations'); }
+  if (own) { views.push({ name: 'Relations', label: DEFAULT_VIEW_LABEL, relations: own }); seen.add('relations'); }
   for (const s of sections) {
     const name = s.name || 'Relations';
     const key = name.toLowerCase();
@@ -80,7 +82,7 @@ export function parseViews(sections, byId, warnings, own = null) {
     }
     seen.add(key);
     if (s.name && !relations.length) warnings.push(problem('view-empty', `Relations "${name}" has no relations.`));
-    views.push({ name, relations });
+    views.push(s.name ? { name, relations } : { name, label: DEFAULT_VIEW_LABEL, relations });
   }
   return views;
 }

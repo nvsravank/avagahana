@@ -41,9 +41,25 @@ export const UI = {
   tables: '<rect x="1" y="3" width="8" height="18" rx="1"/><rect x="15" y="3" width="8" height="18" rx="1"/><path d="M1 8h8M1 13h8M1 17h8M15 8h8M15 13h8M15 17h8M9 11h3v4h3"/>',
   boxes: '<rect x="2.5" y="3.5" width="19" height="17" rx="2"/><rect x="5.5" y="8" width="5" height="4" rx="1"/><rect x="13.5" y="8" width="5" height="4" rx="1"/><rect x="9.5" y="15" width="5" height="3" rx="1"/><path d="M10.5 10h3"/>',
   views: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  openOut: '<path d="M7 17 17 7M9 7h8v8"/>',
 };
 const lightIcons = new Set(['mindmap', 'flowchart', 'state', 'tables', 'lifelines', 'note']);
 export const uiSvg = (name, size = 16) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="${lightIcons.has(name) ? 1.5 : 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${UI[name] || ''}</svg>`;
+
+// The return mark beside a reply's number ("3" and the mark): Phosphor arrow-u-up-left
+// (vendor/phosphor, MIT), always drawn, never the text glyph U+21A9, which some systems
+// show as an emoji (scripts/check_emoji.py keeps such characters out).
+export const RETURN_PATH = 'M168,80H88V40a8,8,0,0,0-13.66-5.66l-48,48a8,8,0,0,0,0,11.32l48,48A8,8,0,0,0,88,136V96h80a48,48,0,0,1,0,96H80a8,8,0,0,0,0,16h88a64,64,0,0,0,0-128ZM72,116.69,43.31,88,72,59.31Z';
+export const RETURN_W = 9;   // the mark's width beside a number on a badge
+export const returnSvg = (size = 11) => `<svg class="mmv-ret" viewBox="0 0 256 256" width="${size}" height="${size}" fill="currentColor" role="img" aria-label="return"><path d="${RETURN_PATH}"/></svg>`;
+// A message's number into an element: the number, and the return mark after it for a return.
+export function putNumber(el, num, back) {
+  el.textContent = String(num);
+  if (back) el.insertAdjacentHTML('beforeend', returnSvg());
+  return el;
+}
+// "opens elsewhere" after a link's text: a drawn arrow, not the text glyph U+2197
+export const opensSvg = () => `<span class="mmv-opens">${uiSvg('openOut', 12)}</span>`;
 
 // Mac uses Cmd for shortcuts, Windows and Linux use Ctrl
 export const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || '');

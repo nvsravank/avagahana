@@ -16,7 +16,7 @@
 // The steps (extra.sequence):
 //   messages: [{i, from, to, label, line, head, reply, self, eid, num, back}]
 //     num: the call's number; a reply answering a call has back: true and that
-//     call's num ("3↩"); a reply with no open call gets a number of its own
+//     call's num ("3", drawn with the return mark); a reply with no open call gets a number of its own
 //   steps: [{msgs, captions[], notes[], repeat?}]  played in order; a `par` plays the
 //     k-th step of each branch together; a loop ends in a "repeat" step
 //   groups: [{kind, label, from, to}]  a block over steps from..to (the timeline's brackets)

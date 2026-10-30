@@ -93,9 +93,13 @@
 .mmv-seq-idle { --n: var(--mmv-idleLine); }
 .mmv-flow.mmv-seq-msg { stroke-opacity: 1; }
 .mmv-seq-badge rect { fill: var(--n); stroke: var(--n); stroke-width: 1.5; }
-.mmv-seq-badge text { fill: var(--mmv-bg); }
+.mmv-seq-badge :is(text, .mmv-ret) { fill: var(--mmv-bg); }
 .mmv-seq-badge.is-reply rect { fill: var(--mmv-bg); }
-.mmv-seq-badge.is-reply text { fill: var(--n); }
+.mmv-seq-badge.is-reply :is(text, .mmv-ret) { fill: var(--n); }
+/* the return mark after a number in the page's text (chrome.js putNumber) */
+.mmv svg.mmv-ret { display: inline-block; vertical-align: -0.1em; margin-left: 1px; }
+.mmv :has(> svg.mmv-ret) { grid-auto-flow: column; justify-content: center; align-items: center; column-gap: 1px; }
+.mmv .mmv-opens svg { display: inline-block; vertical-align: -0.15em; }
 /* while a sequence plays: not reached yet grey, played at 60%, the step in colour */
 .mmv :is(.mmv-node, .mmv-frame).is-idle > .mmv-shape { fill: var(--mmv-idle); stroke: var(--mmv-idleLine); }
 .mmv :is(.mmv-node, .mmv-frame).is-idle { --n: var(--mmv-idleLine); color: var(--mmv-muted); }

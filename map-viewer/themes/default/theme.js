@@ -6,6 +6,8 @@
 //             lighter (darker in dark mode) so they read as an order; deeper levels
 //             reuse the last
 // Every colour is at least 3:1 on its background.
+// frame: the atlas bar in the Avagahana website's colours (its ground, ink, muted and
+// olive accent; chip edges darkened to 3:1), text 4.5:1 or more.
 // Font: Atkinson Hyperlegible Next (OFL, fonts/OFL.txt). Its bytes load only
 // when this theme is first used.
 
@@ -51,6 +53,7 @@ export default {
         bg: 'rgba(255, 255, 255, 0.88)', border: '#e3e7eb', hover: '#f1f3f5',
         active: '#1f2933', activeInk: '#ffffff', shadow: '0 2px 10px rgba(16, 24, 40, 0.10)',
       },
+      frame: { bg: '#ffffff', ink: '#2a2320', muted: '#7a6d64', accent: '#5f7b00', chip: '#ffffff', chipEdge: '#9a8d84', chipInk: '#7a6d64', chipActive: '#f7f3ee', chipActiveInk: '#2a2320' },
       icons: { red: '#e03131', orange: '#e8590c', yellow: '#cc7a00', green: '#2f9e44', blue: '#1971c2', purple: '#9c36b5', grey: '#868e96' },
     },
     dark: {
@@ -70,6 +73,7 @@ export default {
         bg: 'rgba(30, 34, 40, 0.88)', border: '#2c323a', hover: '#2c323a',
         active: '#dbe8ff', activeInk: '#16191d', shadow: '0 2px 12px rgba(0, 0, 0, 0.35)',
       },
+      frame: { bg: '#1e1714', ink: '#f2e8dd', muted: '#a3958a', accent: '#a9be5e', chip: '#1e1714', chipEdge: '#76675e', chipInk: '#a3958a', chipActive: '#271e1a', chipActiveInk: '#f2e8dd' },
       icons: { red: '#ff6b6b', orange: '#ff922b', yellow: '#ffd43b', green: '#69db7c', blue: '#74c0fc', purple: '#da77f2', grey: '#adb5bd' },
     },
   },

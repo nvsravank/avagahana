@@ -3,10 +3,14 @@
 // Served by the relay server, maps come from its API, with live reload, the agent's
 // "look here" and the power button. Served by any other static server, the page offers
 // "Open folder" instead (Chromium's File System Access API).
+//
+// Above the viewer, the contents bar (bar.js) lists what the map holds. `?logo=0` hides
+// its logo (WO-32's .themes/settings.json sets the same `logo` option).
 import { mount, applyTheme } from '../map-viewer/index.js';
 import { parseHash, buildHash, ownMapLink } from './hash.js';
 import { detectServer, serverSource, folderSource, canPickFolder, pickFolder, rememberedFolder, allowFolder } from './sources.js';
 import { mapPanel } from './tree.js';
+import { contentsBar } from './bar.js';
 
 const base = new URL('./', location.href);
 const screenEl = document.getElementById('screen');
@@ -34,18 +38,38 @@ const viewer = mount(document.getElementById('app'), {
   },
 });
 const picker = mapPanel(viewer.slot, { onPick: (path) => goTo(path, {}) });
+// the logo opens the map list, or closes it (the list closes itself on any press
+// outside it, before the click: what it was is read first)
+let pickerWasOpen = false;
+addEventListener('pointerdown', () => { pickerWasOpen = picker.isOpen; }, true);
+const bar = contentsBar(document.getElementById('bar'), {
+  logo: new URLSearchParams(location.search).get('logo') !== '0',
+  onLogo: (e) => ((e.detail ? pickerWasOpen : picker.isOpen) ? picker.close() : picker.open()),   // detail 0: a key
+  onPick: (state) => viewer.setState(state),
+});
+// the bar and the page behind everything follow the viewer's theme and appearance
+let pageTheme = null;
+viewer.on('theme', (t) => {
+  bar.setTheme(t);
+  pageTheme?.release();
+  pageTheme = applyTheme(document.documentElement, t.id, { appearance: t.appearance });
+});
+viewer.on('contents', (list) => bar.setContents(list));
 await viewer.ready;
 
 viewer.on('load', ({ path, title }) => {
   const m = maps.find((x) => x.path === path);
   shown = { path, mtime: m?.mtime, size: m?.size };
   picker.setCurrent(path, title);
+  bar.setTitle(title);
+  bar.setState(viewer.state);
   document.title = `${title} · Avagahana`;
   // the viewer reports state only when it differs, and the last map's may match
   history.replaceState(null, '', buildHash(path, viewer.state));
 });
 // state -> URL, without a history entry (opening another map adds one, in goTo)
 viewer.on('state', (s) => {
+  bar.setState(s);
   if (shown) history.replaceState(null, '', buildHash(shown.path, s));
 });
 // URL -> state: Back, Forward, a pasted link, goTo

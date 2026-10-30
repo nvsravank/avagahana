@@ -14,7 +14,8 @@
   "step": 1,
   "depth": 0,
   "cls": "mmv-lstep is-reply",
-  "num": "1↩",
+  "num": "1",
+  "back": true,
   "text": "Jobs table ⇠ Worker A",
   "label": "job 7",
   "note": false
@@ -34,7 +35,8 @@
   "step": 3,
   "depth": 0,
   "cls": "mmv-lstep is-reply",
-  "num": "2↩",
+  "num": "2",
+  "back": true,
   "text": "Jobs table ⇠ Worker B",
   "label": "job 7",
   "note": false

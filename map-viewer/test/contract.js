@@ -3,6 +3,7 @@
 // window.testResults. scripts/browser_tests.py runs it in headless Chrome.
 import { testErConnections } from './er-connections.js';
 import { testDiagramLinks } from './diagram-links.js';
+import { testContents } from './contents.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
@@ -23,6 +24,7 @@ const linkCount = () => document.querySelectorAll('link[href$="map-viewer/base.c
 try {
   await testErConnections(check);
   await testDiagramLinks(check);
+  await testContents(check);
   // Zoom changes label detail, never box geometry or the precomputed routes.
   for (const [kind, body] of [
     ['flowchart', 'flowchart LR\n  a[Top level] --> b{Decision}\n  subgraph group[Group]\n    c[Nested label] --> d[Another label]\n  end\n  b --> c'],
@@ -549,7 +551,7 @@ try {
   const modeButtons = [...document.querySelectorAll('#a [data-mmv=modes] button')].map((b) => b.dataset.mode).join();
   check('a box diagram offers boxes, layers and list', modeButtons === 'boxes,layers,list' && fv.state.mode === 'boxes', modeButtons);
   check('a box diagram always shows its arrows (no related-links button)', document.querySelector('#a [data-mmv=relBtn]').hidden);
-  check('the view picker lists the views', [...document.querySelectorAll('#a [data-mmv=viewMenu] button')].map((b) => b.textContent).join() === 'Relations,Data flow,Events,Production,Staging,Test'
+  check('the view picker lists the views', [...document.querySelectorAll('#a [data-mmv=viewMenu] button')].map((b) => b.textContent).join() === 'Overview,Data flow,Events,Production,Staging,Test'
     && document.querySelector('#a [data-mmv=viewMenu] .mmv-menu-head')?.textContent === 'Where it runs');
   // ---- the info panel closes on a click outside it ----
   {
@@ -619,7 +621,7 @@ try {
     const said = cards.map((b) => `${b.querySelector('.mmv-page-cap').textContent}${b.classList.contains('is-on') ? '*' : ''}`).join();
     const marked = cards.every((b) => b.querySelector('.mmv.is-spot'));
     cards.find((b) => b.querySelector('.mmv-page-cap').textContent === 'Events')?.click();
-    check('a node\'s page draws the views it is in (the node marked, the shown one outlined); one shows it there', said === 'Relations · shown*,Data flow,Events' && marked
+    check('a node\'s page draws the views it is in (the node marked, the shown one outlined); one shows it there', said === 'Overview · shown*,Data flow,Events' && marked
       && fv.state.view === 'Events' && fv.state.node === 'ord' && fv.state.page === null, `${said} | ${JSON.stringify(fv.state)}`);
     fv.setState({ view: null, node: null });
     const head = '# D\n```mermaid\nflowchart LR\n  subgraph sys [System]\n    a["A"]\n    b["B"]\n  end\n  c["C"]\n  a --> b\n```\n';
@@ -812,9 +814,10 @@ try {
     check('the side panel says who calls whom', /API gateway calls Sign-in service/.test(q('[data-mmv=seqPanel]').textContent), q('[data-mmv=seqPanel]').textContent);
     check('the timeline has a tick per step and a bracket per block', document.querySelectorAll('#a .mmv-tl-tick').length === 15 && document.querySelectorAll('#a .mmv-tl-bracket').length === 2);
     p.setState({ step: 4 });
-    check('a reply runs back along its call\'s arrow, numbered 3↩', [...document.querySelectorAll('#a .mmv-play .mmv-seq-badge text')].map((t) => t.textContent).includes('3↩')
+    const returnBadge = [...document.querySelectorAll('#a .mmv-play .mmv-seq-badge')].find((g) => g.querySelector('path.mmv-ret'));
+    check('a reply runs back along its call\'s arrow, numbered 3 with the return mark', returnBadge?.querySelector('text').textContent === '3'
       && document.querySelector('#a .mmv-play-msg.is-now .mmv-play-path')?.hasAttribute('marker-start'));
-    const card = [...document.querySelectorAll('#a .mmv-play-lines')].find((c) => c.textContent.includes('3↩'));
+    const card = returnBadge?.closest('.mmv-play-lines');
     const [call, ret] = card ? [...card.querySelectorAll('.mmv-play-line')] : [];
     check('its return sits on the line under the call, on the same card', !!ret && call.textContent.includes('check token') && ret.textContent.includes('ok')
       && call.getBBox().y < ret.getBBox().y, card?.textContent);
