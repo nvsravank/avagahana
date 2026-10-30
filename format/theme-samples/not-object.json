@@ -1,0 +1,7 @@
+{
+  "about": "Not a theme object at all.",
+  "expect": [
+    "theme-not-object"
+  ],
+  "theme": "dark blue"
+}

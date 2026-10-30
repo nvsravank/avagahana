@@ -1,0 +1,18 @@
+{
+  "about": "Sample themes held in step by the viewer (map-viewer/test/theme-samples.js) and relay-server/themes.py check (scripts/check_samples.py): each gets exactly the codes it expects of those both report (format/theme-slots.json checks.both).",
+  "samples": [
+    "clean.json",
+    "light-and-dark.json",
+    "minimal.json",
+    "low-contrast.json",
+    "ink-on-fill.json",
+    "frame-contrast.json",
+    "lines-gone.json",
+    "no-category.json",
+    "bad-appearance.json",
+    "no-appearance.json",
+    "bad-id.json",
+    "not-object.json",
+    "font-shape.json"
+  ]
+}

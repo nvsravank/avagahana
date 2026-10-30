@@ -1,0 +1,10 @@
+{
+  "about": "No light or dark appearance.",
+  "expect": [
+    "theme-appearances"
+  ],
+  "theme": {
+    "id": "sample",
+    "appearances": {}
+  }
+}

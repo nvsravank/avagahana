@@ -3,8 +3,10 @@
 
   python3 relay-server/show.py "<folder>/<file>.md" [--part shop-containers] [--node n13] [--focus n8] [--page n13]
                                [--mode MODE] [--view NAME] [--env NAME]
-                               [--seq checkout] [--step 3]
+                               [--seq checkout] [--step 3] [--colour-by changes] [--theme ID]
                                [--port N] [--maps-dir DIR]
+
+--theme previews a theme by id (relay-server/themes.py list): the reader's page switches to it.
 
 Finds the relay server serving the maps folder and sends POST /api/show. Prints one line:
   STATUS=shown URL=...        an open page was told; nothing else to do
@@ -37,6 +39,7 @@ def main(argv=None) -> int:
     ap.add_argument("--seq", help="play this sequence over its view: its heading's anchor (main: the first diagram)")
     ap.add_argument("--step", type=int, help="the sequence's step, from 1")
     ap.add_argument("--colour-by", choices=list(COLOUR_BY), help="open in this colouring: changes shows a plan's added, changed and removed")
+    ap.add_argument("--theme", help="switch the page to this theme (themes.py list)")
     ap.add_argument("--port", type=int, default=DEFAULT_PORT)
     ap.add_argument("--maps-dir", default=None, help=f"the maps folder (default: ${MAP_DIR_ENV})")
     args = ap.parse_args(argv)
@@ -51,7 +54,7 @@ def main(argv=None) -> int:
         return 1
     body = {k: v for k, v in {"path": args.map, "part": args.part, "node": args.node, "focus": args.focus, "page": args.page,
                               "mode": args.mode, "view": args.view, "env": args.env, "seq": args.seq,
-                              "step": args.step if args.seq else None, "colourBy": args.colour_by}.items() if v}
+                              "step": args.step if args.seq else None, "colourBy": args.colour_by, "theme": args.theme}.items() if v}
     req = urllib.request.Request(f"http://127.0.0.1:{port}/api/show", method="POST",
                                  data=json.dumps(body).encode("utf-8"),
                                  headers={"Content-Type": "application/json"})
@@ -69,7 +72,7 @@ def main(argv=None) -> int:
         print(status_line("failed", error=exc))
         return 1
     url = map_url(port, args.map, mode=args.mode, part=args.part, focus=args.focus, node=args.node, page=args.page, view=args.view, env=args.env,
-                  seq=args.seq, step=args.step if args.seq else None, colourBy=args.colour_by)
+                  seq=args.seq, step=args.step if args.seq else None, colourBy=args.colour_by, theme=args.theme)
     print(status_line("shown" if delivered else "none", url=url))
     return 0
 

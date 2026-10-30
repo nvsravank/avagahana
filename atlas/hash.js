@@ -51,7 +51,7 @@ export function parseHash(hash) {
 
 // (path, viewer state) -> '#/Topic/My%20map.md?mode=mindmap&focus=n8'. Like the old
 // viewer it always names the mode; empty fields and rels off are left out. prefs: a
-// colour-by to open in (colourBy=changes for a plan), from the agent's show.
+// colour-by to open in (colourBy=changes for a plan), a theme by id, from the agent's show.
 export function buildHash(path, state = {}, prefs = null) {
   const p = new URLSearchParams();
   p.set('mode', MODE.test(state.mode || '') ? state.mode : 'mindmap');
@@ -59,6 +59,7 @@ export function buildHash(path, state = {}, prefs = null) {
   if (state.seq && state.step) p.set('step', String(state.step));
   if (state.rels) p.set('rels', '1');
   if (prefs?.colourBy) p.set('colourBy', prefs.colourBy);
+  if (prefs?.theme) p.set('theme', prefs.theme);
   return `#/${encodeURIComponent(path).replace(/%2F/g, '/')}?${p}`;
 }
 

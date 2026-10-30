@@ -150,3 +150,6 @@ ERROR=...` (a bad map path, node id or option).
 
 The viewer remembers what each reader has seen and marks what changed since: never add
 notes or classes to say "this is new".
+
+A picture for a document, slide or PDF (SVG or PNG): read `references/render.md`.
+The user asks for a theme, brand or house style, or a new theme: read `references/themes.md`.

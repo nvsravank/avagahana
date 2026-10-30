@@ -125,7 +125,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(info["app"], "avagahana-relay")
         self.assertEqual(info["version"], serve_maps.VERSION)
-        self.assertEqual(info["capabilities"], ["tree", "map", "events", "show", "open", "shutdown"])
+        self.assertEqual(info["capabilities"], ["tree", "map", "events", "show", "render", "themes", "open", "shutdown"])
 
     def test_source_identity(self):
         identity = self.s.json("GET", "/api/info")[1]["sourceId"]
@@ -215,6 +215,10 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(conn.getresponse().status, 400)
         conn.close()
 
+    def test_show_theme(self):
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "theme": "brand"}), (200, {"delivered": 0}))
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "theme": "no such/theme"})[0], 400)
+
     def test_show_with_no_page(self):
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "node": "n3"}), (200, {"delivered": 0}))
 
@@ -256,6 +260,108 @@ class RelayTests(unittest.TestCase):
             self.s.json("POST", "/api/show", {"path": "garden.md"})
         self.assertEqual(self.s.relay.hub.count(), 0)
 
+    # ---- render (WO-32): the agent asks, one open page answers ----
+    def test_render_validates(self):
+        bad = [
+            ({"path": "nope.md"}, 404),
+            ({"path": "garden.md", "format": "pdf"}, 400),
+            ({"path": "garden.md", "width": 10}, 400),
+            ({"path": "garden.md", "width": 800, "scale": 2}, 400),
+            ({"path": "garden.md", "scale": 20}, 400),
+            ({"path": "garden.md", "theme": "../x"}, 400),
+            ({"path": "garden.md", "appearance": "sepia"}, 400),
+            ({"path": "garden.md", "background": "red"}, 400),
+            ({"path": "garden.md", "state": {"expand": -1}}, 400),
+            ({"path": "garden.md", "state": {"expand": "most"}}, 400),
+            ({"path": "garden.md", "state": {"highlight": "n1,not an id"}}, 400),
+            ({"path": "garden.md", "state": {"crop": "1x"}}, 400),
+            ({"path": "garden.md", "state": "n1"}, 400),
+        ]
+        for body, code in bad:
+            self.assertEqual(self.s.json("POST", "/api/render", body)[0], code, body)
+
+    def test_render_with_no_page(self):
+        self.assertEqual(self.s.json("POST", "/api/render", {"path": "garden.md"}), (200, {"status": "none"}))
+
+    def test_render_round_trip(self):
+        es = EventStream(self.s.port)
+        got = {}
+
+        def page():
+            """A stand-in page: claims the render, a second claim is refused, answers it."""
+            es.next()   # tree
+            event, req = es.next()
+            got["event"], got["req"] = event, req
+            got["claim"] = self.s.json("POST", f"/api/render/{req['id']}/claim", {})
+            got["again"] = self.s.json("POST", f"/api/render/{req['id']}/claim", {})
+            got["answer"] = self.s.json("POST", f"/api/render/{req['id']}", {
+                "format": "svg", "encoding": "utf-8", "data": "<svg/>", "width": 10, "height": 5,
+                "report": {"touching": []}, "steps": 4, "ignored": True}, headers={"Origin": f"http://127.0.0.1:{self.s.port}"})
+        t = threading.Thread(target=page)
+        t.start()
+        try:
+            status, body = self.s.json("POST", "/api/render", {"path": "garden.md", "format": "svg", "width": 800, "report": True,
+                                                              "state": {"expand": 2, "highlight": "n3, n4", "crop": "n3", "seq": "main", "step": 2}})
+            t.join(5)
+        finally:
+            es.close()
+        self.assertEqual(status, 200)
+        self.assertEqual(body, {"status": "rendered", "format": "svg", "encoding": "utf-8", "data": "<svg/>", "width": 10, "height": 5, "report": {"touching": []}, "steps": 4})
+        self.assertEqual(got["event"], "render")
+        req = got["req"]
+        self.assertEqual(req["state"], {"expand": 2, "highlight": ["n3", "n4"], "crop": "n3", "seq": "main", "step": 2})
+        self.assertEqual((req["format"], req["width"], req["background"], req["report"]), ("svg", 800, "theme", True))
+        self.assertEqual(got["claim"], (200, {"claimed": True}))
+        self.assertEqual(got["again"], (409, {"claimed": False}))
+        self.assertEqual(got["answer"], (200, {"ok": True}))
+        # the render is over: its id is unknown now
+        self.assertEqual(self.s.json("POST", f"/api/render/{req['id']}", {"error": "late"})[0], 404)
+        self.assertEqual(self.s.json("POST", "/api/render/0123456789abcdef/claim", {})[0], 404)
+
+    def test_render_page_error(self):
+        es = EventStream(self.s.port)
+
+        def page():
+            es.next()
+            _, req = es.next()
+            self.s.json("POST", f"/api/render/{req['id']}/claim", {})
+            self.s.json("POST", f"/api/render/{req['id']}", {"error": "The map could not be read."})
+        t = threading.Thread(target=page)
+        t.start()
+        try:
+            self.assertEqual(self.s.json("POST", "/api/render", {"path": "garden.md"}), (422, {"error": "The map could not be read."}))
+            t.join(5)
+        finally:
+            es.close()
+
+    # ---- themes (WO-32): <maps folder>/.themes/ ----
+    def test_themes(self):
+        self.assertEqual(self.s.json("GET", "/api/themes"), (200, {"themes": [], "settings": {"builtIn": True, "default": None, "logo": True}, "problems": []}))
+        folder = self.maps / ".themes"
+        folder.mkdir()
+        try:
+            (folder / "brand.json").write_text(json.dumps({"name": "Brand", "description": "For reports", "font": {"family": "Brand Sans", "file": "Brand.woff2"},
+                                                          "appearances": {"light": {"bg": "#ffffff", "ink": "#111111", "category": ["#0f766e"]}}}), encoding="utf-8")
+            (folder / "Brand.woff2").write_bytes(b"wOF2 font bytes")
+            (folder / "broken.json").write_text("{", encoding="utf-8")
+            (folder / "settings.json").write_text(json.dumps({"builtIn": False, "default": "brand", "logo": False, "extra": 1}), encoding="utf-8")
+            status, body = self.s.json("GET", "/api/themes")
+            self.assertEqual(status, 200)
+            self.assertEqual(body["settings"], {"builtIn": False, "default": "brand", "logo": False})
+            self.assertEqual([t["id"] for t in body["themes"]], ["brand"])
+            brand = body["themes"][0]
+            self.assertEqual((brand["label"], brand["description"]), ("Brand", "For reports"))
+            self.assertEqual(brand["font"], {"family": "Brand Sans", "faces": [{"weight": 400, "style": "normal", "url": "api/theme-file?f=Brand.woff2"}]})
+            self.assertEqual([p["code"] for p in body["problems"]], ["theme-file"])
+            status, res, data = self.s.request("GET", "/api/theme-file?f=Brand.woff2")
+            self.assertEqual((status, res.getheader("Content-Type"), data), (200, "font/woff2", b"wOF2 font bytes"))
+            for bad in ("../garden.md", "brand.json", ".hidden.woff2", "nope.woff2", "a/b.woff2"):
+                self.assertEqual(self.s.request("GET", f"/api/theme-file?f={bad}")[0], 404, bad)
+            # .themes is hidden: not a map folder, not served as maps
+            self.assertFalse(any(m["path"].startswith(".themes") for m in self.s.json("GET", "/api/tree")[1]["maps"]))
+        finally:
+            shutil.rmtree(folder)
+
     # ---- static ----
     def test_static(self):
         status, res, data = self.s.request("GET", "/")
@@ -287,7 +393,7 @@ class OptionalPartsTests(unittest.TestCase):
         tmp = Path(tempfile.mkdtemp(prefix="avagahana-relay-test-"))
         s = Running(maps_dir=tmp, can_open=False, can_shutdown=False)
         try:
-            self.assertEqual(s.json("GET", "/api/info")[1]["capabilities"], ["tree", "map", "events", "show"])
+            self.assertEqual(s.json("GET", "/api/info")[1]["capabilities"], ["tree", "map", "events", "show", "render", "themes"])
             self.assertEqual(s.json("POST", "/api/open", {"url": "https://example.com"})[0], 403)
             self.assertEqual(s.json("POST", "/api/shutdown")[0], 403)
             self.assertTrue(s.thread.is_alive())
@@ -376,9 +482,45 @@ class LauncherTests(unittest.TestCase):
             self.assertTrue(line.startswith("STATUS=none URL=") and line.endswith("#/garden.md?node=n3"), line)
             self.assertTrue(self.run_cmd("show.py", "nope.md", *common).startswith("STATUS=failed"))
             self.assertTrue(self.run_cmd("show.py", "garden.md", "--node", "bad id", *common).startswith("STATUS=failed"))
+            line = self.run_cmd("show.py", "garden.md", "--theme", "brand", *common)
+            self.assertTrue(line.startswith("STATUS=none URL=") and line.endswith("#/garden.md?theme=brand"), line)
+            # render.py (WO-32): no page open, so none; the URL to open
+            out = tmp / "pictures"
+            line = self.run_cmd("render.py", "garden.md", "--out", str(out / "g.svg"), *common)
+            self.assertTrue(line.startswith("STATUS=none URL=") and line.endswith("#/garden.md"), line)
+            self.assertTrue(self.run_cmd("render.py", "nope.md", "--out", str(out / "g.svg"), *common).startswith("STATUS=failed"))
+            self.assertTrue(self.run_cmd("render.py", "garden.md", "--out", str(out / "g.pdf"), *common).startswith("STATUS=failed ERROR="))
+            self.assertTrue(self.run_cmd("render.py", "garden.md", "--out", str(out), "--steps", "all", *common).startswith("STATUS=failed"))
+            self.assertTrue(self.run_cmd("render.py", "garden.md", "--out", str(out / "g.svg"), "--expand", "most", *common).startswith("STATUS=failed"))
+            self.assertTrue(self.run_cmd("render.py", "garden.md", "--out", str(out / "g.svg"), "--highlight", "n3,bad id", *common).startswith("STATUS=failed"))
+            self.assertFalse(out.exists())
+            # themes.py (WO-32): list, derive --write, check
+            listed = json.loads(subprocess.run([sys.executable, str(HERE / "themes.py"), "list", "--maps-dir", str(maps)],
+                                               capture_output=True, text=True, timeout=20).stdout)
+            self.assertEqual([t["id"] for t in listed["themes"]], ["default"])
+            font = tmp / "Brand-Bold.woff2"
+            font.write_bytes(b"font")
+            made = subprocess.run([sys.executable, str(HERE / "themes.py"), "derive", "--accent", "#0f766e", "--accent2", "#b45309",
+                                   "--font", str(font), "--id", "brand", "--description", "Reports", "--write", "--maps-dir", str(maps)],
+                                  capture_output=True, text=True, timeout=20)
+            self.assertEqual(made.returncode, 0, made.stdout)
+            self.assertEqual(json.loads(made.stdout)["problems"], [])
+            self.assertTrue((maps / ".themes" / "Brand-Bold.woff2").is_file())
+            listed = json.loads(subprocess.run([sys.executable, str(HERE / "themes.py"), "list", "--maps-dir", str(maps)],
+                                               capture_output=True, text=True, timeout=20).stdout)
+            brand = listed["themes"][1]
+            self.assertEqual((brand["id"], brand["usable"], brand["appearances"], brand["font"]["faces"][0]["weight"]), ("brand", True, ["dark", "light"], 700))
+            self.assertTrue(all(c["onBackground"] >= 3 for c in brand["contrast"]["light"]["category"]))
+            checked = subprocess.run([sys.executable, str(HERE / "themes.py"), "check", str(maps / ".themes" / "brand.json")], capture_output=True, text=True, timeout=20)
+            self.assertEqual((checked.returncode, json.loads(checked.stdout)), (0, {"ok": True, "problems": []}))
+            (maps / ".themes" / "bad.json").write_text(json.dumps({"appearances": {"light": {"bg": "#fff"}}}), encoding="utf-8")
+            checked = subprocess.run([sys.executable, str(HERE / "themes.py"), "check", str(maps / ".themes" / "bad.json")], capture_output=True, text=True, timeout=20)
+            self.assertEqual(checked.returncode, 1)
+            self.assertIn("theme-appearance", [p["code"] for p in json.loads(checked.stdout)["problems"]])
             self.assertEqual(self.run_cmd("serve_maps.py", *common, "--stop"), f"STATUS=stopped PORT={port}")
             self.assertEqual(self.run_cmd("serve_maps.py", *common, "--stop"), f"STATUS=not_running PORT={port}")
             self.assertTrue(self.run_cmd("show.py", "garden.md", *common).startswith("STATUS=not_running"))
+            self.assertTrue(self.run_cmd("render.py", "garden.md", "--out", str(tmp / "g.svg"), *common).startswith("STATUS=not_running"))
         finally:
             self.run_cmd("serve_maps.py", *common, "--stop")
             shutil.rmtree(tmp, ignore_errors=True)

@@ -18,9 +18,9 @@ const viewer = mount(element, {
   path,                 // the map's path, for cross-map targets and live reload
   host: { … },          // optional callbacks, below
   state: { … },         // optional starting state, below
-  theme: 'default',     // id of the starting theme
+  theme: 'default',     // id of the starting theme (an unknown id: another, with a problem)
   themes: [ … ],        // theme objects from the host, below
-  defaultTheme: true,   // false hides the built-in theme
+  defaultTheme: true,   // false hides the built-in theme (unless no other can be used)
   prefs: { … },         // starting looks from a link: {theme, appearance, colourBy, look}; not saved
   storageKey: 'avagahana-viewer-prefs',   // where preferences are kept, and (as `<key>-seen`) what
                                        // the reader has seen of each map; null keeps none
@@ -50,6 +50,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.title` | The current map's title, or `null`. |
 | `viewer.views` | The names of the map's relation views, the default first (`[]` when it has none). The default's name is `Relations`; readers see it as "Overview", and `setState({view})` takes either. |
 | `viewer.contents()` | Everything a reader can open in the map, in file order (below). A new array each call. |
+| `viewer.export(opts)` | The picture as a file instead of a download: a promise of `{format, type, data, width, height, scaledDown, report}`. Below (added in WO-32). The toolbar's SVG and PNG buttons use it. |
 | `viewer.problems` | The current problems, below. |
 | `viewer.themes` | `[{id, label}]` of the registered themes. |
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
@@ -88,6 +89,16 @@ promise; a failure is reported as a `host` problem and the viewer carries on.
 | `rels` | Whether all relations are drawn (`true` / `false`). |
 | `seq` | The sequence being played: the anchor of its heading, `main` when it is the file's first diagram, or `null`. Setting it plays that sequence, paused, over the view it is linked to (`## Plays over`; the view is shown), or as the sequence itself when `mode` is `lifelines` (or `list` with `part` the sequence) or it is linked to no view. `null` stops it. |
 | `step` | The step shown while a sequence plays, from 1, or `null`. Setting it alone moves the playing sequence to that step. |
+
+**The picture** (added in WO-32, for an export; `setState` and `options.state` take
+them, `state` does not report them; another diagram clears `highlight` and `crop`):
+
+| Field | Meaning |
+|---|---|
+| `expand` | A whole number of levels shown below the top of the view (`0`: the top only; boxes deeper are closed), or `'all'`. |
+| `close` | Node ids (an array, or a comma-separated string) of boxes shown closed, after `expand`. |
+| `highlight` | Node ids kept in their colours, with what is inside them and the boxes round them; every other box, line and label takes the player's idle colours (`roles.idle`, `idleLine`, `muted`). `null` or `[]` ends it. Not while a sequence plays. |
+| `crop` | A node id: an export shows that box and what it is connected to (its arrows' other ends; in a mind map its parent and children) instead of the whole diagram. `null` ends it. The screen is not cropped. |
 
 - `options.state` sets the starting state on the first map; unknown or invalid values
   are ignored.
@@ -202,6 +213,7 @@ Each viewer has its own list. Entries, in file order:
 
 Every entry has `kind`, `label`, `part` (the diagram's anchor, `null` for the first) and
 `type` (the diagram's type); views, deployments and walks also `diagram` (its title).
+A sequence or walk has `steps`, its number of steps (added in WO-32).
 The first diagram has `first: true`; a diagram no link reaches ("Not linked") has
 `unlinked: true`, and its `state` still opens it. Every entry has `changed`: something
 in it is new or changed since the reader looked (a diagram, sequence or walk: anything in
@@ -209,6 +221,49 @@ it; a view or deployment: its own arrows or places). A host draws it with
 `changeMarkSvg(size)` from `map-viewer/index.js` (an `<svg>` string, `currentColor`).
 Entries may gain fields later; a host ignores those it does not know. The `contents`
 event fires when the list changes, `changed` included.
+
+## Export
+
+`viewer.export(opts)` makes the picture shown as a file, with every label in full, and
+returns it instead of downloading it. The reader's view (camera, selection) does not
+move. Options:
+
+| Option | Meaning |
+|---|---|
+| `format` | `'svg'` (default) or `'png'`. |
+| `width` / `scale` | The output width in pixels, or a scale (default 1 for SVG, 2 for PNG). SVG keeps its drawing units (`viewBox`) and gets `width` / `height`. |
+| `background` | `'theme'` (default: the theme's background) or `'none'` (transparent). |
+| `crop` | A node id; defaults to the state's `crop`. |
+| `report` | `true`: the layout report too (below). |
+
+Result: `{format, type, data, width, height, scaledDown, report}`; `data` is the SVG
+text or a PNG `Blob`. A PNG is scaled down to the browser's canvas limits (16,000 px a
+side, 120 million pixels); `scaledDown` says so. In list mode the list is drawn (no
+report, no crop).
+
+**The file:** colours and the font resolved to their values (the font embedded), arrow
+ends drawn as shapes, so editors read it. It names itself (`role="img"`, a root
+`<title>` with the map's title and the diagram's), and every node, box and line has
+`data-id` (the map's id; a tree's line `parent>child`, a lifeline `<id>~life`) and a
+`<title>` (its label; an arrow `From → To: label`). The same titles are in the drawing
+on screen. Nothing in it leads anywhere: no links, scripts or event attributes, and
+references only to its own `#ids` or to `data:` images and fonts. Change marks,
+selection, search hits and the controls are left out (a host rendering for a document
+mounts with `marks: false` and selects nothing).
+
+**The layout report** (`report`), read from what was drawn:
+
+| Field | What it holds |
+|---|---|
+| `width`, `height`, `outputWidth` | The drawing's size and the output's width (px). |
+| `nodes`, `lines` | How many boxes and lines were checked. |
+| `cutLabels` | `[{id, label, over}]`: a label running out of its box, by how much. |
+| `overlaps` | `[{a, b, area}]`: two boxes over each other, neither inside the other. |
+| `crossings` | `{count, pairs: [{a, b, count, at}]}`: lines crossing, away from their ends. |
+| `touching` | `[{a, b, gap, at}]`: two lines closer than `minGap` px at the output's scale. Lines that share an end meet there by design: the first 24 drawing units from that end do not count, and two lines running together into one end (two keys to one column) are one line until they part. |
+| `minGap` | 2 (px). |
+| `smallestText` | `{px, id}`: the smallest text at the output width. |
+| `colours` | Per box `{id, label, fill, why}`: its fill as `#rrggbb` and why, from the colour-by: `category 3`, `level 2`, `class database`, `change added`, `centre`. |
 
 ## Problems
 
@@ -315,7 +370,15 @@ loads the font with the `FontFace` API.
 **Built-in theme** (`id: 'default'`, label "Avagahana"): light and dark; a 13-colour
 category palette; the blue family as the level ramp; a `frame` in the Avagahana
 website's colours (its ground, ink and olive accent); font Atkinson Hyperlegible Next
-(OFL). Its font files load only when it is used. `defaultTheme: false` hides it.
+(OFL). Its font files load only when it is used. `defaultTheme: false` hides it; when
+none of the host's themes can be used it is used after all, with a `theme-built-in-used`
+warning (added in WO-32; before, a plain grey theme). A theme asked for by an id no
+registered theme has (`options.theme`, `prefs.theme`) gives a `theme-unknown` warning.
+
+Every slot of an appearance, what it means and where the viewer uses it:
+`format/theme-slots.json` (shared with `relay-server/themes.py` and the tests). The
+viewer and `themes.py check` report the same problems for the sample themes in
+`format/theme-samples/`.
 
 ### `applyTheme(element, theme, {appearance})`
 

@@ -100,13 +100,19 @@
 .mmv svg.mmv-ret { display: inline-block; vertical-align: -0.1em; margin-left: 1px; }
 .mmv :has(> svg.mmv-ret) { grid-auto-flow: column; justify-content: center; align-items: center; column-gap: 1px; }
 .mmv .mmv-opens svg { display: inline-block; vertical-align: -0.15em; }
-/* while a sequence plays: not reached yet grey, played at 60%, the step in colour */
-.mmv :is(.mmv-node, .mmv-frame).is-idle > .mmv-shape { fill: var(--mmv-idle); stroke: var(--mmv-idleLine); }
-.mmv :is(.mmv-node, .mmv-frame).is-idle { --n: var(--mmv-idleLine); color: var(--mmv-muted); }
+/* while a sequence plays: not reached yet grey, played at 60%, the step in colour (and a
+   highlight's unlit part). As specific as a look's outline and a theme's colour rule
+   (.mmv[data-theme][data-appearance][data-colour-by] .mmv-k3), and later, so grey wins */
+.mmv[data-look] :is(.mmv-node, .mmv-frame).is-idle > .mmv-shape { fill: var(--mmv-idle); stroke: var(--mmv-idleLine); }
+.mmv[data-theme][data-appearance][data-colour-by] :is(.mmv-node, .mmv-frame).is-idle { --n: var(--mmv-idleLine); color: var(--mmv-muted); }
 .mmv :is(.mmv-node, .mmv-frame).is-idle :is(.mmv-label, .mmv-frame-title) { fill: var(--mmv-muted); }
 .mmv :is(.mmv-node, .mmv-seq-msg, .mmv-seq-badge, .mmv-flow-label, .mmv-seq-life, .mmv-seq-note).is-past { opacity: 0.6; }
 .mmv-seq-life.is-idle { stroke: var(--mmv-idleLine); }
 .mmv-flow-label.is-idle { fill: var(--mmv-muted); }
+/* a highlight (a picture for an export): what is not lit takes the same idle colours */
+.mmv.is-highlighting .mmv-rels :is(.mmv-flow, .mmv-rel).is-idle { stroke: var(--mmv-idleLine); stroke-opacity: 1; }
+.mmv.is-highlighting .mmv-edge.is-idle { stroke: var(--mmv-idleLine); }
+.mmv.is-highlighting .mmv-rel-label.is-idle { fill: var(--mmv-muted); }
 .mmv .mmv-node.is-now > .mmv-shape { stroke-width: 3; }
 .mmv .mmv-seq-msg.is-now { stroke-width: 2.6; }
 .mmv-flow.is-dotted { stroke-dasharray: 5 4; }

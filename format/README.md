@@ -30,3 +30,12 @@ line names the codes it expects: `<!-- expect: note-unknown-id -->`.
 browser tests hold the viewer: each reports exactly the expected codes on its side,
 nothing outside the list, and every code has a sample. A new rule on either side needs a
 code here and a sample, or the checks fail.
+
+## Themes
+
+`theme-slots.json`: every slot of a theme appearance, what it means and where the
+viewer uses it, and which theme checks the viewer and `relay-server/themes.py check`
+share (`checks.both`) or only the tool makes (`checks.checker`). `theme-samples/` holds
+one sample theme per shared problem (and clean ones); each names the codes it expects.
+`scripts/check_samples.py` holds `themes.py` to them and the browser tests hold the
+viewer.

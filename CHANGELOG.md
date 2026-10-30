@@ -6,6 +6,43 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Viewer `viewer.export({format, width | scale, background, crop, report})`
+  returns the picture (SVG text or a PNG Blob) instead of downloading it; the toolbar
+  buttons use it (WO-32).
+- **Contract** Viewer state takes `expand` (levels or `all`), `close` (boxes shown
+  closed), `highlight` (these nodes lit, the rest in the idle colours) and `crop` (a box
+  and what it connects to, for an export) in `setState` and `options.state`; `state`
+  does not report them.
+- **Contract** Exports name what they show: `role="img"` and a root `<title>`; every
+  node, box and line has `data-id` and a `<title>` (also on screen). No links, scripts,
+  event attributes or outside URLs in a file. Before, exports dropped every `data-*`.
+- **Contract** The layout report (`export({report: true})`): labels cut short, boxes
+  overlapping, lines crossing, lines closer than 2 px, the smallest text at the output
+  width, each box's colour and why.
+- **Contract** `viewer.contents()` sequence and walk entries gain `steps`.
+- **Contract** `defaultTheme: false` with no usable host theme uses the built-in theme
+  with a `theme-built-in-used` warning (before: a plain grey theme); an unknown theme id
+  gives a `theme-unknown` warning.
+- **Contract** Relay: `POST /api/render` (the agent asks, one open atlas page draws the
+  map in a hidden viewer and answers; `render` event, `POST /api/render/<id>/claim` and
+  `POST /api/render/<id>`), `GET /api/themes` and `GET /api/theme-file` (the maps
+  folder's `.themes/`), capabilities `render` and `themes`, `theme` on `POST /api/show`.
+  `relay-server/render.py` (SVG or PNG, one file per sequence step, `--report`) and
+  `relay-server/themes.py` (`list`, `check`, `derive`); `show.py --theme`.
+- **Contract** Map source: optional `onRender`, `claimRender`, `answerRender`; the maps
+  folder's `.themes/` (`<id>.json`, `settings.json` with `builtIn`, `default`, `logo`),
+  read by the atlas from the relay or an opened folder.
+- `format/theme-slots.json` (every theme slot, its meaning and use) and
+  `format/theme-samples/` (sample themes the viewer and `themes.py` judge alike).
+- Fixed: a deployment view of a diagram whose nodes link to other diagrams crashed
+  (`Cannot read properties of undefined (reading 'map')`): node sizes are measured again
+  when a view swaps in another tree. Exports during a glide no longer include the boxes
+  shrinking away; a state's loop back to itself no longer writes `rotate(NaN)` into an
+  exported arrowhead.
+- `scripts/browser_tests.py` drives Chrome over its debugging pipe and waits in real
+  time for each page to finish (macOS, Linux); `--dump-dom` with virtual time ended
+  pages early while they waited for a font or a file.
+
 - **Contract** Change marks (WO-31): one sparkle for new or changed (the pencil is
   gone); only the topmost new thing is marked; no outlined sparkle anywhere (closed
   boxes, crumbs, view picker and play button lose theirs). A diagram with changes has a

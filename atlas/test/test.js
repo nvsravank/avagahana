@@ -9,6 +9,7 @@ import { detectServer, serverSource, folderSource } from '../sources.js';
 import { mapPanel } from '../tree.js';
 import { navigationTests } from './navigation.js';
 import { contentsBar } from '../bar.js';
+import { renderThemeTests } from './render-themes.js';
 
 // A folder handle in memory, with the part of the File System Access API that
 // folderSource and these tests use.
@@ -313,6 +314,7 @@ try {
   barEl.remove();
 
   await navigationTests(check);
+  await renderThemeTests(check, memoryFolder);
   check('panel: destroy removes it', !slot.childElementCount);
 } catch (e) {
   check('test run finished', false, e.stack || e);

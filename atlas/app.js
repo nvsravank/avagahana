@@ -5,12 +5,18 @@
 // "Open folder" instead (Chromium's File System Access API).
 //
 // Above the viewer, the contents bar (bar.js) lists what the map holds. `?logo=0` hides
-// its logo (WO-32's .themes/settings.json sets the same `logo` option).
+// its logo, as does `logo: false` in the maps folder's .themes/settings.json.
+//
+// The maps folder's own themes (.themes/, themes.js) are the viewer's themes. The relay's
+// agent can ask this page for a picture of a map (render.js): it is drawn in a hidden
+// second viewer, so the one on screen never moves.
 import { mount, applyTheme } from '../map-viewer/index.js';
 import { parseHash, buildHash, ownMapLink } from './hash.js';
 import { detectServer, serverSource, folderSource, canPickFolder, pickFolder, rememberedFolder, allowFolder } from './sources.js';
 import { mapPanel } from './tree.js';
 import { contentsBar } from './bar.js';
+import { serverThemes, folderThemes } from './themes.js';
+import { answerRender } from './render.js';
 
 const base = new URL('./', location.href);
 const screenEl = document.getElementById('screen');
@@ -28,55 +34,70 @@ let seq = 0;             // the latest openMap call; older ones give way
 
 const info = await detectServer(base);
 const first = parseHash(location.hash);
-const viewer = mount(document.getElementById('app'), {
-  prefs: first?.prefs,
-  host: {
-    openMap: (path, at) => goTo(path, { focus: at?.focus || null, node: at?.node || null }),
-    readMap: (path) => source.read(path),
-    openExternal: openLink,
-    ...(info?.capabilities.includes('shutdown') ? { shutdown } : {}),
-  },
-});
-const picker = mapPanel(viewer.slot, { onPick: (path) => goTo(path, {}) });
+// the maps folder's themes: from the relay now; from a folder once it is opened
+let themeSet = info?.capabilities.includes('themes') ? await serverThemes(base) : null;
+let viewer = null;
+let picker = null;
 // the logo opens the map list, or closes it (the list closes itself on any press
 // outside it, before the click: what it was is read first)
 let pickerWasOpen = false;
-addEventListener('pointerdown', () => { pickerWasOpen = picker.isOpen; }, true);
+addEventListener('pointerdown', () => { pickerWasOpen = !!picker?.isOpen; }, true);
+const logoOff = new URLSearchParams(location.search).get('logo') === '0';
 const bar = contentsBar(document.getElementById('bar'), {
-  logo: new URLSearchParams(location.search).get('logo') !== '0',
+  logo: !logoOff && themeSet?.settings.logo !== false,
   onLogo: (e) => ((e.detail ? pickerWasOpen : picker.isOpen) ? picker.close() : picker.open()),   // detail 0: a key
   onPick: (state) => viewer.setState(state),
 });
-// the bar and the page behind everything follow the viewer's theme and appearance
 let pageTheme = null;
-viewer.on('theme', (t) => {
-  bar.setTheme(t);
-  pageTheme?.release();
-  pageTheme = applyTheme(document.documentElement, t.id, { appearance: t.appearance });
-});
-viewer.on('contents', (list) => bar.setContents(list));
-await viewer.ready;
+await mountViewer();
 
-viewer.on('load', ({ path, title }) => {
-  const m = maps.find((x) => x.path === path);
-  shown = { path, mtime: m?.mtime, size: m?.size };
-  picker.setCurrent(path, title);
-  bar.setState(viewer.state);
-  document.title = `${title} · Avagahana`;
-  // the viewer reports state only when it differs, and the last map's may match
-  history.replaceState(null, '', buildHash(path, viewer.state));
-});
-// state -> URL, without a history entry (opening another map adds one, in goTo)
-viewer.on('state', (s) => {
-  bar.setState(s);
-  if (shown) history.replaceState(null, '', buildHash(shown.path, s));
-});
+// The viewer, with the folder's themes. A folder opened later that brings themes of its
+// own mounts it again (before any map is shown, so nothing is lost).
+async function mountViewer() {
+  picker?.destroy();
+  viewer?.destroy();
+  viewer = mount(document.getElementById('app'), {
+    prefs: first?.prefs,
+    themes: themeSet?.themes || [],
+    defaultTheme: themeSet?.settings.builtIn !== false,
+    ...(themeSet?.settings.default ? { theme: themeSet.settings.default } : {}),
+    host: {
+      openMap: (path, at) => goTo(path, { focus: at?.focus || null, node: at?.node || null }),
+      readMap: (path) => source.read(path),
+      openExternal: openLink,
+      ...(info?.capabilities.includes('shutdown') ? { shutdown } : {}),
+    },
+  });
+  picker = mapPanel(viewer.slot, { onPick: (path) => goTo(path, {}) });
+  // the bar and the page behind everything follow the viewer's theme and appearance
+  viewer.on('theme', (t) => {
+    bar.setTheme(t);
+    pageTheme?.release();
+    pageTheme = applyTheme(document.documentElement, t.id, { appearance: t.appearance });
+  });
+  viewer.on('contents', (list) => bar.setContents(list));
+  await viewer.ready;
+  viewer.on('load', ({ path, title }) => {
+    const m = maps.find((x) => x.path === path);
+    shown = { path, mtime: m?.mtime, size: m?.size };
+    picker.setCurrent(path, title);
+    bar.setState(viewer.state);
+    document.title = `${title} · Avagahana`;
+    // the viewer reports state only when it differs, and the last map's may match
+    history.replaceState(null, '', buildHash(path, viewer.state));
+  });
+  // state -> URL, without a history entry (opening another map adds one, in goTo)
+  viewer.on('state', (s) => {
+    bar.setState(s);
+    if (shown) history.replaceState(null, '', buildHash(shown.path, s));
+  });
+}
 // URL -> state: Back, Forward, a pasted link, goTo
 addEventListener('hashchange', () => {
   const h = parseHash(location.hash);
   if (!h || !source) return;
   // a link names the whole place: no focus means the whole map, no node none selected
-  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...h.state }); viewer.setPrefs(h.prefs); }
+  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...h.state }); usePrefs(h.prefs); }
   else openMap(h.path, h.state, h.prefs);
 });
 
@@ -115,6 +136,7 @@ async function start(src) {
   }
   stops.push(source.watch(() => { if (source === src) onChange(); }));
   if (source.onShow) stops.push(source.onShow((d) => { if (source === src) onShow(d); }));
+  if (source.onRender && info?.capabilities.includes('render')) stops.push(source.onRender((d) => { if (source === src) answerRender(d, { source: src, themeSet }); }));
   const h = parseHash(location.hash);
   if (h && maps.some((m) => m.path === h.path)) {
     await openMap(h.path, h.state);
@@ -154,10 +176,17 @@ async function choose() {
   useFolder(handle);
 }
 
-function useFolder(handle) {
+async function useFolder(handle) {
   screenEl.hidden = true;
   // another folder: the old link names a map that is not in it
   if (source) history.replaceState(null, '', location.pathname + location.search);
+  // its own themes (.themes/): the viewer is mounted again with them
+  const set = await folderThemes(handle);
+  if (set || themeSet) {
+    themeSet = set;
+    bar.setLogo(!logoOff && set?.settings.logo !== false);
+    await mountViewer();
+  }
   start(folderSource(handle));
 }
 
@@ -192,7 +221,15 @@ async function openMap(path, state = {}, prefs = null) {
   if (my === seq) pendingNavigation = 0;
   if (my !== seq || shown?.path !== path) return;
   viewer.setState(state);
-  if (prefs) viewer.setPrefs(prefs);
+  if (prefs) usePrefs(prefs);
+}
+
+// looks from a link or the agent's show: appearance, colour-by, look, and a theme by id
+// (one this atlas has; the reader's own choice from then on, as if picked in the panel)
+function usePrefs(prefs) {
+  if (!prefs) return;
+  viewer.setPrefs(prefs);
+  if (prefs.theme && viewer.themes.some((t) => t.id === prefs.theme)) viewer.setTheme(prefs.theme);
 }
 
 // Live reload: re-list, and re-read the map on screen when it changed. The same
@@ -223,8 +260,8 @@ async function onChange() {
 async function onShow(d) {
   const state = {};
   for (const k of ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'step']) if (d[k]) state[k] = d[k];
-  const prefs = d.colourBy ? { colourBy: d.colourBy } : null;
-  if (d.path === shown?.path) { picker.close(); viewer.setState(state); if (prefs) viewer.setPrefs(prefs); return; }
+  const prefs = d.colourBy || d.theme ? { ...(d.colourBy ? { colourBy: d.colourBy } : {}), ...(d.theme ? { theme: d.theme } : {}) } : null;
+  if (d.path === shown?.path) { picker.close(); viewer.setState(state); usePrefs(prefs); return; }
   if (!maps.some((m) => m.path === d.path)) await onChange();
   picker.close();
   location.hash = buildHash(d.path, state, prefs);

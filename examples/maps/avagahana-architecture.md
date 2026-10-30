@@ -29,7 +29,7 @@ flowchart LR
   relay --> atlas
   atlas --> viewer
   viewer --> reader
-  skill -.->|point| relay
+  skill -.->|point, render| relay
   class agent,reader person
   class files database
   click av "#project-breakdown"
@@ -42,6 +42,7 @@ flowchart LR
   click viewer "#logical-map-model"
   click relay "#relay-internals"
   click relay "#live-reload"
+  click relay "#render-for-a-document"
   click atlas "#atlas-and-sources"
   click skill "#plugin-and-quality"
   click skill "#author-check-show"
@@ -54,12 +55,12 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-10-30 for the contents bar (WO-30) and change marks (WO-31). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-10-30 for the contents bar (WO-30), change marks (WO-31) and rendering for documents, the layout report and the maps folder's themes (WO-32). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
 
-Writes Markdown on disk and invokes the skill commands. The product is a one-way explanation channel: the reader does not edit maps and the relay sends no reader feedback to the agent. Evidence: skills/illuminate-concept/SKILL.md; docs/relay-server-api.md.
+Writes Markdown on disk and invokes the skill commands. The product is a one-way explanation channel: the reader does not edit maps and the relay sends no reader feedback to the agent. A render is the agent's own request, answered by the open page with a picture file; it carries nothing the reader did. Evidence: skills/illuminate-concept/SKILL.md; docs/relay-server-api.md.
 
 
 ### <a id="files"></a>Map files
@@ -69,7 +70,7 @@ External maps folder. Relative slash-separated paths identify .md and .mmd files
 
 ### <a id="skill"></a>Shared map skills
 
-Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family. trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
+Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and two more are read only when needed: render.md (pictures for documents, render.py, the layout report) and themes.md (a brand or house style, themes.py). trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
 
 
 ### <a id="checker"></a>Standalone format checker
@@ -79,17 +80,17 @@ Python 3.9+ standard library checker. Validates syntax, extension sections, iden
 
 ### <a id="relay"></a>Optional relay
 
-Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
+Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
 
 
 ### <a id="atlas"></a>Atlas owns the outside world
 
-Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its quick-links bar above the viewer lists what the map holds, from viewer.contents(). Evidence: atlas/app.js, atlas/bar.js; docs/map-source.md.
+Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its quick-links bar above the viewer lists what the map holds, from viewer.contents(). Mounts the viewer with the maps folder's themes, and answers the agent's renders in a hidden second viewer. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
 
 
 ### <a id="viewer"></a>Embeddable viewer
 
-mount(element, options) returns load, setState, on, ready, contents, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url; CSS is scoped to .mmv. Evidence: map-viewer/index.js, viewer.js, base.css; docs/map-viewer-api.md.
+mount(element, options) returns load, setState, on, ready, contents, export, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url; CSS is scoped to .mmv. Evidence: map-viewer/index.js, viewer.js, base.css; docs/map-viewer-api.md.
 
 
 ### <a id="reader"></a>Reader interaction
@@ -262,12 +263,12 @@ Summarizes model and compares with this reader baseline. localStorage keeps the 
 
 ### <a id="th"></a>themes/theme.js
 
-Validates theme objects, fills defaults, manages shared CSS and FontFace data. Category/level/role colours are data; each diagram defines meaning. An optional frame group colours the host chrome (the atlas bar); without it, values derive from the surface colours. Default theme includes Atkinson Hyperlegible Next. Different font geometry triggers remeasurement. Evidence: themes/theme.js.
+Validates theme objects, fills defaults, manages shared CSS and FontFace data. Category/level/role colours are data; each diagram defines meaning. An optional frame group colours the host chrome (the atlas bar); without it, values derive from the surface colours. Default theme includes Atkinson Hyperlegible Next; it is used after all, with a warning, when the host turned it off and no other theme can be used. Different font geometry triggers remeasurement. Every slot and its use: format/theme-slots.json; format/theme-samples/ keeps this check and themes.py alike. Evidence: themes/theme.js.
 
 
 ### <a id="ex"></a>export.js
 
-SVG/PNG export and print omit reader-specific change marks. Bundled icons and theme/font assets keep the core viewer local. Evidence: export.js; docs/map-viewer-api.md.
+viewer.export() returns SVG text or PNG bytes (the toolbar's buttons download them); print uses the same drawing. Files name what they show (role img, a root title; data-id and a title on every node, box and line), hold no links, and leave out change marks, selection and controls. With report: true, report.js reads the drawing for cut labels, overlaps, crossings, lines under 2 px apart, the smallest text and each box's colour and why. Picture state (expand, close, highlight, crop) shapes what is drawn. Evidence: export.js, report.js; docs/map-viewer-api.md.
 
 
 ### <a id="nt"></a>notes.js and icons.js
@@ -422,6 +423,8 @@ flowchart LR
   idb["IndexedDB"]
   viewerHost["Viewer public API"]
   bar["bar.js"]
+  themesJs["themes.js"]
+  pageRender["render.js"]
   app --> hash
   app --> tree
   app --> interface
@@ -433,6 +436,11 @@ flowchart LR
   app --> viewerHost
   app --> bar
   bar --> viewerHost
+  app --> themesJs
+  themesJs --> api
+  themesJs --> fs
+  server --> pageRender
+  pageRender --> viewerHost
 ```
 
 
@@ -456,12 +464,12 @@ Map picker mounts in viewer.slot. Rebuilds folders from source path prefixes; se
 
 ### <a id="interface"></a>Map source interface
 
-list -> state/maps, read(path) -> raw text, watch -> stop function. Optional onShow, shutdown and openExternal. Capabilities determine available host features. Evidence: docs/map-source.md.
+list -> state/maps, read(path) -> raw text, watch -> stop function. Optional onShow, onRender with claimRender and answerRender, shutdown and openExternal. Capabilities determine available host features. Evidence: docs/map-source.md.
 
 
 ### <a id="server"></a>serverSource
 
-Fetches tree and map, subscribes to EventSource tree/show. SSE errors start 2.5-second polling; open/tree events stop fallback polling. show subscribers receive agent pointers. Evidence: atlas/sources.js.
+Fetches tree and map, subscribes to EventSource tree/show/render. SSE errors start 2.5-second polling; open/tree events stop fallback polling. show subscribers receive agent pointers. Evidence: atlas/sources.js.
 
 
 ### <a id="folder"></a>folderSource
@@ -479,9 +487,19 @@ Remembers picked directory handle. Permission is checked/requested on revisit; a
 The quick-links bar, 44 px above the viewer. The logo (outside the scroller) opens the map list; the scroller holds the word mark, the "Quick links" label and a chip per diagram, view, deployment and play, built from viewer.contents() and refreshed on its contents event. The current chip is marked; a chip whose contents changed takes the viewer's small sparkle (changeMarkSvg). Fades and arrows show more, no scroll bar. Colours from the theme's frame group. Evidence: atlas/bar.js; atlas/atlas.css.
 
 
+### <a id="themesJs"></a>themes.js
+
+The maps folder's own themes (.themes/): from the relay (api/themes, font files from api/theme-file) or an opened folder. Each <id>.json becomes a viewer theme whose font faces load their bytes on demand; settings.json gives builtIn, default and logo. A folder that brings themes mounts the viewer again before any map is shown. Evidence: atlas/themes.js; docs/map-source.md.
+
+
+### <a id="pageRender"></a>render.js
+
+Answers the agent's render: claims it (a focused page at once, others after 0.6 s), mounts a hidden second viewer with the state asked for (no marks, nothing selected), exports, posts the file back and destroys it. The reader's viewer never moves. Evidence: atlas/render.js; docs/relay-server-api.md.
+
+
 ### <a id="viewerHost"></a>Viewer public API
 
-Host callbacks readMap/openMap/openExternal/shutdown mediate effects. Missing optional callback hides its feature; viewer emits state instead of changing location. contents() lists what a host can open; events load, state, contents and theme keep it current. Options since, sinceLabel and marks set the change baseline. Evidence: docs/map-viewer-api.md.
+Host callbacks readMap/openMap/openExternal/shutdown mediate effects. Missing optional callback hides its feature; viewer emits state instead of changing location. contents() lists what a host can open; events load, state, contents and theme keep it current. Options since, sinceLabel and marks set the change baseline. export() returns the picture as a file. Evidence: docs/map-viewer-api.md.
 
 
 ## Relay internals
@@ -496,6 +514,8 @@ flowchart LR
   hub["Hub subscriber queues"]
   watch["Watcher thread"]
   reap["Idle reaper"]
+  renders["Renders waiting"]
+  themesDir["Themes folder"]
   disk["External map folder"]
   static["Atlas and viewer assets"]
   cli --> relayObj
@@ -509,6 +529,9 @@ flowchart LR
   watch --> hub
   relayObj --> watch
   relayObj --> reap
+  relayObj --> renders
+  handler --> renders
+  handler --> themesDir
 ```
 
 
@@ -527,7 +550,17 @@ Holds root paths, capabilities, last_request, tree_state, stopping Event and Hub
 
 ### <a id="handler"></a>HTTP request handler
 
-GET info/ping/tree/map/events and static files. POST show/open/shutdown. show validates path and fields then broadcasts without storing the pointer. open uses webbrowser for allowed schemes. Capability flags can forbid open and shutdown.
+GET info/ping/tree/map/events/themes/theme-file and static files. POST show/render/open/shutdown, and a page's render claim and answer. show validates path and fields then broadcasts without storing the pointer. open uses webbrowser for allowed schemes. Capability flags can forbid open and shutdown.
+
+
+### <a id="renders"></a>Renders waiting
+
+POST /api/render checks the fields, sends a render event and waits: a page claims it within 3 s (else status none) and answers within 30 s (else 504). The first claim wins; a claimer quiet for 5 s may be replaced. Nothing is kept once it is answered. Evidence: serve_maps.py Renders.
+
+
+### <a id="themesDir"></a>Themes folder
+
+<maps folder>/.themes/: <id>.json per theme, settings.json and font files. Hidden from the map list. read_themes serves them; theme_file serves only font files in that folder. Evidence: serve_maps.py read_themes, theme_file; relay-server/themes.py.
 
 
 ### <a id="scan"></a>scan and safe_join
@@ -585,6 +618,38 @@ sequenceDiagram
 ## Plays over
 
 - #avagahana-architecture : Authoring
+
+## Render for a document
+
+```mermaid
+sequenceDiagram
+  actor agent as AI agent
+  participant cli as render.py
+  participant relay as Relay server
+  participant page as Atlas page
+  participant hidden as Hidden viewer
+  agent->>cli: Picture of a map for a document
+  cli->>relay: POST api/render
+  relay-)page: SSE render event
+  page->>relay: Claim it
+  relay-->>page: Claimed
+  page->>relay: Read map
+  relay-->>page: Markdown text
+  page->>hidden: mount with state, load, export
+  hidden-->>page: SVG or PNG and report
+  page->>relay: POST the answer
+  relay-->>cli: The file
+  cli-->>agent: STATUS=rendered FILE
+```
+
+
+## Details
+
+
+### <a id="hidden"></a>Hidden viewer
+
+A second viewer, off screen, mounted for one render and destroyed after it: the reader's viewer, its place and marks, never move. No headless browser: the open page draws. Evidence: atlas/render.js; docs/relay-server-api.md.
+
 
 ## Live reload
 

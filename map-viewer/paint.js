@@ -175,7 +175,8 @@ export function createPainter(v) {
     // lines behind the nodes (an ER diagram's, through semi-transparent tables), else over them
     if (scene.relsBehind) $.viewport.insertBefore($.rels, $.nodes); else $.viewport.insertBefore($.rels, $.play);
     const edgeFrag = document.createDocumentFragment();
-    for (const s of scene.edges) svgEl('path', { d: s.d, class: s.cls, 'stroke-width': s.width }, edgeFrag);
+    // a tree's lines are named too: parent → child
+    for (const s of scene.edges) svgEl('title', {}, svgEl('path', { d: s.d, class: s.cls, 'stroke-width': s.width, 'data-id': s.id }, edgeFrag)).textContent = s.title || String(s.id).split('>').map(labelOfId).join(' → ');
     $.edges.replaceChildren(edgeFrag);
     const frameFrag = document.createDocumentFragment();
     S.marked = new Set();
@@ -197,7 +198,7 @@ export function createPainter(v) {
     for (const g of leaving) if (v.isGone?.(g.dataset.id)) g.classList.add('is-gone');
     if (moving) glide(before, view0, leaving);
     animate = false;
-    $.mapTitle.textContent = S.map.title || 'Map';
+    $.mapTitle.textContent = v.fullTitle();
     $.mapDesc.textContent = `${v.diagram().modes.find((m) => m.id === S.mode)?.label || 'Diagram'} of ${scene.nodes.length} ${scene.nodes.length === 1 ? 'node' : 'nodes'}.`;
     v.afterDraw?.();   // a sequence playing over the drawing marks it again (player.js)
     return scene;
@@ -206,6 +207,7 @@ export function createPainter(v) {
   function paintNode(s, parent) {
     const marked = s.marks.hit || s.marks.sel;
     const g = svgEl('g', { class: s.cls, 'data-id': s.id, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})` }, parent);
+    nameOf(g, s);
     svgEl('rect', { class: 'mmv-hit', width: s.w, height: s.h }, g);   // hit target even for text-only nodes
     if (s.grow > 1) g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${s.grow}) translate(${-s.w / 2},${-s.h / 2})`);
     g.setAttribute('role', 'img');
@@ -282,6 +284,17 @@ export function createPainter(v) {
     }
   }
 
+  // Every node and arrow is named in the drawing, so a picture made from it (an export)
+  // says what is what: a <title> with its label (and data-id, the map's id).
+  const labelOfId = (id) => { const n = S.map.byId[id]; return n ? n.plain || n.label : id; };
+  function nameOf(g, s) {
+    svgEl('title', {}, g).textContent = labelOfId(s.id);
+  }
+  function arrowTitle(s) {
+    if (s.items?.length) return s.items.map((r) => `${labelOfId(r.from)} → ${labelOfId(r.to)}${r.label ? `: ${r.label}` : ''}`).join('; ');
+    return s.label?.text || s.hint || s.id;
+  }
+
   // an icon: a Phosphor symbol in the node's colour, or a cloud icon's own picture
   // (ic.src; the product's name is its title)
   function drawIcon(g, ic) {
@@ -304,6 +317,7 @@ export function createPainter(v) {
   // an open box: a framed area with a title strip; its contents are drawn over it
   function paintFrame(s, parent) {
     const g = svgEl('g', { class: s.cls, 'data-id': s.id, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})`, role: 'img', 'aria-label': s.name }, parent);
+    nameOf(g, s);
     svgEl('rect', { class: 'mmv-shape', width: s.w, height: s.h, rx: 8, style: s.stroke }, g);
     if (s.marks.hit || s.marks.sel) drawMarks(g, null, s.marks, s.w, s.h, 'frame');
     for (const ic of s.icons || []) drawIcon(g, ic);
@@ -373,7 +387,8 @@ export function createPainter(v) {
     for (const s of rels) {
       // a box diagram's arrows carry their own class and ends; related links in a mind map do not
       if (s.cls) {
-        svgEl('path', { class: `${s.cls}${s.items && v.arrowFresh?.(s) ? ' is-glow' : ''}`, d: s.d, 'marker-end': end(s.head, s.slot, s.tint, s.plan), 'marker-start': end(s.tail, s.slot, s.tint, s.plan), style: s.style || null, 'data-msg': s.msg }, frag);
+        const line = svgEl('path', { class: `${s.cls}${s.items && v.arrowFresh?.(s) ? ' is-glow' : ''}`, d: s.d, 'marker-end': end(s.head, s.slot, s.tint, s.plan), 'marker-start': end(s.tail, s.slot, s.tint, s.plan), style: s.style || null, 'data-msg': s.msg, 'data-id': s.id }, frag);
+        svgEl('title', {}, line).textContent = arrowTitle(s);
         // a wide, invisible line to click: it lists the relations behind the arrow
         if (s.items) {
           const hit = svgEl('path', { class: 'mmv-flow-hit', d: s.d, 'data-arrow': s.id }, frag);
@@ -381,7 +396,8 @@ export function createPainter(v) {
         }
       }
       else {
-        svgEl('path', { class: `mmv-rel${s.dim ? ' is-dim' : ''}`, d: s.d, 'marker-end': `url(#${v.uid}-arrow)` }, frag);
+        const line = svgEl('path', { class: `mmv-rel${s.dim ? ' is-dim' : ''}`, d: s.d, 'marker-end': `url(#${v.uid}-arrow)`, 'data-id': s.id }, frag);
+        svgEl('title', {}, line).textContent = arrowTitle(s);
         // merged links: click to list them
         if (s.items) svgEl('path', { class: 'mmv-flow-hit', d: s.d, 'data-arrow': s.id }, frag);
       }
@@ -392,7 +408,7 @@ export function createPainter(v) {
         const iw = icons.length * 16;
         const x0 = s.label.x - (tw + iw + (s.label.note ? 14 : 0)) / 2;
         const lg = s.dim ? svgEl('g', { class: 'is-dim' }, frag) : frag;
-        if (s.label.text) svgEl('text', { class: s.cls ? 'mmv-flow-label' : 'mmv-rel-label', x: x0, y: s.label.y, 'text-anchor': 'start', 'font-size': 12 }, lg).textContent = s.label.text;
+        if (s.label.text) svgEl('text', { class: s.cls ? 'mmv-flow-label' : 'mmv-rel-label', x: x0, y: s.label.y, 'text-anchor': 'start', 'font-size': 12, 'data-for': s.id }, lg).textContent = s.label.text;
         icons.forEach((def, k) => {
           const ig = svgEl('g', { class: 'mmv-icon mmv-flow-icon', transform: `translate(${x0 + tw + k * 16},${s.label.y - 11})`, style: def.color ? `color:${def.color}` : null }, lg);
           svgEl('rect', { class: 'mmv-flow-note-bg', x: -1, y: -1, width: 16, height: 16, rx: 3 }, ig);
@@ -411,7 +427,7 @@ export function createPainter(v) {
           svgEl('title', {}, ng).textContent = 'Note: click to read';
         }
       }
-      else if (s.label) svgEl('text', { class: `${s.cls ? 'mmv-flow-label' : 'mmv-rel-label'}${s.dim ? ' is-dim' : ''}${s.badge?.cls ? ` ${s.badge.cls}` : ''}`, x: s.label.x, y: s.label.y, 'text-anchor': 'middle', 'font-size': 12 }, frag).textContent = s.label.text;
+      else if (s.label) svgEl('text', { class: `${s.cls ? 'mmv-flow-label' : 'mmv-rel-label'}${s.dim ? ' is-dim' : ''}${s.badge?.cls ? ` ${s.badge.cls}` : ''}`, x: s.label.x, y: s.label.y, 'text-anchor': 'middle', 'font-size': 12, 'data-for': s.id }, frag).textContent = s.label.text;
       // a sequence message's number: a call's filled, a reply's outlined
       if (s.badge) badge(s.badge, s.tint, frag);
     }

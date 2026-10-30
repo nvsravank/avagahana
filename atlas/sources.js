@@ -4,7 +4,8 @@
 //   const source = info ? serverSource(base, info) : folderSource(handle);
 //
 // Both meet the same interface: capabilities, list(), read(path), watch(fn), and
-// optionally onShow(fn), shutdown(), openExternal(url).
+// optionally onShow(fn), shutdown(), openExternal(url); the relay also onRender(fn),
+// claimRender(id), answerRender(id, body) (WO-32: the agent's render, render.js).
 
 const MAP_RE = /\.(md|mmd)$/i;
 const POLL_MS = 2500;
@@ -34,6 +35,7 @@ export function serverSource(base, info = { capabilities: [] }, fetchFn = fetch)
     return res.json();
   };
   const showFns = new Set();
+  const renderFns = new Set();
   const source = {
     kind: 'server',
     async identity() { return info.sourceId || `server:${new URL(base).href}`; },
@@ -61,6 +63,7 @@ export function serverSource(base, info = { capabilities: [] }, fetchFn = fetch)
         es = new EventSource(url('api/events'));
         es.addEventListener('tree', (e) => { stopPolling(); try { changed(JSON.parse(e.data).state); } catch (_) { /* bad event */ } });
         es.addEventListener('show', (e) => { let d; try { d = JSON.parse(e.data); } catch (_) { return; } showFns.forEach((f) => f(d)); });
+        es.addEventListener('render', (e) => { let d; try { d = JSON.parse(e.data); } catch (_) { return; } renderFns.forEach((f) => f(d)); });
         es.addEventListener('open', stopPolling);
         es.addEventListener('error', startPolling);
       } else {
@@ -70,6 +73,14 @@ export function serverSource(base, info = { capabilities: [] }, fetchFn = fetch)
     },
     // "Look here" from the agent: fn({path, node?, focus?, mode?, view?, env?}).
     onShow(fn) { showFns.add(fn); return () => showFns.delete(fn); },
+    // The agent's render: fn(request); this page claims it (true: it is this page's to
+    // answer), draws it and posts the answer.
+    onRender(fn) { renderFns.add(fn); return () => renderFns.delete(fn); },
+    async claimRender(id) {
+      const res = await fetchFn(url(`api/render/${encodeURIComponent(id)}/claim`), { method: 'POST' });
+      return res.ok;
+    },
+    answerRender: (id, body) => post(`api/render/${encodeURIComponent(id)}`, body),
   };
   if (caps.has('shutdown')) source.shutdown = () => post('api/shutdown', {});
   if (caps.has('open')) source.openExternal = (u) => post('api/open', { url: u });

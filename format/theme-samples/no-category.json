@@ -1,0 +1,53 @@
+{
+  "about": "No usable category colour (the viewer cannot use it).",
+  "expect": [
+    "theme-category"
+  ],
+  "theme": {
+    "id": "sample",
+    "label": "Sample",
+    "appearances": {
+      "light": {
+        "bg": "#ffffff",
+        "ink": "#1f2933",
+        "muted": "#5f6b76",
+        "accent": "#1971c2",
+        "center": "#1f2933",
+        "centerInk": "#ffffff",
+        "tint": 12,
+        "category": [
+          "not a colour"
+        ],
+        "level": [
+          "#172554",
+          "#1e3a8a",
+          "#1d4ed8"
+        ],
+        "roles": {
+          "good": "#2f9e44",
+          "warn": "#cc7a00",
+          "bad": "#e03131",
+          "info": "#1971c2",
+          "highlight": "#cc7a00",
+          "link": "#d9480f"
+        },
+        "chrome": {
+          "bg": "#ffffff",
+          "border": "#e3e7eb",
+          "hover": "#f1f3f5",
+          "active": "#1f2933",
+          "activeInk": "#ffffff"
+        },
+        "icons": {
+          "red": "#e03131",
+          "orange": "#e8590c",
+          "yellow": "#cc7a00",
+          "green": "#2f9e44",
+          "blue": "#1971c2",
+          "purple": "#9c36b5",
+          "grey": "#868e96"
+        }
+      }
+    }
+  }
+}

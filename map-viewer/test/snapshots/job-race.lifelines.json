@@ -66,16 +66,22 @@
  ],
  "edges": [
   {
+   "id": "a~life",
+   "title": "Worker A: lifeline",
    "d": "M50.5,34 V584",
    "cls": "mmv-seq-life mmv-k1 mmv-l1 mmv-d1 mmv-p0",
    "width": 1.5
   },
   {
+   "id": "db~life",
+   "title": "Jobs table: lifeline",
    "d": "M330.3,34 V584",
    "cls": "mmv-seq-life mmv-k2 mmv-l1 mmv-d1 mmv-p0",
    "width": 1.5
   },
   {
+   "id": "b~life",
+   "title": "Worker B: lifeline",
    "d": "M610.1,34 V584",
    "cls": "mmv-seq-life mmv-k3 mmv-l1 mmv-d1 mmv-p0",
    "width": 1.5

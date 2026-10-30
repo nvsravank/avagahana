@@ -1,0 +1,96 @@
+{
+  "about": "Both appearances, complete.",
+  "expect": [],
+  "theme": {
+    "id": "sample",
+    "label": "Sample",
+    "appearances": {
+      "light": {
+        "bg": "#ffffff",
+        "ink": "#1f2933",
+        "muted": "#5f6b76",
+        "accent": "#1971c2",
+        "center": "#1f2933",
+        "centerInk": "#ffffff",
+        "tint": 12,
+        "category": [
+          "#2b8a3e",
+          "#c92a2a",
+          "#3b5bdb",
+          "#9c6f00"
+        ],
+        "level": [
+          "#172554",
+          "#1e3a8a",
+          "#1d4ed8"
+        ],
+        "roles": {
+          "good": "#2f9e44",
+          "warn": "#cc7a00",
+          "bad": "#e03131",
+          "info": "#1971c2",
+          "highlight": "#cc7a00",
+          "link": "#d9480f"
+        },
+        "chrome": {
+          "bg": "#ffffff",
+          "border": "#e3e7eb",
+          "hover": "#f1f3f5",
+          "active": "#1f2933",
+          "activeInk": "#ffffff"
+        },
+        "icons": {
+          "red": "#e03131",
+          "orange": "#e8590c",
+          "yellow": "#cc7a00",
+          "green": "#2f9e44",
+          "blue": "#1971c2",
+          "purple": "#9c36b5",
+          "grey": "#868e96"
+        }
+      },
+      "dark": {
+        "bg": "#16191d",
+        "ink": "#eef1f4",
+        "muted": "#a7b0ba",
+        "accent": "#74c0fc",
+        "center": "#eef1f4",
+        "centerInk": "#16191d",
+        "tint": 12,
+        "category": [
+          "#69db7c",
+          "#ff6b6b",
+          "#91a7ff"
+        ],
+        "level": [
+          "#e0ecff",
+          "#bfd7ff"
+        ],
+        "roles": {
+          "good": "#69db7c",
+          "warn": "#ffd43b",
+          "bad": "#ff6b6b",
+          "info": "#74c0fc",
+          "highlight": "#ffd43b",
+          "link": "#ff8a65"
+        },
+        "chrome": {
+          "bg": "#16191d",
+          "border": "#2c323a",
+          "hover": "#2c323a",
+          "active": "#dbe8ff",
+          "activeInk": "#16191d"
+        },
+        "icons": {
+          "red": "#ff6b6b",
+          "orange": "#ff922b",
+          "yellow": "#ffd43b",
+          "green": "#69db7c",
+          "blue": "#74c0fc",
+          "purple": "#da77f2",
+          "grey": "#adb5bd"
+        }
+      }
+    }
+  }
+}

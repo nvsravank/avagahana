@@ -71,6 +71,7 @@ export function buildScene(input) {
     nodes.push(s);
   }
   const edges = L.lifelines.map((l) => ({
+    id: `${l.n.id}~life`, title: `${l.n.plain || l.n.label}: lifeline`,
     d: `M${l.x},${l.y0} V${l.y1}`,
     cls: `mmv-seq-life ${shaper.tone(l.n)}${play ? ` ${play.who.get(l.n.id) || 'is-idle'}` : ''}`,
     width: 1.5,

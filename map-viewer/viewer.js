@@ -126,6 +126,8 @@ export function mount(element, options = {}) {
     view: { k: 1, x: 0, y: 0 }, layout: null, lodKey: null, exporting: false,
     expand: 'default', expandStates: [], userMoved: false, lastFit: null,
     play: null,   // a sequence playing: {seq, step, playing} (player.js)
+    // a picture for an export (setState): the nodes lit (the rest idle), the node a crop keeps
+    highlight: null, crop: null,
   };
   const saved = readPrefs();
   const link = options.prefs || {};
@@ -191,6 +193,8 @@ export function mount(element, options = {}) {
     },
   };
   v.sinceWords = sinceWords;
+  // the picture's name: the map, and the diagram when it is not the file's first
+  v.fullTitle = () => (!S.map ? 'Map' : S.file && S.map !== S.file && S.file.title && S.file.title !== S.map.title ? `${S.file.title}: ${S.map.title}` : S.map.title || 'Map');
   const painter = createPainter(v);
   const stage = createStage(v, {
     onLod: () => painter.lod(),
@@ -274,7 +278,63 @@ export function mount(element, options = {}) {
     // played: the sequence's change mark goes (seen.js)
     played: (key) => seenAck([`${key || ''}|s`]),
   });
-  v.afterDraw = () => player.decorate(false);
+  v.afterDraw = () => { player.decorate(false); paintHighlight(); };
+
+  // ---------- a picture for an export: highlight, expand, close, crop (setState) ----------
+  // highlight: these nodes (and what is inside them) keep their colours; every other box,
+  // line and label takes the player's idle colours. Not while a sequence plays.
+  function paintHighlight() {
+    const on = !!S.highlight && !S.play && S.mode !== 'list' && !!S.map?.root;
+    root.classList.toggle('is-highlighting', on);
+    if (!on) return;
+    const lit = (id) => { for (let n = S.map.byId[id]; n; n = n.parent) if (S.highlight.has(n.id)) return true; return false; };
+    // a box round a lit node stays lit too (its title says where the lit node is)
+    const round = new Set();
+    for (const id of S.highlight) for (let n = S.map.byId[id]?.parent; n; n = n.parent) round.add(n.id);
+    for (const g of [...$.frames.children, ...$.nodes.children]) g.classList.toggle('is-idle', !(lit(g.dataset.id) || round.has(g.dataset.id)));
+    for (const e of $.edges.children) e.classList.toggle('is-idle', !lit(String(e.dataset.id || '').split('>').pop()));
+    for (const line of $.rels.querySelectorAll(':scope > path[data-id]')) {
+      const shape = painter.arrow(line.dataset.id);
+      const ends = shape?.items || [];
+      const idle = !ends.some((r) => lit(r.from) && lit(r.to));
+      line.classList.toggle('is-idle', idle);
+      if (idle && shape?.head) line.setAttribute('marker-end', painter.marker(shape.head, 'idle'));
+      if (idle && shape?.tail) line.setAttribute('marker-start', painter.marker(shape.tail, 'idle'));
+      $.rels.querySelectorAll(`[data-for="${CSS.escape(line.dataset.id)}"]`).forEach((l) => l.classList.toggle('is-idle', idle));
+    }
+  }
+  // the picture asked for: expand (a whole number of levels below the view's top, or
+  // 'all'), close (boxes shown closed), highlight (node ids), crop (a node id). Returns
+  // true when the drawing must be laid out again.
+  function pictureState(st) {
+    let relayout = false;
+    if ('expand' in st && st.expand != null) {
+      const depth = st.expand === 'all' ? 'all' : Number.isInteger(+st.expand) && +st.expand >= 0 ? +st.expand : null;
+      if (depth != null) {
+        const top = viewRoot();
+        (function open(n) { S.collapsed.delete(n.id); n.children.forEach(open); })(top);
+        if (depth !== 'all') (function walk(n, d) { if (d >= depth && n.children.length) S.collapsed.add(n.id); n.children.forEach((c) => walk(c, d + 1)); })(top, 0);
+        relayout = true;
+      }
+    }
+    const ids = (x) => (Array.isArray(x) ? x : String(x).split(',')).map((id) => String(id).trim()).filter((id) => S.map.byId[id]);
+    if ('close' in st && st.close != null) {
+      for (const id of ids(st.close)) if (S.map.byId[id].children.length) { S.collapsed.add(id); relayout = true; }
+    }
+    if (relayout) {
+      const { states, sets } = expandStates(viewRoot());
+      S.expand = states.find((st2) => sameSet(sets[st2], closedIn(viewRoot()))) || S.expand;
+      updateExpandBtn(states);
+      painter.clearSizes();
+    }
+    if ('highlight' in st) {
+      const list = st.highlight == null || st.highlight === '' ? [] : ids(st.highlight);
+      S.highlight = list.length ? new Set(list) : null;
+      if (!relayout && S.layout) { if (!S.highlight) for (const el of root.querySelectorAll('[data-mmv=viewport] .is-idle')) el.classList.remove('is-idle'); render(false); }
+    }
+    if ('crop' in st) S.crop = st.crop && S.map.byId[st.crop] ? String(st.crop) : null;
+    return relayout;
+  }
   // ---------- changes since you looked (seen.js) ----------
   const partKey = () => S.part || '';
   const envName = () => (viewNamed(S.relView)?.deploy ? viewNamed(S.relView).name : null);
@@ -469,7 +529,8 @@ export function mount(element, options = {}) {
     if (opener) { openPage(opener.dataset.note); return; }
     const arrow = target.closest('[data-arrow]');
     if (arrow) { showArrow(arrow.dataset.arrow, arrow); return; }
-    const node = target.closest('[data-id]');
+    // a node or an open box (lines carry data-id too, for an export: not a node)
+    const node = target.closest(':is([data-mmv=frames], [data-mmv=nodes]) > [data-id]');
     if (node && node.dataset.bar) stage.zoomToRead(S.map.byId[node.dataset.id]);
     else if (node) clickNode(node.dataset.id);
     else deselect();
@@ -1231,8 +1292,12 @@ export function mount(element, options = {}) {
     const view = viewNamed(name) || S.map.views[0] || null;
     S.relView = view && view !== S.map.views[0] ? view.name : null;
     S.map.relations = view ? view.relations : [];
+    const before = S.map.root;
     S.map.root = view?.deploy ? view.deploy.root : S.map.base.root;
     S.map.byId = view?.deploy ? view.deploy.byId : S.map.base.byId;
+    // another tree (a deployment's): its nodes share ids with the diagram's but not their
+    // sizes (a diagram node's links to other diagrams are not in a deployment)
+    if (S.map.root !== before) painter.clearSizes();
     buildViews();
   }
   function buildViews() {
@@ -1591,6 +1656,7 @@ export function mount(element, options = {}) {
       if (st.rels != null) S.rels = st.rels ? '1' : '0';
       applyChrome();
       if (st.focus && S.map.byId[st.focus]) drill(st.focus); else render('levels');
+      if (pictureState(st)) render(S.expand === 'all' ? 'all' : 'levels');
       // a thumbnail marks the node where the fit put it (no camera move)
       if (st.node && S.map.byId[st.node]) { if (S.thumb) { S.selected = st.node; root.classList.add('is-spot'); render('all'); } else jumpTo(st.node); }
       if (st.page && S.map.byId[st.page]) { S.selected = st.page; page.open(st.page, { instant: true }); }
@@ -1643,6 +1709,8 @@ export function mount(element, options = {}) {
       S.selected = null;
       S.hits = [];
       S.iconFilter.clear();
+      S.highlight = null;
+      S.crop = null;
       if (sInput.value) { sInput.value = ''; $.search.classList.remove('has-value'); $.searchCount.textContent = ''; }
       hideNote();
     } else {
@@ -1674,6 +1742,7 @@ export function mount(element, options = {}) {
     if ('focus' in partial) {
       if (partial.focus == null) { if (S.focus) drill(S.map.root.id); } else if (S.map.byId[partial.focus] && partial.focus !== S.focus) drill(partial.focus);
     }
+    if (pictureState(partial)) render(S.expand === 'all' ? 'all' : 'levels');
     if ('node' in partial) {
       if (partial.node == null) { if (S.selected) deselect(); } else if (S.map.byId[partial.node]) jumpTo(partial.node);
     }
@@ -1710,6 +1779,7 @@ export function mount(element, options = {}) {
   // as kind sequence), then its relation views when it has more than one (the default
   // first, under its label "Overview"; an ER join view as kind join), its deployments
   // and its walks. type: the diagram's type (mindmap, flowchart, sequence, ...).
+  // steps: a sequence's or walk's number of steps.
   // state: what setState takes to open it (a sequence or walk opens
   // playing at step 1; anything else stops a sequence that plays). changed: something
   // in it is new or changed (seen.js; a view: its own arrows or places). Built from
@@ -1724,14 +1794,14 @@ export function mount(element, options = {}) {
       const part = m === f ? null : m.anchor;
       const mark = { ...(m === f ? { first: true } : {}), ...(part && unlinked.has(part) ? { unlinked: true } : {}) };
       const changed = !!seen?.partMarked(part || '');
-      if (m.type === 'sequence') { out.push({ kind: 'sequence', label: m.title, part, type: m.type, state: { seq: part || 'main', step: 1 }, changed, ...mark }); continue; }
+      if (m.type === 'sequence') { out.push({ kind: 'sequence', label: m.title, part, type: m.type, state: { seq: part || 'main', step: 1 }, steps: m.sequence?.steps.length || 0, changed, ...mark }); continue; }
       out.push({ kind: 'diagram', label: m.title, part, type: m.type, state: { seq: null, part, view: null }, changed, ...mark });
       const own = { part, type: m.type, diagram: m.title };
       const viewChanged = (x) => !!seen?.viewMarked(part || '', x.name);
       const views = (m.views || []).filter((x) => !x.deploy);
       if (views.length > 1) for (const x of views) out.push({ kind: x.join ? 'join' : 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name }, changed: viewChanged(x) });
       for (const x of m.views || []) if (x.deploy) out.push({ kind: 'deployment', label: x.name, ...own, state: { seq: null, part, env: x.name }, changed: viewChanged(x) });
-      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 }, changed: !!seen?.partMarked(w.anchor) });
+      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 }, steps: w.sequence?.steps.length || 0, changed: !!seen?.partMarked(w.anchor) });
     }
     return out;
   }
@@ -1750,14 +1820,27 @@ export function mount(element, options = {}) {
     await Promise.all([useCss(), loadIconIndex()]);
     // the change marks' icons (seen.js) and those diagram types draw themselves (an ER key)
     await ensureIcons([...CHANGE_ICONS, ...DIAGRAMS.flatMap((d) => d.icons || [])]);
-    let builtIn = null;
-    if (options.defaultTheme !== false) {
-      try { builtIn = (await import('./themes/default/theme.js')).default; } catch (x) {
+    const loadBuiltIn = async () => {
+      try { return (await import('./themes/default/theme.js')).default; } catch (x) {
         problems.add('theme', [{ level: 'error', code: 'default-theme-missing', message: `The built-in theme could not be loaded (${x.message || x}).` }]);
+        return null;
       }
-    }
+    };
+    const builtIn = options.defaultTheme !== false ? await loadBuiltIn() : null;
     if (builtIn) addTheme(builtIn);
     for (const t of options.themes || []) addTheme(t);
+    // the built-in turned off, and no theme of the host's usable: the built-in after all
+    if (!themes.size && options.defaultTheme === false) {
+      const t = await loadBuiltIn();
+      if (t) {
+        problems.add('theme', [{ level: 'warning', code: 'theme-built-in-used', message: 'The built-in theme was turned off, but no other theme could be used; using the built-in theme.' }]);
+        addTheme(t);
+      }
+    }
+    // a theme asked for by id that is not here: the first one, and say so
+    for (const id of [link.theme, options.theme]) {
+      if (id && !themes.has(id)) problems.add('theme', [{ level: 'warning', code: 'theme-unknown', message: `No theme "${id}"; another theme is used.`, where: String(id) }]);
+    }
     if (!themes.size) {
       problems.add('theme', [{ level: 'error', code: 'no-theme', message: 'No usable theme; using a plain one.' }]);
       addTheme(PLAIN_THEME);
@@ -1774,6 +1857,9 @@ export function mount(element, options = {}) {
     get title() { return S.map?.title || null; },
     get views() { return (S.map?.views || []).map((x) => x.name); },
     contents,
+    // the picture as a file instead of a download (export.js): {format, width | scale,
+    // background, crop, report} -> {format, type, data, width, height, scaledDown, report}
+    async export(opts = {}) { await ready; return exporter.exportImage(opts); },
     get themes() { return [...themes.values()].map((t) => ({ id: t.id, label: t.label })); },
     ready,
     slot: $.slot,

@@ -1,0 +1,17 @@
+{
+  "about": "An appearance with no bg colour.",
+  "expect": [
+    "theme-appearance"
+  ],
+  "theme": {
+    "id": "sample",
+    "appearances": {
+      "light": {
+        "ink": "#222222",
+        "category": [
+          "#2b8a3e"
+        ]
+      }
+    }
+  }
+}

@@ -65,6 +65,13 @@ The agent's "look here" (`POST /api/show` on the relay server). Atlas opens that
 if it is another one (with a history entry), then points the viewer at the node.
 Only a source with a channel from the agent has it.
 
+### `onRender(fn)`, `claimRender(id)`, `answerRender(id, body)` (optional)
+
+The agent's render (`POST /api/render` on the relay server, added in WO-32): `fn`
+gets the request; the page claims it (`true`: it is this page's to answer), draws it
+in a hidden second viewer and posts the file back (`atlas/render.js`). Only the relay's
+source has them.
+
 ### `capabilities`
 
 What the host may offer the viewer. Atlas passes the viewer a `shutdown` callback only
@@ -84,3 +91,16 @@ The picked folder is remembered in IndexedDB; a browser asks the person again be
 reading it in a new visit, which needs one click.
 
 Other hosts may write their own source; anything that meets this interface works.
+
+## Themes of the maps folder (`.themes/`)
+
+A maps folder may hold its own themes in `.themes/` (hidden from the map list, as
+every dot folder is; added in WO-32): `<id>.json` per theme (the viewer's theme object,
+plus `name` and `description`; the font as files beside it, `{family, faces: [{weight,
+style, file}]}` or `{family, file}`) and `settings.json` (`builtIn`: show the built-in
+theme, default `true`; `default`: a theme id; `logo`: the atlas's logo, default `true`).
+The atlas reads them from the relay (`GET /api/themes`, font files from
+`/api/theme-file`) or from an opened folder (`atlas/themes.js`) and mounts the viewer
+with them. One theme and `builtIn: false` hides the theme picker; `builtIn: false`
+with no usable theme uses the built-in after all, with a warning (from the viewer and
+`themes.py check`). Slots: `format/theme-slots.json`; tool: `relay-server/themes.py`.
