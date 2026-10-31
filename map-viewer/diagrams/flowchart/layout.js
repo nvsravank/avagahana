@@ -113,8 +113,9 @@ export function layoutBoxes(root, kids, size, input) {
   const layers = !!input.layers && root.id === '_map';
   const dirOf = (n) => (n === around ? (root.parent ? dirOf(root.parent) : input.direction || 'TB') : layers && !n.parent ? 'TB' : layers && !n.parent.parent ? n.dir || 'LR'
     : n.dir || (!n.parent ? input.direction || 'TB' : !n.parent.parent ? 'LR' : TURN[dirOf(n.parent)]));
-  // the room a box's title takes along its top (open, its cloud icons sit at the right)
-  const titleZone = (b) => size(b).w + (b.logos?.length ? b.logos.length * 26 + 4 : 0);
+  // the room a box's title takes along its top (open, its main icon sits at the right,
+  // or in Poster at the left)
+  const titleZone = (b) => size(b).w + (b.main ? 26 + 4 : 0);
 
   // ---- what is drawn, and the arrows between drawn things (one per pair of ends) ----
   const placed = new Set(isMap ? [] : [root, ...neighbours]);
@@ -142,9 +143,10 @@ export function layoutBoxes(root, kids, size, input) {
   // what an arrow says: its label, or how many relations it stands for; a single
   // relation with a note shows a note mark (a merged arrow shows none); the icons all
   // its relations carry (diagrams/flowchart/scene.js)
+  // (Poster, WO-38: no icons or note mark on the line; the arrow's pop-up has them)
   for (const w of arrows.values()) {
-    w.note = w.items.length === 1 && !!w.items[0].note;
-    w.icons = w.items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), w.items[0].icons || []).length;
+    w.note = !input.poster && w.items.length === 1 && !!w.items[0].note;
+    w.icons = input.poster ? 0 : w.items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), w.items[0].icons || []).length;
     w.text = w.items.length > 1 ? `${w.items.length} links` : w.items[0].label || (w.note || w.icons ? ' ' : null);
     // playing: the arrow says only what the sequence sends along it, the longest
     // message each way (so the picture keeps its place through the play)
@@ -314,7 +316,8 @@ export function layoutBoxes(root, kids, size, input) {
     }
     const need = (n, text) => (n ? 2 * PORT_MARGIN + (n - 1) * (text ? LABEL_SPREAD : SPREAD) : 0);
     const needOn = (p, a, b) => Math.max(need(p[a] || 0, p[`${a}text`]), need(p[b] || 0, p[`${b}text`]));
-    const plain = (c) => !c.figure && !OWN_SHAPE.has(c.shape);
+    // (Poster, WO-38: every node keeps its own size, as figures do)
+    const plain = (c) => !input.poster && !c.figure && !OWN_SHAPE.has(c.shape);
     let common = 0;
     for (const c of placed) {
       if (info.has(c) || !plain(c)) continue;
@@ -367,7 +370,7 @@ export function layoutBoxes(root, kids, size, input) {
     // a column (a rank of a box running across) of plain boxes: all as wide as its widest
     if (across) {
       for (const rank of ranks) {
-        const plain = rank.filter((c) => !c.dummy && !info.has(c) && !c.figure && !OWN_SHAPE.has(c.shape));
+        const plain = input.poster ? [] : rank.filter((c) => !c.dummy && !info.has(c) && !c.figure && !OWN_SHAPE.has(c.shape));
         const w = Math.max(0, ...plain.map((c) => sizes.get(c).w));
         for (const c of plain) sizes.set(c, { ...sizes.get(c), w });
       }
@@ -444,6 +447,19 @@ export function layoutBoxes(root, kids, size, input) {
     for (const list of free.values()) {
       const { c, side } = list[0].end;
       const s = sizes.get(c);
+      // Poster (WO-38): every arrow on a side ends at its middle, a figure's at its icon's
+      // centre; one may slide (below) only within the middle of the icon, to run straight
+      if (input.poster && !info.has(c)) {
+        const flank = side === 'L' || side === 'R';
+        const off = flank ? s.anchor?.y ?? s.h / 2 : s.w / 2;
+        list.forEach((p) => portAt.set(p.end, { side, off }));
+        const give = flank && s.anchor ? s.anchor.top * 0.85 : 0;
+        list.lo = off - give;
+        list.hi = off + give;
+        list.spread = 0;
+        list.fixed = !give || list.length > 1;
+        continue;
+      }
       const len = side === 'L' || side === 'R' ? s.h : s.w;
       let lo = Math.min(6, len / 2);
       const hi = len - lo;
@@ -469,7 +485,7 @@ export function layoutBoxes(root, kids, size, input) {
         const end = seq[i];
         const other = seq[j];
         const list = freeList.get(end);
-        if (!list || !other.c) continue;
+        if (!list || list.fixed || !other.c) continue;
         const target = other.lane ? crossC.get(other.c) : portAt.has(other) ? crossLo(other.c) + portAt.get(other).off : null;
         if (target == null) continue;
         const off = target - crossLo(end.c);
@@ -608,6 +624,10 @@ export function layoutBoxes(root, kids, size, input) {
       const { side, off } = portAt.get(end);
       const l = r.x - r.w / 2;
       const t = r.y - r.h / 2;
+      // a Poster figure's arrows reach its icon, not the edge of its name below
+      const half = input.poster && !info.has(end.c) ? sizes.get(end.c).anchor?.half : null;
+      if (half != null && (side === 'L' || side === 'R')) return [r.x + (side === 'L' ? -half : half), t + off];
+      if (half != null && side === 'T') return [l + off, r.y - sizes.get(end.c).anchor.top];
       return side === 'L' ? [l, t + off] : side === 'R' ? [l + r.w, t + off] : side === 'T' ? [l + off, t] : [l + off, t + r.h];
     };
     const onBorder = ([x, y], side) => (side === 'L' ? [0, y] : side === 'R' ? [W, y] : side === 'T' ? [x, 0] : [x, H]);

@@ -14,6 +14,7 @@
 // map always look different.
 import { parseIconCodes } from './icon-codes.js';
 import { problem } from './problem.js';
+import { takeMain } from './main-icon.js';
 
 // C4's usual meanings. `external` takes the theme's muted colour, as C4 tools draw
 // external systems in grey. A `figure` class draws its nodes as a figure: no border, a
@@ -76,7 +77,10 @@ export function parseClasses(text, warnings) {
     const m = line.match(/^\s*[-*]\s*([\w-]+)\s*:\s*([^:]*?)\s*(?::\s*(.*\S))?\s*$/);
     if (!m) { warnings.push(problem('class-line-syntax', `Class line not understood: "${line.trim()}".`)); continue; }
     if (CHANGE_CLASSES.has(m[1])) { warnings.push(problem('plan-class-reserved', `Class "${m[1]}" is a built-in planned-change class: this line is ignored.`)); continue; }
-    out[m[1]] = { icons: m[2] && m[2] !== '-' ? parseIconCodes(m[2]) : [], label: m[3] || null };
+    // the word main marks the class's main icon (model/main-icon.js)
+    const { codes, marked, problems } = takeMain(m[2] && m[2] !== '-' ? parseIconCodes(m[2]) : [], `Class ${m[1]}`);
+    warnings.push(...problems);
+    out[m[1]] = { icons: codes, label: m[3] || null, ...(marked ? { main: marked } : {}) };
   }
   return out;
 }

@@ -3,9 +3,11 @@
 // (icons for nodes whose diagram has no ::icon line), `## Classes` (what classes mean:
 // model/classes.js), `## Relations[: name]` and `## Deployment: <env>[, <env>]`
 // (model/deployments.js), after a sequence `## Plays over` (the views it plays over), and
-// after a state or ER diagram `## Walks: <name>` (model/walks.js).
+// after a state or ER diagram `## Walks: <name>` (model/walks.js), and `## Look: <look>`
+// (the look a flowchart opens in, WO-38).
 import { parseIconCodes, normalizeIconCode } from './icon-codes.js';
 import { problem } from './problem.js';
+import { takeMain, MAIN } from './main-icon.js';
 
 // -> {details, icons, nodeIcons, playsOver, relations: [{name, text}], deployments: [{names, text}],
 //     walks: [{name, text}]}
@@ -29,6 +31,8 @@ export function splitSections(after) {
     if (join) out.joins.push({ name: join[1].trim(), text });
     const dep = h.title.match(/^deployment\s*:\s*(.+)$/i);
     if (dep) out.deployments.push({ names: dep[1].split(',').map((x) => x.trim()).filter(Boolean), text });
+    const look = h.title.match(/^look\s*:\s*(.*)$/i);
+    if (look) (out.looks ||= []).push(look[1].trim().toLowerCase());
     const walk = h.title.match(/^walks?\s*:\s*(.+)$/i);
     if (walk) {
       const [name, view, extra] = walk[1].split('|').map((x) => x.trim());
@@ -100,9 +104,19 @@ export function attachNodeIcons(text, byId, warnings) {
     if (!line.trim()) continue;
     const m = line.match(/^\s*[-*]\s*([A-Za-z_][\w-]*)\s*:\s*(.+?)\s*$/);
     if (!m) { warnings.push(problem('node-icons-syntax', `Node icon line not understood: "${line.trim()}".`)); continue; }
-    const codes = parseIconCodes(m[2]);
     const n = byId[m[1]];
-    if (!n) { rest.push({ id: m[1], codes }); continue; }
+    // the word main marks a node's main icon (model/main-icon.js); an arrow has none
+    const { codes, marked, problems } = takeMain(parseIconCodes(m[2]), n ? `Node icons for ${m[1]}` : `Icons for arrow ${m[1]}`);
+    if (!n) {
+      if (parseIconCodes(m[2]).includes(MAIN)) warnings.push(problem('main-icon-arrow', `Icons for ${m[1]}: "main" is for nodes; an arrow has no main icon.`));
+      rest.push({ id: m[1], codes });
+      continue;
+    }
+    warnings.push(...problems);
+    if (marked) {
+      if (n.mainMark && n.mainMark !== marked) warnings.push(problem('main-icon-twice', `Node icons for ${m[1]}: two icons marked main (${n.mainMark}, ${marked}); a node has one.`));
+      else n.mainMark = marked;
+    }
     for (const code of codes) if (!n.icons.includes(code)) n.icons.push(code);
   }
   return rest;

@@ -41,7 +41,8 @@ The same flags as `show.py`, plus the picture's own:
   sight: try a change on a temp file (outside the maps folder) before making it. The
   map path still names the map. For many tries, import `draft_report` from `render.py`
   instead (`boxes.md`, "Crossing arrows").
-- `--theme <id>` (see `themes.md`), `--appearance light|dark`.
+- `--theme <id>` (see `themes.md`), `--appearance light|dark`, `--look outline|poster`
+  (a flowchart's look; default the map's `## Look:` line, else Outline).
 - `--width <px>` or `--scale <x>`; `--background none` for a transparent background;
   `.png` (or `--format png` with `--steps`) for PNG. A PNG past the browser's limits
   (16,000 px a side) is scaled down.

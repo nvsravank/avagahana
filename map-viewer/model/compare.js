@@ -19,7 +19,7 @@ const PINS = new Set(['left', 'right']);
 const partsOf = (file) => [['', file], ...[...(file.parts || new Map())]];
 const nameOf = (n) => n?.plain || n?.label || n?.id || '';
 const ownClass = (n) => (n.cls || '').split(/\s+/).filter((c) => c && !CHANGE_CLASSES.has(c) && !PINS.has(c)).sort().join(' ');
-const icons = (x) => [...(x.icons || []), ...(x.logos || [])].sort().join(' ');
+const icons = (x) => [...(x.icons || [])].sort().join(' ');
 const kindOf = (r) => `${r.tail || ''}${r.line || ''}${r.head || ''}`;
 const nodesOf = (m) => Object.values(m.byId).filter((n) => !(n === m.root && n.id === '_map'));
 

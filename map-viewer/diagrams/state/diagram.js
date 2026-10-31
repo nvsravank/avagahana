@@ -26,6 +26,8 @@ export const colourBy = [
 ];
 export const autoColourBy = (map) => (Object.values(map.byId).some((n) => n.kind) ? 'class' : 'category');
 export const stableColours = true;
+// one look: no Look row (WO-38)
+export const looks = [];
 export const branchOrder = (kids) => kids;
 export const defaultCollapsed = () => new Set();
 export const layoutByView = true;

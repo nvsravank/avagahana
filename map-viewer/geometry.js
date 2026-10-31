@@ -29,41 +29,66 @@ export const typeFor = (rel) => (rel === 0 ? { size: 20, weight: 700 } : rel ===
 // A node's size and wrapped label at a depth below the view root. (ox, oy) is where
 // the label block (icons, text, note icon) starts inside the box. A circle is a true
 // circle: square box, diameter = the label block's diagonal plus padding, block centred.
-export function nodeGeometry(n, rel, font, measureFn) {
+// look.poster (WO-38): the node is its main icon with the name under it; with no main
+// icon, a box with its name alone. Either way its tags, note and quick links are left to
+// the hover pop-up. What a node shows: geo.main (its main icon or null), geo.tags (the
+// icons beside its name), geo.note, geo.inners.
+export function nodeGeometry(n, rel, font, measureFn, look = {}) {
   const type = typeFor(rel);
+  const poster = !!look.poster && !n.figure;
+  const shown = {
+    hover: !!look.poster,   // its details are in the hover pop-up, not on the drawing
+    main: n.main || null,
+    tags: poster ? [] : n.icons.filter((c) => c !== n.main),
+    note: !poster && !!n.note,
+    inners: poster ? [] : n.inners || [],
+  };
+  if (poster && shown.main) return posterGeometry(n, type, font, measureFn, shown);
+  if (poster) shown.main = null;
   const lines = wrapRuns(n.runs, type, font, MAX_LINE, measureFn);
   const lh = Math.round(type.size * 1.25);
   const iconSize = Math.round(type.size * 1.05);
-  const iconsW = n.icons.length ? n.icons.length * (iconSize + 3) + 3 : 0;
+  const iconsW = shown.tags.length ? shown.tags.length * (iconSize + 3) + 3 : 0;
   const textW = Math.max(...lines.map((l) => l.w), 0);
   // Diagram quick links occupy a second row between the side icons.
-  const inners = n.inners?.length || 0;
+  const inners = shown.inners.length;
   const linksW = inners ? inners * (iconSize + LINK_GAP) - LINK_GAP : 0;
   const bodyW = Math.max(textW, linksW);
-  // cloud icons (n.logos): a row centred above the name, in the vendor's own colours
-  const logos = n.logos?.length || 0;
+  // the main icon (model/main-icon.js) centred above the name; a cloud icon in the
+  // vendor's own colours, any other in the node's
   const logoSize = Math.round(type.size * 2);
-  const logo = logos ? { size: logoSize, rowW: logos * logoSize + (logos - 1) * 4, h: logoSize + 4 } : null;
-  const blockW = Math.max(bodyW + iconsW + (n.note ? iconSize + 8 : 0), logo ? logo.rowW : 0);
+  const logo = shown.main ? { size: logoSize, rowW: logoSize, h: logoSize + 4 } : null;
+  const blockW = Math.max(bodyW + iconsW + (shown.note ? iconSize + 8 : 0), logo ? logo.rowW : 0);
   const blockH = lines.length * lh + (inners ? iconSize + 8 : 0) + (logo ? logo.h : 0);
   const linkRow = inners ? { linkRow: { w: linksW, bodyW, y: lines.length * lh + 8 } } : {};
+  const geo = { type, lines, lh, iconSize, iconsW, textW, logo, ...linkRow, ...shown };
   if (n.figure) {
-    // a figure: no border, a large icon (or a row of them) with the label under it
-    const big = Math.round(type.size * 2.4);
-    const count = n.icons.length + logos;   // a figure's cloud icons join its icon row
+    // a figure: no border, a large icon (or a row of them) with the label under it; in
+    // Poster its main icon (else its first) alone
+    // (in Poster as large as the other nodes' icons, and centred like them)
+    const big = look.poster ? posterIconSize(type) : Math.round(type.size * 2.4);
+    const row = look.poster ? [n.main || n.icons[0]].filter(Boolean) : [...(n.main ? [n.main] : []), ...n.icons.filter((c) => c !== n.main)];
+    const count = row.length;
     const rowW = count ? count * big + (count - 1) * 4 : 0;
-    const side = (n.note ? iconSize + 6 : 0) + inners * (iconSize + 6);   // small icons beside the row
+    const note = !look.poster && !!n.note;
+    const figInners = look.poster ? [] : n.inners || [];
+    const side = (note ? iconSize + 6 : 0) + figInners.length * (iconSize + 6);   // small icons beside the row
     const w = Math.ceil(Math.max(textW, rowW + 2 * side) + 12);
     const top = count ? big + 6 : 0;
-    return { type, lines, lh, iconSize: big, iconsW: 0, textW, figure: { big, rowW, top }, w, h: Math.ceil(4 + top + lines.length * lh + 4), ox: 6, oy: 4 };
+    if (look.poster && count) {
+      const h = Math.ceil(2 * (big / 2 + 6 + lines.length * lh + 4));
+      return { type, lines, lh, iconSize: big, iconsW: 0, textW, figure: { big, rowW, top, row }, hover: true, anchor: { y: h / 2, half: rowW / 2, top: big / 2 },
+        main: n.main || null, tags: [], note: false, inners: [], w, h, ox: 6, oy: h / 2 - big / 2 };
+    }
+    return { type, lines, lh, iconSize: big, iconsW: 0, textW, figure: { big, rowW, top, row }, hover: !!look.poster, main: n.main || null, tags: [], note, inners: figInners, w, h: Math.ceil(4 + top + lines.length * lh + 4), ox: 6, oy: 4 };
   }
   // a state diagram's marks: small fixed shapes, no label (diagrams/state)
-  if (STATE_MARK[n.shape]) return { type, lines: [], lh, iconSize, iconsW: 0, textW: 0, ox: 0, oy: 0, ...STATE_MARK[n.shape](n) };
+  if (STATE_MARK[n.shape]) return { type, lines: [], lh, iconSize, iconsW: 0, textW: 0, ox: 0, oy: 0, main: null, tags: [], note: !!n.note, inners: [], ...STATE_MARK[n.shape](n) };
   if (n.shape === 'circle' || n.shape === 'doublecircle') {
     const d = Math.ceil(Math.hypot(blockW, blockH) + PAD.x * 2 + (n.shape === 'doublecircle' ? 12 : 0));
-    return { type, lines, lh, iconSize, iconsW, textW, logo, ...linkRow, w: d, h: d, ox: (d - blockW) / 2, oy: (d - blockH) / 2 };
+    return { ...geo, w: d, h: d, ox: (d - blockW) / 2, oy: (d - blockH) / 2 };
   }
-  if (FLOW[n.shape]) return { type, lines, lh, iconSize, iconsW, textW, logo, ...linkRow, ...FLOW[n.shape](blockW, blockH) };
+  if (FLOW[n.shape]) return { ...geo, ...FLOW[n.shape](blockW, blockH) };
   if (n.shape === 'cloud' || n.shape === 'bang') {
     // bumps (cloud) or hollows (bang) round the label: a margin as deep as the deepest.
     // Their spacing grows with the label (up to 1.8 times), so a long node gets fewer,
@@ -74,14 +99,31 @@ export function nodeGeometry(n, rel, font, measureFn) {
     // a short label still gets a proper cloud or bang (not four bumps): a minimum width
     const w = Math.ceil(Math.max(blockW, base * 2.5) + 2 * (6 + m));
     return {
-      type, lines, lh, iconSize, iconsW, textW, logo, ...linkRow, bump,
+      ...geo, bump,
       w, h: Math.ceil(blockH + 2 * (3 + m)), ox: (w - blockW) / 2, oy: 3 + m,
     };
   }
   return {
-    type, lines, lh, iconSize, iconsW, textW, logo, ...linkRow,
+    ...geo,
     w: Math.ceil(blockW + PAD.x * 2), h: Math.ceil(blockH + PAD.y * 2), ox: PAD.x, oy: PAD.y,
   };
+}
+
+// Poster (WO-38): the main icon, large, with the name centred under it; no border.
+// Labels wrap narrower than in a box, so a name stays about as wide as a few icons.
+const POSTER_LINE = 150;
+export const posterIconSize = (type) => Math.round(type.size * 3);
+function posterGeometry(n, type, font, measureFn, shown) {
+  const lines = wrapRuns(n.runs, type, font, POSTER_LINE, measureFn);
+  const lh = Math.round(type.size * 1.25);
+  const big = posterIconSize(type);
+  const textW = Math.max(...lines.map((l) => l.w), 0);
+  const w = Math.ceil(Math.max(textW, big) + 12);
+  // the icon at the box's centre (as much room above it as its name takes below), so
+  // icons line up across a row and arrows meet them straight; anchor: where arrows end
+  const below = big / 2 + 6 + lines.length * lh + 4;
+  const h = Math.ceil(2 * below);
+  return { type, lines, lh, iconSize: big, iconsW: 0, textW, poster: { big, top: big + 6 }, anchor: { y: h / 2, half: big / 2, top: big / 2 }, ...shown, w, h, ox: 6, oy: h / 2 - big / 2 };
 }
 
 // Cloud and bang outlines, as SVG paths filling a w x h box. Both put points round the
@@ -274,6 +316,7 @@ export function nodeShaper(input) {
       return s;
     }
     if (geo.figure) return figure(n, p, geo, s);
+    if (geo.poster) return posterNode(n, p, geo, s);
     s.shape = n.shape;
     if (STATE_MARK[n.shape]) {
       const o = stateOutline(n.shape, p.w, p.h);
@@ -282,7 +325,7 @@ export function nodeShaper(input) {
       if (o.dot) s.innerDot = { x: p.w / 2, y: p.h / 2, r: p.w / 2 - 9 };
       s.icons = [];
       s.text = { size: geo.type.size, weight: geo.type.weight, spans: [] };
-      if (n.note) s.note = { x: p.w + 4, y: -6, size: 14 };
+      if (geo.note) s.note = { x: p.w + 4, y: -6, size: 14 };
       return s;
     }
     if (n.shape === 'cloud') s.outline = cloudPath(p.w, p.h, n.id, geo.bump);
@@ -294,12 +337,9 @@ export function nodeShaper(input) {
     const top = geo.oy + Math.max(0, (p.h - geo.h) / 2);
     // the name and what sits beside it start under the cloud icons
     const ty = top + (geo.logo ? geo.logo.h : 0);
-    if (geo.logo) s.logos = n.logos.map((code, i) => logoOf(code, geo.logo.size, (p.w - geo.logo.rowW) / 2 + i * (geo.logo.size + 4), top));
-    s.icons = n.icons.map((code, i) => {
-      const def = input.iconDef(code, input.legend);
-      return { code, ph: def.ph, color: def.color || null, label: def.label, size: geo.iconSize,
-        x: ox + i * (geo.iconSize + 3), y: geo.linkRow ? (ty + p.h - top - geo.iconSize) / 2 : ty + (geo.lh - geo.iconSize) / 2 };
-    });
+    if (geo.logo) s.main = iconOf(geo.main, geo.logo.size, (p.w - geo.logo.rowW) / 2, top);
+    s.icons = geo.tags.map((code, i) => iconOf(code, geo.iconSize,
+      ox + i * (geo.iconSize + 3), geo.linkRow ? (ty + p.h - top - geo.iconSize) / 2 : ty + (geo.lh - geo.iconSize) / 2));
     s.text = { size: geo.type.size, weight: geo.type.weight, spans: [] };
     geo.lines.forEach((line, li) => {
       let first = true;
@@ -316,30 +356,33 @@ export function nodeShaper(input) {
     }
     // with a description the marks sit on the name's line, else in the middle
     const markY = n.compartment && !geo.linkRow ? ty + (geo.lh - geo.iconSize) / 2 : geo.logo ? ty + (geo.lh - geo.iconSize) / 2 : (p.h - geo.iconSize) / 2;
-    if (n.note) s.note = { x: geo.linkRow ? ox + geo.iconsW + geo.linkRow.bodyW + 8 : tx + geo.textW + 8, y: markY, size: geo.iconSize };
-    if (geo.linkRow) s.inners = n.inners.map((x, i) => ({ ...x, x: ox + geo.iconsW + (geo.linkRow.bodyW - geo.linkRow.w) / 2 + i * (geo.iconSize + LINK_GAP), y: ty + geo.linkRow.y, size: geo.iconSize }));
-    // the related-links dot: the top right corner, or the circle's edge at 45°
-    if (input.relCount(n.id)) {
+    if (geo.note) s.note = { x: geo.linkRow ? ox + geo.iconsW + geo.linkRow.bodyW + 8 : tx + geo.textW + 8, y: markY, size: geo.iconSize };
+    if (geo.linkRow) s.inners = geo.inners.map((x, i) => ({ ...x, x: ox + geo.iconsW + (geo.linkRow.bodyW - geo.linkRow.w) / 2 + i * (geo.iconSize + LINK_GAP), y: ty + geo.linkRow.y, size: geo.iconSize }));
+    // the related-links dot: the top right corner, or the circle's edge at 45° (in
+    // Poster: in the hover pop-up)
+    if (!geo.hover && input.relCount(n.id)) {
       s.relDot = n.shape === 'circle' || n.shape === 'doublecircle'
         ? { x: p.w / 2 * (1 + Math.SQRT1_2), y: p.h / 2 * (1 - Math.SQRT1_2), on: input.rels || input.relNode === n.id }
         : { x: p.w - 1, y: 1, on: input.rels || input.relNode === n.id };
     }
+    if (geo.hover) {
+      s.hover = true;
+      if (n.inners?.length) s.innerAnchors = n.inners.map((x) => x.anchor);
+    }
     return s;
   }
-  // a cloud icon in a scene: its file (paint draws the picture) and the product's name
-  function logoOf(code, size, x, y) {
+  // an icon in a scene: a cloud icon's file (paint draws the picture) and the product's
+  // name, or a Phosphor symbol in its colour (tile: on a square of the node's colour)
+  function iconOf(code, size, x, y, tile = false) {
     const def = input.iconDef(code, input.legend);
-    return { code, src: def.src, ...(def.dark ? { dark: def.dark } : {}), label: def.label, size, x, y };
+    if (def.vendor) return { code, src: def.src, ...(def.dark ? { dark: def.dark } : {}), label: def.label, size, x, y };
+    return { code, ph: def.ph, color: tile ? null : def.color || null, label: def.label, size, x, y, ...(tile ? { tile: true } : {}) };
   }
   // a figure: the icon row centred at the top, each label line centred under it
   function figure(n, p, geo, s) {
     const { big, rowW, top } = geo.figure;
     s.shape = 'figure';
-    s.icons = [...(n.logos || []), ...n.icons].map((code, i) => {
-      const def = input.iconDef(code, input.legend);
-      return def.vendor ? logoOf(code, big, (p.w - rowW) / 2 + i * (big + 4), geo.oy)
-        : { code, ph: def.ph, color: def.color || null, label: def.label, size: big, x: (p.w - rowW) / 2 + i * (big + 4), y: geo.oy };
-    });
+    s.icons = geo.figure.row.map((code, i) => iconOf(code, big, (p.w - rowW) / 2 + i * (big + 4), geo.oy));
     s.text = { size: geo.type.size, weight: geo.type.weight, spans: [] };
     geo.lines.forEach((line, li) => {
       let first = true;
@@ -350,9 +393,33 @@ export function nodeShaper(input) {
       }
     });
     const small = Math.round(geo.type.size * 1.05);
-    if (n.note) s.note = { x: (p.w + rowW) / 2 + 6, y: geo.oy, size: small };
-    if (n.inners) s.inners = n.inners.map((x, i) => ({ ...x, x: (p.w + rowW) / 2 + 6 + (n.note ? small + 6 : 0) + i * (small + 6), y: geo.oy, size: small }));
-    if (input.relCount(n.id)) s.relDot = { x: p.w - 1, y: 1, on: input.rels || input.relNode === n.id };
+    if (geo.note) s.note = { x: (p.w + rowW) / 2 + 6, y: geo.oy, size: small };
+    if (geo.inners.length) s.inners = geo.inners.map((x, i) => ({ ...x, x: (p.w + rowW) / 2 + 6 + (geo.note ? small + 6 : 0) + i * (small + 6), y: geo.oy, size: small }));
+    if (geo.hover) { s.hover = true; if (geo.anchor) s.top = geo.oy; }
+    if (!geo.hover && input.relCount(n.id)) s.relDot = { x: p.w - 1, y: 1, on: input.rels || input.relNode === n.id };
+    return s;
+  }
+  // Poster (WO-38): the main icon, large, centred at the top (a Phosphor one on a tile
+  // of the node's colour), the name centred under it; no border. Tags, the note, quick
+  // links and related links are in the hover pop-up.
+  function posterNode(n, p, geo, s) {
+    const { big, top } = geo.poster;
+    s.shape = 'figure';
+    s.cls += ' is-poster';
+    s.hover = true;
+    s.top = geo.oy;   // the room above the icon is not part of the node to point at
+    s.main = iconOf(geo.main, big, (p.w - big) / 2, geo.oy, true);
+    if (n.inners?.length) s.innerAnchors = n.inners.map((x) => x.anchor);
+    s.icons = [];
+    s.text = { size: geo.type.size, weight: geo.type.weight, spans: [] };
+    geo.lines.forEach((line, li) => {
+      let first = true;
+      for (const r of line.runs) {
+        s.text.spans.push({ text: r.text, bold: !!r.bold, italic: !!r.italic,
+          x: first ? (p.w - line.w) / 2 : null, y: first ? geo.oy + top + li * geo.lh + geo.type.size * 0.95 : null });
+        first = false;
+      }
+    });
     return s;
   }
   // Box diagrams keep their outlines and routed ports at every zoom. Only their

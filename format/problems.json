@@ -477,6 +477,56 @@
    "level": "error",
    "side": "both",
    "what": "Two walks of one diagram with the same name"
+  },
+  "look-not-flowchart": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Look: line on a diagram that is not a flowchart (only flowcharts have looks to choose)"
+  },
+  "look-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "Two ## Look: lines for one diagram"
+  },
+  "look-unknown": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Look: value that is not one of a flowchart's looks (outline, poster)"
+  },
+  "main-icon-alone": {
+   "level": "error",
+   "side": "both",
+   "what": "The word main in an icon list with no icon after it"
+  },
+  "main-icon-arrow": {
+   "level": "error",
+   "side": "both",
+   "what": "The word main in an arrow's icons: an arrow has no main icon"
+  },
+  "main-icon-cloud": {
+   "level": "error",
+   "side": "both",
+   "what": "main before a cloud icon: the first cloud icon is main by its place, never marked"
+  },
+  "main-icon-mark": {
+   "level": "error",
+   "side": "both",
+   "what": "main before a trust mark or a status code: a main icon shows what the node is"
+  },
+  "main-icon-mind-map": {
+   "level": "error",
+   "side": "both",
+   "what": "main in a mind map's ::icon: a mind map has no main icon"
+  },
+  "main-icon-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "Two icons marked main for one node or class"
+  },
+  "main-icon-with-cloud": {
+   "level": "error",
+   "side": "both",
+   "what": "An icon marked main on a node that has a cloud icon, its own or its class's (the cloud icon is main)"
   }
  }
 }

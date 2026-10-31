@@ -8,6 +8,7 @@ import { problem } from './problem.js';
 import { splitSections, attachNotes, parseIconLegend, attachNodeIcons, attachArrowIcons, parsePlaysOver } from './sections.js';
 import { parseViews } from './relations.js';
 import { assignDepth } from './tree.js';
+import { resolveMain } from './main-icon.js';
 import { parseClasses, mergeClasses, classOf, assignSlots, strokeOf, withClassIcon, CHANGE_CLASSES, planOf } from './classes.js';
 import { readDeployment, infraOf, buildDeployment, syncWarnings } from './deployments.js';
 import { WALK_TYPES, readWalk, walkText } from './walks.js';
@@ -43,7 +44,7 @@ export function parseMap(text, fileName) {
     const h = before.match(/(?:^|\n)(#{2,6})\s+(.+)$/);
     // a deployment's block belongs to the diagram above it (model/deployments.js)
     if (h && /^deployment\s*:/i.test(h[2].trim())) continue;
-    if (h && !/^(relations|joins|classes|details|notes|icons|node icons)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
+    if (h && !/^(relations|joins|classes|details|notes|icons|node icons|look)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
     else lost.push(f.index);
   }
   const main = parsePart(src.slice(0, cuts[0]?.start ?? src.length), fileName, null);
@@ -177,6 +178,15 @@ function parsePart(text, fileName, shared) {
   const messages = read.extra?.sequence?.messages || [];
   if (sections.details) attachNotes(sections.details, { ...firstInfra, ...byId }, warnings, [...allRels, ...messages]);
   if (sections.walks.length && !WALK_TYPES.has(diagram.type)) warnings.push(problem('walks-not-here', 'Walks are for state and ER diagrams: not read.'));
+  // ## Look: the look a flowchart opens in (WO-38); the reader can still switch
+  let look = null;
+  if (sections.looks) {
+    const offered = (diagram.looks || []).map(([id]) => id);
+    if (diagram.type !== 'flowchart') warnings.push(problem('look-not-flowchart', `"## Look: ${sections.looks[0]}" is for flowcharts: not read.`));
+    else if (sections.looks.length > 1) warnings.push(problem('look-twice', `${sections.looks.length} "## Look:" lines: one per diagram.`));
+    else if (!offered.includes(sections.looks[0])) warnings.push(problem('look-unknown', `"## Look: ${sections.looks[0]}": a flowchart's looks are ${offered.join(' and ')}.`));
+    else look = sections.looks[0];
+  }
   if (sections.playsOver && diagram.type !== 'sequence') warnings.push(problem('plays-over-not-sequence', 'A "Plays over" section is for a sequence diagram: not read.'));
   const playsOver = sections.playsOver && diagram.type === 'sequence' ? parsePlaysOver(sections.playsOver, warnings) : [];
   for (const { n } of infra) n.note ||= firstInfra[n.id].note;
@@ -219,6 +229,12 @@ function parsePart(text, fileName, shared) {
       if (st) n.stroke = { ...n.stroke, ...Object.fromEntries(Object.entries(st).filter(([, v]) => v != null)) };
     }
   }
+  // each node's main icon (WO-38): its first cloud icon, its own before its class's, else
+  // the one its ## Node icons line (or its class) marks main
+  for (const n of [...Object.values(byId), ...infra.map((x) => x.n)]) {
+    const c = own.get(n);
+    warnings.push(...resolveMain(n, c ? classes[c] : null));
+  }
   // each environment is a view: the diagram's own arrows over its own placement
   const deps = raw.map((d) => buildDeployment(d, { root, byId, views }, warnings));
   syncWarnings(deps, { root, byId }, warnings);
@@ -249,6 +265,7 @@ function parsePart(text, fileName, shared) {
     hasPlan: Object.values(byId).some((n) => n.plan) || infra.some(({ n }) => n.plan) || views.some((x) => x.relations.some((r) => r.plan)),
     ...(diagram.type === 'sequence' ? { playsOver } : {}), notesText: sections.details || '',
     walks: WALK_TYPES.has(diagram.type) ? sections.walks : [],
+    ...(look ? { look } : {}),
   };
 }
 

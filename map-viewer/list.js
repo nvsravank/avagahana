@@ -28,8 +28,8 @@ export function buildListScene(input) {
         + (filterOn && !passesFilter(n, input.iconFilter) ? ' is-dim' : ''),
       toggle: n.children.length && n !== input.root ? { closed } : null,
       closed,
-      icons: n.icons.slice(),
-      ...(n.logos?.length ? { logos: n.logos.slice() } : {}),
+      // the main icon first (model/main-icon.js)
+      icons: [...(n.main ? [n.main] : []), ...n.icons.filter((c) => c !== n.main)],
       runs: n.runs,
       count: closed && n.children.length ? input.countDesc(n) : null,
       rels: input.relations.filter((r) => !r.cross && (r.from === n.id || r.to === n.id)).map((r) => {
@@ -119,7 +119,7 @@ export function renderList(v, on) {
     label.className = 'mmv-llabel';
     const text = document.createElement('span');
     text.className = s.depth === 0 ? 'mmv-d0' : s.depth === 1 ? 'mmv-d1' : '';
-    [...(s.logos || []), ...s.icons].forEach((code) => text.insertAdjacentHTML('beforeend', v.iconHtml(code, legend, 'mmv-inline-ic', 'var(--n)')));
+    s.icons.forEach((code) => text.insertAdjacentHTML('beforeend', v.iconHtml(code, legend, 'mmv-inline-ic', 'var(--n)')));
     s.runs.forEach((runs, i) => {
       if (i) text.appendChild(document.createTextNode(' '));
       for (const r of runs) {
@@ -163,7 +163,7 @@ export function renderList(v, on) {
     const kids = n?.children.length || 0;
     const spoken = [
       n?.plain || s.id,
-      ...[...(s.logos || []), ...s.icons].map(words),
+      ...s.icons.map(words),
       ...(v.wordsOf?.(n) || []),
       change ? `${change === 'new' ? 'new' : 'changed'} ${v.sinceWords}` : null,
       s.note ? 'has a note' : null,

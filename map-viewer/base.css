@@ -66,6 +66,14 @@
 .mmv[data-boxes][data-look="outline"] .mmv-node > .mmv-shape { fill: color-mix(in srgb, var(--n) var(--mmv-tint), var(--mmv-bg)); }
 .mmv-frame-title { fill: var(--n); }
 .mmv[data-boxes][data-look="fade"] .mmv-node > .mmv-shape { display: inline; fill: var(--mmv-bg); stroke: var(--n); }
+/* Poster (WO-38): a node is its main icon with the name under it (no shape); one with
+   no main icon is a light box; boxes are thin, their title in ink, their main icon in
+   the top-left corner. A Phosphor main icon sits on a tile of the node's colour. */
+.mmv[data-look="poster"] .mmv-node > .mmv-shape { display: inline; fill: var(--mmv-bg); stroke: var(--n); stroke-width: 1.5; }
+.mmv[data-look="poster"] .mmv-frame > .mmv-shape { fill: color-mix(in srgb, var(--n) 5%, var(--mmv-bg)); stroke: var(--n); stroke-width: 1.3; }
+.mmv[data-look="poster"] .mmv-frame-title { fill: var(--mmv-ink); }
+.mmv-icon.is-tile .mmv-tile { fill: var(--n); }
+.mmv[data-look] :is(.mmv-node, .mmv-frame) .mmv-icon.is-tile:not([style]) { color: var(--mmv-bg); }
 /* a box diagram's centre (a box drilled into with nothing inside) is outlined like the
    rest: its label and icon keep their colours, never the filled centre's ink */
 .mmv[data-boxes] .mmv-node, .mmv[data-boxes] .mmv-node.mmv-d0 { color: var(--mmv-ink); }

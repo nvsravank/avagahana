@@ -40,7 +40,7 @@ export async function answerRender(req, { source, themeSet, wait = UNFOCUSED_WAI
       storageKey: null, marks: false, showProblems: 'none',
       themes: themeSet?.themes || [], defaultTheme: themeSet?.settings?.builtIn !== false,
       theme: req.theme || themeSet?.settings?.default || undefined,
-      prefs: { ...(req.theme ? { theme: req.theme } : {}), ...(req.appearance ? { appearance: req.appearance } : {}), ...(st.colourBy ? { colourBy: st.colourBy } : {}) },
+      prefs: { ...(req.theme ? { theme: req.theme } : {}), ...(req.appearance ? { appearance: req.appearance } : {}), ...(req.look ? { look: req.look } : {}), ...(st.colourBy ? { colourBy: st.colourBy } : {}) },
       state: st,
       // an earlier version: the picture marks what differs (WO-34)
       ...(req.before != null ? { before: req.before } : {}),

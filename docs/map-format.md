@@ -125,12 +125,42 @@ vendor's prefix: `aws lambda`, `aws api-gateway`, `azure virtual-machine`,
 
 - They are drawn as the vendor made them, in their own colours, never recoloured; the
   product's name is the icon's title (shown on hover).
-- In a node they sit centred above its name. On an open box (a subgraph drawn with
-  what is inside it) they sit at the top right of its title strip. In a figure they
-  join its icon row; on an arrow they follow its label.
+- A node's first cloud icon is its **main icon** (below): centred above its name, or in
+  the Poster look the node itself. Further cloud icons are tags, drawn small beside the
+  name like Phosphor icons. On an open box (a subgraph drawn with what is inside it) the
+  main icon sits at the top right of its title strip (in Poster, the top-left corner). In
+  a figure they join its icon row; on an arrow they follow its label.
 - The checker rejects a name the set does not have (`unknown-cloud-icon`) and names
   the nearest one. The viewer leaves such an icon out, without a warning.
 - Use them for the infrastructure a diagram is about, not to decorate every node.
+- For a box, use the vendor's group icon where there is one (`aws
+  virtual-private-cloud-vpc`, `aws private-subnet`, `aws public-subnet`, `aws region`,
+  `aws account`, `aws auto-scaling-group`, ...), not a service's.
+
+### Main icon
+
+**Contract** (WO-38). A node's main icon is the one picture that stands for it.
+
+- It is the node's first cloud icon; when the node has none, its class's first cloud
+  icon (even when the node has Phosphor icons of its own: the class's cloud icon is then
+  added in front of them).
+- With no cloud icon, the map may mark one other icon main with the reserved word
+  `main` before it, in `## Node icons` or `## Classes`: `- sched : main ph clock`,
+  `- queue : main ph tray : Message queue`. A node's own mark wins over its class's.
+  Marking is never required: with no main icon a node simply has none.
+- Mermaid never reads those sections, so the word cannot break a diagram. `main` is a
+  reserved word: an `## Icons` legend name `main` is an error (`icon-legend-name`).
+- Problems: `main` with no icon after it (`main-icon-alone`), before a cloud icon
+  (`main-icon-cloud`: a cloud icon is main by its place), before a trust mark or a
+  `status-` code (`main-icon-mark`), twice for one node or class (`main-icon-twice`), on
+  a node that has a cloud icon, its own or its class's (`main-icon-with-cloud`), on an
+  arrow id (`main-icon-arrow`), in a mind map's `::icon` (`main-icon-mind-map`: a mind
+  map has no main icon).
+- Outline draws the main icon above the name (a Phosphor one in the node's colour);
+  Poster draws it as the node (`## Look: poster`, under Box diagrams).
+- In Poster an AWS main icon gives its box its colour (each AWS icon is one colour). This
+  is the one place a map's icon, not the theme, picks a colour; Azure and Google icons
+  have several colours, so their boxes keep the theme's.
 
 ### Trust marks
 
@@ -334,6 +364,14 @@ flowchart LR
   problem.
 - The map's title is the top of the tree; boxes and nodes hang below it. Notes
   (`## Details`) work by id, as in a mind map.
+- **Look**: `## Look: poster` (or `outline`), a section line among the diagram's
+  sections, outside its block, says which look the diagram opens in (**Contract**,
+  WO-38). Outline draws boxes with coloured borders; Poster draws each node as its main
+  icon with its name under it, the rest (tags, trust marks, notes, linked diagrams) in a
+  pop-up on hover. The reader can still switch; their choice holds for maps that name no
+  look. Flowcharts only (`look-not-flowchart`); one line per diagram (`look-twice`);
+  another value is `look-unknown`. Each further diagram in the file can say its own.
+  `render.py --look` overrides it for a picture.
 
 ## Classes: what a node is
 

@@ -31,10 +31,11 @@ export function createPainter(v) {
 
   function nodeGeom(n) {
     const rel = v.relDepth(n);
-    const key = `${n.id}|${rel}`;
+    const poster = !!v.poster?.();
+    const key = `${n.id}|${rel}|${poster ? 'p' : ''}`;
     let g = sizeCache.get(key);
     if (!g) {
-      g = (v.diagram().nodeGeometry || nodeGeometry)(n, rel, v.font(), measure);
+      g = (v.diagram().nodeGeometry || nodeGeometry)(n, rel, v.font(), measure, { poster });
       sizeCache.set(key, g);
     }
     return g;
@@ -49,6 +50,7 @@ export function createPainter(v) {
       rels: S.rels === '1', relNode: S.relNode, relations: S.map.relations, byId: S.map.byId,
       relCount: v.relCount, countDesc: v.countDesc,
       legend: v.legend(), iconDef: v.iconDef,
+      poster: !!v.poster?.(), tintOf: v.tintOf,
       play: S.play,   // a sequence being played: {step} (diagrams/sequence/scene.js)
     };
   }
@@ -208,7 +210,9 @@ export function createPainter(v) {
     const marked = s.marks.hit || s.marks.sel;
     const g = svgEl('g', { class: s.cls, 'data-id': s.id, 'data-plan': s.plan || null, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})` }, parent);
     nameOf(g, s);
-    svgEl('rect', { class: 'mmv-hit', width: s.w, height: s.h }, g);   // hit target even for text-only nodes
+    svgEl('rect', { class: 'mmv-hit', y: s.top || null, width: s.w, height: s.h - (s.top || 0) }, g);   // hit target even for text-only nodes
+    if (s.top) g.dataset.top = s.top;
+    if (s.hover) g.dataset.hover = s.id;   // Poster: hovering the node shows its details (WO-38)
     if (s.grow > 1) g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${s.grow}) translate(${-s.w / 2},${-s.h / 2})`);
     g.setAttribute('role', 'img');
     g.setAttribute('aria-label', planName(s));
@@ -242,7 +246,21 @@ export function createPainter(v) {
     if (s.stroke) for (const sh of g.querySelectorAll(':scope > .mmv-shape')) sh.setAttribute('style', s.stroke);
     if (marked) drawMarks(g, null, s.marks, s.w, s.h, s.shape);
     for (const ic of s.icons) drawIcon(g, ic);
-    for (const ic of s.logos || []) drawIcon(g, ic);
+    if (s.main) drawIcon(g, s.main);
+    // Poster (WO-38): the pop-up names it all, so no browser tooltips on the screen (an
+    // export keeps every title, for labelled pictures)
+    if (s.hover && !S.exporting) g.querySelectorAll('title').forEach((t) => t.remove());
+    if (s.hover) {
+      // Poster (WO-38): marks on the main icon's corner; a change inside a linked
+      // diagram (its quick link is in the pop-up) as the small sparkle on the icon, or
+      // on the box's top-right corner
+      const at = s.main || { x: s.w - 16, y: 0, size: 16 };
+      if (s.main) Object.assign(g.dataset, { markX: at.x, markY: at.y });
+      if (s.innerAnchors?.length) {
+        const sg = svgEl('g', { class: 'mmv-inner-spot', 'data-anchors': s.innerAnchors.join(' '), 'data-size': at.size, transform: `translate(${at.x},${at.y})` }, g);
+        if (s.innerAnchors.some((a) => v.partChanged?.(a))) drawSpark(sg, at.size);
+      }
+    }
     if (s.labelBars) {
       for (const b of s.labelBars) svgEl('rect', { class: 'mmv-bar', x: b.x, y: b.y, width: b.w, height: 6, rx: 3 }, g);
     } else {
@@ -303,8 +321,17 @@ export function createPainter(v) {
   }
 
   // an icon: a Phosphor symbol in the node's colour, or a cloud icon's own picture
-  // (ic.src; the product's name is its title)
+  // (ic.src; the product's name is its title). A tile (a Poster main icon, WO-38): the
+  // symbol in the background colour on a square of the node's colour.
   function drawIcon(g, ic) {
+    if (ic.tile && !ic.src) {
+      const tg = svgEl('g', { class: 'mmv-icon is-tile', transform: `translate(${ic.x},${ic.y})` }, g);
+      svgEl('rect', { class: 'mmv-tile', width: ic.size, height: ic.size, rx: Math.round(ic.size / 7) }, tg);
+      const k = Math.round(ic.size * 0.62), o = (ic.size - k) / 2;
+      svgEl('use', { href: v.symbols.href(ic.ph), x: o, y: o, width: k, height: k }, tg);
+      svgEl('title', {}, tg).textContent = ic.label;
+      return;
+    }
     if (ic.src) {
       const url = picture(ic.src);
       if (!url) return;
@@ -325,10 +352,16 @@ export function createPainter(v) {
   function paintFrame(s, parent) {
     const g = svgEl('g', { class: s.cls, 'data-id': s.id, 'data-plan': s.plan || null, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})`, role: 'img', 'aria-label': planName(s) }, parent);
     nameOf(g, s);
-    svgEl('rect', { class: 'mmv-shape', width: s.w, height: s.h, rx: 8, style: s.stroke }, g);
+    // a Poster box (WO-38): square corners, an AWS icon's colour, its title strip opens
+    // the hover pop-up
+    if (s.tint) g.style.setProperty('--n', s.tint);
+    svgEl('rect', { class: 'mmv-shape', width: s.w, height: s.h, rx: s.hover ? 2 : 8, style: s.stroke }, g);
+    if (s.hover) svgEl('rect', { class: 'mmv-hit', 'data-hover': s.id, width: s.w, height: 26 }, g);
     if (s.marks.hit || s.marks.sel) drawMarks(g, null, s.marks, s.w, s.h, 'frame');
     for (const ic of s.icons || []) drawIcon(g, ic);
-    for (const ic of s.logos || []) drawIcon(g, ic);
+    if (s.main) drawIcon(g, s.main);
+    // Poster: the pop-up names it, so no browser tooltip on the screen (exports keep it)
+    if (s.hover && !S.exporting) g.querySelectorAll('title').forEach((t) => t.remove());
     svgEl('text', { class: 'mmv-frame-title', x: s.title.x, y: s.title.y, 'font-size': s.title.size, 'font-weight': s.title.weight }, g).textContent = s.title.text;
     if (s.note) {
       const ng = svgEl('g', { class: 'mmv-note-ic', 'data-note': s.id, transform: `translate(${s.note.x},${s.note.y})` }, g);
@@ -361,7 +394,10 @@ export function createPainter(v) {
   // a search hit's and the selected node's outlines (over the box, under the label);
   // rings around a circle
   function drawMarks(g, at, marks, w, h, shape) {
-    const add = (tag, attrs) => g.insertBefore(svgEl(tag, attrs), at);
+    // a Poster node: round its icon and name, not the room above the icon
+    const top = Number(g.dataset?.top || 0);
+    const add = (tag, attrs) => g.insertBefore(svgEl(tag, top ? { ...attrs, transform: `translate(0,${top})` } : attrs), at);
+    h -= top;
     const ring = shape === 'circle' || shape === 'doublecircle';
     if (marks.hit) add(ring ? 'circle' : 'rect', ring ? { class: 'mmv-mark mmv-mark-hit', cx: w / 2, cy: h / 2, r: w / 2 + 4 } : { class: 'mmv-mark mmv-mark-hit', x: -4, y: -4, width: w + 8, height: h + 8, rx: 10 });
     if (marks.sel) add(ring ? 'circle' : 'rect', ring ? { class: 'mmv-mark mmv-mark-sel', cx: w / 2, cy: h / 2, r: w / 2 + 5 } : { class: 'mmv-mark mmv-mark-sel', x: -5, y: -5, width: w + 10, height: h + 10, rx: 11 });
@@ -466,9 +502,12 @@ export function createPainter(v) {
     const plan = g.dataset.plan;
     if (!kind && !plan) return;
     const bar = g.dataset.bar && g.querySelector('.mmv-bar');
-    const y = bar ? Number(bar.getAttribute('y')) + 4 : 0;
-    if (plan) drawPlan(g, plan, 0, y);
-    if (kind) drawChange(g, kind, 0, y);
+    // (a Poster node: at its main icon's top-left corner)
+    const x = bar ? 0 : Number(g.dataset.markX || 0);
+    const y = bar ? Number(bar.getAttribute('y')) + 4 : Number(g.dataset.markY || 0);
+    const marks = [plan && drawPlan(g, plan, x, y), kind && drawChange(g, kind, x, y)];
+    // a Poster node's pop-up says it (WO-38): no browser tooltip on the screen
+    if (g.dataset.hover && !S.exporting) for (const m of marks) m?.querySelector?.('title')?.remove();
   }
   // A planned change's ringed sign (WO-34), where the sparkle would be. Zoomed far out it
   // stays readable: up to three times its size, so about 6 px across on screen or more.
@@ -503,6 +542,7 @@ export function createPainter(v) {
   function paintChanges() {
     v.root.querySelectorAll('[data-mmv=viewport] :is(.mmv-change, .mmv-plan)').forEach((e) => e.remove());
     for (const ig of v.root.querySelectorAll('[data-mmv=viewport] .mmv-inner-ic')) if (v.partChanged?.(ig.dataset.anchor)) drawSpark(ig, +ig.dataset.size);
+    for (const sg of v.root.querySelectorAll('[data-mmv=viewport] .mmv-inner-spot')) if (sg.dataset.anchors.split(' ').some((a) => v.partChanged?.(a))) drawSpark(sg, +sg.dataset.size);
     for (const g of $.frames.children) markNode(g, true);
     for (const g of $.nodes.children) markNode(g, false);
     markArrows();

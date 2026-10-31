@@ -28,6 +28,10 @@ export const colourBy = [
 ];
 export const autoColourBy = (map) => (Object.values(map.byId).some((n) => n.kind) ? 'class' : 'category');
 export const stableColours = true;
+// Looks (WO-38): Outline draws as the box diagrams' one style (data-look fade); Poster
+// draws each node as its main icon with the name under it, the rest on hover
+export const looks = [['outline', 'Outline', 'fade'], ['poster', 'Poster', 'poster']];
+export const defaultLook = 'outline';
 
 export const branchOrder = (kids) => kids;
 export const defaultCollapsed = () => new Set();

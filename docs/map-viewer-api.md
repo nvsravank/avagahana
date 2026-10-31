@@ -22,6 +22,7 @@ const viewer = mount(element, {
   themes: [ … ],        // theme objects from the host, below
   defaultTheme: true,   // false hides the built-in theme (unless no other can be used)
   prefs: { … },         // starting looks from a link: {theme, appearance, colourBy, look}; not saved
+                        // (look: for each diagram that offers it, WO-38)
   storageKey: 'avagahana-viewer-prefs',   // where preferences are kept, and (as `<key>-seen`) what
                                        // the reader has seen of each map; null keeps none
   since: null,          // an older map text: mark what changed since it (below); nothing kept
@@ -65,7 +66,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.themes` | `[{id, label}]` of the registered themes. |
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
 | `viewer.setTheme(id)` | Switch to a registered theme. The reader keeps their place: the diagram, view, step and camera (pan and zoom) stay as they were. |
-| `viewer.setPrefs({appearance, colourBy, look})` | Change looks from outside (a link, the agent's show), not kept; a colour-by the map does not offer is ignored. E.g. `{colourBy: 'changes'}` for a plan (added in WO-13). |
+| `viewer.setPrefs({appearance, colourBy, look})` | Change looks from outside (a link, the agent's show), not kept; a colour-by or look the shown diagram does not offer is ignored (a look applies to the shown diagram's type, WO-38). E.g. `{colourBy: 'changes'}` for a plan (added in WO-13). |
 | `viewer.slot` | An empty element at the start of the toolbar for the host's own button. While empty, it shows the map title (unless `title: false`). |
 | `viewer.destroy()` | Remove everything the viewer added to the element and the document: listeners, observers, styles no other viewer uses. |
 
@@ -412,11 +413,34 @@ loads the font with the `FontFace` API.
   front only when that theme is already loaded.
 - Choosing a theme waits up to about 2 s for its font before measuring text; a later
   font measures and lays out once more.
-- **Appearance, colour-by and look switches restyle without a repaint.** A theme with
-  another font re-measures and lays out.
+- **Appearance and colour-by switches restyle without a repaint**, as do looks other
+  than Poster. A theme with another font re-measures and lays out; so does going in or
+  out of Poster (node sizes change), the camera kept.
 - The theme panel: Theme (only with more than one registered), Appearance (the theme's
-  own, plus Auto when it has both), Colour by (from the diagram type), Look (fade /
-  outline). Choices are saved under `storageKey`.
+  own, plus Auto when it has both), Colour by (from the diagram type), Look. Choices are
+  saved under `storageKey`.
+- **Looks are per diagram type** (WO-38), each saved on its own (`looks: {type: look}`
+  in the stored preferences; a single `look` saved before is taken as the mind map's
+  and ER's). Changing one never changes another. Mind map: Fade / Outline. Flowchart:
+  Outline (`outline`) / Poster (`poster`). ER: Flat (`outline`) / Zebra (`fade`). State
+  diagrams and sequences have one look and no Look row.
+- The look a diagram opens in: one set from outside (`setPrefs`) or by the reader for
+  this file, a link's (`prefs.look`, when the diagram offers it), the map's
+  `## Look:` line, the reader's saved choice, the type's default (flowchart Outline).
+- **Poster** (flowcharts): each node is its main icon (a cloud icon in its own colours,
+  else the Phosphor icon the map marks `main`, on a tile of the node's colour) with its
+  name under it; a node with no main icon is a light box with its name. Tags, trust
+  marks, warnings, the note icon, quick links, related links and arrows' icons and note
+  marks leave the drawing for the **details pop-up**: hovering a node or a box's title
+  strip shows its class, its icons named (the main one first), its change, its note, the
+  diagrams it opens (a small sparkle on one with changes), its related links and Open
+  page; a click, a tap or keyboard selection keeps it open. Sparkles and plan signs sit
+  on the main icon's corner; a change inside a linked diagram shows as the small sparkle
+  on the icon. Arrows end at the icon's centre (the middle of a side for a box). Boxes
+  are thin, the main icon in the top-left corner; an AWS main icon gives the box its
+  colour (border and tint, the title in ink), since those icons are one colour; Azure and
+  Google icons are not, so their boxes keep the theme's colour. On screen Poster nodes
+  carry no `<title>` tooltips (the pop-up names them); exports keep them.
 
 **Built-in theme** (`id: 'default'`, label "Avagahana"): light and dark; a 13-colour
 category palette; the blue family as the level ramp; a `frame` in the Avagahana
@@ -440,7 +464,7 @@ the id of a theme a viewer has registered. Returns `{ok, problems, release()}`.
 
 ### Classes a theme's `css` can use
 
-Root: `.mmv` (`is-narrow` while the toolbar leaves out Export, Search and a `'wide'` view picker: under 480 px, or the top row does not fit; a host may style its own slot button by it) with `data-theme`, `data-appearance`, `data-colour-by`, `data-look`, `data-diagram` (`mindmap`, `flowchart`, `sequence`, `state` or `er`), `data-boxes` (a box diagram: flowchart, state, er). Drawing: `mmv-node`, `mmv-shape` (`is-solid`, `is-mark`: a state diagram's dots, bar and choice), `mmv-divider` (a state's description rule), `mmv-warn` (a state's path warning), `mmv-table` with `mmv-table-head`, `mmv-table-row`, `mmv-table-more`, `mmv-key`, `mmv-grain` (an ER table), `mmv-er-line` (`is-lit`), `mmv-er-end` (crow's-foot marks), `mmv-label`, `mmv-icon`, `mmv-edge`, `mmv-frame` (an open box), `mmv-frame-title`, `mmv-flow` (a box diagram's arrow; `is-dotted`, `is-thick`), `mmv-flow-label`,
+Root: `.mmv` (`is-narrow` while the toolbar leaves out Export, Search and a `'wide'` view picker: under 480 px, or the top row does not fit; a host may style its own slot button by it) with `data-theme`, `data-appearance`, `data-colour-by`, `data-look` (how the look draws: `fade` or `outline` for a mind map and ER, `fade` for a flowchart's Outline and for state diagrams and sequences, `poster`), `data-diagram` (`mindmap`, `flowchart`, `sequence`, `state` or `er`), `data-boxes` (a box diagram: flowchart, state, er). Drawing: `mmv-node`, `mmv-shape` (`is-solid`, `is-mark`: a state diagram's dots, bar and choice), `mmv-divider` (a state's description rule), `mmv-warn` (a state's path warning), `mmv-table` with `mmv-table-head`, `mmv-table-row`, `mmv-table-more`, `mmv-key`, `mmv-grain` (an ER table), `mmv-er-line` (`is-lit`), `mmv-er-end` (crow's-foot marks), `mmv-label`, `mmv-icon`, `mmv-edge`, `mmv-frame` (an open box; `is-poster` in Poster, its `--n` set to an AWS main icon's colour), `mmv-frame-title`, `is-poster` on a Poster node (`data-hover`: the node whose details hovering shows), `mmv-icon is-tile` with `mmv-tile` (a Phosphor main icon on a tile), `mmv-inner-spot` (a Poster node's linked-diagram sparkle), `mmv-flow` (a box diagram's arrow; `is-dotted`, `is-thick`), `mmv-flow-label`,
 `mmv-rel`, `mmv-rel-label`, `mmv-dot`, `mmv-rel-dot`, `mmv-bar`,
 `mmv-mark-hit`, `mmv-mark-sel`. Colour classes: `mmv-c<n>` (a node's class: its slot, `mmv-cm` external, `mmv-c0` none; box diagrams), `mmv-k<n>` (category, 0 = centre),
 `mmv-l<n>` (level), `mmv-d0|1|2` (depth band), `mmv-pa|pc|pr|p0` (planned change: added,

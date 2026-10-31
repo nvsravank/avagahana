@@ -46,5 +46,6 @@ Need six hours of sun.
 
 Namespaced icons use two words, for example `::icon(ph database)` or
 `::icon(ph cloud verified)`. The old hyphen after `ph` is unsupported. Use the same
-spelling in classes, node icons, and legend definitions. AWS/Azure/Google assets
-are future work and currently fail checking.
+spelling in classes, node icons, and legend definitions. Cloud icons (`aws`, `azure`,
+`gcp`) work in a mind map too. `main` (a box diagram's main icon) is not for mind maps:
+the checker rejects it in `::icon(...)`.

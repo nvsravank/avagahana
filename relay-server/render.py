@@ -8,7 +8,7 @@ reader's open atlas page (no headless browser), without moving what the reader s
                                  [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
                                  [--seq ANCHOR [--step N | --steps all|3-5]]
                                  [--before FILE [--perspective before|after]] [--draft FILE]
-                                 [--theme ID] [--appearance light|dark]
+                                 [--theme ID] [--appearance light|dark] [--look outline|poster]
                                  [--width PX | --scale X] [--background theme|none]
                                  [--report] [--port N] [--maps-dir DIR]
 
@@ -148,6 +148,7 @@ def main(argv=None) -> int:
     ap.add_argument("--draft", help="draw this file (any file) in the map's place: a change tried before it is made")
     ap.add_argument("--theme", help="a theme id (themes.py list)")
     ap.add_argument("--appearance", choices=("light", "dark"))
+    ap.add_argument("--look", help="a flowchart's look: outline or poster (default: the map's ## Look: line, else outline)")
     size = ap.add_mutually_exclusive_group()
     size.add_argument("--width", type=int, help="output width in pixels")
     size.add_argument("--scale", type=float, help="output scale (default 1 for SVG, 2 for PNG)")
@@ -204,7 +205,7 @@ def main(argv=None) -> int:
             print(status_line("failed", error=f"cannot read --draft {args.draft}: {exc.strerror or exc}"))
             return 1
     body = {k: v for k, v in {"path": args.map, "text": draft, "state": state, "format": fmt, "theme": args.theme,
-                              "appearance": args.appearance, "width": args.width, "scale": args.scale,
+                              "appearance": args.appearance, "look": args.look, "width": args.width, "scale": args.scale,
                               "background": args.background, "report": args.report, "before": before}.items() if v is not None}
 
     def one(st, target):

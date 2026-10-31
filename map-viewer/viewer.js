@@ -4,8 +4,9 @@
 // The viewer never touches location, document.title or a server: map text comes
 // in through load(), and links, cross-map navigation and shutdown go out through
 // the host callbacks. A missing callback hides its feature.
-import { chromeHtml, collect, uiSvg, opensSvg, UI, SHORTCUT, IS_MAC, planSignSvg, PLAN_WORD } from './chrome.js';
+import { chromeHtml, collect, uiSvg, opensSvg, UI, SHORTCUT, IS_MAC, planSignSvg, PLAN_WORD, sparkleSvg } from './chrome.js';
 import { parseMap } from './model/map.js';
+import { isCloudCode } from './model/main-icon.js';
 import { placeIn } from './model/deployments.js';
 import { categoryOf as branchCategory } from './model/tree.js';
 import { diagramOf, DIAGRAMS } from './diagrams/index.js';
@@ -15,7 +16,7 @@ import { createStage } from './stage.js';
 import { createExporter } from './export.js';
 import { createPage } from './page.js';
 import { createPlayer } from './player.js';
-import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml, useAssets } from './icons.js';
+import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml, useAssets, tintOf } from './icons.js';
 import { createSeen } from './seen.js';
 import { summarize } from './model/changes.js';
 import { compareFiles, markFile, changesIn, changesOf } from './model/compare.js';
@@ -24,11 +25,10 @@ import { problemList, mapProblems } from './problems.js';
 import { checkTheme, acquire, release, loadFont } from './themes/theme.js';
 import { clearMeasureCache } from './measure.js';
 
-const LOOKS = ['fade', 'outline'];
 const CHANGE_ICONS = ['ph sparkle'];   // new or changed (seen.js)
 const FRESH_MS = 2500;   // how long what a load brought counts as just arrived (it glows)
 const APPEARANCES = ['light', 'dark', 'auto'];
-const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'look', 'rels', 'infoClosed', 'stepSeconds', 'sparkles'];
+const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'looks', 'rels', 'infoClosed', 'stepSeconds', 'sparkles'];
 // below this the viewer shows a message and nothing else
 const MIN_W = 320;
 const MIN_H = 280;
@@ -134,7 +134,7 @@ export function mount(element, options = {}) {
 
   // ---------- state ----------
   const S = {
-    themeId: null, appearance: 'auto', colourBy: 'category', look: 'fade', mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0',
+    themeId: null, appearance: 'auto', colourBy: 'category', looks: {}, mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0',
     relNode: null, noteSticky: false, noteOpen: false,
     path: null, text: null, map: null, focus: null, collapsed: new Set(), selected: null,
     // a file may hold several diagrams (model/map.js): file is the first, map the one
@@ -151,10 +151,17 @@ export function mount(element, options = {}) {
   };
   const saved = readPrefs();
   const link = options.prefs || {};
-  for (const k of PREF_KEYS) if (saved[k] != null) S[k] = String(saved[k]);
-  for (const k of ['appearance', 'colourBy', 'look']) if (link[k] != null) S[k] = String(link[k]);
+  for (const k of PREF_KEYS) if (saved[k] != null && k !== 'looks') S[k] = String(saved[k]);
+  // a look per diagram type (WO-38); a look saved before then was the mind map's and ER's
+  if (saved.looks && typeof saved.looks === 'object') for (const [t, x] of Object.entries(saved.looks)) S.looks[t] = String(x);
+  else if (typeof saved.look === 'string') S.looks = { mindmap: saved.look, er: saved.look };
+  for (const k of ['appearance', 'colourBy']) if (link[k] != null) S[k] = String(link[k]);
+  // a link's look: for every diagram that offers it, this visit only
+  const linkLook = link.look != null ? String(link.look) : null;
+  // a look set from outside (setPrefs) or by the reader on this file, by diagram (part
+  // anchor, '' the first): it wins over the map's ## Look: line until another file opens
+  let lookHere = new Map();
   if (!APPEARANCES.includes(S.appearance)) S.appearance = 'auto';
-  if (!LOOKS.includes(S.look)) S.look = 'fade';
   S.colourByKept = saved.colourBy != null ? String(saved.colourBy) : S.colourBy;   // the choice kept while Changes shows
   const wantTheme = link.theme || saved.theme || options.theme || null;
   // seconds a sequence's step shows while playing: the reader's choice (the step bar's
@@ -178,6 +185,27 @@ export function mount(element, options = {}) {
   // ---------- the diagram type (diagrams/index.js) ----------
   const diagram = () => diagramOf(S.map);
   const modeIds = () => diagram().modes.map((m) => m.id);
+  // The diagram type's looks, [[value, label, drawn as]] (WO-38): each type keeps its own,
+  // and a type with one look has no Look row. The look shown: set here (the reader or
+  // setPrefs), a link's, the map's ## Look: line, the reader's saved one, the type's default.
+  const looksOf = (d = diagram()) => d.looks || [['fade', 'Fade'], ['outline', 'Outline']];
+  function lookOf() {
+    const d = diagram(), ls = looksOf(d);
+    const ok = (x) => x != null && ls.some(([id]) => id === x);
+    for (const x of [lookHere.get(S.part || ''), linkLook, S.map?.look, S.looks[d.type]]) if (ok(x)) return x;
+    return d.defaultLook || ls[0]?.[0] || 'fade';
+  }
+  // how the look draws: the root's data-look (a flowchart's Outline draws as Fade)
+  const cssLook = () => { const x = lookOf(); return looksOf().find(([id]) => id === x)?.[2] || x; };
+  const posterNow = () => cssLook() === 'poster';
+  // Poster changes node sizes: going in or out of it lays the diagram out again, the
+  // camera kept unless the reader has not moved it since the last fit
+  function lookChanged(wasPoster) {
+    applyChrome();
+    if (wasPoster === posterNow() || !S.map?.root) return;
+    painter.clearSizes();
+    render(S.layout && !S.userMoved && S.lastFit ? S.lastFit : false);
+  }
 
   // ---------- tree helpers ----------
   const viewRoot = () => (S.focus && S.map.byId[S.focus]) || S.map.root;
@@ -197,10 +225,12 @@ export function mount(element, options = {}) {
   let fontString = getComputedStyle(root).getPropertyValue('--mmv-font').trim() || 'system-ui, sans-serif';
   const v = {
     S, $, root, uid, diagram,
+    // the Poster look (WO-38): nodes as their main icon, details on hover
+    poster: () => posterNow(),
     viewRoot, relDepth, kids, countDesc, categoryOf, levelOf,
     relCount: (id) => relationsOf(id).length,
     legend: () => S.map?.iconLegend,
-    iconDef, iconHtml,
+    iconDef, iconHtml, tintOf,
     font: () => fontString,
     // every label in full when exporting, and in a thumbnail (drawn small, like an export)
     detailZoom: () => (S.exporting || S.thumb ? 1 : S.view.k),
@@ -548,7 +578,7 @@ export function mount(element, options = {}) {
   // ---------- rendering ----------
   function layout() {
     const size = (n) => painter.nodeGeom(n);
-    S.layout = diagram().layout(S.mode, viewRoot(), kids, size, { relations: S.map.relations, byId: S.map.byId, direction: S.map.direction, selected: S.selected, collapsed: S.collapsed, all: !!viewNamed(S.relView)?.deploy, sequence: S.map.sequence,
+    S.layout = diagram().layout(S.mode, viewRoot(), kids, size, { poster: posterNow(), relations: S.map.relations, byId: S.map.byId, direction: S.map.direction, selected: S.selected, collapsed: S.collapsed, all: !!viewNamed(S.relView)?.deploy, sequence: S.map.sequence,
       // a sequence played over the view: its arrows make room for the messages' labels
       playLabel: player.onMap() ? player.labelOf : null });
   }
@@ -630,11 +660,21 @@ export function mount(element, options = {}) {
     if (S.noteSticky || page.isOpen()) return;
     showNote(S.map.byId[id], anchor, true);
   }
+  // Poster (WO-38): hovering a node, or a box's title strip, shows what the drawing
+  // leaves out (showDetails)
+  function hoverDetails(id, anchor) {
+    clearTimeout(hideTimer);
+    if (S.noteSticky || page.isOpen() || !S.map?.byId[id]) return;
+    showDetails(S.map.byId[id], anchor);
+  }
   $.canvas.addEventListener('mouseover', (e) => {
+    if (stage.dragging()) return;
     const ni = e.target.closest('[data-note]');
-    if (ni && !stage.dragging()) hoverNote(ni.dataset.note, ni);
+    if (ni) { hoverNote(ni.dataset.note, ni); return; }
+    const hv = posterNow() && e.target.closest('[data-hover]');
+    if (hv) hoverDetails(hv.dataset.hover, hv);
   });
-  $.canvas.addEventListener('mouseout', (e) => { if (e.target.closest('[data-note]')) scheduleHide(); });
+  $.canvas.addEventListener('mouseout', (e) => { if (e.target.closest('[data-note], [data-hover]')) scheduleHide(); });
   $.note.addEventListener('mouseenter', () => clearTimeout(hideTimer));
   $.note.addEventListener('mouseleave', () => { if (!S.noteSticky) scheduleHide(); });
   const listHandlers = {
@@ -823,6 +863,11 @@ export function mount(element, options = {}) {
     S.selected = id;
     hideNote();
     if (S.mode === 'list') render(false); else paintMarks();
+    // Poster (WO-38): a click, a tap or the keyboard keeps the node's details open
+    if (id && S.mode !== 'list' && posterNow() && S.map?.byId[id]) {
+      const el = [...$.nodes.children, ...$.frames.children].find((g) => g.dataset.id === id);
+      if (el) { showDetails(S.map.byId[id], el.querySelector('[data-hover]') || el); S.noteSticky = true; }
+    }
     // looked at: its change marks go (a node with no page is read here)
     seenAck(seen?.nodeKeys(partKey(), id, envName()) || []);
     emitState();
@@ -935,22 +980,72 @@ export function mount(element, options = {}) {
     body.replaceChildren();
     if (n.note) renderNoteBody(n.note.body, body, wireLink);
     else body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-muted', textContent: 'No note for this node.' }));
-    const rels = peek ? [] : relationsOf(n.id);
-    if (rels.length) {
-      body.appendChild(Object.assign(document.createElement('h4'), { textContent: 'Related' }));
-      for (const r of rels) {
-        const out = r.from === n.id;
-        const otherId = out ? r.to : r.from;
-        const other = S.map.byId[otherId];
-        const text = `${out ? '→' : '←'} ${other ? other.plain : otherId}${r.label ? ` (${r.label})` : ''}`;
-        if (r.cross) { body.appendChild(crossRow(r, n, text)); continue; }
+    if (!peek) relatedRows(n, body);
+    $.note.hidden = false;
+    S.noteOpen = true;
+    placeNote(anchorEl);
+  }
+  // the node's related links as rows in a pop-up (a click goes to the other end)
+  function relatedRows(n, body) {
+    const rels = relationsOf(n.id);
+    if (!rels.length) return;
+    body.appendChild(Object.assign(document.createElement('h4'), { textContent: 'Related' }));
+    for (const r of rels) {
+      const out = r.from === n.id;
+      const otherId = out ? r.to : r.from;
+      const other = S.map.byId[otherId];
+      const text = `${out ? '→' : '←'} ${other ? other.plain : otherId}${r.label ? ` (${r.label})` : ''}`;
+      if (r.cross) { body.appendChild(crossRow(r, n, text)); continue; }
+      const b = document.createElement('button');
+      b.className = 'mmv-relrow';
+      b.textContent = text;
+      relIcons(b, r);
+      b.addEventListener('click', () => jumpTo(otherId));
+      body.appendChild(b);
+    }
+  }
+  // Poster (WO-38): what the drawing leaves out, in the note panel: the node's class,
+  // its icons named (the main one first: a product, a trust mark's meaning), its change,
+  // its note, the diagrams it opens (a small sparkle on one with changes), its related
+  // links and its page.
+  function showDetails(n, anchorEl) {
+    const legend = v.legend();
+    $.noteTitle.textContent = n.plain || '(untitled)';
+    const body = $.noteBody;
+    body.replaceChildren();
+    const words = v.wordsOf(n);
+    if (words.length) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-muted mmv-details-kind', textContent: words.join(' · ') }));
+    const icons = [...(n.main ? [n.main] : []), ...n.icons.filter((c) => c !== n.main)];
+    if (icons.length) {
+      const row = Object.assign(document.createElement('p'), { className: 'mmv-arrow-marks mmv-details-icons' });
+      for (const code of icons) {
+        const span = document.createElement('span');
+        span.innerHTML = iconHtml(code, legend, 'mmv-inline-ic', 'var(--mmv-ink)');
+        span.appendChild(document.createTextNode(iconDef(code, legend).label));
+        row.appendChild(span);
+      }
+      body.appendChild(row);
+    }
+    const change = v.changeOf(n.id);
+    if (change) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: change === 'new' ? `New ${sinceWords}.` : `Changed ${sinceWords}.` }));
+    if (n.note) renderNoteBody(n.note.body, body, wireLink);
+    if (n.inners?.length) {
+      body.appendChild(Object.assign(document.createElement('h4'), { textContent: 'Opens' }));
+      for (const inner of n.inners) {
         const b = document.createElement('button');
-        b.className = 'mmv-relrow';
-        b.textContent = text;
-        relIcons(b, r);
-        b.addEventListener('click', () => jumpTo(otherId));
+        b.className = 'mmv-relrow mmv-details-opens';
+        b.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">${UI[diagramOf({ type: inner.type }).modes[0].icon] || UI.list}</svg>`;
+        if (v.partChanged?.(inner.anchor)) { b.classList.add('has-spark'); b.insertAdjacentHTML('beforeend', sparkleSvg()); }
+        b.append(` ${inner.title}`);
+        b.addEventListener('click', () => { hideNote(); enterPart(inner.anchor, n.id); });
         body.appendChild(b);
       }
+    }
+    relatedRows(n, body);
+    if (n.note || n.inners?.length) {
+      const b = Object.assign(document.createElement('button'), { className: 'mmv-relrow mmv-details-page', textContent: 'Open page' });
+      b.addEventListener('click', () => openPage(n.id));
+      body.appendChild(b);
     }
     $.note.hidden = false;
     S.noteOpen = true;
@@ -1232,12 +1327,12 @@ export function mount(element, options = {}) {
       root.dataset.diagram = diagram().type;
       if (diagram().boxes) root.dataset.boxes = ''; else delete root.dataset.boxes;
     }
-    root.dataset.look = S.look;
+    root.dataset.look = cssLook();
     $.modes.querySelectorAll('button').forEach((b) => b.classList.toggle('is-on', b.dataset.mode === S.mode));
     $.relBtn.hidden = !!diagram().layoutByView || !!diagram().noRelations;   // a box diagram always shows its arrows; a sequence has none
     $.relBtn.classList.toggle('is-active', S.rels === '1');
     $.relBtn.title = S.rels === '1' ? 'Hide related links' : 'Show related links';
-    $.themePanel.querySelectorAll('[data-pref] button').forEach((b) => b.classList.toggle('is-on', b.dataset.v === String(S[b.closest('[data-pref]').dataset.pref])));
+    $.themePanel.querySelectorAll('[data-pref] button').forEach((b) => { const pref = b.closest('[data-pref]').dataset.pref; b.classList.toggle('is-on', b.dataset.v === String(pref === 'look' ? lookOf() : S[pref])); });
   }
   // The theme panel is built from the registered themes: each shows its own
   // appearances; the colour-by choices come from the diagram type, not the theme.
@@ -1266,7 +1361,7 @@ export function mount(element, options = {}) {
     if (apps.length > 1) row('Appearance', 'appearance', [['light', 'Light'], ['dark', 'Dark'], ['auto', 'Auto']]);
     const colourBy = colourChoices();
     if (colourBy.length > 1) row('Colour by', 'colourBy', colourBy);
-    row('Look', 'look', diagram().looks || [['fade', 'Fade'], ['outline', 'Outline']]);
+    if (looksOf().length > 1) row('Look', 'look', looksOf().map(([id, text]) => [id, text]));
     applyChrome();
   }
   // The colour-by choices: the diagram type's (a box diagram's map decides, so it has
@@ -1281,6 +1376,14 @@ export function mount(element, options = {}) {
   }
   function setPref(pref, value) {
     if (pref === 'themeId') { selectTheme(value, true).then(savePrefs); return; }
+    if (pref === 'look') {
+      const was = posterNow();
+      S.looks = { ...S.looks, [diagram().type]: value };
+      lookHere.set(S.part || '', value);
+      savePrefs();
+      lookChanged(was);
+      return;
+    }
     S[pref] = value;
     if (pref === 'colourBy' && value !== 'changes') S.colourByKept = value;
     savePrefs();
@@ -1869,13 +1972,16 @@ export function mount(element, options = {}) {
       for (const code of new Set(used)) {
         if (!iconDef(code, m.iconLegend).vendor && !iconKnown(code, m.iconLegend)) extra.push({ level: 'warning', code: 'map-unknown-icon', message: `Unknown icon code "${code}"; shown as the unknown icon.`, where: null });
       }
-      // cloud icons go above a node's name (n.logos), never beside it; one the set
-      // does not have is left out
+      // a cloud icon the set does not have is left out; when it was the main icon
+      // (model/main-icon.js), the next cloud icon is main
       const split = (n) => {
-        if (!n.logos) {
-          const vendor = (c) => iconDef(c, m.iconLegend).vendor;
-          n.logos = n.icons.filter((c) => vendor(c) && iconKnown(c, m.iconLegend));
-          n.icons = n.icons.filter((c) => !vendor(c));
+        if (!n.iconsChecked) {
+          n.iconsChecked = true;
+          const gone = (c) => iconDef(c, m.iconLegend).vendor && !iconKnown(c, m.iconLegend);
+          if (n.icons.some(gone)) {
+            n.icons = n.icons.filter((c) => !gone(c));
+            if (n.main && !n.icons.includes(n.main)) n.main = n.icons.find(isCloudCode) || null;
+          }
         }
         n.children.forEach(split);
       };
@@ -1908,6 +2014,7 @@ export function mount(element, options = {}) {
     clearTimeout(freshTimer);
     if (S.fresh.size) freshTimer = setTimeout(() => { S.fresh = new Set(); }, FRESH_MS);
     // a live reload stays in the diagram shown, while the file still has it
+    if (!keep) lookHere = new Map();
     if (!keep || (S.part && !file.parts.has(S.part))) { S.part = null; S.trail = []; }
     else S.trail = S.trail.filter((e) => !e.anchor || file.parts.has(e.anchor));
     show(mapFor(S.part), keep && S.map?.type === mapFor(S.part).type);
@@ -2191,9 +2298,10 @@ export function mount(element, options = {}) {
     },
     setPrefs(p = {}) {
       if (APPEARANCES.includes(p.appearance)) S.appearance = p.appearance;
-      if (LOOKS.includes(p.look)) S.look = p.look;
+      const was = posterNow();
+      if (p.look != null && looksOf().some(([id]) => id === p.look)) lookHere.set(S.part || '', String(p.look));
       if (p.colourBy != null && colourChoices().some(([id]) => id === p.colourBy)) S.colourBy = p.colourBy;
-      applyChrome();
+      lookChanged(was);
       renderInfo();
     },
     destroy() {

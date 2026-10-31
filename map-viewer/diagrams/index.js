@@ -13,7 +13,8 @@
 //   walk's step along r reaches the many side), pageSections(n) -> [{title, el}] (sections
 //   of the node's page), noteLinks (a link in a node's note to another diagram links
 //   the node, as a flowchart's click does: a state diagram, which has no click)
-//   looks ([[preference value, reader-facing label]]) for type-specific look names,
+//   looks ([[preference value, reader-facing label, data-look when not the value]]) for
+//   type-specific looks (each type keeps its own; [] or one look: no Look row), defaultLook,
 //   detailSizes (font sizes whose semantic-zoom thresholds trigger redraws),
 //   parseViews(sections, byId, warnings, own) (type-specific connection sections)
 // Everything else (labels, shapes, notes, icons, relations and views, list mode,

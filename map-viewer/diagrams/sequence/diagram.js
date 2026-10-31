@@ -20,6 +20,8 @@ export const modes = [
 // each participant its own colour (a box's together)
 export const colourBy = [{ id: 'category', label: 'Participant' }];
 export const stableColours = true;
+// one look: no Look row (WO-38)
+export const looks = [];
 export const branchOrder = (kids) => kids;
 export const defaultCollapsed = () => new Set();
 // no related links: the messages are the sequence's own (no related-links button)

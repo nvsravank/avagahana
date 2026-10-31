@@ -13,6 +13,7 @@ import { strokeStyle } from '../../model/classes.js';
 
 const TITLE_X = 12;
 const TITLE_Y = 18;
+const POSTER_CORNER = 26;   // a Poster box's main icon, in its top-left corner
 
 // input: as the mind map's (diagrams/mindmap/scene.js), layout.pos holding frame: true
 // for open boxes
@@ -25,19 +26,37 @@ export function buildScene(input) {
     if (p.frame) {
       const rel = input.relDepth(n);
       const type = typeFor(Math.max(1, rel));
+      const iconOf = (code, size, x, y, tile = false) => {
+        const def = input.iconDef(code, input.legend);
+        return def.vendor ? { code, src: def.src, ...(def.dark ? { dark: def.dark } : {}), label: def.label, size, x, y }
+          : { code, ph: def.ph, color: tile ? null : def.color || null, label: def.label, size, x, y, ...(tile ? { tile: true } : {}) };
+      };
+      if (input.poster) {
+        // Poster (WO-38): the main icon in the top-left corner, the title after it; an AWS
+        // icon gives the box its colour (tint, paint.js); the rest is in the hover pop-up
+        const main = n.main ? iconOf(n.main, POSTER_CORNER, 0, 0, true) : null;
+        frames.push({
+          kind: 'frame', id: n.id, x: p.x, y: p.y, w: p.w, h: p.h,
+          cls: `mmv-frame is-poster ${shaper.tone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
+          ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
+          ...(main?.src && input.tintOf?.(main.src) ? { tint: input.tintOf(main.src) } : {}),
+          name: `${nodeName(n, rel, false)}, a box`,
+          title: { text: n.plain, x: main ? POSTER_CORNER + 8 : TITLE_X, y: 17, size: Math.min(type.size, 15) - 1, weight: 600 },
+          icons: [], ...(main ? { main } : {}), hover: true,
+          marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
+          ...(n.plan ? { plan: n.plan } : {}),
+          note: null,
+          dot: n !== root && !L.context?.has(n) ? { x: p.w - 1, y: 1, closed: false, count: null } : null,
+        });
+        continue;
+      }
       // the box's icons (its class's, say) in the title strip, before its name
       const size = Math.min(type.size, 15) + 1;
-      const icons = n.icons.map((code, i) => {
-        const def = input.iconDef(code, input.legend);
-        return { code, ph: def.ph, color: def.color || null, label: def.label, size, x: TITLE_X + i * (size + 3), y: TITLE_Y - size + 3 };
-      });
+      const icons = n.icons.filter((c) => c !== n.main).map((code, i) => iconOf(code, size, TITLE_X + i * (size + 3), TITLE_Y - size + 3));
       const titleX = TITLE_X + icons.length * (size + 3) + (icons.length ? 2 : 0);
-      // its cloud icons at the top right, left of the note icon
+      // its main icon (model/main-icon.js) at the top right, left of the note icon
       const right = p.w - 8 - (n.note ? 26 : 0);
-      const logos = (n.logos || []).map((code, i, all) => {
-        const def = input.iconDef(code, input.legend);
-        return { code, src: def.src, ...(def.dark ? { dark: def.dark } : {}), label: def.label, size: 22, x: right - (all.length - i) * 26 + 4, y: 4 };
-      });
+      const main = n.main ? iconOf(n.main, 22, right - 22, 4) : null;
       frames.push({
         kind: 'frame', id: n.id, x: p.x, y: p.y, w: p.w, h: p.h,
         cls: `mmv-frame ${shaper.tone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
@@ -45,7 +64,7 @@ export function buildScene(input) {
         name: `${nodeName(n, rel, false)}, a box`,
         title: { text: n.plain, x: titleX, y: TITLE_Y, size: Math.min(type.size, 15), weight: 600 },
         icons,
-        ...(logos.length ? { logos } : {}),
+        ...(main ? { main } : {}),
         marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
         ...(n.plan ? { plan: n.plan } : {}),
         note: n.note ? { x: p.w - 30, y: 6, size: 16 } : null,
@@ -102,7 +121,9 @@ export function relationShapes(input) {
     if (placed) { mid[0] = placed[0]; mid[1] = placed[1] + 4; }
     // icons: those all of them carry (as with the colour); the icon filter finds an
     // arrow when any of its relations carries a picked icon
-    const icons = items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), first.icons || []);
+    // (Poster, WO-38: none on the line, nor the note mark; the arrow's pop-up has them)
+    const icons = input.poster ? [] : items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), first.icons || []);
+    const noteMark = !input.poster && first.note;
     const dim = input.iconFilter?.size > 0 && !items.some((r) => passesFilter(r, input.iconFilter));
     out.push({
       kind: 'rel', id: key, d,
@@ -110,7 +131,7 @@ export function relationShapes(input) {
       ...(slot != null ? { slot } : {}), ...(plan ? { plan } : {}), ...(lineCls?.stroke ? { style: strokeStyle(lineCls.stroke) } : {}),
       head: kind.head || null, tail: kind.tail || null,
       label: items.length > 1 ? { x: mid[0], y: mid[1], text: `${items.length} links`, ...(icons.length ? { icons } : {}) }
-        : first.label || first.note || icons.length ? { x: mid[0], y: mid[1], text: first.label, ...(first.note ? { note: true } : {}), ...(icons.length ? { icons } : {}) } : null,
+        : first.label || noteMark || icons.length ? { x: mid[0], y: mid[1], text: first.label, ...(noteMark ? { note: true } : {}), ...(icons.length ? { icons } : {}) } : null,
       ...(dim ? { dim } : {}),
       items: items.map((r) => ({ from: r.from, to: r.to, label: r.label, ...(r.note ? { note: r.note } : {}), ...(r.icons?.length ? { icons: r.icons.slice() } : {}) })),
     });

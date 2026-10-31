@@ -147,11 +147,25 @@ agent may be using.)
   subroutine, `(["…"])` stadium. Icons for flowchart nodes go in `## Node icons`
   (`- db : ph database`; any `ph <name>` from the Phosphor set), sparingly.
 - Cloud infrastructure: the vendors' own icons, `aws <name>`, `azure <name>`,
-  `gcp <name>` (`- fn : aws lambda`, `- bucket : aws s3`, `- vm : azure vm`). They draw
-  above the node's name, or at the top right of an open box (a VPC, a resource
-  group). Names come from `map-viewer/vendor-icons.json` (the plugin root); the checker
-  rejects an unknown one and suggests the nearest. Use them in deployment and
-  infrastructure diagrams, on the nodes that are those products.
+  `gcp <name>` (`- fn : aws lambda`, `- bucket : aws s3`, `- vm : azure vm`). Names come
+  from `map-viewer/vendor-icons.json` (the plugin root); the checker rejects an unknown
+  one and suggests the nearest. Use them in deployment and infrastructure diagrams, on
+  the nodes that are those products.
+- **Main icon**: a node's first cloud icon is its main icon (drawn above the name, or as
+  the node in Poster); a class's cloud icon counts too (`- ec2 : aws ec2 : Virtual
+  machines`). Put the product first; further cloud icons become small tags. A node with
+  no cloud icon may mark one Phosphor icon main: `- sched : main ph clock` (`main` only
+  in `## Node icons` and `## Classes`, never before a cloud icon or a trust mark, one per
+  node, and not on a node whose class brings a cloud icon). Leave it off where no icon
+  stands for the node.
+- For a box (a VPC, a subnet, an account), use the vendor's group icon where there is
+  one: `aws virtual-private-cloud-vpc`, `aws private-subnet`, `aws public-subnet`,
+  `aws region`, `aws account`, `aws auto-scaling-group`; not a service's icon.
+- **Poster look**: `## Look: poster` (a section line after the block) opens a flowchart
+  with each node drawn as its main icon and its name under it, details on hover. Use it
+  for architecture maps that are mostly cloud icons and for pictures in decks and docs
+  (`render.py --look poster` for one picture). Give nodes that matter a main icon first;
+  without one a node is a plain box. Default (no line): Outline, boxes with borders.
 
 ## Layer diagrams
 

@@ -6,6 +6,25 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Map format: a node's **main icon** (WO-38): its first cloud icon, else
+  its class's first cloud icon, else the icon `## Node icons` or `## Classes` marks with
+  the reserved word `main` (`- sched : main ph clock`). Further cloud icons are tags
+  beside the name (they were all drawn above it). Seven problem codes (`main-icon-*`);
+  `main` is no legend name. Cloud icons are now in the icon filter.
+- **Contract** Map format: `## Look: poster` (or `outline`) says which look a flowchart
+  opens in (`look-not-flowchart`, `look-twice`, `look-unknown`) (WO-38).
+- **Contract** Viewer: looks are per diagram type, saved as `looks` (a saved `look` is
+  read as the mind map's and ER's). Flowcharts: Outline (always drawn as Fade, the tint
+  is gone) and **Poster**: each node its main icon with the name under it, boxes thin
+  with the main icon in the corner and an AWS icon's colour, arrows to the icon's
+  centre, tags, trust marks, notes and linked diagrams in a pop-up on hover (a click,
+  tap or keyboard selection keeps it open), sparkles and plan signs on the icon. State
+  diagrams and sequences have no Look row (it changed little or nothing). Going in or
+  out of Poster lays the diagram out again. `setPrefs({look})` and a link's look apply to
+  the shown diagram's type (WO-38).
+- **Contract** Relay: `POST /api/render` takes `look`; `render.py --look outline|poster`
+  (WO-38).
+
 - **Contract** Map format: where the layout has nothing else to go on, the order of
   lines decides: children of a box with no arrows among them sit in the order they are
   first named, and arrows that leave or enter a node's box take their places on its

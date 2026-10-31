@@ -7,6 +7,7 @@ import { testContents } from './contents.js';
 import { testChangeMarks, showSparkles } from './change-marks.js';
 import { testRender } from './render.js';
 import { testWholeMap } from './whole-map.js';
+import { testPoster } from './poster.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
@@ -32,6 +33,7 @@ try {
   await testChangeMarks(check, wait);
   await testRender(check);
   await testWholeMap(check);
+  await testPoster(check, wait);
   // Zoom changes label detail, never box geometry or the precomputed routes.
   for (const [kind, body] of [
     ['flowchart', 'flowchart LR\n  a[Top level] --> b{Decision}\n  subgraph group[Group]\n    c[Nested label] --> d[Another label]\n  end\n  b --> c'],
@@ -206,7 +208,7 @@ try {
   check('colour by level uses the level ramp', getComputedStyle(shape).stroke === getComputedStyle(root).getPropertyValue('--mmv-lvl-2').trim().replace(/^#(..)(..)(..)$/, (_, r, g, b) => `rgb(${parseInt(r, 16)}, ${parseInt(g, 16)}, ${parseInt(b, 16)})`), `${getComputedStyle(shape).stroke} vs ${getComputedStyle(root).getPropertyValue('--mmv-lvl-2')}`);
   check('the colour-by choices come from the diagram', [...root.querySelectorAll('[data-pref=colourBy] button')].map((b) => b.textContent).join('/') === 'Branch/Level');
   const saved = JSON.parse(localStorage.getItem('avagahana-test-a') || '{}');
-  check('preferences saved under the storage key', saved.colourBy === 'level' && saved.look === 'outline', JSON.stringify(saved));
+  check('preferences saved under the storage key', saved.colourBy === 'level' && saved.looks?.mindmap === 'outline', JSON.stringify(saved));
 
   // ---- a second viewer: host theme only, no storage ----
   const paper = {

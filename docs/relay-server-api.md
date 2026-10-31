@@ -71,7 +71,7 @@ python3 relay-server/serve_maps.py [--port N] [--maps-dir DIR] [--map <rel path>
 | `POST /api/show` | Body `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?}`. Tells every open page to show that map and node; `part` names one of the file's further diagrams by its heading's anchor (added in WO-07); `page` opens that node's page (added in WO-08); `seq` plays a sequence by its heading's anchor (`main` for the first diagram) over the view it is linked to, at `step` (a whole number from 1); `mode` may be `lifelines` (added in WO-12). `colourBy` (`category`, `level`, `class` or `changes`) opens the map in that colouring, e.g. `changes` for a plan (added in WO-13). `before`: the map's earlier version as text (2 MB at most), kept in the server's memory for that map until another, `null` (forget it) or a restart; `perspective` (`before` or `after`) which of the two to show (added in WO-34). `{delivered: <number of pages told>}`; `404` for no such map, `400` for a bad field. Stores nothing else. |
 | `GET /api/themes` | `{themes, settings, problems}`: the maps folder's `.themes/` (below). `themes`: each `<id>.json` with `id` (its file name) and `label` (its `name`) set and its font faces as `{weight, style, url}`; `settings`: `{builtIn, default, logo}` with defaults filled in; `problems`: files it could not read. Empty lists when there is no `.themes/`. Added in WO-32. |
 | `GET /api/theme-file?f=<file>` | A font file (`.woff2 .woff .ttf .otf`) in `.themes/`; `404` for anything else. Added in WO-32. |
-| `POST /api/render` | Body `{path, state?, theme?, appearance?, format?, width? or scale?, background?, report?, before?, text?}`: one open page draws the map and sends the file back (below). Added in WO-32; `text` in WO-37. |
+| `POST /api/render` | Body `{path, state?, theme?, appearance?, look?, format?, width? or scale?, background?, report?, before?, text?}`: one open page draws the map and sends the file back (below). Added in WO-32; `text` in WO-37, `look` in WO-38. |
 | `POST /api/render/<id>/claim` | A page takes a render: `200 {claimed: true}` for the first, `409` while another has it, `404` when it is over. |
 | `POST /api/render/<id>` | A page's answer: `{format, encoding, data, width, height, scaledDown?, report?, steps?, problems?, draft?}` or `{error}`. `404` when the render is over. |
 | `POST /api/open` | Body `{"url"}`. Opens an `http`, `https` or `mailto` link in the default browser. `{opened}`; `400` for any other link. |
@@ -95,7 +95,7 @@ hyphens. Unsupported modes are ignored by the viewer for the current diagram.
 |---|---|---|
 | `tree` | `{state}` | A map was added, removed or changed (the folder is scanned about once a second while a page listens). |
 | `show` | `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?}` | Someone called `POST /api/show`. |
-| `render` | `{id, path, state, format, theme?, appearance?, width? or scale?, background, report, before?, text?, pages}` | Someone called `POST /api/render`: the page that claims it answers. |
+| `render` | `{id, path, state, format, theme?, appearance?, look?, width? or scale?, background, report, before?, text?, pages}` | Someone called `POST /api/render`: the page that claims it answers. |
 
 A comment line (`: keep-alive`) every 15 s keeps the stream open. A page that cannot hold
 the stream polls `GET /api/tree` instead.
@@ -147,7 +147,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
                                [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
                                [--seq ANCHOR [--step N | --steps all|3-5]]
                                [--before FILE [--perspective before|after]] [--draft FILE]
-                               [--theme ID] [--appearance light|dark] [--width PX | --scale X] [--background theme|none]
+                               [--theme ID] [--appearance light|dark] [--look outline|poster] [--width PX | --scale X] [--background theme|none]
                                [--report] [--port N] [--maps-dir DIR]
 ```
 
@@ -171,7 +171,9 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   `close`, `highlight`: node ids; `crop`: a node id). `format` `svg` (default) or `png`;
   `width` 16 to 16,000 px, or `scale` 0.1 to 8; `background` `theme` or `none`;
   `appearance` `light` or `dark`; `theme` a theme id (an unknown one: the default, and
-  `problems` says so); `report` the layout report (`map-viewer-api.md`, Export).
+  `problems` says so); `report` the layout report (`map-viewer-api.md`, Export);
+  `look` a flowchart's look, `outline` or `poster` (a look the diagram does not offer:
+  its own; without it, the map's `## Look:` line, else Outline; WO-38).
 - `steps` (with `seq`): the sequence's number of steps.
 - `before`: the map's earlier version as text; the picture marks what differs (and `report` gets `changes`), on the map
   or (`state.perspective: "before"`) on the earlier file. `render.py --before FILE

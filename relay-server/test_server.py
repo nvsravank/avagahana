@@ -293,6 +293,8 @@ class RelayTests(unittest.TestCase):
             ({"path": "garden.md", "scale": 20}, 400),
             ({"path": "garden.md", "theme": "../x"}, 400),
             ({"path": "garden.md", "appearance": "sepia"}, 400),
+            ({"path": "garden.md", "look": "../poster"}, 400),
+            ({"path": "garden.md", "look": 3}, 400),
             ({"path": "garden.md", "background": "red"}, 400),
             ({"path": "garden.md", "state": {"expand": -1}}, 400),
             ({"path": "garden.md", "state": {"expand": "most"}}, 400),
@@ -325,7 +327,7 @@ class RelayTests(unittest.TestCase):
         t = threading.Thread(target=page)
         t.start()
         try:
-            status, body = self.s.json("POST", "/api/render", {"path": "garden.md", "format": "svg", "width": 800, "report": True,
+            status, body = self.s.json("POST", "/api/render", {"path": "garden.md", "format": "svg", "width": 800, "report": True, "look": "poster",
                                                               "state": {"expand": 2, "highlight": "n3, n4", "crop": "n3", "seq": "main", "step": 2}})
             t.join(5)
         finally:
@@ -335,7 +337,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(got["event"], "render")
         req = got["req"]
         self.assertEqual(req["state"], {"expand": 2, "highlight": ["n3", "n4"], "crop": "n3", "seq": "main", "step": 2})
-        self.assertEqual((req["format"], req["width"], req["background"], req["report"]), ("svg", 800, "theme", True))
+        self.assertEqual((req["format"], req["width"], req["background"], req["report"], req["look"]), ("svg", 800, "theme", True, "poster"))
         self.assertEqual(got["claim"], (200, {"claimed": True}))
         self.assertEqual(got["again"], (409, {"claimed": False}))
         self.assertEqual(got["answer"], (200, {"ok": True}))

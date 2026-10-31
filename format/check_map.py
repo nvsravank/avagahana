@@ -387,7 +387,9 @@ def read_flowchart(m, lines, first, start_line, what="flowchart"):
         m.report(start_line + first, "large-map", f"large map: {len(ids):,} nodes; drawing may be slow")
     return {"ids": ids, "root": root, "arrows": arrows, "eids": eids, "class_defs": class_defs, "links": links,
             "plans": plans_of([(x, cls, ln) for names, cls, ln in inline_classes + class_lines for x in names]),
-            "line_classes": {(c, ln) for names, c, ln in class_lines if any(x in eids for x in names)}}
+            "line_classes": {(c, ln) for names, c, ln in class_lines if any(x in eids for x in names)},
+            # the classes each node names itself (a class's cloud icon is its main icon)
+            "node_classes": {x: [c for names, c, _ in inline_classes + class_lines for y in names if y == x] for x in ids}}
 
 
 # ---------- one block ----------
@@ -461,6 +463,33 @@ def cross_target(m, path, ln, target):
     m.report(ln, "cross-map-missing", f"relation to {target}: map {file} not found (looked from this map's folder up)")
 
 
+MAIN = "main"   # the reserved word that marks a main icon (WO-38)
+LOOKS = ("outline", "poster")   # a flowchart's looks
+TRUST = {"verified", "inferred", "hypothesis", "unsourced"}
+
+
+def take_main(m, ln, codes, where):
+    """The word main taken out of an icon list (map-viewer/model/main-icon.js):
+    -> (codes without it, the code it marks or None); problems reported."""
+    out, marked = [], None
+    for i, code in enumerate(codes):
+        if code != MAIN:
+            out.append(code)
+            continue
+        nxt = codes[i + 1] if i + 1 < len(codes) else None
+        if not nxt or nxt == MAIN:
+            m.report(ln, "main-icon-alone", f'{where}: "main" with no icon after it')
+        elif VENDOR_CODE.fullmatch(nxt):
+            m.report(ln, "main-icon-cloud", f'{where}: "main" before {nxt}; a cloud icon is main by its place (the first one), never marked')
+        elif nxt in TRUST or nxt.startswith("status-"):
+            m.report(ln, "main-icon-mark", f'{where}: "main" before {nxt}, a mark; a main icon shows what the node is')
+        elif marked:
+            m.report(ln, "main-icon-twice", f"{where}: two icons marked main ({marked}, {nxt}); a node has one")
+        else:
+            marked = nxt
+    return out, marked
+
+
 def check_part(m, part, shared_classes, anchors, legend_out):
     """One diagram: its block and the sections after it, to the next diagram's heading."""
     kind, read = part["kind"], part["read"]
@@ -475,10 +504,19 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
-        if not single and not re.match(r"^(relations\s*(:.*)?|joins\s*:.*|deployment\s*:.*|walks?\s*:.*)$", title, re.I):
-            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations[: name], Deployment: <env>, Walks: <name>, Details, Icons, Node icons, Classes, Plays over), and no Mermaid block follows")
+        if not single and not re.match(r"^(relations\s*(:.*)?|joins\s*:.*|deployment\s*:.*|walks?\s*:.*|look\s*:.*)$", title, re.I):
+            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations[: name], Deployment: <env>, Walks: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over), and no Mermaid block follows")
         if key == "plays over" and kind != "sequence":
             m.report(hl, "plays-over-not-sequence", "## Plays over is for a sequence diagram")
+    # ## Look: the look a flowchart opens in (WO-38)
+    looks = [(re.match(r"^look\s*:\s*(.*)$", t, re.I).group(1).strip().lower(), hl) for t, _, hl in secs if re.match(r"^look\s*:", t, re.I)]
+    if looks:
+        if kind != "flowchart":
+            m.report(looks[0][1], "look-not-flowchart", f"## Look: {looks[0][0]}: a look is for flowcharts")
+        elif len(looks) > 1:
+            m.report(looks[1][1], "look-twice", f"{len(looks)} ## Look: lines; one per diagram")
+        elif looks[0][0] not in LOOKS:
+            m.report(looks[0][1], "look-unknown", f"## Look: {looks[0][0]}: a flowchart's looks are {' and '.join(LOOKS)}")
 
     # icon legend first: other sections may use its names
     legend = {}
@@ -493,8 +531,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             name = ' '.join(mm.group(1).split())
             base = ' '.join(mm.group(2).split()) if mm.group(2) else None
             if base:
-                if name in CODES or " " in name or name.startswith("ph-"):
-                    m.report(ln, "icon-legend-name", f"icon legend: {name} is a named code or starts with ph-; pick a new name")
+                if name in CODES or " " in name or name.startswith("ph-") or name == MAIN:
+                    m.report(ln, "icon-legend-name", f"icon legend: {name} is a named code, the reserved word main, or starts with ph-; pick a new name")
                 if not (base in CODES or phosphor_ok(base) or vendor_ok(base)):
                     m.report(ln, "icon-legend-unknown", f"icon legend: unknown base icon '{base}'")
             elif not (name in CODES or phosphor_ok(name) or vendor_ok(name)):
@@ -504,6 +542,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
 
     # classes: this diagram's own, with the first diagram's shared
     classes = dict(shared_classes)
+    class_clouds = dict(part.get("shared_clouds", {}))
     for title, body, hl in secs:
         if title.lower() != "classes":
             continue
@@ -512,18 +551,25 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             if not mm:
                 m.report(ln, "class-line-syntax", f'class line not understood: "{line.strip()}"')
                 continue
-            for code in (icon_codes(mm.group(2)) if mm.group(2) and mm.group(2) != "-" else []):
+            codes, _ = take_main(m, ln, icon_codes(mm.group(2)) if mm.group(2) and mm.group(2) != "-" else [], f"class {mm.group(1)}")
+            for code in codes:
                 check_icon(m, ln, code, legend)
             if mm.group(1) in CHANGE_CLASSES:
                 m.report(ln, "plan-class-reserved", f"class {mm.group(1)}: a built-in planned-change class; this line is ignored")
                 continue
             classes[mm.group(1)] = True
+            class_clouds[mm.group(1)] = next((c for c in codes if VENDOR_CODE.fullmatch(c)), None)
     part["classes"] = classes
+    part["class_clouds"] = class_clouds
 
     # mind map ::icon codes
     for n in ids.values():
         for code in n.get("icons", []):
-            check_icon(m, n["icon_lines"][0] if n.get("icon_lines") else n["line"], code, legend)
+            ln = n["icon_lines"][0] if n.get("icon_lines") else n["line"]
+            if code == MAIN:
+                m.report(ln, "main-icon-mind-map", f"node {n['id']}: \"main\" in ::icon; a mind map has no main icon")
+                continue
+            check_icon(m, ln, code, legend)
 
     if kind != 'er':
         for title, _, hl in secs:
@@ -646,6 +692,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         check_plan(m, read, noted, view_plans)
 
     # node and arrow icons
+    main_marks, own_icons = {}, {}
     for title, body, hl in secs:
         if title.lower() != "node icons":
             continue
@@ -654,10 +701,29 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             if not mm:
                 m.report(ln, "node-icons-syntax", f'node icon line not understood: "{line.strip()}"')
                 continue
-            if mm.group(1) not in ids and mm.group(1) not in view_eids:
-                m.report(ln, "node-icons-unknown-id", f"node icons for {mm.group(1)}, which is no node or arrow id")
-            for code in icon_codes(mm.group(2)):
+            nid = mm.group(1)
+            if nid not in ids and nid not in view_eids:
+                m.report(ln, "node-icons-unknown-id", f"node icons for {nid}, which is no node or arrow id")
+            codes = icon_codes(mm.group(2))
+            if nid not in ids:
+                if MAIN in codes:
+                    m.report(ln, "main-icon-arrow", f"icons for {nid}: \"main\" is for nodes; an arrow has no main icon")
+                codes = [c for c in codes if c != MAIN]
+            else:
+                codes, marked = take_main(m, ln, codes, f"node icons for {nid}")
+                if marked:
+                    if nid in main_marks and main_marks[nid][0] != marked:
+                        m.report(ln, "main-icon-twice", f"node icons for {nid}: two icons marked main ({main_marks[nid][0]}, {marked}); a node has one")
+                    main_marks.setdefault(nid, (marked, ln))
+                own_icons.setdefault(nid, []).extend(codes)
+            for code in codes:
                 check_icon(m, ln, code, legend)
+    # a node marked main that has a cloud icon, its own or its class's
+    for nid, (marked, ln) in main_marks.items():
+        own = next((c for c in own_icons.get(nid, []) if VENDOR_CODE.fullmatch(c)), None)
+        cls = next((class_clouds[c] for c in read.get("node_classes", {}).get(nid, []) if class_clouds.get(c)), None)
+        if own or cls:
+            m.report(ln, "main-icon-with-cloud", f"node {nid}: {marked} is marked main, but " + (f"the node has a cloud icon ({own})" if own else f"its class brings a cloud icon ({cls})") + ", which is main")
 
     # links into the file's diagrams
     for nid, link, ln in read["links"]:
@@ -1070,11 +1136,14 @@ def check(path):
             m.report(p["line"], "diagram-heading-twice", f'two diagrams are headed "{p["heading"]}"')
         anchors.setdefault(p["anchor"], p)
     shared = {}
+    clouds = {}
     legend = {}
     for i, p in enumerate(parts):
+        p["shared_clouds"] = clouds
         check_part(m, p, shared, anchors, legend)
         if i == 0:
             shared = p.get("classes", {})
+            clouds = p.get("class_clouds", {})
     tm = re.search(r"^# (.+)$", src[:fences[0].start()], re.M)
     if parts:
         parts[0]["anchor_self"] = anchor_of(tm.group(1)) if tm else None

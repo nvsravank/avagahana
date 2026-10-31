@@ -87,7 +87,7 @@ export function ensureIcons(codes, legend) {
   return Promise.all([...[...files].map((src) => {
     if (!pending.has(`v:${src}`)) {
       pending.set(`v:${src}`, read(`vendor/${src}`)
-        .then((t) => { pictures.set(src, /<svg[\s>]/.test(t) ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(t)}` : null); })
+        .then((t) => { const ok = /<svg[\s>]/.test(t); pictures.set(src, ok ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(t)}` : null); if (ok) tints.set(src, solidColour(t)); })
         .catch(() => { pictures.set(src, null); }));
     }
     return pending.get(`v:${src}`);
@@ -110,6 +110,17 @@ export function iconKnown(code, legend) {
 
 // a cloud icon's picture (a data: URL) after ensureIcons, or null
 export const picture = (src) => pictures.get(src) || null;
+// A cloud icon's one colour (WO-38: a Poster box takes it), after ensureIcons, or null.
+// Every AWS icon is one solid colour on white; Azure's gradients and Google's four
+// colours have none, so their boxes keep the theme's colour.
+const tints = new Map();
+export const tintOf = (src) => tints.get(src) || null;
+function solidColour(svg) {
+  if (/Gradient/i.test(svg)) return null;
+  const colours = new Set([...svg.matchAll(/(?:fill|stop-color)\s*[=:]\s*"?\s*(#[0-9a-f]{6}|#[0-9a-f]{3})\b/gi)]
+    .map((m) => m[1].toLowerCase()).filter((c) => c !== '#fff' && c !== '#ffffff'));
+  return colours.size === 1 ? [...colours][0] : null;
+}
 // is this code a cloud icon (drawn above the name, never beside it)?
 export const isVendorCode = (code) => VENDOR_NAME.test(code);
 

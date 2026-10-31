@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-10-31 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-10-31 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37), and the Poster look: a main icon per node, details on hover, a look per diagram type (WO-38). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -95,7 +95,7 @@ mount(element, options) returns load, setState, on, ready, contents, export, sna
 
 ### <a id="reader"></a>Reader interaction
 
-Drill, select, search, filter icons, open notes and node pages, change view/deployment, play sequences, inspect changes, export and print. Multiple viewer instances can coexist; only read-only caches are shared. Evidence: viewer.js, page.js, player.js, export.js.
+Drill, select, search, filter icons, open notes and node pages, change view/deployment, play sequences, inspect changes, export and print. Each diagram type keeps its own look; a flowchart's Poster look draws nodes as their main icon and shows the rest in a pop-up on hover. Multiple viewer instances can coexist; only read-only caches are shared. Evidence: viewer.js, page.js, player.js, export.js.
 
 
 ## Node icons
@@ -235,7 +235,7 @@ Per-instance closure coordinates model, state, DOM, redraw and event subscriptio
 
 ### <a id="m"></a>model/map.js
 
-Shared parseMap orchestrates type parsing, notes, classes, relations, deployments, further diagrams, walks and sequence linkage. Evidence: model/map.js.
+Shared parseMap orchestrates type parsing, notes, classes, relations, deployments, further diagrams, walks and sequence linkage. Each node gets its main icon (model/main-icon.js: the first cloud icon, its class's, else one marked main), and a flowchart its ## Look: line. Evidence: model/map.js; model/main-icon.js.
 
 
 ### <a id="p"></a>paint.js
@@ -285,7 +285,7 @@ The Export menu's Whole map group: Source file saves the map's Markdown text (fo
 
 ### <a id="nt"></a>notes.js and icons.js
 
-Notes become DOM through a Markdown subset, never raw map HTML. safeHref allows http, https, mailto and internal heading anchors. Phosphor symbols are bundled and loaded as needed. Evidence: notes.js; icons.js.
+Notes become DOM through a Markdown subset, never raw map HTML. safeHref allows http, https, mailto and internal heading anchors. Phosphor symbols are bundled and loaded as needed. A cloud icon's one colour (AWS) is read from its file, for a Poster box (tintOf). Evidence: notes.js; icons.js.
 
 
 ### <a id="d"></a>Select diagram behavior

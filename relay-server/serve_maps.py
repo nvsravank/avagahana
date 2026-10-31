@@ -29,7 +29,7 @@ Serves, on 127.0.0.1 only:
   POST /api/show        {path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?, before?}: tell open pages to show it
                         (before: an earlier version's text, kept in memory for that map; null forgets it)
   GET  /api/before?p=   that map's earlier version as text (404: none)
-  POST /api/render      {path, state?, theme?, appearance?, format?, width?|scale?, background?, report?}:
+  POST /api/render      {path, state?, theme?, appearance?, look?, format?, width?|scale?, background?, report?}:
                         one open page draws it and sends the file back (render.py)
   POST /api/render/<id>/claim, POST /api/render/<id>   the page's side of a render
   POST /api/open        {"url"}: open a link in the default browser   (not with --no-open)
@@ -295,6 +295,12 @@ def render_fields(body: dict):
         if appearance not in ("light", "dark"):
             return None, "appearance must be light or dark"
         out["appearance"] = appearance
+    look = body.get("look")
+    if look is not None:
+        # a look the diagram type does not offer draws its own default (WO-38)
+        if not isinstance(look, str) or not re.match(r"^[a-z]{1,20}$", look):
+            return None, "look must be a look's name, such as outline or poster"
+        out["look"] = look
     width, scale = body.get("width"), body.get("scale")
     if width is not None and scale is not None:
         return None, "give width or scale, not both"

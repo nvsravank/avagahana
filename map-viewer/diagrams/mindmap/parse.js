@@ -23,7 +23,7 @@ export function parseMindmap(lines, start, title, warnings) {
 
     const iconM = trimmed.match(/^::icon\((.*)\)\s*$/);
     if (iconM) {
-      if (last) addIconCodes(last, iconM[1]);
+      if (last) addIconCodes(last, iconM[1], warnings);
       continue;
     }
     const clsM = trimmed.match(/^:::\s*(.+)$/);
@@ -60,8 +60,11 @@ export function parseMindmap(lines, start, title, warnings) {
   return { root, byId, shortened };
 }
 
-function addIconCodes(node, spec) {
-  for (const code of parseIconCodes(spec)) {
+// a mind map has no main icon (WO-38): the word main is reported and left out
+function addIconCodes(node, spec, warnings) {
+  const codes = parseIconCodes(spec);
+  if (codes.includes('main')) warnings.push(problem('main-icon-mind-map', `Node ${node.id}: "main" in ::icon(${spec.trim()}); a mind map has no main icon.`));
+  for (const code of codes.filter((c) => c !== 'main')) {
     if (!node.icons.includes(code)) node.icons.push(code);
   }
 }

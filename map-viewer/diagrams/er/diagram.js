@@ -54,3 +54,4 @@ export const detailSizes = [16, 14, 12];
 
 // Reader-facing look names for tables; keep the shared preference values.
 export const looks = [['outline', 'Flat'], ['fade', 'Zebra']];
+export const defaultLook = 'fade';
