@@ -27,8 +27,9 @@ export const BUILT_IN = {
 
 // Planned changes: what a plan (a proposal, before it is made) adds, changes or removes.
 // Built-in classes on nodes and arrows (`class api added`, `class e7 removed`), kept
-// apart from a node's own class (a node is `database` and `added`): they flow down
-// like a class, colour only the "Changes" colour-by, and never take a colour slot.
+// apart from a node's own class (a node is `database` and `added`): each stays on the
+// node or arrow that names it (nothing flows down or up), draws as a mark of its own
+// (paint.js), colours the "Changes" colour-by, and never takes a colour slot.
 export const CHANGE_CLASSES = new Set(['added', 'changed', 'removed']);
 
 // A node's planned change from the class words it names itself: the last one (as in

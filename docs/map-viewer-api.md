@@ -26,6 +26,7 @@ const viewer = mount(element, {
                                        // the reader has seen of each map; null keeps none
   since: null,          // an older map text: mark what changed since it (below); nothing kept
   sinceLabel: 'the earlier version',   // with since: "Since <label>" in the info panel
+  before: null,         // the map's earlier version as text: Before and After (below); never fetched
   marks: true,          // false: no change marks at all
   showProblems: 'map',  // 'map' | 'all' | 'none': which problems show on screen
   sequenceStepSeconds: 3,   // a sequence's step while playing: 2 to 5 s, by halves
@@ -45,7 +46,8 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 
 | Member | What it does |
 |---|---|
-| `viewer.load(text, path, context?)` | Show a map; returns a promise. The same `path` again is a live reload: the viewer keeps the user's place (focus, selection, open branches). |
+| `viewer.load(text, path, context?)` | Show a map; returns a promise. The same `path` again is a live reload: the viewer keeps the user's place (focus, selection, open branches). `context.before`: the map's earlier version (text, or `null` for none); without it a reload of the same map keeps the earlier version and another map has none (added in WO-34). |
+| `viewer.setBefore(text)` | Set the shown map's earlier version (text), or clear it (`null`), and draw again; a promise (added in WO-34). |
 | `viewer.setState(partial)` | Change state from outside, e.g. to point at a node. With `seq: null` the sequence stops first and the other fields still apply (`{seq: null, view: 'Events'}` stops and switches view). With a sequence to play, the sequence chooses its diagram and view, so only `seq` and `step` are read. |
 | `viewer.state` | The current state (a copy). |
 | `viewer.on(type, fn)` | Subscribe to an event; returns an unsubscribe function. |
@@ -188,6 +190,31 @@ this and learns nothing back. (WO-13, WO-31.)
   Thumbnails never mark.
 - Marks are per reader: SVG/PNG export and print leave them out.
 
+## Before and After: an earlier version (added in WO-34)
+
+Given the map's earlier version (`before`, `load`'s `context.before` or `setBefore`), the
+viewer compares the two by id, in each diagram, view and deployment:
+
+- A toggle in the top row, next to the view picker (the first thing in the row when
+  narrow), switches between **Before** (the earlier file) and **After** (the map). The
+  diagram, view, deployment and selection stay; what stayed glides to its new place, what
+  goes fades out, what comes fades in (reduced motion: no glide).
+- Both are marked with the planned-change signs (map format, Planned changes): After
+  shows added and changed, Before removed and changed; a move (a new parent, or a new place
+  in a deployment) reads as changed. The legend says "Since the earlier version". No
+  "since you looked" sparkle while comparing.
+- A changes button beside the info button lists what changed in the diagram and view
+  shown, grouped Removed, Added, Moved, Changed, each line saying what (`Moved: Orders
+  service: EKS on Fargate → Orders hosts, EC2 (Production)`, `Changed: Payments service:
+  note`). Read only. A view or diagram only one file has is named as a whole. The node
+  page says the same for its node.
+- Changed means a different label, icon, class (not a planned-change class), note or
+  parent for a node; label, note, class, line kind, icons or an end for an arrow. A new
+  id is a removal and an addition: keep ids stable across versions.
+- A map with planned-change classes of its own shows those only.
+- `state` carries `perspective` (`'before'` or `'after'`) while comparing, and
+  `setState({perspective})` and `options.state.perspective` switch it.
+
 ## Events
 
 | Event | Payload |
@@ -266,6 +293,7 @@ mounts with `marks: false` and selects nothing).
 | `touching` | `[{a, b, gap, at}]`: two lines closer than `minGap` px at the output's scale. Lines that share an end meet there by design: the first 24 drawing units from that end do not count, and two lines running together into one end (two keys to one column) are one line until they part. |
 | `minGap` | 2 (px). |
 | `smallestText` | `{px, id}`: the smallest text at the output width. |
+| `changes` | Only with an earlier version (WO-34): `{perspective, diagram, view, whole, groups, views, diagramsAdded, diagramsRemoved}`. `groups`: `[{state, lines}]` in the order removed, added, moved, changed, as the changes list says them, for the view drawn; `views`: `[{view, deployment, whole, groups}]` for each view and deployment of that diagram; `whole`: `added` or `removed` for a view or diagram only one file has. |
 | `colours` | Per box `{id, label, fill, stroke, why}`: its fill and its outline as `#rrggbb` (a class or theme may colour either, so read both) and why, from the colour-by: `category 3`, `level 2`, `class database`, `change added`, `centre`. |
 
 ## Problems
@@ -305,7 +333,10 @@ fixed shape that never grows with new diagram types:
   ones for a playing sequence: `idle` (a box not reached yet), `idleLine` (its outline,
   and arrows not reached yet), `call` and `reply` (the messages). A theme that leaves
   them out gets them quietly: `idle` and `idleLine` mixed from `ink` into `bg`, `call`
-  the `accent`, `reply` the orange icon swatch;
+  the `accent`, `reply` the orange icon swatch; and three optional ones for a plan's
+  ringed signs, `planAdded`, `planChanged`, `planRemoved` (CSS `--mmv-plan-added`,
+  `--mmv-plan-changed`, `--mmv-plan-removed`), which default to `good`, `warn` and `bad`
+  (added in WO-34);
 - the surface, chrome, icon swatches and font.
 
 Lines between shapes have no colour of their own: a mind map's lines take the colour of
@@ -333,7 +364,7 @@ loads the font with the `FontFace` API.
       category: [fill | {fill, ink}, …],          // required
       level: [fill | {fill, ink}, …],             // centre first, then each level down
       muted, accent, center, centerInk, tint,
-      roles: { good, warn, bad, info, highlight, link, idle?, idleLine?, call?, reply? },
+      roles: { good, warn, bad, info, highlight, link, idle?, idleLine?, call?, reply?, planAdded?, planChanged?, planRemoved? },
       chrome: { bg, border, hover, active, activeInk, shadow },
       frame: { bg, ink, muted, accent, chip, chipEdge, chipInk, chipActive, chipActiveInk },
       icons: { red, orange, yellow, green, blue, purple, grey },

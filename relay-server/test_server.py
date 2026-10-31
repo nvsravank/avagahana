@@ -125,7 +125,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(info["app"], "avagahana-relay")
         self.assertEqual(info["version"], serve_maps.VERSION)
-        self.assertEqual(info["capabilities"], ["tree", "map", "events", "show", "render", "themes", "open", "shutdown"])
+        self.assertEqual(info["capabilities"], ["tree", "map", "events", "show", "render", "themes", "before", "open", "shutdown"])
 
     def test_source_identity(self):
         identity = self.s.json("GET", "/api/info")[1]["sourceId"]
@@ -214,6 +214,22 @@ class RelayTests(unittest.TestCase):
         conn.request("POST", "/api/show", body=b"not json", headers={"Host": f"127.0.0.1:{self.s.port}", "Content-Type": "application/json"})
         self.assertEqual(conn.getresponse().status, 400)
         conn.close()
+
+    def test_show_before(self):
+        # an earlier version (WO-34): kept in memory for that map, served to pages, forgotten on null
+        self.assertEqual(self.s.json("GET", "/api/before?p=garden.md")[0], 404)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "before": "# Old garden\n"})[0], 200)
+        conn = http.client.HTTPConnection("127.0.0.1", self.s.port, timeout=5)
+        conn.request("GET", "/api/before?p=garden.md", headers={"Host": f"127.0.0.1:{self.s.port}"})
+        res = conn.getresponse()
+        self.assertEqual((res.status, res.read().decode("utf-8")), (200, "# Old garden\n"))
+        conn.close()
+        self.assertEqual(self.s.json("GET", "/api/before?p=tools.md")[0], 404)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "before": None})[0], 200)
+        self.assertEqual(self.s.json("GET", "/api/before?p=garden.md")[0], 404)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "before": 12})[0], 400)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "perspective": "sideways"})[0], 400)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "perspective": "before"})[0], 200)
 
     def test_show_theme(self):
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "theme": "brand"}), (200, {"delivered": 0}))
@@ -393,7 +409,7 @@ class OptionalPartsTests(unittest.TestCase):
         tmp = Path(tempfile.mkdtemp(prefix="avagahana-relay-test-"))
         s = Running(maps_dir=tmp, can_open=False, can_shutdown=False)
         try:
-            self.assertEqual(s.json("GET", "/api/info")[1]["capabilities"], ["tree", "map", "events", "show", "render", "themes"])
+            self.assertEqual(s.json("GET", "/api/info")[1]["capabilities"], ["tree", "map", "events", "show", "render", "themes", "before"])
             self.assertEqual(s.json("POST", "/api/open", {"url": "https://example.com"})[0], 403)
             self.assertEqual(s.json("POST", "/api/shutdown")[0], 403)
             self.assertTrue(s.thread.is_alive())

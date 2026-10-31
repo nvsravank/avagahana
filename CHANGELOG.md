@@ -6,6 +6,29 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Map format: a planned-change class (`added`, `changed`, `removed`) stays on
+  the node or arrow that names it; it no longer flows down to what is inside a box (a
+  removed box's children may move elsewhere). `examples/maps/shop-plan.md` marks each
+  node (WO-34).
+- Planned changes are drawn without colour, in every colouring, print and export: a ringed
+  +, ~ or − at a marked node's top-left corner (where the "since you looked" sparkle goes),
+  on arrows and on List rows; hidden marks show on closed boxes; the legend says
+  "Planned changes". Theme tokens `plan-added`, `plan-changed`, `plan-removed`. The
+  "since you looked" sparkle is off on a diagram with a plan.
+- **Contract** Before and After: viewer option `before` (an earlier version's text),
+  `load` context `before`, `viewer.setBefore(text)`, `perspective` in `state` and
+  `setState`. A toggle beside the view picker switches versions with a glide; a changes
+  button lists what changed in the view shown (Removed, Added, Moved, Changed); the node
+  page says the same. Matching is by id (WO-34).
+- **Contract** Relay: `POST /api/show` takes `before` (kept in memory per map, `null`
+  forgets it) and `perspective`; `GET /api/before?p=`; capability `before`;
+  `POST /api/render` takes `before`; the layout report then has `changes` (per view). `show.py --before FILE|none`, `render.py --before FILE
+  --perspective before|after`. The atlas carries `perspective=before` in its URL.
+- Example pair `examples/maps/checkout-release-before.md` and `checkout-release-after.md`
+  (a release review); skill reference `compare.md`.
+- Checker: `plan-arrow-contradicts` (error), `plan-arrow-to-removed`, `plan-removed-keeps`,
+  `plan-all-removed` (warnings).
+
 - **Contract** Viewer options `title: false` and `viewPicker: false` leave out the map's
   title and the view picker, for a host that names the map and lists its views itself
   (the website gallery); `viewPicker: 'wide'` drops the picker only while the toolbar is narrow

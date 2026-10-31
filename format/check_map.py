@@ -172,7 +172,8 @@ def read_mindmap(m, lines, first, start_line):
             m.report(n["line"], "pin-side", f"node {n['id']}: pinned both :::left and :::right")
         elif ("left" in n["cls"] or "right" in n["cls"]) and n["depth"] != 1:
             m.report(n["line"], "pin-side", f"node {n['id']}: only main branches (children of the centre) can be pinned :::left / :::right")
-    return {"ids": ids, "root": root, "arrows": [], "eids": {}, "class_defs": {}, "links": []}
+    return {"ids": ids, "root": root, "arrows": [], "eids": {}, "class_defs": {}, "links": [],
+            "plans": plans_of([(n["id"], c, n["line"]) for n in ids.values() for c in n["cls"]])}
 
 
 # ---------- flowchart ----------
@@ -385,6 +386,7 @@ def read_flowchart(m, lines, first, start_line, what="flowchart"):
     if len(ids) > LARGE_MAP:
         m.report(start_line + first, "large-map", f"large map: {len(ids):,} nodes; drawing may be slow")
     return {"ids": ids, "root": root, "arrows": arrows, "eids": eids, "class_defs": class_defs, "links": links,
+            "plans": plans_of([(x, cls, ln) for names, cls, ln in inline_classes + class_lines for x in names]),
             "line_classes": {(c, ln) for names, c, ln in class_lines if any(x in eids for x in names)}}
 
 
@@ -533,6 +535,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     views = {}
     view_eids = set(eids)
     view_rels = {}   # name -> the view's arrows [(from, to)], for sequences that play over it
+    view_plans = []  # [(from, to, plan, line)] a view line's own `:::added`
     if kind in BOX_KINDS:
         views["relations"] = ("Relations", part["line"])
         view_rels["relations"] = ("Relations", [(a["from"], a["to"]) for a in read["arrows"]])
@@ -558,6 +561,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             count += 1
             frm, eid, to = mm.group(1), mm.group(2), mm.group(4)
             walk_views.setdefault(name.lower(), (name, []))[1].append({"from": frm, "to": to, "eid": eid})
+            if cm and cm.group(1) in CHANGE_CLASSES:
+                view_plans.append((frm, to, cm.group(1), ln))
             if "#" not in to:
                 rels.append((frm, to))
             if frm not in ids:
@@ -637,6 +642,9 @@ def check_part(m, part, shared_classes, anchors, legend_out):
                 m.report(ln, "note-twice", f"second note for {nid} (first on line {noted[nid]})")
             noted.setdefault(nid, ln)
 
+    if read.get("plans") is not None:
+        check_plan(m, read, noted, view_plans)
+
     # node and arrow icons
     for title, body, hl in secs:
         if title.lower() != "node icons":
@@ -679,6 +687,48 @@ def plan_classes_twice(m, pairs):
         if x in seen and seen[x] != cls:
             m.report(ln, "plan-class-twice", f"{x} is both {seen[x]} and {cls}: {cls}, the later, is used")
         seen[x] = cls
+
+
+def plans_of(pairs):
+    """Each node's or arrow's planned change: the later class wins. -> {id: (plan, line)}"""
+    out = {}
+    for x, cls, ln in sorted(pairs, key=lambda p: p[2]):
+        if cls in CHANGE_CLASSES:
+            out[x] = (cls, ln)
+    return out
+
+
+def check_plan(m, read, noted, view_plans):
+    """A plan's marks agree with each other (WO-34). A mark stays on the node or arrow that
+    names it (nothing flows down), so a box and what is inside it are marked one by one."""
+    plans, ids = read["plans"], read["ids"]
+    if not plans and not view_plans:
+        return
+    plan = lambda x: plans.get(x, (None, None))[0]
+    arrows = [(a["from"], a["to"], plan(a["eid"]) if a["eid"] else None, a["line"]) for a in read["arrows"]]
+    for frm, to, p, ln in arrows + view_plans:
+        ends = (plan(frm), plan(to))
+        if p == "added" and "removed" in ends:
+            m.report(ln, "plan-arrow-contradicts", f"arrow {frm} --> {to} is added but ends on a removed node")
+        elif p == "removed" and ends == ("added", "added"):
+            m.report(ln, "plan-arrow-contradicts", f"arrow {frm} --> {to} is removed but both its ends are added")
+    for frm, to, p, ln in arrows:
+        if not p and "removed" in (plan(frm), plan(to)):
+            m.report(ln, "plan-arrow-to-removed", f"arrow {frm} --> {to} touches a removed node but is not marked: mark it removed (or changed)")
+
+    def inside(n):
+        for k in n["children"]:
+            yield k
+            yield from inside(k)
+    for n in ids.values():
+        under = list(inside(n))
+        if not under:
+            continue
+        ln = plans.get(n["id"], (None, n["line"]))[1]
+        if plan(n["id"]) == "removed" and any(plan(k["id"]) != "removed" for k in n["children"]) and n["id"] not in noted:
+            m.report(ln, "plan-removed-keeps", f"box {n['id']} is removed but not everything in it is: say in a note where the rest goes")
+        if not plan(n["id"]) and all(plan(k["id"]) == "removed" for k in under):
+            m.report(n["line"], "plan-all-removed", f"everything inside box {n['id']} is removed but the box is not marked")
 
 
 # ---------- deployments ----------

@@ -45,7 +45,7 @@ flowchart LR
   class customer person
   class psp external
   class db,ledger database
-  class pay added
+  class pay,charge,fraud,ledger added
   class payh,e1,e2 removed
   class ord,e5 changed
   class e3,e4 added
@@ -56,7 +56,7 @@ flowchart LR
 ### <a id="pay"></a>Payments service
 
 A service of its own for taking payments, so the card data stays out of the orders
-service. It keeps its own ledger.
+service. It keeps its own ledger. Its charge API, fraud check and ledger are new with it.
 
 ### <a id="payh"></a>Payment handler
 

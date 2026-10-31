@@ -318,21 +318,24 @@
     "other": "payh",
     "name": "Payment handler",
     "label": null,
-    "glyph": "→"
+    "glyph": "→",
+    "plan": "removed"
    },
    {
     "dir": "out",
     "other": "charge",
     "name": "Charge API",
     "label": "charge",
-    "glyph": "→"
+    "glyph": "→",
+    "plan": "added"
    },
    {
     "dir": "out",
     "other": "db",
     "name": "Orders database",
     "label": null,
-    "glyph": "→"
+    "glyph": "→",
+    "plan": "changed"
    }
   ],
   "note": true
@@ -397,14 +400,16 @@
     "other": "ord",
     "name": "Order handler",
     "label": null,
-    "glyph": "←"
+    "glyph": "←",
+    "plan": "removed"
    },
    {
     "dir": "out",
     "other": "psp",
     "name": "Card provider",
     "label": null,
-    "glyph": "→"
+    "glyph": "→",
+    "plan": "removed"
    }
   ],
   "note": true
@@ -456,7 +461,8 @@
     "other": "ord",
     "name": "Order handler",
     "label": "charge",
-    "glyph": "←"
+    "glyph": "←",
+    "plan": "added"
    },
    {
     "dir": "out",
@@ -477,7 +483,8 @@
     "other": "psp",
     "name": "Card provider",
     "label": "card token",
-    "glyph": "→"
+    "glyph": "→",
+    "plan": "added"
    }
   ],
   "note": false
@@ -568,7 +575,8 @@
     "other": "ord",
     "name": "Order handler",
     "label": null,
-    "glyph": "←"
+    "glyph": "←",
+    "plan": "changed"
    },
    {
     "dir": "in",
@@ -606,14 +614,16 @@
     "other": "payh",
     "name": "Payment handler",
     "label": null,
-    "glyph": "←"
+    "glyph": "←",
+    "plan": "removed"
    },
    {
     "dir": "in",
     "other": "charge",
     "name": "Charge API",
     "label": "card token",
-    "glyph": "←"
+    "glyph": "←",
+    "plan": "added"
    }
   ],
   "note": false

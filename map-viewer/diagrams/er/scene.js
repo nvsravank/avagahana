@@ -3,7 +3,7 @@
 // routed column connections behind the tables (scene.relsBehind) with the cardinality marks at
 // their ends. A selected table with a grain says what one row is (its caption) and its
 // lines light up. Pure: no DOM, no viewer state.
-import { nodeShaper, nodeName, MIN_LABEL_PX, planClass } from '../../geometry.js';
+import { nodeShaper, nodeName, MIN_LABEL_PX, planClass, passesFilter } from '../../geometry.js';
 import { strokeStyle } from '../../model/classes.js';
 import { HEAD } from './table.js';
 import { cardinalityWords, grainSentence } from './roles.js';
@@ -55,7 +55,7 @@ export function relationShapes(input) {
   for (const [key, { r, pair, points }] of paths) {
     const d = points.map((pt, i) => `${i ? 'L' : 'M'}${r2(pt[0])},${r2(pt[1])}`).join(' ');
     const lit = input.selected === r.from || input.selected === r.to;
-    const dim = input.iconFilter?.size > 0 && !r.icons?.some((c) => input.iconFilter.has(c));
+    const dim = input.iconFilter?.size > 0 && !passesFilter(r, input.iconFilter);
     // Use layout-owned label positions, with the same baseline as flowcharts.
     const a = points[Math.floor((points.length - 1) / 2)], b = points[Math.ceil((points.length - 1) / 2)];
     const mid = labels.get(key) || [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];

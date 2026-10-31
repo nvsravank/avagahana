@@ -184,9 +184,9 @@ function parsePart(text, fileName, shared) {
   // from the boxes' on one map)
   const lineClasses = new Set(views.flatMap((v) => v.relations.map((r) => r.cls)).filter((c) => c && classes[c]));
   const slots = assignSlots(new Set([...own.values(), ...lineClasses].filter(Boolean)), classes);
-  // a planned change flows down the same way, apart from the class
-  (function flow(n, inherited, plan) {
-    n.plan = planOf(n, warnings) || plan;
+  // a planned change stays on the node that names it: nothing flows down or up (WO-34)
+  (function flow(n, inherited) {
+    n.plan = planOf(n, warnings);
     const c = own.get(n) || inherited;
     if (c) {
       n.kind = c;
@@ -202,8 +202,8 @@ function parsePart(text, fileName, shared) {
       const st = strokeOf(defs[name]);
       if (st) n.stroke = { ...n.stroke, ...Object.fromEntries(Object.entries(st).filter(([, v]) => v != null)) };
     }
-    n.children.forEach((k) => flow(k, c, n.plan));
-  })(root, null, null);
+    n.children.forEach((k) => flow(k, c));
+  })(root, null);
   // infrastructure: its own class only (it holds none of the diagram's nodes in the read)
   for (const { n, d } of infra) {
     n.plan = planOf(n, warnings);

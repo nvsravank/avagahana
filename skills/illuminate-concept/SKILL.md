@@ -55,6 +55,7 @@ things connect.
 | How one thing changes over its life | `stateDiagram-v2` | `references/state-and-er.md` |
 | A data model, tables and joins | `erDiagram` | `references/state-and-er.md` |
 | A plan: what will be added, changed, removed | classes `added` `changed` `removed` | `references/changes.md` |
+| Two versions of a map compared (a release review: what is new, removed, moved, changed) | the same map, plus its earlier file | `references/compare.md` |
 
 Read the reference before writing that kind; the full format is
 `../../docs/map-format.md` (read it for anything the references do not cover). Use
@@ -143,6 +144,7 @@ moves every open page to that place while you explain it:
   `--mode mindmap|org|list|boxes|layers|lifelines`.
 - `--seq <anchor> --step N` play a sequence or a walk at step N (see the references);
   `--colour-by changes` open a plan in its Changes colouring.
+- `--before <file>` compare with an earlier version of the map (`references/compare.md`).
 
 It prints `STATUS=shown` (done), `STATUS=none URL=...` (no page is open: give the user
 the link and open it), `STATUS=not_running` (run step 3 first) or `STATUS=failed

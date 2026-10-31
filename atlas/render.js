@@ -37,6 +37,8 @@ export async function answerRender(req, { source, themeSet, wait = UNFOCUSED_WAI
       theme: req.theme || themeSet?.settings?.default || undefined,
       prefs: { ...(req.theme ? { theme: req.theme } : {}), ...(req.appearance ? { appearance: req.appearance } : {}), ...(st.colourBy ? { colourBy: st.colourBy } : {}) },
       state: st,
+      // an earlier version: the picture marks what differs (WO-34)
+      ...(req.before != null ? { before: req.before } : {}),
     });
     await v.ready;
     await v.load(text, req.path);

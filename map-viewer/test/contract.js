@@ -9,6 +9,7 @@ import { testRender } from './render.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
+import { compareFiles, changesIn } from '../model/compare.js';
 import { mapProblems } from '../problems.js';
 import { layoutBoxes } from '../diagrams/flowchart/layout.js';
 import { relationShapes as mindRels } from '../diagrams/mindmap/scene.js';
@@ -966,16 +967,33 @@ try {
   {
     const planText = await fetch('../../examples/maps/shop-plan.md').then((r) => r.text());
     const m = parseMap(planText, 'shop-plan.md');
-    check('planned-change classes flow down and stay apart from the node\'s class', m.hasPlan && m.byId.pay.plan === 'added' && m.byId.ledger.plan === 'added'
+    check('planned-change classes stay apart from the node\'s class', m.hasPlan && m.byId.pay.plan === 'added' && m.byId.ledger.plan === 'added'
       && m.byId.ledger.kind === 'database' && m.byId.payh.plan === 'removed' && m.byId.ord.plan === 'changed' && !m.byId.gw.plan,
       JSON.stringify(['pay', 'ledger', 'payh', 'ord', 'gw'].map((id) => [m.byId[id].plan, m.byId[id].kind])));
     const rel = (eid) => m.relations.find((r) => r.eid === eid);
     check('an arrow\'s planned change, by its id', rel('e3').plan === 'added' && rel('e1').plan === 'removed' && rel('e5').plan === 'changed' && !rel('e3').cls);
+    const own = parseMap('# P\n\n```mermaid\nflowchart LR\n  subgraph box [Box]\n    a["A"]\n    b["B"]\n  end\n  a --> b\n  class box removed\n  class b added\n```\n', 'p.md');
+    check('a planned change stays on its node: nothing flows down (WO-34)', own.byId.box.plan === 'removed' && !own.byId.a.plan && own.byId.b.plan === 'added', JSON.stringify(['box', 'a', 'b'].map((id) => own.byId[id].plan)));
     check('a map with no plan has none', !parseMap(SAMPLE, 'garden.md').hasPlan);
     const pv = mount(document.getElementById('a'), { storageKey: null });
     await pv.load(planText, 'shop-plan.md');
     const q = (sel) => document.querySelector(`#a ${sel}`);
     check('a plan map opens in its usual colouring (opt in)', q('.mmv').dataset.colourBy === 'class', q('.mmv').dataset.colourBy);
+    // the ringed signs (WO-34): on each marked node and arrow, in any colouring, nothing inherited
+    const sign = (id) => q(`[data-mmv=viewport] [data-id="${id}"] > .mmv-plan`)?.classList[1] || null;
+    check('each marked node carries its own ringed sign', sign('pay') === 'is-added' && sign('charge') === 'is-added' && sign('ord') === 'is-changed'
+      && sign('payh') === 'is-removed' && sign('gw') === null, ['pay', 'charge', 'ord', 'payh', 'gw'].map(sign).join(' '));
+    const arrowSigns = [...document.querySelectorAll('#a [data-mmv=viewport] .mmv-plan[data-arrow]')].map((g) => g.classList[1]).sort().join();
+    check('marked arrows carry the sign too', arrowSigns === 'is-added,is-added,is-changed,is-removed,is-removed', arrowSigns);
+    check('no sparkle on a plan diagram', !document.querySelector('#a [data-mmv=viewport] .mmv-change'));
+    check('a node with a mark says it', /planned: added/.test(q('[data-id="charge"]').getAttribute('aria-label') || ''), q('[data-id="charge"]').getAttribute('aria-label'));
+    const chips = [...document.querySelectorAll('#a [data-mmv=iconBar] .mmv-chip')].map((b) => b.textContent.trim());
+    check('the filter lists Added, Changed, Removed first', chips.slice(0, 3).join('|') === 'Added 6|Changed 2|Removed 3', chips.join('|'));
+    pv.setState({ close: ['pay'] });
+    await wait(50);
+    check('a closed box with marks inside says so', !!q('[data-dot="pay"].has-plan') && q('[data-mmv=expandBtn]').classList.contains('has-plan'));
+    pv.setState({ expand: 'all' });
+    await wait(50);
     const seg = [...document.querySelectorAll('#a [data-pref=colourBy] button')].map((b) => b.dataset.v).join();
     check('its Colour by offers Changes', seg === 'class,changes', seg);
     pv.setPrefs({ colourBy: 'changes' });
@@ -987,6 +1005,7 @@ try {
     q('[data-mmv=infoBtn]').click();
     await wait(50);
     check('the key lists the changes', /Added.*Changed.*Removed.*Unchanged/s.test(q('[data-mmv=infoPanel]').textContent));
+    check('the key names the planned-change signs', /Planned changes\s*Added.*Changed.*Removed/s.test(q('[data-mmv=infoPanel]').textContent));
     q('[data-mmv=infoBtn]').click();
     pv.setPrefs({ colourBy: 'level' });
     check('a colour-by the map does not offer is ignored', q('.mmv').dataset.colourBy === 'changes');
@@ -994,6 +1013,57 @@ try {
     check('another map does not start in Changes', q('.mmv').dataset.colourBy === 'category'
       && ![...document.querySelectorAll('#a [data-pref=colourBy] button')].some((b) => b.dataset.v === 'changes'), q('.mmv').dataset.colourBy);
     pv.destroy();
+  }
+
+  // ---- before and after: an earlier version of the map (WO-34 part B) ----
+  {
+    const [was, now] = await Promise.all(['before', 'after'].map((x) => fetch(`../../examples/maps/checkout-release-${x}.md`).then((r) => r.text())));
+    const cmp = compareFiles(parseMap(was, 'b.md'), parseMap(now, 'a.md'));
+    const own = changesIn(cmp, '', 'Relations', false);
+    const lines = (c, st) => c.groups.find((g) => g.state === st)?.lines || [];
+    check('compare: the firewall and its arrows are removed', lines(own, 'removed').join('|') === 'Web firewall|Arrow CDN → Web firewall|Arrow Web firewall → API gateway', lines(own, 'removed').join('|'));
+    check('compare: the new arrow across the boundary is added', lines(own, 'added').includes('Arrow Orders service → Secrets: db password'), lines(own, 'added').join('|'));
+    check('compare: a changed note says so', lines(own, 'changed').includes('Payments service: note'), lines(own, 'changed').join('|'));
+    const prod = changesIn(cmp, '', 'Production', true);
+    check('compare: the move between hosts, in the deployment', lines(prod, 'moved').join('|') === 'Orders service: EKS on Fargate → Orders hosts, EC2 (Production)', lines(prod, 'moved').join('|'));
+    check('compare: groups in the order Removed, Added, Moved, Changed', prod.groups.map((g) => g.state).join() === 'removed,added,moved,changed', prod.groups.map((g) => g.state).join());
+
+    const bv = mount(document.getElementById('a'), { storageKey: null });
+    const q = (sel) => document.querySelector(`#a ${sel}`);
+    await bv.load(now, 'release.md');
+    check('no earlier version: no toggle, no changes button', q('[data-mmv=perspBtn]').hidden && q('[data-mmv=changesBtn]').hidden && !('perspective' in bv.state));
+    await bv.setBefore(was);
+    check('with an earlier version: the toggle says After, the changes button shows', !q('[data-mmv=perspBtn]').hidden && q('[data-mmv=perspBtn]').textContent.trim() === 'After' && !q('[data-mmv=changesBtn]').hidden && bv.state.perspective === 'after');
+    const sign = (id) => q(`[data-mmv=viewport] [data-id="${id}"] > .mmv-plan`)?.classList[1] || null;
+    check('After marks what came and what changed, nothing removed is drawn', !q('[data-id="waf"]') && sign('pay') === 'is-changed', sign('pay'));
+    bv.setState({ node: 'orders' });
+    await bv.setState({ perspective: 'before', env: 'Production' });
+    await wait(50);
+    check('Before draws the earlier file: the firewall, marked removed', bv.state.perspective === 'before' && sign('waf') === 'is-removed' && bv.title === 'Checkout platform, release 1.4', `${sign('waf')} ${bv.title}`);
+    check('switching keeps the view and the selection', bv.state.env === 'Production' && bv.state.node === 'orders', JSON.stringify(bv.state));
+    check('a moved node is marked changed in the deployment', sign('orders') === 'is-changed', sign('orders'));
+    check('no sparkle while comparing', !document.querySelector('#a [data-mmv=viewport] .mmv-change'));
+    q('[data-mmv=changesBtn]').click();
+    await wait(30);
+    const listed = q('[data-mmv=changesPanel]').textContent;
+    check('the changes list: the view\'s changes in four groups', /Removed \(3\).*Added \(3\).*Moved \(1\).*Changed \(2\)/s.test(listed) && /EKS on Fargate → Orders hosts, EC2/.test(listed), listed.slice(0, 200));
+    q('[data-mmv=perspBtn]').click();
+    // the switch is a load, then the glide: what went fades out
+    for (let i = 0; i < 60 && (bv.state.perspective !== 'after' || q('[data-id="waf"]')); i++) await wait(50);
+    check('the toggle switches back to After, the list stays open', bv.state.perspective === 'after' && !q('[data-mmv=changesPanel]').hidden && !q('[data-id="waf"]'),
+      JSON.stringify([bv.state.perspective, q('[data-mmv=changesPanel]').hidden, !!q('[data-id="waf"]'), q('[data-id="waf"]')?.getAttribute('class')]));
+    const rep = (await bv.export({ format: 'svg', report: true })).report;
+    check('the layout report lists the changes, per view', rep.changes?.perspective === 'after' && rep.changes.views.length === 2
+      && rep.changes.views.find((x) => x.view === 'Production').groups.some((g) => g.state === 'moved'), JSON.stringify(rep.changes?.views?.map((x) => x.view)));
+    const plain = (await (async () => { const pv = mount(document.getElementById('b'), { storageKey: null }); await pv.load(now, 'x.md'); const r = (await pv.export({ format: 'svg', report: true })).report; pv.destroy(); return r; })());
+    check('no earlier version: no changes in the report', !('changes' in plain));
+    await bv.setBefore(null);
+    check('setBefore(null) stops comparing', q('[data-mmv=perspBtn]').hidden && !('perspective' in bv.state) && !sign('orders'));
+    await bv.load(now, 'other.md', { before: was });
+    check('load with before: compared at once', !q('[data-mmv=perspBtn]').hidden);
+    await bv.load(now, 'third.md');
+    check('another map without before: not compared', q('[data-mmv=perspBtn]').hidden);
+    bv.destroy();
   }
 
   // ---- changes since you looked (WO-13 part B) ----

@@ -156,6 +156,16 @@ marker.is-kind .mmv-flow-x { stroke: var(--n); stroke-opacity: 1; }
 .mmv .mmv-lnote-ic.has-spark > .mmv-spark { top: -2px; right: -3px; }
 .mmv .mmv-page-cap.has-spark > .mmv-spark { top: -4px; left: 11px; }
 .mmv.mmv-printing .mmv-change { display: none; }
+/* a planned change (WO-34): the ringed sign, in print and export too */
+.mmv .mmv-plan.is-added { --mmv-p: var(--mmv-plan-added); }
+.mmv .mmv-plan.is-changed { --mmv-p: var(--mmv-plan-changed); }
+.mmv .mmv-plan.is-removed { --mmv-p: var(--mmv-plan-removed); }
+.mmv .mmv-plan circle { fill: var(--mmv-p); stroke: var(--mmv-bg); stroke-width: 2; }
+.mmv .mmv-plan path { fill: none; stroke: var(--mmv-bg); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+svg.mmv-plan { flex: none; vertical-align: middle; margin-right: 4px; overflow: visible; }
+/* planned changes hidden in a closed box: a dashed ring round its count */
+.mmv .mmv-dot.has-plan .mmv-plan-ring { fill: none; stroke: var(--mmv-ink); stroke-width: 1.5; stroke-dasharray: 2.5 2; }
+.mmv-lplan-inside { margin-left: 6px; font-size: 12px; color: var(--mmv-muted); }
 /* just arrived: one glow; just removed: it leaves in red */
 .mmv-node.is-glow > :is(.mmv-shape, .mmv-bar), .mmv-frame.is-glow > rect, .mmv-flow.is-glow { animation: mmv-glow 1.2s ease-in-out 0.45s; }
 @keyframes mmv-glow { 40% { stroke: var(--mmv-highlight); stroke-width: 5; stroke-opacity: 1; filter: drop-shadow(0 0 6px var(--mmv-highlight)); } }
@@ -165,6 +175,10 @@ marker.is-kind .mmv-flow-x { stroke: var(--n); stroke-opacity: 1; }
 .mmv .mmv-pill.has-changes { position: relative; }
 .mmv .mmv-pill.has-changes::after { content: ""; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
   background: var(--mmv-chrome-bg, var(--mmv-bg)); border: 2px solid var(--mmv-highlight); }
+/* the expand button while closed boxes hide planned changes: a dashed ring */
+.mmv .mmv-pill.has-plan { position: relative; }
+.mmv .mmv-pill.has-plan::after { content: ""; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--mmv-chrome-bg, var(--mmv-bg)); border: 2px dashed var(--mmv-ink); }
 /* the expand button while closed boxes hide changes: the small sparkle */
 .mmv .mmv-pill.has-marks { position: relative; }
 .mmv .mmv-pill.has-marks::after { content: ""; position: absolute; top: -4px; right: -4px; width: 11px; height: 11px; background: var(--mmv-highlight);
@@ -244,6 +258,15 @@ button.mmv-pill:hover { background: var(--mmv-chrome-hover); }
 
 /* narrow (a phone upright): no Export and no Search, so the layout modes open sideways
    without covering anything; landscape brings them back */
+.mmv .mmv-bl { display: flex; gap: 6px; }
+/* Before and After (WO-34): next to the view name; the first thing in the top row when narrow */
+.mmv.is-narrow [data-mmv="perspBtn"] { order: -1; }
+.mmv .mmv-persp.is-before { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
+.mmv-changes h4 { margin: 8px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--mmv-muted); display: flex; align-items: center; gap: 6px; }
+.mmv-changes h4:first-child { margin-top: 0; }
+.mmv-changes ul { margin: 0; padding: 0 0 0 4px; list-style: none; }
+.mmv-changes li { font-size: 13px; padding: 2px 0; }
+.mmv-changes .mmv-changes-none { font-size: 13px; color: var(--mmv-muted); }
 .mmv.is-narrow :is(.mmv-tl [data-mmv="exportWrap"], .mmv-tr .mmv-search),
 .mmv.is-narrow.mmv-views-wide [data-mmv="viewWrap"] { display: none; }
 /* measuring the top row (viewer.js fitTop) at its widest: every layout mode, search open,

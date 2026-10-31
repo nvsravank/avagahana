@@ -222,6 +222,26 @@
    "side": "both",
    "what": "A ## Classes line or classDef named added, changed or removed: those are built-in planned-change classes; the line is ignored"
   },
+  "plan-arrow-contradicts": {
+   "level": "error",
+   "side": "checker",
+   "what": "A planned change that contradicts itself: an arrow marked added ending on a removed node, or an arrow marked removed between two added nodes"
+  },
+  "plan-arrow-to-removed": {
+   "level": "warning",
+   "side": "checker",
+   "what": "An unmarked arrow touching a node marked removed: mark the arrow removed (or changed)"
+  },
+  "plan-removed-keeps": {
+   "level": "warning",
+   "side": "checker",
+   "what": "A box marked removed whose children are not all removed, and no note on it saying where they go"
+  },
+  "plan-all-removed": {
+   "level": "warning",
+   "side": "checker",
+   "what": "Everything inside a box marked removed, the box itself not marked"
+  },
   "relation-syntax": {
    "level": "error",
    "side": "both",

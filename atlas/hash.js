@@ -1,7 +1,8 @@
 // hash.js — the atlas URL: #/<folder>/<file>.md?mode=..&part=..&focus=..&node=..&page=..&view=..&env=..&seq=..&step=..&rels=1
 // (part: which of the file's diagrams, by its heading's anchor; none for the first;
 // page: the node whose page is open; seq: the sequence playing over the view, by its
-// anchor, 'main' for the first diagram; step: its step, from 1)
+// anchor, 'main' for the first diagram; step: its step, from 1; perspective=before: the
+// map's earlier version, when the agent sent one)
 //
 // Pure functions, no DOM, so test/ can check them on their own. The format is the one
 // the Simple Mind Maps viewer used, so old links still open; the relay server's
@@ -33,6 +34,7 @@ export function parseHash(hash) {
   const step = Number(p.get('step'));
   if (Number.isInteger(step) && step > 0) state.step = step;
   if (p.get('rels') === '1' || p.get('rels') === '0') state.rels = p.get('rels') === '1';
+  if (p.get('perspective') === 'before' || p.get('perspective') === 'after') state.perspective = p.get('perspective');
   const prefs = {};
   // old links: theme=light|dark was the appearance; scheme=colorful|blues the colours
   const theme = p.get('theme');
@@ -58,6 +60,7 @@ export function buildHash(path, state = {}, prefs = null) {
   for (const k of ['part', 'focus', 'node', 'page', 'view', 'env', 'seq']) if (state[k]) p.set(k, state[k]);
   if (state.seq && state.step) p.set('step', String(state.step));
   if (state.rels) p.set('rels', '1');
+  if (state.perspective === 'before') p.set('perspective', 'before');
   if (prefs?.colourBy) p.set('colourBy', prefs.colourBy);
   if (prefs?.theme) p.set('theme', prefs.theme);
   return `#/${encodeURIComponent(path).replace(/%2F/g, '/')}?${p}`;

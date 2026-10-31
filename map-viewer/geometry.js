@@ -20,6 +20,9 @@ export const MIN_LABEL_PX = 8;
 // plan: a planned change (model/classes.js), mmv-pa / mmv-pc / mmv-pr, else mmv-p0
 export const toneClass = (k, rel, level = rel, slot = null, plan = null) => `mmv-k${k > 120 ? ((k - 1) % 120) + 1 : k} mmv-l${Math.min(level, 15)} mmv-d${Math.min(rel, 2)}${slot == null ? '' : ` mmv-c${slot}`} ${planClass(plan)}`;
 export const planClass = (plan) => `mmv-p${plan ? plan[0] : 0}`;
+// The icon filter (viewer.js): a node or arrow passes when it carries a picked icon or
+// has a picked planned change (`plan:added`, ...; WO-34). filter: Set
+export const passesFilter = (x, filter) => !filter?.size || !!x.icons?.some((c) => filter.has(c)) || (!!x.plan && filter.has(`plan:${x.plan}`));
 
 export const typeFor = (rel) => (rel === 0 ? { size: 20, weight: 700 } : rel === 1 ? { size: 16, weight: 600 } : { size: 14, weight: 400 });
 
@@ -240,7 +243,7 @@ export function nodeName(n, rel, closed) {
 export function nodeShaper(input) {
   const relDepth = input.relDepth;
   const filterOn = input.iconFilter.size > 0;
-  const passes = (n) => !filterOn || n.icons.some((c) => input.iconFilter.has(c));
+  const passes = (n) => passesFilter(n, input.iconFilter);
   const hitSet = new Set(input.hits);
   const tone = (n) => toneClass(input.categoryOf(n), relDepth(n), input.levelOf ? input.levelOf(n) : relDepth(n), n.kindSlot, n.plan);
   const isBar = (n) => !input.fixedGeometry && relDepth(n) > 1 && input.geom(n).type.size * input.zoom < MIN_LABEL_PX;
@@ -261,6 +264,7 @@ export function nodeShaper(input) {
       grow: growOf(n),
       name: nodeName(n, rel, closed),
       marks: { hit: hitSet.has(n.id), sel: input.selected === n.id },
+      ...(n.plan ? { plan: n.plan } : {}),
     };
     // a path problem (diagrams/state/checks.js): a warning mark at the bottom-left corner
     if (n.pathWarning) s.warn = { x: 1, y: p.h - 1, text: n.pathWarning };

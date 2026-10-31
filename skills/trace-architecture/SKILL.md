@@ -64,6 +64,11 @@ files; you write the one map from them, so names, layers and roles stay consiste
 
 ## 5. Finish
 
+For a release or security review (what changed since a tag), keep every id of the map
+from the earlier version, update it from the code, and compare the two with the
+illuminate-concept skill's `references/compare.md` (Before and After, and the changes as
+data from `render.py --before --report`).
+
 Run the checker until it prints `OK`, show the map, and look at each diagram (a
 screenshot if you have a browser). Redraw any that is dense, has arrows running back
 up the layers, or shows nothing another diagram does not.

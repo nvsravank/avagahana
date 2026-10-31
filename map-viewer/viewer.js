@@ -4,7 +4,7 @@
 // The viewer never touches location, document.title or a server: map text comes
 // in through load(), and links, cross-map navigation and shutdown go out through
 // the host callbacks. A missing callback hides its feature.
-import { chromeHtml, collect, uiSvg, opensSvg, UI, SHORTCUT, IS_MAC } from './chrome.js';
+import { chromeHtml, collect, uiSvg, opensSvg, UI, SHORTCUT, IS_MAC, planSignSvg, PLAN_WORD } from './chrome.js';
 import { parseMap } from './model/map.js';
 import { placeIn } from './model/deployments.js';
 import { categoryOf as branchCategory } from './model/tree.js';
@@ -18,6 +18,7 @@ import { createPlayer } from './player.js';
 import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml } from './icons.js';
 import { createSeen } from './seen.js';
 import { summarize } from './model/changes.js';
+import { compareFiles, markFile, changesIn, changesOf } from './model/compare.js';
 import { renderNoteBody } from './notes.js';
 import { problemList, mapProblems } from './problems.js';
 import { checkTheme, acquire, release, loadFont } from './themes/theme.js';
@@ -118,6 +119,9 @@ export function mount(element, options = {}) {
   const seen = options.thumbnail || options.marks === false ? null : createSeen({ storageKey, base: sinceBase, problem: hostProblem });
   // the words after "New", "Changed", "Removed": since you looked, or since the version
   const sinceWords = sinceText == null ? 'since you looked' : `since ${options.sinceLabel || 'the earlier version'}`;
+  // the map's earlier version (WO-34): text, never fetched. With it the reader switches
+  // between Before (that file) and After (the map), each marked with what differs.
+  let beforeText = options.before == null || options.thumbnail ? null : String(options.before);
 
   // ---------- state ----------
   const S = {
@@ -129,7 +133,7 @@ export function mount(element, options = {}) {
     // first, as {anchor, focus, node} (node: the node that opened the next level)
     file: null, part: null, trail: [],
     thumb: !!options.thumbnail,   // drawn small inside another viewer's node page
-    hits: [], hitIdx: -1, iconFilter: new Set(),
+    hits: [], hitIdx: -1, iconFilter: new Set(), perspective: 'after', compare: null,
     view: { k: 1, x: 0, y: 0 }, layout: null, lodKey: null, exporting: false,
     expand: 'default', expandStates: [], userMoved: false, lastFit: null,
     play: null,   // a sequence playing: {seq, step, playing} (player.js)
@@ -207,7 +211,7 @@ export function mount(element, options = {}) {
     const out = [];
     const cls = n.kind && S.map?.classes?.[n.kind];
     if (n.kind) out.push(cls?.label || n.kind);
-    if (n.plan) out.push(`planned: ${n.plan}`);
+    if (n.plan) out.push(S.map?.compared ? `${n.plan} since the earlier version` : `planned: ${n.plan}`);
     const role = diagram().categoryKey && S.map ? diagram().categoryKey(S.map).find((x) => x.k === categoryOf(n)) : null;
     if (role && n.parent === S.map.root) out.push(role.label);
     return out;
@@ -361,26 +365,41 @@ export function mount(element, options = {}) {
   const shownView = () => viewNamed(S.relView) || S.map?.views[0] || null;
   // A drawn node's mark ('new', 'changed'), only its own: a change inside a closed box
   // marks the expand button, one in a diagram it opens that diagram's icon.
-  v.changeOf = (id) => (seen && S.map?.byId[id] ? seen.nodeMark(partKey(), id, envName()) : null);
+  // A diagram with planned changes shows those instead: no sparkle anywhere on it (WO-34).
+  const planShown = () => !!S.map?.hasPlan;
+  v.changeOf = (id) => (seen && !planShown() && S.map?.byId[id] ? seen.nodeMark(partKey(), id, envName()) : null);
   // a diagram with anything new or changed in it (or new as a whole): its icon's small sparkle
-  v.partChanged = (anchor) => !!seen?.partMarked(anchor || '');
+  v.partChanged = (anchor) => !planShown() && !!seen?.partMarked(anchor || '');
+  // Planned changes a closed box (or collapsed branch, closed List row) hides: a node
+  // under it with a mark, or a marked arrow of the view shown with an end under it
+  // (drawn on the closed box, or inside it once open) (WO-34).
+  v.planInside = (id) => {
+    const n = S.map?.byId[id];
+    if (!n?.children.length || !planShown()) return false;
+    const under = (x) => x.children.some((k) => k.plan || under(k));
+    return under(n) || (shownView()?.relations || []).some((r) => r.plan && ((r.from !== id && holds(n, r.from)) || (r.to !== id && holds(n, r.to))));
+  };
   // a closed box in the picture hides a mark: the expand button's small sparkle
   function markExpandBtn() {
-    let hidden = false;
-    if (seen && S.map?.root) {
+    let hidden = false, planned = false;
+    if (S.map?.root) {
       (function walk(n) {
-        if (hidden) return;
-        if (S.collapsed.has(n.id) && n.children.length) { hidden = seen.inside(partKey(), n, envName()); return; }
+        if (S.collapsed.has(n.id) && n.children.length) {
+          if (seen && !planShown()) hidden ||= seen.inside(partKey(), n, envName());
+          planned ||= v.planInside(n.id);
+          return;
+        }
         n.children.forEach(walk);
       })(viewRoot());
     }
     $.expandBtn.classList.toggle('has-marks', hidden);
+    $.expandBtn.classList.toggle('has-plan', planned);
     const title = EXPAND_TITLE[EXPAND_ICON[S.expandNext]];
-    if (title) $.expandBtn.title = hidden ? `${title} (closed boxes hide changes ${sinceWords})` : title;
+    if (title) $.expandBtn.title = hidden ? `${title} (closed boxes hide changes ${sinceWords})` : planned ? `${title} (closed boxes hide planned changes)` : title;
   }
   // the view's relations behind a drawn arrow (its shape lists copies)
   const relsOf = (shape) => (shownView()?.relations || []).filter((r) => shape.items.some((i) => i.from === r.from && i.to === r.to && i.label === r.label));
-  v.arrowChange = (shape) => (seen && shownView() ? seen.arrowMark(partKey(), shownView(), relsOf(shape)) : null);
+  v.arrowChange = (shape) => (seen && !planShown() && shownView() ? seen.arrowMark(partKey(), shownView(), relsOf(shape)) : null);
   // just brought by a load: it glows once
   v.isFresh = (id) => S.fresh?.has(`${partKey()}|n|${id}`) || (envName() && S.fresh?.has(`${partKey()}|e|${envName()}|${id}`));
   v.arrowFresh = (shape) => !!shownView() && seen?.relationKeys(partKey(), shownView(), relsOf(shape)).some((k) => S.fresh?.has(k));
@@ -1067,8 +1086,30 @@ export function mount(element, options = {}) {
     const counts = {};
     if (S.map?.root) (function walk(n) { n.icons.forEach((c) => { counts[c] = (counts[c] || 0) + 1; }); n.children.forEach(walk); })(S.map.root);
     for (const r of arrowsWithIcons()) r.icons.forEach((c) => { counts[c] = (counts[c] || 0) + 1; });
-    $.filterWrap.hidden = !Object.keys(counts).length;   // no icons in this map: no filter
+    // planned changes first (WO-34): each node and arrow id once
+    const plans = { added: 0, changed: 0, removed: 0 };
+    if (S.map?.root) (function walk(n) { if (n.plan) plans[n.plan]++; n.children.forEach(walk); })(S.map.root);
+    const planArrows = new Map();
+    for (const x of S.map?.views || []) for (const r of x.relations) if (r.plan) planArrows.set(r.eid || r, r.plan);
+    for (const p of planArrows.values()) plans[p]++;
+    $.filterWrap.hidden = !Object.keys(counts).length && !Object.values(plans).some(Boolean);   // no icons or plan: no filter
     updateFilterBtn();
+    for (const [p, count] of Object.entries(plans)) {
+      if (!count) continue;
+      const code = `plan:${p}`;
+      const b = document.createElement('button');
+      b.className = 'mmv-chip' + (S.iconFilter.has(code) ? ' is-on' : '');
+      b.title = `Show only: ${PLAN_WORD[p]} (planned)`;
+      b.innerHTML = planSignSvg(p, 16);
+      b.appendChild(document.createTextNode(`${PLAN_WORD[p]} ${count}`));
+      b.addEventListener('click', () => {
+        if (S.iconFilter.has(code)) S.iconFilter.delete(code); else S.iconFilter.add(code);
+        b.classList.toggle('is-on');
+        updateFilterBtn();
+        render(false);
+      });
+      bar.appendChild(b);
+    }
     for (const [code, count] of Object.entries(counts).sort((a, b) => b[1] - a[1])) {
       const def = iconDef(code, v.legend());
       const b = document.createElement('button');
@@ -1246,7 +1287,7 @@ export function mount(element, options = {}) {
   function hideError() { $.errorbar.hidden = true; }
 
   // ---------- panels ----------
-  const PANELS = ['warnPanel', 'infoPanel'];
+  const PANELS = ['warnPanel', 'infoPanel', 'changesPanel'];
   function closePanels() {
     // the info panel read: the removals it listed at the top of a diagram are seen
     if (!$.infoPanel.hidden && seen) { $.infoPanel.hidden = true; seenAck(seen.removedTop().map((r) => r.key)); }
@@ -1262,10 +1303,68 @@ export function mount(element, options = {}) {
   });
   $.warnBtn.addEventListener('click', () => togglePanel('warnPanel'));
   $.infoBtn.addEventListener('click', () => { togglePanel('infoPanel'); renderInfo(); });
+  $.changesBtn.addEventListener('click', () => { togglePanel('changesPanel'); renderChanges(); });
+  $.perspBtn.addEventListener('click', () => switchPerspective(S.perspective === 'before' ? 'after' : 'before'));
+
+  // ---------- Before and After (WO-34) ----------
+  // The other version: loaded in place of this one (a live reload, so what stayed glides,
+  // what goes fades and what comes appears), keeping the diagram, view and selection.
+  async function switchPerspective(p) {
+    if (!S.compare || !['before', 'after'].includes(p) || p === S.perspective) return;
+    S.perspective = p;
+    await load(S.text, S.path, { sourceId });
+  }
+  function markPerspective() {
+    $.perspBtn.hidden = !S.compare;
+    $.changesBtn.hidden = !S.compare;
+    if (!S.compare) { $.changesPanel.hidden = true; return; }
+    const before = S.perspective === 'before';
+    $.perspName.textContent = before ? 'Before' : 'After';
+    $.perspBtn.classList.toggle('is-before', before);
+    $.perspBtn.title = before ? 'Showing the earlier version: show the later one' : 'Showing the later version: show the earlier one';
+    $.perspBtn.setAttribute('aria-label', `${before ? 'Before' : 'After'}: switch to ${before ? 'after' : 'before'}`);
+    renderChanges();
+  }
+  // What changed in the diagram and view shown, grouped; read only (WO-34: no clicking).
+  function renderChanges() {
+    const panel = $.changesPanel;
+    if (panel.hidden || !S.compare) return;
+    panel.replaceChildren();
+    const view = shownView();
+    const c = changesIn(S.compare, partKey(), view?.name || null, !!view?.deploy);
+    const where = [S.part ? S.map.title : null, view && S.map.views.length > 1 ? labelOf(view) : null].filter(Boolean).join(', ');
+    panel.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-legend-since', textContent: `What changed${where ? ` in ${where}` : ''}` }));
+    if (c.whole) { panel.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-changes-none', textContent: c.whole === 'added' ? 'All of it is new.' : 'All of it is gone in the later version.' })); return; }
+    if (!c.groups.length) { panel.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-changes-none', textContent: 'Nothing changed here.' })); return; }
+    const sign = { removed: 'removed', added: 'added', moved: 'changed', changed: 'changed' };
+    for (const g of c.groups) {
+      const h = document.createElement('h4');
+      h.innerHTML = planSignSvg(sign[g.state], 14);
+      h.append(`${g.state[0].toUpperCase()}${g.state.slice(1)} (${g.lines.length})`);
+      const ul = document.createElement('ul');
+      for (const line of g.lines) ul.appendChild(Object.assign(document.createElement('li'), { textContent: line }));
+      panel.append(h, ul);
+    }
+  }
+  // For the layout report (export.js): what changed, in the view drawn and in each view
+  // and deployment of its diagram. -> {perspective, diagram, view, whole, groups, views} or null
+  v.changesReport = () => {
+    if (!S.compare || !S.map) return null;
+    const one = (x) => changesIn(S.compare, partKey(), x?.name || null, !!x?.deploy);
+    const view = shownView();
+    const here = one(view);
+    return {
+      perspective: S.perspective, diagram: S.map.title, view: view ? labelOf(view) : null, whole: here.whole, groups: here.groups,
+      views: S.map.views.map((x) => ({ view: labelOf(x), deployment: !!x.deploy, ...one(x) })),
+      diagramsAdded: S.compare.added.map((x) => x.title), diagramsRemoved: S.compare.removed.map((x) => x.title),
+    };
+  };
+  // the node page's line on what changed about its node (page.js)
+  v.versionChanges = (id) => (S.compare ? changesOf(S.compare, partKey(), id, envName()) : []);
   // like the other menus, the panels close on a click anywhere else (in the host page too)
   function outsidePanels(e) {
     const t = e.target;
-    if (PANELS.some((p) => !$[p].hidden) && ![$.infoPanel, $.warnPanel, $.infoBtn, $.warnBtn].some((el) => el.contains(t))) closePanels();
+    if (PANELS.some((p) => !$[p].hidden) && ![$.infoPanel, $.warnPanel, $.changesPanel, $.infoBtn, $.warnBtn, $.changesBtn, $.perspBtn].some((el) => el.contains(t))) closePanels();
   }
   document.addEventListener('pointerdown', outsidePanels, true);
   // the mode buttons come from the diagram type
@@ -1491,6 +1590,11 @@ export function mount(element, options = {}) {
         }
       }
     }
+    // planned changes (WO-34): what the ringed signs mean, in any colouring
+    if (planShown()) {
+      section('plan', S.map.compared ? `Since the earlier version (${S.perspective === 'before' ? 'Before' : 'After'})` : 'Planned changes');
+      for (const p of ['added', 'changed', 'removed']) row(planSignSvg(p, 18), PLAN_WORD[p], p);
+    }
     // colour by Changes: what the plan adds, changes and removes
     if (S.colourBy === 'changes') {
       section('colours', 'Changes');
@@ -1575,6 +1679,8 @@ export function mount(element, options = {}) {
     if (S.thumb) return;
     const tl = root.querySelector('.mmv-tl'), tr = root.querySelector('.mmv-tr');
     const shown = $.viewName.textContent;
+    const persp = $.perspName.textContent;
+    $.perspName.textContent = 'Before';   // the wider label
     const names = [...(S.map?.views || []).map(labelOf), ...(S.file?.unlinked || []).map((a) => S.file.parts.get(a)?.title)].filter(Boolean);
     if (names.length) $.viewName.textContent = names.reduce((a, b) => (b.length > a.length ? b : a));
     // no transitions while measuring, and none on the way back (search would animate shut)
@@ -1583,6 +1689,7 @@ export function mount(element, options = {}) {
     const over = tl.getBoundingClientRect().right + 8 > tr.getBoundingClientRect().left;
     root.classList.remove('is-measuring');
     $.viewName.textContent = shown;
+    $.perspName.textContent = persp;
     root.classList.toggle('is-narrow', over || (root.clientWidth > 0 && root.clientWidth < NARROW_W));
     void tl.offsetWidth;   // the real widths are set while transitions are still off
     root.classList.remove('is-still');
@@ -1604,9 +1711,10 @@ export function mount(element, options = {}) {
   function currentState() {
     // a deployment is reported as env, a relation view as view
     const env = viewNamed(S.relView)?.deploy ? S.relView : null;
-    return { mode: S.mode, part: S.part, focus: S.focus, node: S.selected, page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state() };
+    return { mode: S.mode, part: S.part, focus: S.focus, node: S.selected, page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state(), ...(S.compare ? { perspective: S.perspective } : {}) };
   }
   function emitState() {
+    renderChanges();   // the view shown may be another
     const s = currentState();
     const key = JSON.stringify(s);
     if (key === lastState) return;
@@ -1626,10 +1734,25 @@ export function mount(element, options = {}) {
     await ready;
     if (destroyed || generation !== loadGeneration || context.signal?.aborted) return;
     const keep = path != null && path === S.path && sourceId === (context.sourceId ?? null) && !!S.map?.root;
+    // the earlier version goes with its map: given with the load, else kept only for the same map
+    if ('before' in context) beforeText = context.before == null || options.thumbnail ? null : String(context.before);
+    else if (!keep && !firstLoad) beforeText = null;
     // a thumbnail is handed the file its page's viewer already read
     // (each diagram copied, as a viewer sets the relations of the view it shows on it;
     // the nodes are shared and only read)
-    const file = options.thumbnail && options.file ? thumbFile(options.file) : parseMap(String(text ?? ''), String(path || 'map.md').split('/').pop());
+    let file = options.thumbnail && options.file ? thumbFile(options.file) : parseMap(String(text ?? ''), String(path || 'map.md').split('/').pop());
+    // an earlier version: the version shown, marked with what differs (model/compare.js).
+    // A file with planned changes of its own shows those only.
+    let compare = null;
+    if (firstLoad && options.state?.perspective === 'before') S.perspective = 'before';
+    if (beforeText != null && file.root && ![file, ...file.parts.values()].some((m) => m.hasPlan)) {
+      const earlier = parseMap(beforeText, String(path || 'map.md').split('/').pop());
+      if (earlier.root) {
+        compare = compareFiles(earlier, file);
+        if (S.perspective === 'before') file = earlier;
+        markFile(file, compare, S.perspective);
+      }
+    }
     if (!file.root) {
       problems.set('map', mapProblems(file));
       showError(file.warnings[0] || 'The map could not be read.');
@@ -1678,9 +1801,11 @@ export function mount(element, options = {}) {
     S.path = path;
     S.text = String(text ?? '');
     S.file = file;
+    S.compare = compare;
+    if (!compare) S.perspective = 'after';
     // what changed since this reader last looked: the marks, and what this load brought
     // (it glows) or took away (it leaves in red)
-    const got = seen ? seen.load(sourceId == null ? (path || 'map.md') : JSON.stringify([sourceId, path || 'map.md']), file) : null;
+    const got = seen && S.perspective === 'after' ? seen.load(sourceId == null ? (path || 'map.md') : JSON.stringify([sourceId, path || 'map.md']), file) : null;
     S.fresh = got?.fresh || new Set();
     S.gone = got?.gone || new Set();
     clearTimeout(freshTimer);
@@ -1712,6 +1837,7 @@ export function mount(element, options = {}) {
       render(keep ? false : 'levels');
     }
     markInfoBtn();
+    markPerspective();
     emit('load', { path, title: file.title, warnings: file.warnings.slice() });
     fitTopSoon();   // the host may have changed its button in the slot
     emitContents();
@@ -1772,6 +1898,11 @@ export function mount(element, options = {}) {
 
   function setState(partial = {}) {
     if (!S.map?.root) return;
+    // the other version first (a load), then the rest on it
+    if ('perspective' in partial && S.compare && partial.perspective !== S.perspective) {
+      const { perspective, ...rest } = partial;
+      return switchPerspective(perspective).then(() => { if (Object.keys(rest).length) setState(rest); });
+    }
     // a stop (seq null) comes first and the rest of the call still applies; a sequence to
     // play chooses its own diagram and view, so the call ends there
     const stop = 'seq' in partial && (partial.seq === null || partial.seq === '');
@@ -1918,6 +2049,12 @@ export function mount(element, options = {}) {
     setTheme(id) { return themes.has(id) ? selectTheme(id, true).then(savePrefs) : Promise.resolve(false); },
     // looks from outside (a link, the agent's show): {appearance, colourBy, look}, not
     // kept; a colour-by the map does not offer is ignored
+    // the map's earlier version (WO-34): text, or null to stop comparing; draws again
+    async setBefore(text) {
+      beforeText = text == null || options.thumbnail ? null : String(text);
+      if (beforeText == null) S.perspective = 'after';
+      if (S.path != null || S.text) await load(S.text, S.path, { sourceId });
+    },
     setPrefs(p = {}) {
       if (APPEARANCES.includes(p.appearance)) S.appearance = p.appearance;
       if (LOOKS.includes(p.look)) S.look = p.look;

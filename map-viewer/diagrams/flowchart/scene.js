@@ -8,7 +8,7 @@
 // stay apart. Every arrow looks the same whether lifted or not. The layout routes them
 // (layout.routes): straight runs with rounded corners; labels where the layout put them
 // (layout.labels), else on the longest run.
-import { nodeShaper, nodeName, typeFor, planClass } from '../../geometry.js';
+import { nodeShaper, nodeName, typeFor, planClass, passesFilter } from '../../geometry.js';
 import { strokeStyle } from '../../model/classes.js';
 
 const TITLE_X = 12;
@@ -47,6 +47,7 @@ export function buildScene(input) {
         icons,
         ...(logos.length ? { logos } : {}),
         marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
+        ...(n.plan ? { plan: n.plan } : {}),
         note: n.note ? { x: p.w - 30, y: 6, size: 16 } : null,
         // a frame round a drilled-in box's neighbour: faded, no dot (drill out to open)
         dot: n !== root && !L.context?.has(n) ? { x: p.w - 1, y: 1, closed: false, count: null } : null,
@@ -102,7 +103,7 @@ export function relationShapes(input) {
     // icons: those all of them carry (as with the colour); the icon filter finds an
     // arrow when any of its relations carries a picked icon
     const icons = items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), first.icons || []);
-    const dim = input.iconFilter?.size > 0 && !items.some((r) => r.icons?.some((c) => input.iconFilter.has(c)));
+    const dim = input.iconFilter?.size > 0 && !items.some((r) => passesFilter(r, input.iconFilter));
     out.push({
       kind: 'rel', id: key, d,
       cls: `mmv-flow${kind.line === 'dotted' ? ' is-dotted' : kind.line === 'thick' ? ' is-thick' : ''}${slot != null ? ` is-kind mmv-lc${slot}` : ''} ${planClass(plan)}${dim ? ' is-dim' : ''}`,

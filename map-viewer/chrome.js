@@ -42,6 +42,9 @@ export const UI = {
   boxes: '<rect x="2.5" y="3.5" width="19" height="17" rx="2"/><rect x="5.5" y="8" width="5" height="4" rx="1"/><rect x="13.5" y="8" width="5" height="4" rx="1"/><rect x="9.5" y="15" width="5" height="3" rx="1"/><path d="M10.5 10h3"/>',
   views: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
   openOut: '<path d="M7 17 17 7M9 7h8v8"/>',
+  // Before and After (WO-34): two versions swapping places; the changes list: rows with + and ~
+  perspective: '<path d="M4 8h13M14 5l3 3-3 3"/><path d="M20 16H7M10 13l-3 3 3 3"/>',
+  changes: '<path d="M11 6h10M11 12h10M11 18h10"/><path d="M3 6h5M5.5 3.5v5M3 12.5c.8-1.2 1.7-1.2 2.5 0s1.7 1.2 2.5 0M3 18h5"/>',
 };
 const lightIcons = new Set(['mindmap', 'flowchart', 'state', 'tables', 'lifelines', 'note']);
 export const uiSvg = (name, size = 16) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="${lightIcons.has(name) ? 1.5 : 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${UI[name] || ''}</svg>`;
@@ -57,6 +60,12 @@ export const returnSvg = (size = 11) => `<svg class="mmv-ret" viewBox="0 0 256 2
 // filled, drawn as a path.
 export const SPARKLE_PATH = 'M194.82,151.43l-55.09,20.3-20.3,55.09a7.92,7.92,0,0,1-14.86,0l-20.3-55.09-55.09-20.3a7.92,7.92,0,0,1,0-14.86l55.09-20.3,20.3-55.09a7.92,7.92,0,0,1,14.86,0l20.3,55.09,55.09,20.3A7.92,7.92,0,0,1,194.82,151.43ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z';
 export const sparkleSvg = (size = 9, cls = 'mmv-spark') => `<svg class="${cls}" viewBox="16 8 240 232" width="${size}" height="${size}" fill="currentColor" role="img" aria-label="changed"><path d="${SPARKLE_PATH}"/></svg>`;
+// A planned change's sign (WO-34): a ring holding +, ~ or −, drawn as paths (never a
+// glyph) for a ring of radius 9, read as the word ("added"), never as a symbol. On a node
+// it sits where the "since you looked" sparkle would, which is off where plans show.
+export const PLAN_GLYPH = { added: 'M-4.5,0H4.5M0,-4.5V4.5', changed: 'M-5,1.6C-3.4,-2.4 -1.6,-2.4 0,0S3.4,2.4 5,-1.6', removed: 'M-4.5,0H4.5' };
+export const PLAN_WORD = { added: 'Added', changed: 'Changed', removed: 'Removed' };
+export const planSignSvg = (plan, size = 16) => `<svg class="mmv-plan is-${plan}" viewBox="-11 -11 22 22" width="${size}" height="${size}" role="img" aria-label="${PLAN_WORD[plan].toLowerCase()}"><circle r="9"/><path d="${PLAN_GLYPH[plan]}"/></svg>`;
 // A message's number into an element: the number, and the return mark after it for a return.
 export function putNumber(el, num, back) {
   el.textContent = String(num);
@@ -123,6 +132,7 @@ export function chromeHtml(uid) {
       <button class="mmv-menu-item" data-mmv="printBtn"><span class="mmv-mi-label">${ic('print')}Print</span><span data-mmv="printKey"></span></button>
     </div>
   </div>
+  <button class="mmv-pill mmv-persp" data-mmv="perspBtn" hidden>${ic('perspective')}<span data-mmv="perspName"></span></button>
   <div class="mmv-hov" data-mmv="viewWrap" hidden>
     <button class="mmv-pill" data-mmv="viewBtn" title="Relation view">${ic('views')}<span data-mmv="viewName"></span></button>
     <div class="mmv-panel mmv-drop mmv-left-drop" data-mmv="viewMenu"></div>
@@ -177,8 +187,10 @@ export function chromeHtml(uid) {
 
 <div class="mmv-float mmv-bl">
   <button class="mmv-pill mmv-icon" data-mmv="infoBtn" title="What the icons mean">${ic('info')}</button>
+  <button class="mmv-pill mmv-icon" data-mmv="changesBtn" title="What changed in this view" hidden>${ic('changes')}</button>
 </div>
 <div class="mmv-panel mmv-bl-panel" data-mmv="infoPanel" hidden></div>
+<div class="mmv-panel mmv-bl-panel mmv-changes" data-mmv="changesPanel" role="region" aria-label="What changed" hidden></div>
 
 <div class="mmv-note" data-mmv="note" hidden>
   <div class="mmv-note-head">

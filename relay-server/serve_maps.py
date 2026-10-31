@@ -26,7 +26,9 @@ Serves, on 127.0.0.1 only:
   GET  /api/events      Server-Sent Events: tree (maps changed), show (look here), render
   GET  /api/themes      {themes, settings, problems}: the maps folder's .themes/ (WO-32)
   GET  /api/theme-file?f=<file>  a font file from .themes/
-  POST /api/show        {path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?}: tell open pages to show it
+  POST /api/show        {path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?, before?}: tell open pages to show it
+                        (before: an earlier version's text, kept in memory for that map; null forgets it)
+  GET  /api/before?p=   that map's earlier version as text (404: none)
   POST /api/render      {path, state?, theme?, appearance?, format?, width?|scale?, background?, report?}:
                         one open page draws it and sends the file back (render.py)
   POST /api/render/<id>/claim, POST /api/render/<id>   the page's side of a render
@@ -82,7 +84,8 @@ MODE = re.compile(r"^[a-z][a-z-]{0,23}$")
 # colour-by values a show may ask for (the viewer ignores one the map does not offer)
 COLOUR_BY = ("category", "level", "class", "changes")
 # what a show may ask for (a render's state may ask for more: expand, close, highlight, crop)
-SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "step", "view", "env")
+BEFORE_MAX = 2 * 1024 * 1024   # an earlier version's text, in POST /api/show
+SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "step", "view", "env", "perspective")
 NODE_ID = re.compile(r"^[A-Za-z][\w-]{0,99}$")
 PART_ID = re.compile(r"^[\w-]{1,100}$")   # a diagram heading's anchor
 THEME_ID = re.compile(r"^[A-Za-z0-9][\w-]{0,63}$")
@@ -228,6 +231,12 @@ def picture_fields(body: dict, out: dict):
         if not isinstance(value, str) or not value or len(value) > 100 or any(c in value for c in "\r\n\x00"):
             return f"{key} must be a short name"
         out[key] = value
+    perspective = body.get("perspective")
+    if perspective is not None:
+        # with an earlier version: which of the two to show (WO-34)
+        if perspective not in ("before", "after"):
+            return "perspective must be before or after"
+        out["perspective"] = perspective
     expand = body.get("expand")
     if expand is not None:
         if expand != "all" and (not isinstance(expand, int) or isinstance(expand, bool) or expand < 0):
@@ -285,6 +294,12 @@ def render_fields(body: dict):
         return None, "background must be theme or none"
     out["background"] = background
     out["report"] = bool(body.get("report"))
+    before = body.get("before")
+    if before is not None:
+        # an earlier version of the map: the picture marks what differs (WO-34)
+        if not isinstance(before, str) or len(before.encode("utf-8")) > BEFORE_MAX:
+            return None, f"before must be the earlier map's text, at most {BEFORE_MAX // 1024} KB"
+        out["before"] = before
     return out, None
 
 
@@ -460,6 +475,9 @@ class Relay:
         self.stopping = threading.Event()
         self.tree_state = scan(self.maps_dir)["state"] if self.maps_dir.is_dir() else ""
         self.open_url = webbrowser.open_new_tab   # replaced in tests
+        # each map's earlier version (show --before), in memory only: a restart forgets it
+        self.befores = {}
+        self.befores_lock = threading.Lock()
 
     def config(self):
         return {"atlas_dir": str(self.atlas_dir), "viewer_dir": str(self.viewer_dir),
@@ -470,7 +488,7 @@ class Relay:
         return hashlib.sha256(str(self.maps_dir).encode("utf-8")).hexdigest()
 
     def capabilities(self) -> list:
-        caps = ["tree", "map", "events", "show", "render", "themes"]
+        caps = ["tree", "map", "events", "show", "render", "themes", "before"]
         if self.can_open:
             caps.append("open")
         if self.can_shutdown:
@@ -559,6 +577,13 @@ def make_handler(relay: Relay):
                 return self.send_payload(200, full.read_bytes(), "text/plain; charset=utf-8")
             if path == "/api/events":
                 return self._events()
+            if path == "/api/before":
+                rel = (parse_qs(query).get("p") or [""])[0]
+                with relay.befores_lock:
+                    text = relay.befores.get(rel)
+                if text is None:
+                    return self.not_found()
+                return self.send_payload(200, text.encode("utf-8"), "text/plain; charset=utf-8")
             if path == "/api/themes":
                 return self.send_json(200, read_themes(relay.maps_dir))
             if path == "/api/theme-file":
@@ -627,7 +652,7 @@ def make_handler(relay: Relay):
 
         def _show(self):
             """Point open pages at a map and node: the agent's one-way "look here"."""
-            body = self.read_json()
+            body = self.read_json(limit=BEFORE_MAX + 8192)
             if body is None:
                 return self.send_json(400, {"error": "a JSON object is expected"})
             rel = str(body.get("path") or "")
@@ -644,12 +669,23 @@ def make_handler(relay: Relay):
                 if not isinstance(theme, str) or not THEME_ID.match(theme):
                     return self.send_json(400, {"error": "theme must be a theme id"})
                 out["theme"] = theme
+            if "before" in body:
+                # the map's earlier version: kept for that map until another or a restart
+                before = body["before"]
+                if before is not None and (not isinstance(before, str) or len(before.encode("utf-8")) > BEFORE_MAX):
+                    return self.send_json(400, {"error": f"before must be the earlier map's text, at most {BEFORE_MAX // 1024} KB"})
+                with relay.befores_lock:
+                    if before is None:
+                        relay.befores.pop(rel, None)
+                    else:
+                        relay.befores[rel] = before
+                out["before"] = before is not None
             return self.send_json(200, {"delivered": relay.hub.broadcast("show", out)})
 
         def _render(self):
             """The agent asks for a picture: one open page draws it in a hidden viewer and
             sends the file back. Waits up to RENDER_WAIT_S."""
-            body = self.read_json()
+            body = self.read_json(limit=BEFORE_MAX + 8192)
             if body is None:
                 return self.send_json(400, {"error": "a JSON object is expected"})
             out, problem = render_fields(body)

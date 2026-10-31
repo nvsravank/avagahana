@@ -1,8 +1,8 @@
 // list.js — any diagram as an indented outline (list mode): the list scene (rows,
 // pure data) and its painting. Rows carry the mmv-k / mmv-l classes like drawn
 // nodes, so the theme colours them.
-import { uiSvg, sparkleSvg } from './chrome.js';
-import { toneClass } from './geometry.js';
+import { uiSvg, sparkleSvg, planSignSvg, PLAN_WORD } from './chrome.js';
+import { toneClass, passesFilter } from './geometry.js';
 import { diagramOf } from './diagrams/index.js';
 
 // List mode: the outline's rows, in order.
@@ -25,7 +25,7 @@ export function buildListScene(input) {
     rows.push({
       kind: 'row', id: n.id, depth: rel - skip,
       cls: `mmv-lrow ${toneClass(input.categoryOf(n), rel, input.levelOf ? input.levelOf(n) : rel, n.kindSlot, n.plan)}` + (input.selected === n.id ? ' is-selected' : '') + (hitSet.has(n.id) ? ' is-hit' : '')
-        + (filterOn && !n.icons.some((c) => input.iconFilter.has(c)) ? ' is-dim' : ''),
+        + (filterOn && !passesFilter(n, input.iconFilter) ? ' is-dim' : ''),
       toggle: n.children.length && n !== input.root ? { closed } : null,
       closed,
       icons: n.icons.slice(),
@@ -36,7 +36,7 @@ export function buildListScene(input) {
         const out = r.from === n.id;
         return {
           dir: out ? 'out' : 'in', other: out ? r.to : r.from, name: name(out ? r.to : r.from), label: r.label || null, glyph: glyphOf(r, out), ...(r.note ? { note: true } : {}),
-          ...(r.icons?.length ? { icons: r.icons.slice() } : {}), ...(filterOn && !r.icons?.some((c) => input.iconFilter.has(c)) ? { dim: true } : {}),
+          ...(r.icons?.length ? { icons: r.icons.slice() } : {}), ...(r.plan ? { plan: r.plan } : {}), ...(filterOn && !passesFilter(r, input.iconFilter) ? { dim: true } : {}),
         };
       }),
       note: !!n.note,
@@ -130,12 +130,16 @@ export function renderList(v, on) {
     });
     // changed since you looked (seen.js): the drawing's badge before the label
     const change = v.changeOf?.(s.id);
+    // a planned change (WO-34): the drawing's ringed sign before the label
+    if (n?.plan) label.insertAdjacentHTML('beforeend', planSignSvg(n.plan));
     if (change) label.appendChild(Object.assign(document.createElement('span'), { className: `mmv-lchange is-${change}`, title: `${change === 'new' ? 'New' : 'Changed'} ${v.sinceWords}`,
       innerHTML: v.iconHtml('ph sparkle', legend, 'mmv-inline-ic', 'currentColor') }));
     label.appendChild(text);
     // coloured by class: the class in words too, so the colour is not the only cue
     if (v.S.colourBy === 'class' && n?.kind) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lclass', textContent: v.S.map.classes?.[n.kind]?.label || n.kind }));
     if (s.count != null) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lcount', textContent: `${s.count} more` }));
+    const planInside = s.count != null && v.planInside?.(s.id);
+    if (planInside) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lplan-inside', textContent: 'planned changes inside' }));
     row.appendChild(label);
     if (s.note) {
       const ni = Object.assign(document.createElement('span'), { className: 'mmv-lnote-ic', title: 'Note' });
@@ -164,6 +168,7 @@ export function renderList(v, on) {
       change ? `${change === 'new' ? 'new' : 'changed'} ${v.sinceWords}` : null,
       s.note ? 'has a note' : null,
       kids ? `${kids} ${kids === 1 ? 'child' : 'children'}` : null,
+      planInside ? 'planned changes inside' : null,
       s.rels.length ? `${s.rels.length} ${s.rels.length === 1 ? 'arrow' : 'arrows'}` : null,
       (s.inners || []).length ? `diagrams: ${s.inners.map((x) => x.title).join(', ')}` : null,
     ].filter(Boolean).join(', ');
@@ -179,6 +184,7 @@ export function renderList(v, on) {
       const b = document.createElement('div');
       b.className = `mmv-lrel${r.dim ? ' is-dim' : ''}`;
       b.style.paddingLeft = `${6 + (s.depth + 1) * 22 + 20}px`;
+      if (r.plan) b.insertAdjacentHTML('beforeend', planSignSvg(r.plan, 14));
       b.append(Object.assign(document.createElement('span'), { className: 'mmv-lrel-arrow', textContent: r.glyph, ariaHidden: 'true' }), ` ${r.name}`);
       if (r.label) b.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lrel-label', textContent: ` · ${r.label}` }));
       for (const code of r.icons || []) {
@@ -189,7 +195,7 @@ export function renderList(v, on) {
       const way = DIRECTION[r.dir];   // "to" or "from" the other end
       b.title = `${way[0].toUpperCase()}${way.slice(1)} ${r.name}: go there`;
       const key = `r:${s.id}:${i}`;
-      b.setAttribute('aria-label', [`${way} ${r.name}${r.label ? `: ${r.label}` : ''}`, ...(r.icons || []).map(words), r.note ? 'has a note' : null].filter(Boolean).join(', '));
+      b.setAttribute('aria-label', [`${way} ${r.name}${r.label ? `: ${r.label}` : ''}`, r.plan ? (v.S.map?.compared ? `${r.plan} since the earlier version` : `planned: ${PLAN_WORD[r.plan].toLowerCase()}`) : null, ...(r.icons || []).map(words), r.note ? 'has a note' : null].filter(Boolean).join(', '));
       b.addEventListener('click', (e) => { e.stopPropagation(); k.key = `n:${r.other}`; on.jump(r.other); });
       if (r.note) b.setAttribute('aria-expanded', String(k.notes.has(`${key}:note`)));
       add(b, { key, level: level + 1, kind: 'rel', id: s.id, other: r.other, note: r.note ? `${key}:note` : null });

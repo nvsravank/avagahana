@@ -7,7 +7,7 @@
 // colour-by or look restyles without a repaint. Only geometry (layout, zoom level of
 // detail, collapse) repaints; selection and search repaint only the marks, related
 // links only their own layer and dots.
-import { UI, RETURN_PATH, RETURN_W, SPARKLE_PATH } from './chrome.js';
+import { UI, RETURN_PATH, RETURN_W, SPARKLE_PATH, PLAN_GLYPH, PLAN_WORD } from './chrome.js';
 import { picture } from './icons.js';
 import { diagramOf } from './diagrams/index.js';
 import { measure } from './measure.js';
@@ -206,12 +206,12 @@ export function createPainter(v) {
 
   function paintNode(s, parent) {
     const marked = s.marks.hit || s.marks.sel;
-    const g = svgEl('g', { class: s.cls, 'data-id': s.id, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})` }, parent);
+    const g = svgEl('g', { class: s.cls, 'data-id': s.id, 'data-plan': s.plan || null, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})` }, parent);
     nameOf(g, s);
     svgEl('rect', { class: 'mmv-hit', width: s.w, height: s.h }, g);   // hit target even for text-only nodes
     if (s.grow > 1) g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${s.grow}) translate(${-s.w / 2},${-s.h / 2})`);
     g.setAttribute('role', 'img');
-    g.setAttribute('aria-label', s.name);
+    g.setAttribute('aria-label', planName(s));
     if (s.bar) {
       g.dataset.bar = '1';
       svgEl('rect', { class: `mmv-bar${marked ? ' is-marked' : ''}`, y: s.h / 2 - 4, width: s.w, height: 8, rx: 4 }, g);
@@ -277,6 +277,11 @@ export function createPainter(v) {
     if (s.dot) {
       const dg = svgEl('g', { class: `mmv-dot${s.dot.closed ? ' is-closed' : ''}`, 'data-dot': s.id, transform: `translate(${s.dot.x},${s.dot.y})` }, g);
       svgEl('circle', { r: s.dot.closed ? 9 : 5 }, dg);
+      if (s.dot.closed && v.planInside?.(s.id)) {
+        dg.classList.add('has-plan');
+        svgEl('circle', { class: 'mmv-plan-ring', r: 12.5 }, dg);
+        svgEl('title', {}, dg).textContent = 'Planned changes inside: open to see them';
+      }
       if (s.dot.closed) {
         const c = s.dot.count;
         svgEl('text', { 'text-anchor': 'middle', y: 3.5, 'font-size': 10, 'font-weight': 700 }, dg).textContent = c > 99 ? '99+' : String(c);
@@ -288,8 +293,10 @@ export function createPainter(v) {
   // says what is what: a <title> with its label (and data-id, the map's id).
   const labelOfId = (id) => { const n = S.map.byId[id]; return n ? n.plain || n.label : id; };
   function nameOf(g, s) {
-    svgEl('title', {}, g).textContent = labelOfId(s.id);
+    svgEl('title', {}, g).textContent = `${labelOfId(s.id)}${s.plan ? ` (${planWords(s.plan)})` : ''}`;
   }
+  const planWords = (plan) => (S.map?.compared ? `${plan} since the earlier version` : `planned: ${plan}`);
+  const planName = (s) => (s.plan ? `${s.name}, ${planWords(s.plan)}` : s.name);
   function arrowTitle(s) {
     if (s.items?.length) return s.items.map((r) => `${labelOfId(r.from)} → ${labelOfId(r.to)}${r.label ? `: ${r.label}` : ''}`).join('; ');
     return s.label?.text || s.hint || s.id;
@@ -316,7 +323,7 @@ export function createPainter(v) {
 
   // an open box: a framed area with a title strip; its contents are drawn over it
   function paintFrame(s, parent) {
-    const g = svgEl('g', { class: s.cls, 'data-id': s.id, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})`, role: 'img', 'aria-label': s.name }, parent);
+    const g = svgEl('g', { class: s.cls, 'data-id': s.id, 'data-plan': s.plan || null, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})`, role: 'img', 'aria-label': planName(s) }, parent);
     nameOf(g, s);
     svgEl('rect', { class: 'mmv-shape', width: s.w, height: s.h, rx: 8, style: s.stroke }, g);
     if (s.marks.hit || s.marks.sel) drawMarks(g, null, s.marks, s.w, s.h, 'frame');
@@ -456,30 +463,45 @@ export function createPainter(v) {
   // (a node too small to read, a bar: at the bar's start)
   function markNode(g, open) {
     const kind = v.changeOf?.(g.dataset.id, open);
-    if (!kind) return;
+    const plan = g.dataset.plan;
+    if (!kind && !plan) return;
     const bar = g.dataset.bar && g.querySelector('.mmv-bar');
-    drawChange(g, kind, 0, bar ? Number(bar.getAttribute('y')) + 4 : 0);
+    const y = bar ? Number(bar.getAttribute('y')) + 4 : 0;
+    if (plan) drawPlan(g, plan, 0, y);
+    if (kind) drawChange(g, kind, 0, y);
+  }
+  // A planned change's ringed sign (WO-34), where the sparkle would be. Zoomed far out it
+  // stays readable: up to three times its size, so about 6 px across on screen or more.
+  function drawPlan(parent, plan, x, y) {
+    const k = Math.min(3, Math.max(1, 0.6 / (v.detailZoom?.() || 1)));
+    const g = svgEl('g', { class: `mmv-plan is-${plan}`, transform: `translate(${x},${y})${k > 1 ? ` scale(${k.toFixed(2)})` : ''}` }, parent);
+    svgEl('circle', { r: 9 }, g);
+    svgEl('path', { d: PLAN_GLYPH[plan] }, g);
+    svgEl('title', {}, g).textContent = `${PLAN_WORD[plan]} ${S.map?.compared ? 'since the earlier version' : '(planned change)'}`;
+    return g;
   }
   // an arrow's mark: before its label, else at its middle
   function markArrows() {
-    if (!v.arrowChange) return;
     for (const [id, s] of arrows) {
-      const kind = v.arrowChange(s);
-      if (!kind) continue;
+      const kind = v.arrowChange?.(s) || null;
+      if (!kind && !s.plan) continue;
       let at;
-      if (s.label?.text) at = [s.label.x - measure(s.label.text, 12, 400, false, v.font()) / 2 - 12, s.label.y - 4];
+      // before the label (with its icons and note mark, as paintRelLayer lays them out)
+      const extra = (s.label?.icons?.length || 0) * 16 + (s.label?.note ? 14 : 0) + (s.label?.icons || s.label?.note ? 4 : 0);
+      if (s.label?.text) at = [s.label.x - (measure(s.label.text, 12, 400, false, v.font()) + extra) / 2 - 12, s.label.y - 4];
       else {
         const hit = $.rels.querySelector(`.mmv-flow-hit[data-arrow="${CSS.escape(id)}"]`);
         if (!hit) continue;
         const p = hit.getPointAtLength(hit.getTotalLength() / 2);
         at = [p.x, p.y];
       }
-      drawChange($.rels, kind, at[0], at[1]).dataset.arrow = id;
+      if (s.plan) drawPlan($.rels, s.plan, at[0], at[1]).dataset.arrow = id;
+      if (kind) drawChange($.rels, kind, at[0], at[1]).dataset.arrow = id;
     }
   }
   // the marks again, nothing else (a page may be open over the drawing)
   function paintChanges() {
-    v.root.querySelectorAll('[data-mmv=viewport] .mmv-change').forEach((e) => e.remove());
+    v.root.querySelectorAll('[data-mmv=viewport] :is(.mmv-change, .mmv-plan)').forEach((e) => e.remove());
     for (const g of $.frames.children) markNode(g, true);
     for (const g of $.nodes.children) markNode(g, false);
     markArrows();

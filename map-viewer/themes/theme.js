@@ -20,7 +20,8 @@
 //                 category: [colour | {fill, ink}, ...],   // told apart; repeats after the last
 //                 level?: [colour | {fill, ink}, ...],     // centre first, then each level down
 //                 muted?, accent?, center?, centerInk?, tint?,
-//                 roles?: {good, warn, bad, info, highlight, link, idle?, idleLine?, call?, reply?},
+//                 roles?: {good, warn, bad, info, highlight, link, idle?, idleLine?, call?, reply?,
+//                          planAdded?, planChanged?, planRemoved?},
 //                 chrome?: {bg, border, hover, active, activeInk, shadow},
 //                 frame?: {bg, ink, muted, accent, chip, chipEdge, chipInk, chipActive, chipActiveInk},
 //                   a host's bar round the viewer (the atlas's contents bar); optional,
@@ -169,6 +170,9 @@ function fillAppearance(name, src, warn) {
   // fill, idleLine outline and arrow), and its calls and replies
   const quiet = { idle: mix(ink, 8, bg), idleLine: mix(ink, 30, bg), call: app.accent, reply: app.icons.orange };
   for (const k of OPTIONAL_ROLES) app.roles[k] = isColour(ro[k]) ? ro[k] : quiet[k];
+  // a plan's marks (paint.js: the line inside a box, the ringed sign; WO-34), as CSS
+  // tokens plan-added / plan-changed / plan-removed: the good, warn and bad roles unless set
+  app.plan = { added: isColour(ro.planAdded) ? ro.planAdded : app.roles.good, changed: isColour(ro.planChanged) ? ro.planChanged : app.roles.warn, removed: isColour(ro.planRemoved) ? ro.planRemoved : app.roles.bad };
   if (src.lines) warn('theme-lines-gone', `Appearance "${name}": "lines" is no longer used; lines take their node's colour, and related links use roles.link.`);
   app.category = palette('category', src.category, app, name, warn);
   app.level = palette('level', src.level, app, name, warn);
@@ -217,6 +221,7 @@ function themeCss(t) {
       'frame-chip': app.frame.chip, 'frame-chip-edge': app.frame.chipEdge, 'frame-chip-ink': app.frame.chipInk,
       'frame-chip-active': app.frame.chipActive, 'frame-chip-active-ink': app.frame.chipActiveInk,
       ...app.roles,
+      'plan-added': app.plan.added, 'plan-changed': app.plan.changed, 'plan-removed': app.plan.removed,
       ...Object.fromEntries(SWATCHES.map((k) => [`icon-${k}`, app.icons[k]])),
     };
     app.category.forEach((c, i) => { v[`cat-${i + 1}`] = c.fill; v[`cat-${i + 1}-ink`] = c.ink; });

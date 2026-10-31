@@ -32,12 +32,18 @@ The same flags as `show.py`, plus the picture's own:
 - `--seq <anchor> --step N` a sequence (or walk) at a step; `--seq <anchor> --steps all
   --out <folder>` one file per step (`step-01.svg`, ...), each with its step lit: a
   storyboard. `--steps 3-5` for some.
+- `--before <file>` an earlier version of the map: the picture carries the ringed +, ~
+  and − marks of what differs; `--perspective before` draws the earlier file instead
+  (removed things marked), `after` (the default) the map (added things marked). With
+  `--report` the report's `changes` lists what changed, in the view drawn and in each view
+  and deployment: the findings of a review, as data. See `compare.md`.
 - `--theme <id>` (see `themes.md`), `--appearance light|dark`.
 - `--width <px>` or `--scale <x>`; `--background none` for a transparent background;
   `.png` (or `--format png` with `--steps`) for PNG. A PNG past the browser's limits
   (16,000 px a side) is scaled down.
 
-Change marks and the reader's selection are never drawn.
+The reader's "since you looked" marks and selection are never drawn; planned changes
+and an earlier version's marks are.
 
 ## Check it: `--report`
 

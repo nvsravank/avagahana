@@ -50,6 +50,12 @@ export function serverSource(base, info = { capabilities: [] }, fetchFn = fetch)
       if (!res.ok) throw new Error(res.status === 404 ? `No map "${path}".` : `api/map: HTTP ${res.status}`);
       return res.text();
     },
+    // the map's earlier version the agent sent (show --before), or null
+    async readBefore(path) {
+      if (!caps.has('before')) return null;
+      const res = await fetchFn(url(`api/before?p=${encodeURIComponent(path)}`), { cache: 'no-store' });
+      return res.ok ? res.text() : null;
+    },
     // Server-Sent Events while the stream holds; polling /api/tree while it does not.
     watch(fn) {
       let last = null;

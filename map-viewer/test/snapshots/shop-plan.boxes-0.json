@@ -137,6 +137,7 @@
     "hit": false,
     "sel": false
    },
+   "plan": "added",
    "note": {
     "x": 290,
     "y": 6,
@@ -326,6 +327,7 @@
     "hit": false,
     "sel": false
    },
+   "plan": "changed",
    "shape": "square",
    "icons": [],
    "text": {
@@ -391,6 +393,7 @@
     "hit": true,
     "sel": false
    },
+   "plan": "removed",
    "shape": "square",
    "icons": [],
    "text": {
@@ -426,6 +429,7 @@
     "hit": false,
     "sel": true
    },
+   "plan": "added",
    "shape": "square",
    "icons": [],
    "text": {
@@ -456,6 +460,7 @@
     "hit": false,
     "sel": false
    },
+   "plan": "added",
    "shape": "square",
    "icons": [],
    "text": {
@@ -486,6 +491,7 @@
     "hit": false,
     "sel": false
    },
+   "plan": "added",
    "shape": "cylinder",
    "outline": "M0,6 A80.5,6 0 0 1 161,6 V44 A80.5,6 0 0 1 0,44 Z M0,6 A80.5,6 0 0 0 161,6",
    "icons": [

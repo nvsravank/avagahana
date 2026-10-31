@@ -375,18 +375,32 @@ class ord changed
 
 (In a mind map: `n9("Compost"):::added`; on a relation view line: `- a --> b :::added`.)
 
-- They flow down like a class: a box marked `added` makes everything inside it added,
-  until a node names another.
+- Each stays on the node or arrow that names it: nothing flows down or up. A new box
+  and the new things in it are marked one by one (`class pay,charge,ledger added`); a
+  box marked `removed` does not remove what is inside it (its children may move to
+  another box: say where in the box's note). A move is told in a note; there is no
+  moved state.
 - They stay apart from a node's own class: `class ledger database` and
   `class ledger added` both hold (its icon and colour key stay the database's).
 - What is removed stays in the text, so it can be drawn.
-- They colour only the **Changes** colour-by (the viewer's Colour by menu offers it when
+- The viewer always draws them, in any colouring, in print and in exported pictures: a
+  ringed +, ~ or − at a node's top-left corner, and on an arrow before its label or at its
+  middle (List mode puts it before the row's label). A closed box, a collapsed branch or a closed List row that
+  hides marks says so. The info panel's legend names the marks ("Planned changes") and the
+  icon filter lists Added, Changed and Removed first.
+- They also colour the **Changes** colour-by (the viewer's Colour by menu offers it when
   the diagram has planned changes): added in the theme's good colour, changed in warn,
   removed in bad, the rest muted. A plan map opens in its usual colouring; a link with
   `colourBy=changes` (or `show.py --colour-by changes`) opens it in Changes.
 - Problems: two different change classes on one node or arrow (`plan-class-twice`, the
   later is used); a `## Classes` line or `classDef` named `added`, `changed` or
   `removed` (`plan-class-reserved`, ignored). Both are warnings.
+- The checker keeps a plan's marks consistent: an arrow marked added ending on a removed
+  node, or marked removed between two added nodes (`plan-arrow-contradicts`, an error);
+  an unmarked arrow touching a removed node (`plan-arrow-to-removed`); a box marked
+  removed whose children are not all removed and that has no note (`plan-removed-keeps`);
+  everything inside a box removed and the box not marked (`plan-all-removed`). The last
+  three are warnings.
 - Sequence diagrams have no classes, so no planned changes.
 
 What changed since a reader last looked is not written in the map: the viewer works it

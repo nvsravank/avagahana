@@ -15,11 +15,16 @@ class ord changed
 
 - On arrows by their id (`api e1@--> psp`, then `class e1 removed`); in a mind map
   `n9("Compost"):::added`; on a view line `- a --> b :::added`.
-- A class flows down: a whole new subsystem is one line on its box.
+- Mark each node: a class stays on the node that names it, so a whole new subsystem
+  lists its box and every new thing in it (`class pay,charge,ledger added`). A box marked
+  `removed` does not remove its children; if they move, say where in the box's note.
+- Mark the arrows too: an arrow to a removed node is removed (or changed), and the
+  checker warns about one left unmarked. A move goes in a note.
 - What is removed stays in the text, so it can be drawn.
 - They never replace a node's own class: `class ledger database` and
   `class ledger added` both hold.
-- A plan opens in its usual colouring, so open it in the Changes colouring yourself:
+- The viewer draws the marks in any colouring (a ringed +, ~ or − on each marked node
+  and arrow). For colour too, open it in the Changes colouring yourself:
   `show.py "<map>" --colour-by changes` (added green, changed amber, removed red, the
   rest muted).
 - Do not fake planned changes with `classDef` fills or colours.

@@ -382,6 +382,9 @@ export function createExporter(v) {
     const width = Math.round(w * scale);
     const height = Math.round(h * scale);
     const report = facts ? layoutReport(facts, { width: w, height: h, outputWidth: width }) : null;
+    // compared with an earlier version (WO-34): what changed, as the changes list says it
+    const changes = report && v.changesReport?.();
+    if (changes) report.changes = changes;
     if (format === 'svg') {
       if (scale !== 1) { svg.setAttribute('width', width); svg.setAttribute('height', height); }
       return { format, type: 'image/svg+xml', data: new XMLSerializer().serializeToString(svg), width, height, scaledDown, report };

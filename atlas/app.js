@@ -210,9 +210,9 @@ async function openMap(path, state = {}, prefs = null) {
   navigationAbort.abort();
   reloadAbort.abort();
   const controller = navigationAbort = new AbortController();
-  let text;
+  let text, before;
   try {
-    text = await source.read(path);
+    [text, before] = await Promise.all([source.read(path), readBefore(path)]);
   } catch (x) {
     if (my !== seq) return;
     pendingNavigation = 0;
@@ -221,12 +221,15 @@ async function openMap(path, state = {}, prefs = null) {
     return;
   }
   if (my !== seq) return;
-  await viewer.load(text, path, { sourceId, signal: controller.signal });
+  await viewer.load(text, path, { sourceId, signal: controller.signal, before });
   if (my === seq) pendingNavigation = 0;
   if (my !== seq || shown?.path !== path) return;
   viewer.setState(state);
   if (prefs) usePrefs(prefs);
 }
+
+// the map's earlier version the agent sent (WO-34: Before and After), or null
+const readBefore = (path) => (source.readBefore ? source.readBefore(path).catch(() => null) : Promise.resolve(null));
 
 // looks from a link or the agent's show: appearance, colour-by, look, and a theme by id
 // (one this atlas has; the reader's own choice from then on, as if picked in the panel)
@@ -253,9 +256,9 @@ async function onChange() {
   const m = maps.find((x) => x.path === path);
   if (!m || (m.mtime === shown.mtime && m.size === shown.size)) return;
   try {
-    const text = await src.read(path);
+    const [text, before] = await Promise.all([src.read(path), readBefore(path)]);
     if (!current() || shown?.path !== path) return;
-    await viewer.load(text, path, { sourceId: id, signal: controller.signal });
+    await viewer.load(text, path, { sourceId: id, signal: controller.signal, before });
   } catch (_) { /* gone between list and read: wait for the next change */ }
 }
 
@@ -263,9 +266,16 @@ async function onChange() {
 // points at the node.
 async function onShow(d) {
   const state = {};
-  for (const k of ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'step']) if (d[k]) state[k] = d[k];
+  for (const k of ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'step', 'perspective']) if (d[k]) state[k] = d[k];
   const prefs = d.colourBy || d.theme ? { ...(d.colourBy ? { colourBy: d.colourBy } : {}), ...(d.theme ? { theme: d.theme } : {}) } : null;
-  if (d.path === shown?.path) { picker.close(); viewer.setState(state); usePrefs(prefs); return; }
+  if (d.path === shown?.path) {
+    picker.close();
+    // an earlier version sent or forgotten: the viewer takes it, then the rest
+    if ('before' in d) await viewer.setBefore(await readBefore(d.path));
+    viewer.setState(state);
+    usePrefs(prefs);
+    return;
+  }
   if (!maps.some((m) => m.path === d.path)) await onChange();
   picker.close();
   location.hash = buildHash(d.path, state, prefs);

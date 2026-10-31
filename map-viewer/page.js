@@ -98,7 +98,10 @@ export function createPage(v, h) {
     body.appendChild(head);
     // changed since this reader last looked (seen.js): a line, and what went from under it
     const since = h.since?.(n.id);
-    if (since?.kind) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: `${since.kind === 'new' ? 'New' : 'Changed'} ${v.sinceWords}.` }));
+    if (since?.kind && !S.map.hasPlan) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: `${since.kind === 'new' ? 'New' : 'Changed'} ${v.sinceWords}.` }));
+    // against the map's earlier version (WO-34): what the changes list says of this node
+    const version = v.versionChanges?.(n.id) || [];
+    if (version.length) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: `Since the earlier version: ${version.join('; ')}.` }));
     if (n.note) {
       const note = document.createElement('div');
       note.className = 'mmv-page-note';

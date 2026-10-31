@@ -101,6 +101,8 @@ def main(argv=None) -> int:
     ap.add_argument("--seq", help="a sequence over its view: its heading's anchor (main: the first diagram)")
     ap.add_argument("--step", type=int, help="the sequence's step, from 1")
     ap.add_argument("--steps", help="one file per step: all, or a range like 3-5 (--out is a folder)")
+    ap.add_argument("--before", help="an earlier version of the map (any file): the picture marks what differs")
+    ap.add_argument("--perspective", choices=("before", "after"), help="with --before: draw the earlier file (before) or the map (after, the default)")
     ap.add_argument("--theme", help="a theme id (themes.py list)")
     ap.add_argument("--appearance", choices=("light", "dark"))
     size = ap.add_mutually_exclusive_group()
@@ -142,10 +144,18 @@ def main(argv=None) -> int:
     state = {k: v for k, v in {"part": args.part, "view": args.view, "env": args.env, "focus": args.focus,
                                 "mode": args.mode, "colourBy": args.colour_by, "expand": expand,
                                 "close": ids(args.close), "highlight": ids(args.highlight), "crop": args.crop,
-                                "seq": args.seq, "step": args.step if args.seq and not args.steps else None}.items() if v is not None}
+                                "seq": args.seq, "step": args.step if args.seq and not args.steps else None,
+                                "perspective": args.perspective if args.before else None}.items() if v is not None}
+    before = None
+    if args.before:
+        try:
+            before = Path(args.before).expanduser().read_text(encoding="utf-8")
+        except OSError as exc:
+            print(status_line("failed", error=f"cannot read --before {args.before}: {exc.strerror or exc}"))
+            return 1
     body = {k: v for k, v in {"path": args.map, "state": state, "format": fmt, "theme": args.theme,
                               "appearance": args.appearance, "width": args.width, "scale": args.scale,
-                              "background": args.background, "report": args.report}.items() if v is not None}
+                              "background": args.background, "report": args.report, "before": before}.items() if v is not None}
 
     def one(st, target):
         answer, error = ask(port, {**body, "state": st})

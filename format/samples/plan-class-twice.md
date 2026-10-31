@@ -5,5 +5,5 @@
 flowchart LR
   api["API"] --> db["Database"]
   class api added
-  class api removed
+  class api changed
 ```
