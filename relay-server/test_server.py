@@ -132,7 +132,7 @@ class RelayTests(unittest.TestCase):
         # the code's commit (this is a checkout), for the generator tag of an export
         self.assertEqual(info["build"], serve_maps.build_version())
         self.assertRegex(info["build"] or "", r"^[0-9a-f]{12}$")
-        self.assertEqual(info["capabilities"], ["tree", "map", "events", "show", "render", "themes", "before", "open", "shutdown"])
+        self.assertEqual(info["capabilities"], ["tree", "map", "events", "show", "render", "themes", "before", "draft", "open", "shutdown"])
 
     def test_source_identity(self):
         identity = self.s.json("GET", "/api/info")[1]["sourceId"]
@@ -299,6 +299,8 @@ class RelayTests(unittest.TestCase):
             ({"path": "garden.md", "state": {"highlight": "n1,not an id"}}, 400),
             ({"path": "garden.md", "state": {"crop": "1x"}}, 400),
             ({"path": "garden.md", "state": "n1"}, 400),
+            ({"path": "garden.md", "text": 12}, 400),
+            ({"path": "garden.md", "text": "x" * (2 * 1024 * 1024 + 1)}, 400),
         ]
         for body, code in bad:
             self.assertEqual(self.s.json("POST", "/api/render", body)[0], code, body)
@@ -340,6 +342,71 @@ class RelayTests(unittest.TestCase):
         # the render is over: its id is unknown now
         self.assertEqual(self.s.json("POST", f"/api/render/{req['id']}", {"error": "late"})[0], 404)
         self.assertEqual(self.s.json("POST", "/api/render/0123456789abcdef/claim", {})[0], 404)
+
+    def test_render_draft(self):
+        """A draft (WO-37): the text goes to the page with the map's path; the page's
+        draft flag comes back; render.py refuses an answer that is not the draft."""
+        def stand_in(es, answer):
+            def page():
+                es.next()   # tree
+                _, req = es.next()
+                got.append(req)
+                self.s.json("POST", f"/api/render/{req['id']}/claim", {})
+                self.s.json("POST", f"/api/render/{req['id']}", {"format": "svg", "encoding": "utf-8", "data": "<svg/>", **answer})
+            t = threading.Thread(target=page)
+            t.start()
+            return t
+        got = []
+        es = EventStream(self.s.port)
+        t = stand_in(es, {"draft": True})
+        try:
+            status, body = self.s.json("POST", "/api/render", {"path": "garden.md", "text": "# Draft garden\n"})
+            t.join(5)
+        finally:
+            es.close()
+        self.assertEqual((status, body.get("draft")), (200, True))
+        self.assertEqual((got[0]["path"], got[0]["text"]), ("garden.md", "# Draft garden\n"))
+        self.assertEqual(got[0]["pages"], 1)   # the only page listening claims at once
+        # the library: draft_report gives the report in-process
+        sys.path.insert(0, str(HERE))
+        import render
+        es = EventStream(self.s.port)
+        t = stand_in(es, {"draft": True, "report": {"crossings": {"count": 0, "pairs": []}}})
+        try:
+            report = render.draft_report("garden.md", "# Draft garden\n", maps_dir=str(self.maps), port=self.s.port, mode="boxes", highlight="n1, n2")
+            t.join(5)
+        finally:
+            es.close()
+        self.assertEqual(report, {"crossings": {"count": 0, "pairs": []}})
+        self.assertEqual((got[1]["text"], got[1]["state"]), ("# Draft garden\n", {"mode": "boxes", "highlight": ["n1", "n2"]}))
+        es = EventStream(self.s.port)
+        t = stand_in(es, {})
+        try:
+            with self.assertRaises(render.RenderError):
+                render.draft_report("garden.md", "# Draft garden\n", maps_dir=str(self.maps), port=self.s.port)
+            t.join(5)
+        finally:
+            es.close()
+        # an older page draws the map's file and says nothing of a draft
+        tmp = Path(tempfile.mkdtemp(prefix="avagahana-relay-test-"))
+        try:
+            draft = tmp / "draft.md"
+            draft.write_text("# Draft garden\n", encoding="utf-8")
+            es = EventStream(self.s.port)
+            t = stand_in(es, {})
+            try:
+                out = subprocess.run([sys.executable, str(HERE / "render.py"), "garden.md", "--out", str(tmp / "d.svg"), "--draft", str(draft),
+                                      "--maps-dir", str(self.maps), "--port", str(self.s.port)], capture_output=True, text=True, timeout=20).stdout.strip()
+                t.join(5)
+            finally:
+                es.close()
+            self.assertTrue(out.startswith("STATUS=failed") and "not the draft" in out, out)
+            self.assertFalse((tmp / "d.svg").exists())
+            missing = subprocess.run([sys.executable, str(HERE / "render.py"), "garden.md", "--out", str(tmp / "d.svg"), "--draft", str(tmp / "nope.md"),
+                                      "--maps-dir", str(self.maps), "--port", str(self.s.port)], capture_output=True, text=True, timeout=20).stdout.strip()
+            self.assertTrue(missing.startswith("STATUS=failed ERROR=\"cannot read --draft"), missing)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
     def test_render_page_error(self):
         es = EventStream(self.s.port)
@@ -416,7 +483,7 @@ class OptionalPartsTests(unittest.TestCase):
         tmp = Path(tempfile.mkdtemp(prefix="avagahana-relay-test-"))
         s = Running(maps_dir=tmp, can_open=False, can_shutdown=False)
         try:
-            self.assertEqual(s.json("GET", "/api/info")[1]["capabilities"], ["tree", "map", "events", "show", "render", "themes", "before"])
+            self.assertEqual(s.json("GET", "/api/info")[1]["capabilities"], ["tree", "map", "events", "show", "render", "themes", "before", "draft"])
             self.assertEqual(s.json("POST", "/api/open", {"url": "https://example.com"})[0], 403)
             self.assertEqual(s.json("POST", "/api/shutdown")[0], 403)
             self.assertTrue(s.thread.is_alive())

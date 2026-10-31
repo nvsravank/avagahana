@@ -6,6 +6,27 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Map format: where the layout has nothing else to go on, the order of
+  lines decides: children of a box with no arrows among them sit in the order they are
+  first named, and arrows that leave or enter a node's box take their places on its
+  side in the order they are written. The map skill uses it to untangle crossing
+  arrows when they are many for the picture, trying orders on a draft first (WO-37).
+- **Contract** Relay: `POST /api/render` takes `text`, a draft drawn in the map's place
+  (the `render` event carries it, the page's answer says `draft: true`); `/api/info`
+  capabilities gain `draft`. `render.py --draft FILE` sends a file the reader never
+  sees, and refuses an answer from an older page or relay that drew the map's file
+  instead. `render.py` is also a library: `draft_report(map, text, ...)` returns the
+  layout report in-process, for trial scripts. The `render` event carries `pages`; the
+  only page listening claims at once (a page in the background waited 0.6 s, slowed to
+  about 1 s by the browser, on every render; a draft now takes under 0.1 s) (WO-37).
+- A box's own `direction` now holds for its children with no arrows between them; they
+  used to line up across the parent's flow, so `direction LR` inside a left-to-right box
+  stacked them in a column (WO-37).
+- Examples `shop-layers`, `slow-checkout` and `shop-plan` reordered by an agent with
+  the skill, the same lines in a new order: crossings 14 to 4, 2 (Layers 4) to 0, and 1
+  to 0 in Boxes. In `slow-checkout` and `shop-plan` the top level moved too, so their
+  category colours and List order changed (the card provider now comes first) (WO-37).
+
 - **Contract** Sparkles (changes since you looked) are hidden until the reader shows them.
   A sparkle button beside the info button appears while a map has changes; its panel
   has Show sparkles (kept with the preferences as `sparkles`), this view's and the whole

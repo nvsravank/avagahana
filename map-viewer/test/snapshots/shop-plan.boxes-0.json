@@ -5,9 +5,9 @@
    "id": "shop",
    "x": -62,
    "y": 0,
-   "w": 1111.8,
+   "w": 1101.8,
    "h": 370.5,
-   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "cls": "mmv-frame mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Shop system, level 1, 5 children, a box",
    "title": {
     "text": "Shop system",
@@ -23,7 +23,7 @@
    },
    "note": null,
    "dot": {
-    "x": 1110.8,
+    "x": 1100.8,
     "y": 1,
     "closed": false,
     "count": null
@@ -32,11 +32,11 @@
   {
    "kind": "frame",
    "id": "web",
-   "x": -535.4,
+   "x": -530.4,
    "y": 59.25,
    "w": 137,
    "h": 198,
-   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-frame mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "name": "Web app, level 2, 2 children, a box",
    "title": {
     "text": "Web app",
@@ -61,11 +61,11 @@
   {
    "kind": "frame",
    "id": "api",
-   "x": -369.9,
+   "x": -364.9,
    "y": 59.25,
    "w": 106,
    "h": 198,
-   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-frame mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "name": "API, level 2, 2 children, a box",
    "title": {
     "text": "API",
@@ -90,11 +90,11 @@
   {
    "kind": "frame",
    "id": "orders",
-   "x": -111.9,
+   "x": -106.9,
    "y": 59.25,
    "w": 322,
    "h": 224,
-   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-frame mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "name": "Orders service, level 2, 3 children, a box",
    "title": {
     "text": "Orders service",
@@ -119,11 +119,11 @@
   {
    "kind": "frame",
    "id": "pay",
-   "x": 319.9,
+   "x": 314.9,
    "y": -46.25,
    "w": 320,
    "h": 198,
-   "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-pa",
+   "cls": "mmv-frame mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-pa",
    "name": "Payments service, level 2, 3 children, has a note, a box",
    "title": {
     "text": "Payments service",
@@ -156,11 +156,11 @@
   {
    "kind": "node",
    "id": "customer",
-   "x": -714.4,
+   "x": -709.4,
    "y": 0,
    "w": 89,
    "h": 72,
-   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
    "grow": 1,
    "name": "Customer, level 1",
    "marks": {
@@ -196,11 +196,11 @@
   {
    "kind": "node",
    "id": "ui",
-   "x": -535.4,
+   "x": -530.4,
    "y": 25.25,
    "w": 101,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
    "name": "Storefront, level 3",
    "marks": {
@@ -226,11 +226,11 @@
   {
    "kind": "node",
    "id": "cart",
-   "x": -535.4,
+   "x": -530.4,
    "y": 119.25,
    "w": 109,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
    "name": "Basket page, level 3",
    "marks": {
@@ -256,11 +256,11 @@
   {
    "kind": "node",
    "id": "gw",
-   "x": -369.9,
+   "x": -364.9,
    "y": 25.25,
    "w": 78,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
    "name": "Gateway, level 3",
    "marks": {
@@ -286,11 +286,11 @@
   {
    "kind": "node",
    "id": "auth",
-   "x": -369.9,
+   "x": -364.9,
    "y": 119.25,
    "w": 78,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
    "name": "Sign-in, level 3",
    "marks": {
@@ -316,11 +316,11 @@
   {
    "kind": "node",
    "id": "ord",
-   "x": -125.4,
+   "x": -93.4,
    "y": 12.25,
    "w": 148,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pc",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pc",
    "grow": 1,
    "name": "Order handler, level 3, has a note",
    "marks": {
@@ -351,42 +351,12 @@
   },
   {
    "kind": "node",
-   "id": "stock",
-   "x": -204.4,
-   "y": 106.25,
-   "w": 109,
-   "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
-   "grow": 1,
-   "name": "Stock check, level 3",
-   "marks": {
-    "hit": false,
-    "sel": false
-   },
-   "shape": "square",
-   "icons": [],
-   "text": {
-    "size": 14,
-    "weight": 400,
-    "spans": [
-     {
-      "text": "Stock check",
-      "bold": false,
-      "italic": false,
-      "x": 12,
-      "y": 29.3
-     }
-    ]
-   }
-  },
-  {
-   "kind": "node",
    "id": "payh",
-   "x": -46.4,
+   "x": -172.4,
    "y": 106.25,
    "w": 163,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pr",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pr",
    "grow": 1,
    "name": "Payment handler, level 3, has a note",
    "marks": {
@@ -417,12 +387,42 @@
   },
   {
    "kind": "node",
+   "id": "stock",
+   "x": -14.4,
+   "y": 106.25,
+   "w": 109,
+   "h": 50,
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Stock check, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Stock check",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
    "id": "charge",
-   "x": 306.9,
+   "x": 327.9,
    "y": -80.25,
    "w": 101,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pa",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pa",
    "grow": 1,
    "name": "Charge API, level 3",
    "marks": {
@@ -448,43 +448,12 @@
   },
   {
    "kind": "node",
-   "id": "fraud",
-   "x": 228.4,
-   "y": 13.75,
-   "w": 109,
-   "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pa",
-   "grow": 1,
-   "name": "Fraud check, level 3",
-   "marks": {
-    "hit": false,
-    "sel": false
-   },
-   "plan": "added",
-   "shape": "square",
-   "icons": [],
-   "text": {
-    "size": 14,
-    "weight": 400,
-    "spans": [
-     {
-      "text": "Fraud check",
-      "bold": false,
-      "italic": false,
-      "x": 12,
-      "y": 29.3
-     }
-    ]
-   }
-  },
-  {
-   "kind": "node",
    "id": "ledger",
-   "x": 385.4,
+   "x": 249.4,
    "y": 13.75,
    "w": 161,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c5 mmv-pa",
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c5 mmv-pa",
    "grow": 1,
    "name": "Payments ledger, level 3",
    "marks": {
@@ -521,12 +490,43 @@
   },
   {
    "kind": "node",
+   "id": "fraud",
+   "x": 406.4,
+   "y": 13.75,
+   "w": 109,
+   "h": 50,
+   "cls": "mmv-node mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pa",
+   "grow": 1,
+   "name": "Fraud check, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "plan": "added",
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Fraud check",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 29.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
    "id": "db",
-   "x": 319.9,
+   "x": 314.9,
    "y": 99.75,
    "w": 161,
    "h": 50,
-   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
    "grow": 1,
    "name": "Orders database, level 2",
    "marks": {
@@ -563,11 +563,11 @@
   {
    "kind": "node",
    "id": "psp",
-   "x": 690.4,
+   "x": 685.4,
    "y": 0,
    "w": 137,
    "h": 72,
-   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
    "grow": 1,
    "name": "Card provider, level 1",
    "marks": {
@@ -604,40 +604,8 @@
  "rels": [
   {
    "kind": "rel",
-   "id": "customer>ui",
-   "d": "M-669.9,-6 L-641.9,-6 Q-633.9,-6 -633.9,2 L-633.9,17.25 Q-633.9,25.25 -625.9,25.25 L-585.9,25.25",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": null,
-   "items": [
-    {
-     "from": "customer",
-     "to": "ui",
-     "label": ""
-    }
-   ]
-  },
-  {
-   "kind": "rel",
-   "id": "customer>cart",
-   "d": "M-669.9,6 L-651.9,6 Q-643.9,6 -643.9,14 L-643.9,111.25 Q-643.9,119.25 -635.9,119.25 L-589.9,119.25",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": null,
-   "items": [
-    {
-     "from": "customer",
-     "to": "cart",
-     "label": ""
-    }
-   ]
-  },
-  {
-   "kind": "rel",
    "id": "ui>gw",
-   "d": "M-484.9,25.25 L-441.9,25.25 Q-438.9,25.25 -438.9,22.25 L-438.9,22.25 Q-438.9,19.25 -435.9,19.25 L-408.9,19.25",
+   "d": "M-479.9,25.25 L-436.9,25.25 Q-433.9,25.25 -433.9,22.25 L-433.9,22.25 Q-433.9,19.25 -430.9,19.25 L-403.9,19.25",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
@@ -652,8 +620,24 @@
   },
   {
    "kind": "rel",
+   "id": "charge>ledger",
+   "d": "M321.9,-55.25 L321.9,-11.25",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "charge",
+     "to": "ledger",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
    "id": "cart>gw",
-   "d": "M-480.9,119.25 L-446.9,119.25 Q-438.9,119.25 -438.9,111.25 L-438.9,39.25 Q-438.9,31.25 -430.9,31.25 L-408.9,31.25",
+   "d": "M-475.9,119.25 L-441.9,119.25 Q-433.9,119.25 -433.9,111.25 L-433.9,39.25 Q-433.9,31.25 -425.9,31.25 L-403.9,31.25",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
@@ -668,24 +652,8 @@
   },
   {
    "kind": "rel",
-   "id": "gw>auth",
-   "d": "M-369.9,50.25 L-369.9,94.25",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": null,
-   "items": [
-    {
-     "from": "gw",
-     "to": "auth",
-     "label": ""
-    }
-   ]
-  },
-  {
-   "kind": "rel",
    "id": "gw>ord",
-   "d": "M-330.9,25.25 L-295.4,25.25 Q-288.9,25.25 -288.9,18.75 L-288.9,18.75 Q-288.9,12.25 -282.4,12.25 L-199.4,12.25",
+   "d": "M-325.9,25.25 L-290.4,25.25 Q-283.9,25.25 -283.9,18.75 L-283.9,18.75 Q-283.9,12.25 -277.4,12.25 L-167.4,12.25",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
@@ -700,16 +668,69 @@
   },
   {
    "kind": "rel",
-   "id": "ord>stock",
-   "d": "M-131.4,37.25 L-131.4,57.25 Q-131.4,65.25 -139.4,65.25 L-196.4,65.25 Q-204.4,65.25 -204.4,73.25 L-204.4,81.25",
+   "id": "ord>charge",
+   "d": "M-19.4,2.25 L130.9,2.25 Q138.9,2.25 138.9,-5.75 L138.9,-72.25 Q138.9,-80.25 146.9,-80.25 L277.4,-80.25",
+   "cls": "mmv-flow mmv-pa",
+   "plan": "added",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 22,
+    "y": 6.25,
+    "text": "charge"
+   },
+   "items": [
+    {
+     "from": "ord",
+     "to": "charge",
+     "label": "charge"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "customer>cart",
+   "d": "M-664.9,6 L-646.9,6 Q-638.9,6 -638.9,14 L-638.9,111.25 Q-638.9,119.25 -630.9,119.25 L-584.9,119.25",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": null,
    "items": [
     {
-     "from": "ord",
-     "to": "stock",
+     "from": "customer",
+     "to": "cart",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "customer>ui",
+   "d": "M-664.9,-6 L-636.9,-6 Q-628.9,-6 -628.9,2 L-628.9,17.25 Q-628.9,25.25 -620.9,25.25 L-580.9,25.25",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "customer",
+     "to": "ui",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "gw>auth",
+   "d": "M-364.9,50.25 L-364.9,94.25",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "gw",
+     "to": "auth",
      "label": ""
     }
    ]
@@ -717,7 +738,7 @@
   {
    "kind": "rel",
    "id": "ord>payh",
-   "d": "M-119.4,37.25 L-119.4,81.25",
+   "d": "M-99.4,37.25 L-99.4,81.25",
    "cls": "mmv-flow mmv-pr",
    "plan": "removed",
    "head": "arrow",
@@ -733,84 +754,14 @@
   },
   {
    "kind": "rel",
-   "id": "payh>psp",
-   "d": "M35.1,106.25 L135.9,106.25 Q143.9,106.25 143.9,114.25 L143.9,140.75 Q143.9,148.75 151.9,148.75 L597.9,148.75 Q605.9,148.75 605.9,140.75 L605.9,18 Q605.9,10 613.9,10 L621.9,10",
-   "cls": "mmv-flow mmv-pr",
-   "plan": "removed",
-   "head": "arrow",
-   "tail": null,
-   "label": null,
-   "items": [
-    {
-     "from": "payh",
-     "to": "psp",
-     "label": ""
-    }
-   ]
-  },
-  {
-   "kind": "rel",
-   "id": "ord>charge",
-   "d": "M-51.4,2.25 L125.9,2.25 Q133.9,2.25 133.9,-5.75 L133.9,-72.25 Q133.9,-80.25 141.9,-80.25 L256.4,-80.25",
-   "cls": "mmv-flow mmv-pa",
-   "plan": "added",
-   "head": "arrow",
-   "tail": null,
-   "label": {
-    "x": -10,
-    "y": 6.25,
-    "text": "charge"
-   },
-   "items": [
-    {
-     "from": "ord",
-     "to": "charge",
-     "label": "charge"
-    }
-   ]
-  },
-  {
-   "kind": "rel",
-   "id": "charge>fraud",
-   "d": "M300.9,-55.25 L300.9,-35.25 Q300.9,-27.25 292.9,-27.25 L236.4,-27.25 Q228.4,-27.25 228.4,-19.25 L228.4,-11.25",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": null,
-   "items": [
-    {
-     "from": "charge",
-     "to": "fraud",
-     "label": ""
-    }
-   ]
-  },
-  {
-   "kind": "rel",
-   "id": "charge>ledger",
-   "d": "M312.9,-55.25 L312.9,-11.25",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": null,
-   "items": [
-    {
-     "from": "charge",
-     "to": "ledger",
-     "label": ""
-    }
-   ]
-  },
-  {
-   "kind": "rel",
    "id": "charge>psp",
-   "d": "M357.4,-80.25 L597.9,-80.25 Q605.9,-80.25 605.9,-72.25 L605.9,-18 Q605.9,-10 613.9,-10 L621.9,-10",
+   "d": "M378.4,-80.25 L592.9,-80.25 Q600.9,-80.25 600.9,-72.25 L600.9,-18 Q600.9,-10 608.9,-10 L616.9,-10",
    "cls": "mmv-flow mmv-pa",
    "plan": "added",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 412.4,
+    "x": 433.4,
     "y": -76.25,
     "text": "card token"
    },
@@ -825,7 +776,7 @@
   {
    "kind": "rel",
    "id": "ord>db",
-   "d": "M-51.4,22.25 L125.9,22.25 Q133.9,22.25 133.9,30.25 L133.9,85.75 Q133.9,93.75 141.9,93.75 L239.4,93.75",
+   "d": "M-19.4,22.25 L130.9,22.25 Q138.9,22.25 138.9,30.25 L138.9,85.75 Q138.9,93.75 146.9,93.75 L234.4,93.75",
    "cls": "mmv-flow mmv-pc",
    "plan": "changed",
    "head": "arrow",
@@ -841,8 +792,24 @@
   },
   {
    "kind": "rel",
+   "id": "ord>stock",
+   "d": "M-87.4,37.25 L-87.4,57.25 Q-87.4,65.25 -79.4,65.25 L-22.4,65.25 Q-14.4,65.25 -14.4,73.25 L-14.4,81.25",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "ord",
+     "to": "stock",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
    "id": "stock>db",
-   "d": "M-204.4,131.25 L-204.4,137.75 Q-204.4,144.25 -197.9,144.25 L125.9,144.25 Q133.9,144.25 133.9,136.25 L133.9,113.75 Q133.9,105.75 141.9,105.75 L239.4,105.75",
+   "d": "M40.1,106.25 L234.4,106.25",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
@@ -851,6 +818,39 @@
     {
      "from": "stock",
      "to": "db",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "charge>fraud",
+   "d": "M333.9,-55.25 L333.9,-35.25 Q333.9,-27.25 341.9,-27.25 L398.4,-27.25 Q406.4,-27.25 406.4,-19.25 L406.4,-11.25",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "charge",
+     "to": "fraud",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "payh>psp",
+   "d": "M-172.4,131.25 L-172.4,137.75 Q-172.4,144.25 -165.9,144.25 L136.65,144.25 Q138.9,144.25 138.9,146.5 L138.9,146.5 Q138.9,148.75 141.15,148.75 L592.9,148.75 Q600.9,148.75 600.9,140.75 L600.9,18 Q600.9,10 608.9,10 L616.9,10",
+   "cls": "mmv-flow mmv-pr",
+   "plan": "removed",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "payh",
+     "to": "psp",
      "label": ""
     }
    ]

@@ -15,15 +15,15 @@ flowchart TB
   end
 
   subgraph edge [Edge]
+    auth["Sign-in service"]
     cdn["CDN"]
     gateway["API gateway"]
-    auth["Sign-in service"]
   end
 
   subgraph services [Services]
-    catalogue["Catalogue service"]
-    cart["Cart service"]
     orders["Orders service"]
+    cart["Cart service"]
+    catalogue["Catalogue service"]
     payments["Payments service"]
     stock["Stock service"]
     notify["Notification service"]
@@ -35,44 +35,44 @@ flowchart TB
   end
 
   subgraph data [Data]
-    catdb[("Catalogue database")]
-    cache[("Cart cache")]
     orderdb[("Orders database")]
     stockdb[("Stock database")]
+    cache[("Cart cache")]
+    catdb[("Catalogue database")]
   end
 
   subgraph outside [Outside systems]
+    courier["Courier"]
     psp["Card provider"]
     mail["Email provider"]
-    courier["Courier"]
   end
 
-  shopper -->|browses, buys| web
-  shopper -->|buys| mobile
-  support -->|refunds| backoffice
-  merchant -->|lists products| backoffice
-
-  web -->|pages, images| cdn
   web -->|HTTPS| gateway
-  mobile -->|HTTPS| gateway
-  backoffice -->|HTTPS| gateway
-  gateway -->|checks token| auth
-
-  gateway -->|reads| catalogue
-  gateway -->|adds items| cart
   gateway -->|places order| orders
-  backoffice -->|lists products| catalogue
+  gateway -->|checks token| auth
+  gateway -->|adds items| cart
 
-  orders -->|reserves| stock
+  mobile -->|HTTPS| gateway
+  web -->|pages, images| cdn
+  catalogue --> catdb
+  orders --> orderdb
+  support -->|refunds| backoffice
+
+  backoffice -->|HTTPS| gateway
+  gateway -->|reads| catalogue
   orders e1@-->|charges| payments
-  payments e2@-->|card charge| psp
-
   notify -->|sends email| mail
 
-  catalogue --> catdb
-  cart --> cache
-  orders --> orderdb
+  shopper -->|browses, buys| web
   stock --> stockdb
+  orders -->|reserves| stock
+
+  backoffice -->|lists products| catalogue
+
+  shopper -->|buys| mobile
+  merchant -->|lists products| backoffice
+  payments e2@-->|card charge| psp
+  cart --> cache
 
   click orders "#orders-service-components"
   click orders "#payment-retry-ideas"

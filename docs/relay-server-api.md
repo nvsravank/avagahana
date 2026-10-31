@@ -62,7 +62,7 @@ python3 relay-server/serve_maps.py [--port N] [--maps-dir DIR] [--map <rel path>
 |---|---|
 | `GET /` and `GET /<file>` | The atlas (`index.html` and its files). |
 | `GET /map-viewer/<file>` | The map viewer's files. |
-| `GET /api/info` | `{app, version, build, capabilities, sourceId}`. `build`: the commit of the code the relay runs (a git checkout's, or an installed plugin folder's name), or `null`; the atlas passes it to the viewer for an export's generator tag (added in WO-35). `capabilities` is a list of `tree`, `map`, `events`, `show`, `render`, `themes`, `before`, `open`, `shutdown` (`render` and `themes` added in WO-32, `before` in WO-34). |
+| `GET /api/info` | `{app, version, build, capabilities, sourceId}`. `build`: the commit of the code the relay runs (a git checkout's, or an installed plugin folder's name), or `null`; the atlas passes it to the viewer for an export's generator tag (added in WO-35). `capabilities` is a list of `tree`, `map`, `events`, `show`, `render`, `themes`, `before`, `draft`, `open`, `shutdown` (`render` and `themes` added in WO-32, `before` in WO-34, `draft` in WO-37). |
 | `GET /api/ping` | `{app, version, root, config}`: identity, so a second launch can reuse this server. Kept for older skills. |
 | `GET /api/tree` | `{state, maps: [{path, title, mtime, size}]}` (see `map-source.md`). Hidden files and folders are left out. |
 | `GET /api/map?p=<path>` | Raw text of one map, `text/plain; charset=utf-8`. `404` if not a map. |
@@ -71,9 +71,9 @@ python3 relay-server/serve_maps.py [--port N] [--maps-dir DIR] [--map <rel path>
 | `POST /api/show` | Body `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?}`. Tells every open page to show that map and node; `part` names one of the file's further diagrams by its heading's anchor (added in WO-07); `page` opens that node's page (added in WO-08); `seq` plays a sequence by its heading's anchor (`main` for the first diagram) over the view it is linked to, at `step` (a whole number from 1); `mode` may be `lifelines` (added in WO-12). `colourBy` (`category`, `level`, `class` or `changes`) opens the map in that colouring, e.g. `changes` for a plan (added in WO-13). `before`: the map's earlier version as text (2 MB at most), kept in the server's memory for that map until another, `null` (forget it) or a restart; `perspective` (`before` or `after`) which of the two to show (added in WO-34). `{delivered: <number of pages told>}`; `404` for no such map, `400` for a bad field. Stores nothing else. |
 | `GET /api/themes` | `{themes, settings, problems}`: the maps folder's `.themes/` (below). `themes`: each `<id>.json` with `id` (its file name) and `label` (its `name`) set and its font faces as `{weight, style, url}`; `settings`: `{builtIn, default, logo}` with defaults filled in; `problems`: files it could not read. Empty lists when there is no `.themes/`. Added in WO-32. |
 | `GET /api/theme-file?f=<file>` | A font file (`.woff2 .woff .ttf .otf`) in `.themes/`; `404` for anything else. Added in WO-32. |
-| `POST /api/render` | Body `{path, state?, theme?, appearance?, format?, width? or scale?, background?, report?, before?}`: one open page draws the map and sends the file back (below). Added in WO-32. |
+| `POST /api/render` | Body `{path, state?, theme?, appearance?, format?, width? or scale?, background?, report?, before?, text?}`: one open page draws the map and sends the file back (below). Added in WO-32; `text` in WO-37. |
 | `POST /api/render/<id>/claim` | A page takes a render: `200 {claimed: true}` for the first, `409` while another has it, `404` when it is over. |
-| `POST /api/render/<id>` | A page's answer: `{format, encoding, data, width, height, scaledDown?, report?, steps?, problems?}` or `{error}`. `404` when the render is over. |
+| `POST /api/render/<id>` | A page's answer: `{format, encoding, data, width, height, scaledDown?, report?, steps?, problems?, draft?}` or `{error}`. `404` when the render is over. |
 | `POST /api/open` | Body `{"url"}`. Opens an `http`, `https` or `mailto` link in the default browser. `{opened}`; `400` for any other link. |
 | `POST /api/shutdown` | `{stopping: true}`, then the server stops and closes open event streams. |
 
@@ -95,7 +95,7 @@ hyphens. Unsupported modes are ignored by the viewer for the current diagram.
 |---|---|---|
 | `tree` | `{state}` | A map was added, removed or changed (the folder is scanned about once a second while a page listens). |
 | `show` | `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?}` | Someone called `POST /api/show`. |
-| `render` | `{id, path, state, format, theme?, appearance?, width? or scale?, background, report}` | Someone called `POST /api/render`: the page that claims it answers. |
+| `render` | `{id, path, state, format, theme?, appearance?, width? or scale?, background, report, before?, text?, pages}` | Someone called `POST /api/render`: the page that claims it answers. |
 
 A comment line (`: keep-alive`) every 15 s keeps the stream open. A page that cannot hold
 the stream polls `GET /api/tree` instead.
@@ -146,13 +146,15 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
                                [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID] [--mode MODE] [--colour-by NAME]
                                [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
                                [--seq ANCHOR [--step N | --steps all|3-5]]
+                               [--before FILE [--perspective before|after]] [--draft FILE]
                                [--theme ID] [--appearance light|dark] [--width PX | --scale X] [--background theme|none]
                                [--report] [--port N] [--maps-dir DIR]
 ```
 
 - The server sends the request to the open pages as a `render` event. Each page claims
   it: a focused page at once, others after 0.6 s, so the page the reader looked at last
-  answers; the first claim wins (`409` for the rest). A page that claimed and went quiet
+  answers; the only page listening (`pages`, added in WO-37) claims at once, focused or
+  not; the first claim wins (`409` for the rest). A page that claimed and went quiet
   for 5 s may be replaced. No claim within 3 s means no page is really open: `{status:
   "none"}` (a page closed a moment ago still counts as listening until the next
   heartbeat).
@@ -162,7 +164,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   move.
 - `POST /api/render` answers when the page does (30 s at most; `504` after):
   `{status: "rendered", format, encoding ("utf-8" for SVG text, "base64" for PNG),
-  data, width, height, scaledDown, report?, steps?, problems?}`; `{status: "none"}`
+  data, width, height, scaledDown, report?, steps?, problems?, draft?}`; `{status: "none"}`
   with no page; `422 {error}` when the page could not draw it; `400` for a bad field.
 - `state` takes the show fields (`part`, `view`, `env`, `focus`, `node`, `page`, `mode`,
   `seq`, `step`, `colourBy`, `perspective`) and the picture's (`expand`: a whole number or `"all"`;
@@ -175,6 +177,20 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   or (`state.perspective: "before"`) on the earlier file. `render.py --before FILE
   [--perspective before|after]` (added in WO-34). Plain pictures of two versions need
   nothing new: render each file.
+- `text`: a draft, a map's text (2 MB at most) drawn in the map's place; `path` still
+  names the map (its folder for links, icons and themes). The agent tries a change on
+  a file the reader never sees before making it (added in WO-37). The page's answer
+  carries `draft: true`. `render.py --draft FILE` reads the file and sends its text,
+  so the relay still serves nothing outside the maps folder, and refuses an answer
+  without `draft` (an older page or relay drew the map's file instead): `STATUS=failed`.
+  Works with `before` and every other field.
+- For many drafts (an agent's trial script), `render.py` is also a library, so no
+  process starts per try and no file is written (WO-37):
+  `sys.path.insert(0, "<plugin root>/relay-server")`, `from render import draft_report,
+  RenderError`, then `draft_report(map_path, text, maps_dir=..., mode=..., view=...)`
+  returns the layout report as a dict (the state as the request names it; `close` and
+  `highlight` as lists or comma-separated ids) or raises `RenderError` (no relay, no
+  page, a bad field, the map's own error, or an answer that is not the draft).
 - Open-folder mode (no relay) has no render; the viewer's export buttons still work.
 
 `render.py` prints one line:

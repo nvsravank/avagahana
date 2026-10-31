@@ -74,6 +74,22 @@ export async function renderThemeTests(check, memoryFolder) {
   check('render: the folder\'s theme is used', /rgb\(20, 33, 61\)/.test(answers[4]?.data || ''), answers[4]?.error);
   await answerRender({ id: 'r7', path: 'garden.md', format: 'svg', state: {} }, { source: { ...source(), read: async () => 'not a map at all' }, themeSet: null, wait: 0 });
   check('render: a map that cannot be drawn answers with the error', !!answers[5]?.error && !answers[5].data);
+  // a draft (WO-37): the text sent is drawn, not the map's file, and the answer says so
+  let reads = 0;
+  const draftText = '# Draft\n\n```mermaid\nmindmap\n  d(("Draft root"))\n    e("Only in the draft")\n```\n';
+  await answerRender({ id: 'r8', path: 'garden.md', format: 'svg', text: draftText, state: {} }, { source: { ...source(), read: async () => { reads += 1; return GARDEN; } }, themeSet: null, wait: 0 });
+  check('render: a draft draws the text sent, not the map\'s file, and says so', answers[6]?.draft === true && /Only in the draft/.test(answers[6].data || '') && reads === 0,
+    JSON.stringify({ draft: answers[6]?.draft, reads, error: answers[6]?.error }));
+  check('render: a render of the map\'s file says nothing of a draft', answers.slice(0, 6).every((x) => !('draft' in x)));
+  // the only page listening claims at once, focused or not (WO-37: an agent's trials)
+  let t0 = performance.now();
+  await answerRender({ id: 'r9', path: 'garden.md', format: 'svg', pages: 1, state: {} }, { source: source(), themeSet: null, wait: 3000 });
+  const lone = performance.now() - t0;
+  t0 = performance.now();
+  await answerRender({ id: 'r10', path: 'garden.md', format: 'svg', pages: 2, state: {} }, { source: source(), themeSet: null, wait: 300 });
+  const shared = performance.now() - t0;
+  check('render: the only page listening claims at once; with others, a page without focus waits', answers[7]?.data && lone < 1000 && (document.hasFocus() || shared >= 300),
+    JSON.stringify({ lone: Math.round(lone), shared: Math.round(shared), focus: document.hasFocus() }));
   reader.destroy();
   box.remove();
 }

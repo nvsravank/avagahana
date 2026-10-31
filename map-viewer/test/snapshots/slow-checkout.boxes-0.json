@@ -3,9 +3,9 @@
   {
    "kind": "frame",
    "id": "shop",
-   "x": -82,
+   "x": -77,
    "y": 0,
-   "w": 926.6,
+   "w": 936.6,
    "h": 354,
    "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Shop system, level 1, 5 children, has a note, a box",
@@ -22,12 +22,12 @@
     "sel": false
    },
    "note": {
-    "x": 896.6,
+    "x": 906.6,
     "y": 6,
     "size": 16
    },
    "dot": {
-    "x": 925.6,
+    "x": 935.6,
     "y": 1,
     "closed": false,
     "count": null
@@ -37,7 +37,7 @@
    "kind": "frame",
    "id": "orders",
    "x": -68.3,
-   "y": 52.5,
+   "y": -26.5,
    "w": 174,
    "h": 218,
    "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
@@ -65,8 +65,8 @@
   {
    "kind": "frame",
    "id": "pay",
-   "x": 276.8,
-   "y": -28,
+   "x": 286.8,
+   "y": 54,
    "w": 181,
    "h": 218,
    "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
@@ -101,7 +101,7 @@
    "y": 0,
    "w": 89,
    "h": 72,
-   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
+   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
    "grow": 1,
    "name": "Customer, level 1",
    "marks": {
@@ -138,7 +138,7 @@
    "kind": "node",
    "id": "ui",
    "x": -480.8,
-   "y": 52.5,
+   "y": -26.5,
    "w": 101,
    "h": 60,
    "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
@@ -168,7 +168,7 @@
    "kind": "node",
    "id": "gw",
    "x": -314.8,
-   "y": 52.5,
+   "y": -26.5,
    "w": 99,
    "h": 60,
    "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
@@ -206,9 +206,39 @@
   },
   {
    "kind": "node",
+   "id": "stock",
+   "x": -68.3,
+   "y": -65.5,
+   "w": 109,
+   "h": 60,
+   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "grow": 1,
+   "name": "Stock check, level 3",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "shape": "square",
+   "icons": [],
+   "text": {
+    "size": 14,
+    "weight": 400,
+    "spans": [
+     {
+      "text": "Stock check",
+      "bold": false,
+      "italic": false,
+      "x": 12,
+      "y": 34.3
+     }
+    ]
+   }
+  },
+  {
+   "kind": "node",
    "id": "ord",
    "x": -68.3,
-   "y": 13.5,
+   "y": 38.5,
    "w": 146,
    "h": 60,
    "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
@@ -246,30 +276,41 @@
   },
   {
    "kind": "node",
-   "id": "stock",
-   "x": -68.3,
-   "y": 117.5,
-   "w": 109,
+   "id": "db",
+   "x": 286.8,
+   "y": -107,
+   "w": 161,
    "h": 60,
-   "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
    "grow": 1,
-   "name": "Stock check, level 3",
+   "name": "Orders database, level 2",
    "marks": {
     "hit": false,
     "sel": false
    },
-   "shape": "square",
-   "icons": [],
+   "shape": "cylinder",
+   "outline": "M0,6 A80.5,6 0 0 1 161,6 V54 A80.5,6 0 0 1 0,54 Z M0,6 A80.5,6 0 0 0 161,6",
+   "icons": [
+    {
+     "code": "ph database",
+     "ph": "database",
+     "color": null,
+     "label": "Database",
+     "size": 15,
+     "x": 12,
+     "y": 25.5
+    }
+   ],
    "text": {
     "size": 14,
     "weight": 400,
     "spans": [
      {
-      "text": "Stock check",
+      "text": "Orders database",
       "bold": false,
       "italic": false,
-      "x": 12,
-      "y": 34.3
+      "x": 33,
+      "y": 37.3
      }
     ]
    }
@@ -277,8 +318,8 @@
   {
    "kind": "node",
    "id": "payh",
-   "x": 276.8,
-   "y": -67,
+   "x": 286.8,
+   "y": 15,
    "w": 140,
    "h": 60,
    "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
@@ -307,8 +348,8 @@
   {
    "kind": "node",
    "id": "fraud",
-   "x": 276.8,
-   "y": 37,
+   "x": 286.8,
+   "y": 119,
    "w": 153,
    "h": 60,
    "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
@@ -351,53 +392,12 @@
   },
   {
    "kind": "node",
-   "id": "db",
-   "x": 276.8,
-   "y": 133,
-   "w": 161,
-   "h": 60,
-   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
-   "grow": 1,
-   "name": "Orders database, level 2",
-   "marks": {
-    "hit": false,
-    "sel": false
-   },
-   "shape": "cylinder",
-   "outline": "M0,6 A80.5,6 0 0 1 161,6 V54 A80.5,6 0 0 1 0,54 Z M0,6 A80.5,6 0 0 0 161,6",
-   "icons": [
-    {
-     "code": "ph database",
-     "ph": "database",
-     "color": null,
-     "label": "Database",
-     "size": 15,
-     "x": 12,
-     "y": 25.5
-    }
-   ],
-   "text": {
-    "size": 14,
-    "weight": 400,
-    "spans": [
-     {
-      "text": "Orders database",
-      "bold": false,
-      "italic": false,
-      "x": 33,
-      "y": 37.3
-     }
-    ]
-   }
-  },
-  {
-   "kind": "node",
    "id": "psp",
    "x": 609.8,
    "y": 0,
    "w": 137,
    "h": 72,
-   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
    "grow": 1,
    "name": "Card provider, level 1",
    "marks": {
@@ -443,30 +443,40 @@
  "rels": [
   {
    "kind": "rel",
-   "id": "customer>ui",
-   "d": "M-589.3,0 L-569.3,0 Q-561.3,0 -561.3,8 L-561.3,44.5 Q-561.3,52.5 -553.3,52.5 L-531.3,52.5",
+   "id": "stock>db",
+   "d": "M-13.8,-65.5 L152.3,-65.5 Q160.3,-65.5 160.3,-73.5 L160.3,-109 Q160.3,-117 168.3,-117 L206.3,-117",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
-   "label": null,
+   "label": {
+    "x": 72.83,
+    "y": -61.5,
+    "text": "stock levels",
+    "icons": [
+     "verified"
+    ]
+   },
    "items": [
     {
-     "from": "customer",
-     "to": "ui",
-     "label": ""
+     "from": "stock",
+     "to": "db",
+     "label": "stock levels",
+     "icons": [
+      "verified"
+     ]
     }
    ]
   },
   {
    "kind": "rel",
    "id": "ui>gw",
-   "d": "M-430.3,52.5 L-364.3,52.5",
+   "d": "M-430.3,-26.5 L-364.3,-26.5",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
     "x": -401.3,
-    "y": 56.5,
+    "y": -22.5,
     "text": "",
     "icons": [
      "verified"
@@ -485,123 +495,50 @@
   },
   {
    "kind": "rel",
-   "id": "gw>ord",
-   "d": "M-265.3,42.5 L-179.3,42.5 Q-171.3,42.5 -171.3,34.5 L-171.3,21.5 Q-171.3,13.5 -163.3,13.5 L-141.3,13.5",
+   "id": "ord>db",
+   "d": "M4.7,18.5 L162.3,18.5 Q170.3,18.5 170.3,10.5 L170.3,-89 Q170.3,-97 178.3,-97 L206.3,-97",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": -219.3,
-    "y": 46.5,
-    "text": "order",
-    "icons": [
-     "inferred"
-    ]
-   },
-   "items": [
-    {
-     "from": "gw",
-     "to": "ord",
-     "label": "order",
-     "icons": [
-      "inferred"
-     ]
-    }
-   ]
-  },
-  {
-   "kind": "rel",
-   "id": "gw>stock",
-   "d": "M-265.3,62.5 L-179.3,62.5 Q-171.3,62.5 -171.3,70.5 L-171.3,109.5 Q-171.3,117.5 -163.3,117.5 L-122.8,117.5",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": {
-    "x": -219.3,
-    "y": 66.5,
-    "text": "stock",
-    "icons": [
-     "inferred"
-    ]
-   },
-   "items": [
-    {
-     "from": "gw",
-     "to": "stock",
-     "label": "stock",
-     "icons": [
-      "inferred"
-     ]
-    }
-   ]
-  },
-  {
-   "kind": "rel",
-   "id": "ord>payh",
-   "d": "M4.7,-6.5 L152.3,-6.5 Q160.3,-6.5 160.3,-14.5 L160.3,-59 Q160.3,-67 168.3,-67 L206.8,-67",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": {
-    "x": 54.1,
-    "y": -2.5,
-    "text": "charge",
-    "icons": [
-     "verified"
-    ]
+    "x": 59.7,
+    "y": 22.5,
+    "text": "order rows"
    },
    "items": [
     {
      "from": "ord",
-     "to": "payh",
-     "label": "charge",
-     "icons": [
-      "verified"
-     ]
+     "to": "db",
+     "label": "order rows"
     }
    ]
   },
   {
    "kind": "rel",
-   "id": "ord>fraud",
-   "d": "M4.7,13.5 L162.3,13.5 Q170.3,13.5 170.3,21.5 L170.3,29 Q170.3,37 178.3,37 L200.3,37",
+   "id": "customer>ui",
+   "d": "M-589.3,-26.5 L-531.3,-26.5",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
-   "label": {
-    "x": 58.7,
-    "y": 17.5,
-    "text": "score",
-    "note": true,
-    "icons": [
-     "hypothesis"
-    ]
-   },
+   "label": null,
    "items": [
     {
-     "from": "ord",
-     "to": "fraud",
-     "label": "score",
-     "note": {
-      "heading": "Order handler scores the order",
-      "body": "Hypothesis: the order handler waits for the fraud score before charging. If so, the\ntwo calls run one after the other, not side by side."
-     },
-     "icons": [
-      "hypothesis"
-     ]
+     "from": "customer",
+     "to": "ui",
+     "label": ""
     }
    ]
   },
   {
    "kind": "rel",
    "id": "payh>psp",
-   "d": "M346.8,-67 L517.3,-67 Q525.3,-67 525.3,-59 L525.3,-8 Q525.3,0 533.3,0 L541.3,0",
+   "d": "M356.8,15 L541.3,15",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 444.05,
-    "y": -63,
+    "x": 449.05,
+    "y": 19,
     "text": "card token",
     "note": true,
     "icons": [
@@ -625,24 +562,24 @@
   },
   {
    "kind": "rel",
-   "id": "stock>db",
-   "d": "M-13.8,117.5 L162.3,117.5 Q170.3,117.5 170.3,125.5 L170.3,135 Q170.3,143 178.3,143 L196.3,143",
+   "id": "ord>payh",
+   "d": "M4.7,38.5 L172.3,38.5 Q180.3,38.5 180.3,30.5 L180.3,23 Q180.3,15 188.3,15 L216.8,15",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 76.17,
-    "y": 121.5,
-    "text": "stock levels",
+    "x": 54.1,
+    "y": 42.5,
+    "text": "charge",
     "icons": [
      "verified"
     ]
    },
    "items": [
     {
-     "from": "stock",
-     "to": "db",
-     "label": "stock levels",
+     "from": "ord",
+     "to": "payh",
+     "label": "charge",
      "icons": [
       "verified"
      ]
@@ -651,21 +588,84 @@
   },
   {
    "kind": "rel",
-   "id": "ord>db",
-   "d": "M4.7,33.5 L152.3,33.5 Q160.3,33.5 160.3,41.5 L160.3,115 Q160.3,123 168.3,123 L196.3,123",
+   "id": "gw>stock",
+   "d": "M-265.3,-36.5 L-179.3,-36.5 Q-171.3,-36.5 -171.3,-44.5 L-171.3,-57.5 Q-171.3,-65.5 -163.3,-65.5 L-122.8,-65.5",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 59.7,
-    "y": 37.5,
-    "text": "order rows"
+    "x": -219.3,
+    "y": -32.5,
+    "text": "stock",
+    "icons": [
+     "inferred"
+    ]
+   },
+   "items": [
+    {
+     "from": "gw",
+     "to": "stock",
+     "label": "stock",
+     "icons": [
+      "inferred"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "gw>ord",
+   "d": "M-265.3,-16.5 L-179.3,-16.5 Q-171.3,-16.5 -171.3,-8.5 L-171.3,30.5 Q-171.3,38.5 -163.3,38.5 L-141.3,38.5",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -219.3,
+    "y": -12.5,
+    "text": "order",
+    "icons": [
+     "inferred"
+    ]
+   },
+   "items": [
+    {
+     "from": "gw",
+     "to": "ord",
+     "label": "order",
+     "icons": [
+      "inferred"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "ord>fraud",
+   "d": "M4.7,58.5 L152.3,58.5 Q160.3,58.5 160.3,66.5 L160.3,111 Q160.3,119 168.3,119 L210.3,119",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": 58.7,
+    "y": 62.5,
+    "text": "score",
+    "note": true,
+    "icons": [
+     "hypothesis"
+    ]
    },
    "items": [
     {
      "from": "ord",
-     "to": "db",
-     "label": "order rows"
+     "to": "fraud",
+     "label": "score",
+     "note": {
+      "heading": "Order handler scores the order",
+      "body": "Hypothesis: the order handler waits for the fraud score before charging. If so, the\ntwo calls run one after the other, not side by side."
+     },
+     "icons": [
+      "hypothesis"
+     ]
     }
    ]
   }

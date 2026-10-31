@@ -18,9 +18,11 @@ const toBase64 = async (blob) => {
 
 // req: the event's data; source: the relay source (read, claimRender, answerRender);
 // themeSet: {themes, settings} the page's viewer was given; wait: how long a page
-// without focus lets a focused one claim first
+// without focus lets a focused one claim first. The only page listening (req.pages)
+// claims at once: a page in the background has its timers slowed, and an agent's
+// trials (WO-37) would pay that on every render
 export async function answerRender(req, { source, themeSet, wait = UNFOCUSED_WAIT_MS }) {
-  if (!document.hasFocus() && wait) await new Promise((r) => setTimeout(r, wait));
+  if (!document.hasFocus() && wait && !(req.pages <= 1)) await new Promise((r) => setTimeout(r, wait));
   if (!(await source.claimRender(req.id))) return;   // another page has it
   const host = document.createElement('div');
   host.setAttribute('aria-hidden', 'true');
@@ -29,7 +31,10 @@ export async function answerRender(req, { source, themeSet, wait = UNFOCUSED_WAI
   document.body.appendChild(host);
   let v = null;
   try {
-    const text = await source.read(req.path);
+    // a draft (render.py --draft): text the agent sent, drawn in the map's place; the
+    // path still names the map (WO-37)
+    const draft = typeof req.text === 'string';
+    const text = draft ? req.text : await source.read(req.path);
     const st = req.state || {};
     v = mount(host, {
       storageKey: null, marks: false, showProblems: 'none',
@@ -56,6 +61,8 @@ export async function answerRender(req, { source, themeSet, wait = UNFOCUSED_WAI
       width: out.width, height: out.height, scaledDown: out.scaledDown,
       ...(out.report ? { report: out.report } : {}),
       ...(steps != null ? { steps } : {}),
+      // says it drew the draft, so render.py can tell an older page that read the file
+      ...(draft ? { draft: true } : {}),
       // what the agent should hear: a theme that is not here (the default was used)
       problems: v.problems.filter((p) => p.code === 'theme-unknown' || p.code === 'theme-built-in-used').map((p) => p.message),
     });

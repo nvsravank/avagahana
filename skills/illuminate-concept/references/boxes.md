@@ -12,8 +12,91 @@ in one file", "Deployments".
 - The inside of top-level boxes runs left to right whatever the first line says; each
   level further in turns 90 degrees. Children with no arrows between them line up
   across the way their box's arrows travel.
-- `direction TB` / `direction LR` inside a subgraph overrides it for that box. Leave
-  direction lines out unless the default looks wrong.
+- `direction TB` / `direction LR` inside a subgraph overrides it for that box, and its
+  children follow it whether or not they have arrows between them. Leave direction
+  lines out unless the default looks wrong.
+
+## Crossing arrows: the order of lines
+
+The layout cuts crossings itself wherever it can see the arrows: children of one
+subgraph with arrows among them are reordered by those arrows, whatever the file says.
+In two places it cannot see, and there it keeps the order the lines are written in:
+
+- **Arrows that leave a node's subgraph** (to anything outside the box it sits in) take
+  their places on the node's side in the order their lines are written. Arrows coming
+  in from outside do the same on the receiving node.
+- **Children of one subgraph with no arrows among them** sit in the order they are
+  first named.
+
+So reordering those lines moves things without changing what the map says.
+
+The order is read elsewhere too: colour by category gives each top-level thing its
+colour by its place, and List mode (the keyboard outline, screen readers) reads in file
+order. Reorder inside boxes and the arrows freely; move a top-level line only when the
+person agrees that its colours and List order may change.
+
+**When.** Only when the person says the arrows tangle, or the crossings look
+avoidable. Read the report (`render.md`, "Check it"): weigh `crossings.count` against
+`lines`. Crossings that are a large share of the arrows in a small picture are worth
+a try. A few among many arrows are usually the best the picture allows, and some
+pictures cannot be drawn without any: leave those. In `crossings.pairs`, a pair is
+worth trying when its two arrows share an end or join the same two subgraphs.
+
+**What to try:**
+
+1. In each subgraph, name the children in the order of what they connect to in the
+   subgraphs around them, each one in line with what most of its arrows reach.
+2. Write a node's arrows that leave its subgraph in the order their far ends sit along
+   the line (left to right, or top to bottom); write the arrows into one node in the
+   order their starts sit.
+3. When adding a node or an arrow later, put its line in its place, not at the end.
+
+The two work together: a node's place sets where its arrows should sit. Moving a node
+without re-sorting the arrows to its new place often looks like no gain, so a search
+that changes only one of them at a time can stop short.
+
+**How.** Try orders on a draft, not on the map: the reader's page redraws on every
+save. Write a short Python script that imports the renderer and asks for the layout
+report of each attempt's text, drawn in the map's place out of sight. No process starts
+per try and nothing is written, so a try takes about a tenth of a second:
+
+```python
+import sys
+sys.path.insert(0, "<plugin root>/relay-server")
+from render import draft_report, RenderError
+
+MAP, MAPS = "<Topic>/<Name>.md", "<maps folder>"
+VIEWS = [None, "Events"]          # None: the default view; then each `## Relations: <name>`
+
+def score(text):
+    """(crossings, problems) for each mode and view of the first diagram."""
+    out = {}
+    for mode in ("boxes", "layers"):
+        for view in VIEWS:
+            r = draft_report(MAP, text, maps_dir=MAPS, mode=mode, view=view)
+            out[mode, view] = (r["crossings"]["count"], len(r["overlaps"]) + len(r["cutLabels"]))
+    return out
+```
+
+Score every mode and view, not only the one the person reads. The reader can switch
+between Boxes and Layers, and a view lays out the first block's nodes in the first
+block's order, so a reorder that helps the default view can tangle a view. `view=`
+takes the name after `## Relations: `; `part=` a further diagram's heading anchor. Keep
+an attempt only when nothing gets worse anywhere; when the modes want opposite orders
+and neither can gain without the other losing, the picture is at its best: leave it.
+There is no need to look at pictures.
+
+Start from the order the rules above give (children in line with what they reach,
+then every arrow sorted by where its ends now sit). If crossings remain, let the script
+try changes from there and keep the best: move one node's line and re-sort the arrows
+to match; swap two arrow lines. Stop when a round brings nothing; a few hundred tries
+are a minute or so, and the start from the rules saves most of them. Then write the
+winner into the map once, and check that only the order changed: the same lines,
+sorted, as before.
+
+(From a shell, `render.py ... --draft <file> --report --out <file>.svg` does the same
+for one file: use a temp folder of your own, `mktemp -d`, never a fixed name another
+agent may be using.)
 
 ## C4 levels and drilling in
 

@@ -7,6 +7,7 @@ reader's open atlas page (no headless browser), without moving what the reader s
                                  [--mode MODE] [--colour-by category|level|class|changes]
                                  [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
                                  [--seq ANCHOR [--step N | --steps all|3-5]]
+                                 [--before FILE [--perspective before|after]] [--draft FILE]
                                  [--theme ID] [--appearance light|dark]
                                  [--width PX | --scale X] [--background theme|none]
                                  [--report] [--port N] [--maps-dir DIR]
@@ -14,6 +15,15 @@ reader's open atlas page (no headless browser), without moving what the reader s
 The format comes from --out's extension. --steps writes one file per step into --out,
 a folder (step-01.svg, step-02.svg, ...), each with its step lit.
 --report writes the layout report beside the file (<file>.report.json).
+--draft FILE draws that file's text in the map's place, a file the reader never sees
+(the agent tries a change before making it); the map path still names the map.
+
+As a library, for an agent's trial script (WO-37): draft_report() gives the layout
+report of a map's text drawn in the map's place, with no process and no file per try:
+
+  sys.path.insert(0, "<plugin root>/relay-server")
+  from render import draft_report, RenderError
+  report = draft_report("<folder>/<file>.md", text, maps_dir="<maps folder>", mode="layers")
 
 Finds the relay server serving the maps folder and sends POST /api/render. Prints one line:
   STATUS=rendered FILE=... [REPORT=...] [WARNING=...]   written
@@ -36,6 +46,38 @@ from serve_maps import COLOUR_BY, DEFAULT_PORT, MAP_DIR_ENV, RENDER_WAIT_S, find
 
 def ids(text):
     return [x.strip() for x in text.split(",") if x.strip()] if text else None
+
+
+class RenderError(Exception):
+    """A draft that could not be drawn: no relay or page, a bad field, or the map's own error."""
+
+
+_ports = {}
+
+
+def draft_report(map_path, text, *, maps_dir=None, port=DEFAULT_PORT, **state):
+    """The layout report (a dict, map-viewer-api.md) of text drawn in map_path's place by
+    the reader's open page, out of sight. state: the picture's state as the request names
+    it (mode, view, part, env, focus, expand, close, highlight, crop, colourBy, ...);
+    close and highlight as lists or comma-separated ids. One HTTP request, no files."""
+    folder, problem = resolve_maps_dir(maps_dir)
+    if problem:
+        raise RenderError(problem)
+    key = (str(folder), port)
+    if key not in _ports:
+        found = find_running(folder, port)
+        if found is None:
+            raise RenderError("no relay server for this maps folder: start serve_maps.py")
+        _ports[key] = found
+    st = {k: (ids(v) if k in ("close", "highlight") and isinstance(v, str) else v) for k, v in state.items() if v is not None}
+    answer, error = ask(_ports[key], {"path": map_path, "text": text, "state": st, "format": "svg", "report": True})
+    if error:
+        raise RenderError(error)
+    if answer.get("status") == "none":
+        raise RenderError(f"no page is open: open {map_url(_ports[key], map_path)}")
+    if not answer.get("draft"):
+        raise RenderError("the open page drew the map, not the draft: reload the page (and restart an older relay)")
+    return answer.get("report") or {}
 
 
 def ask(port, body):
@@ -103,6 +145,7 @@ def main(argv=None) -> int:
     ap.add_argument("--steps", help="one file per step: all, or a range like 3-5 (--out is a folder)")
     ap.add_argument("--before", help="an earlier version of the map (any file): the picture marks what differs")
     ap.add_argument("--perspective", choices=("before", "after"), help="with --before: draw the earlier file (before) or the map (after, the default)")
+    ap.add_argument("--draft", help="draw this file (any file) in the map's place: a change tried before it is made")
     ap.add_argument("--theme", help="a theme id (themes.py list)")
     ap.add_argument("--appearance", choices=("light", "dark"))
     size = ap.add_mutually_exclusive_group()
@@ -153,7 +196,14 @@ def main(argv=None) -> int:
         except OSError as exc:
             print(status_line("failed", error=f"cannot read --before {args.before}: {exc.strerror or exc}"))
             return 1
-    body = {k: v for k, v in {"path": args.map, "state": state, "format": fmt, "theme": args.theme,
+    draft = None
+    if args.draft:
+        try:
+            draft = Path(args.draft).expanduser().read_text(encoding="utf-8")
+        except OSError as exc:
+            print(status_line("failed", error=f"cannot read --draft {args.draft}: {exc.strerror or exc}"))
+            return 1
+    body = {k: v for k, v in {"path": args.map, "text": draft, "state": state, "format": fmt, "theme": args.theme,
                               "appearance": args.appearance, "width": args.width, "scale": args.scale,
                               "background": args.background, "report": args.report, "before": before}.items() if v is not None}
 
@@ -163,6 +213,9 @@ def main(argv=None) -> int:
             return None, error
         if answer.get("status") == "none":
             return {"none": True}, None
+        if draft is not None and not answer.get("draft"):
+            # an older relay or page drew the map's file instead: never pass that off as the draft
+            return None, "the open page drew the map, not the draft: reload the page (and restart an older relay), then run again"
         return {"answer": answer, "report": write(answer, target, args.report)}, None
 
     warnings = []

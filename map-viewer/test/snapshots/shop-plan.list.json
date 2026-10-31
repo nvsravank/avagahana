@@ -1,9 +1,49 @@
 [
  {
   "kind": "row",
+  "id": "psp",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [
+   "ph globe"
+  ],
+  "runs": [
+   [
+    {
+     "text": "Card provider",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "charge",
+    "name": "Charge API",
+    "label": "card token",
+    "glyph": "←",
+    "plan": "added"
+   },
+   {
+    "dir": "in",
+    "other": "payh",
+    "name": "Payment handler",
+    "label": null,
+    "glyph": "←",
+    "plan": "removed"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
   "id": "customer",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0",
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c3 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [
@@ -22,15 +62,15 @@
   "rels": [
    {
     "dir": "out",
-    "other": "ui",
-    "name": "Storefront",
+    "other": "cart",
+    "name": "Basket page",
     "label": null,
     "glyph": "→"
    },
    {
     "dir": "out",
-    "other": "cart",
-    "name": "Basket page",
+    "other": "ui",
+    "name": "Storefront",
     "label": null,
     "glyph": "→"
    }
@@ -41,7 +81,7 @@
   "kind": "row",
   "id": "shop",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
   "toggle": {
    "closed": false
   },
@@ -62,9 +102,9 @@
  },
  {
   "kind": "row",
-  "id": "web",
+  "id": "pay",
   "depth": 1,
-  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-pa",
   "toggle": {
    "closed": false
   },
@@ -73,7 +113,7 @@
   "runs": [
    [
     {
-     "text": "Web app",
+     "text": "Payments service",
      "bold": false,
      "italic": false
     }
@@ -81,20 +121,20 @@
   ],
   "count": null,
   "rels": [],
-  "note": false
+  "note": true
  },
  {
   "kind": "row",
-  "id": "ui",
+  "id": "charge",
   "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pa is-selected",
   "toggle": null,
   "closed": false,
   "icons": [],
   "runs": [
    [
     {
-     "text": "Storefront",
+     "text": "Charge API",
      "bold": false,
      "italic": false
     }
@@ -103,16 +143,32 @@
   "count": null,
   "rels": [
    {
-    "dir": "in",
-    "other": "customer",
-    "name": "Customer",
+    "dir": "out",
+    "other": "ledger",
+    "name": "Payments ledger",
     "label": null,
-    "glyph": "←"
+    "glyph": "→"
+   },
+   {
+    "dir": "in",
+    "other": "ord",
+    "name": "Order handler",
+    "label": "charge",
+    "glyph": "←",
+    "plan": "added"
    },
    {
     "dir": "out",
-    "other": "gw",
-    "name": "Gateway",
+    "other": "psp",
+    "name": "Card provider",
+    "label": "card token",
+    "glyph": "→",
+    "plan": "added"
+   },
+   {
+    "dir": "out",
+    "other": "fraud",
+    "name": "Fraud check",
     "label": null,
     "glyph": "→"
    }
@@ -121,16 +177,18 @@
  },
  {
   "kind": "row",
-  "id": "cart",
+  "id": "ledger",
   "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c5 mmv-pa",
   "toggle": null,
   "closed": false,
-  "icons": [],
+  "icons": [
+   "ph database"
+  ],
   "runs": [
    [
     {
-     "text": "Basket page",
+     "text": "Payments ledger",
      "bold": false,
      "italic": false
     }
@@ -140,17 +198,39 @@
   "rels": [
    {
     "dir": "in",
-    "other": "customer",
-    "name": "Customer",
+    "other": "charge",
+    "name": "Charge API",
     "label": null,
     "glyph": "←"
-   },
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "fraud",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pa",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Fraud check",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
    {
-    "dir": "out",
-    "other": "gw",
-    "name": "Gateway",
+    "dir": "in",
+    "other": "charge",
+    "name": "Charge API",
     "label": null,
-    "glyph": "→"
+    "glyph": "←"
    }
   ],
   "note": false
@@ -159,7 +239,7 @@
   "kind": "row",
   "id": "api",
   "depth": 1,
-  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
   "toggle": {
    "closed": false
   },
@@ -182,7 +262,7 @@
   "kind": "row",
   "id": "gw",
   "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -213,15 +293,15 @@
    },
    {
     "dir": "out",
-    "other": "auth",
-    "name": "Sign-in",
+    "other": "ord",
+    "name": "Order handler",
     "label": null,
     "glyph": "→"
    },
    {
     "dir": "out",
-    "other": "ord",
-    "name": "Order handler",
+    "other": "auth",
+    "name": "Sign-in",
     "label": null,
     "glyph": "→"
    }
@@ -232,7 +312,7 @@
   "kind": "row",
   "id": "auth",
   "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -261,7 +341,7 @@
   "kind": "row",
   "id": "orders",
   "depth": 1,
-  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
   "toggle": {
    "closed": false
   },
@@ -284,7 +364,7 @@
   "kind": "row",
   "id": "ord",
   "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pc",
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pc",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -308,10 +388,11 @@
    },
    {
     "dir": "out",
-    "other": "stock",
-    "name": "Stock check",
-    "label": null,
-    "glyph": "→"
+    "other": "charge",
+    "name": "Charge API",
+    "label": "charge",
+    "glyph": "→",
+    "plan": "added"
    },
    {
     "dir": "out",
@@ -323,64 +404,27 @@
    },
    {
     "dir": "out",
-    "other": "charge",
-    "name": "Charge API",
-    "label": "charge",
-    "glyph": "→",
-    "plan": "added"
-   },
-   {
-    "dir": "out",
     "other": "db",
     "name": "Orders database",
     "label": null,
     "glyph": "→",
     "plan": "changed"
+   },
+   {
+    "dir": "out",
+    "other": "stock",
+    "name": "Stock check",
+    "label": null,
+    "glyph": "→"
    }
   ],
   "note": true
  },
  {
   "kind": "row",
-  "id": "stock",
-  "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
-  "toggle": null,
-  "closed": false,
-  "icons": [],
-  "runs": [
-   [
-    {
-     "text": "Stock check",
-     "bold": false,
-     "italic": false
-    }
-   ]
-  ],
-  "count": null,
-  "rels": [
-   {
-    "dir": "in",
-    "other": "ord",
-    "name": "Order handler",
-    "label": null,
-    "glyph": "←"
-   },
-   {
-    "dir": "out",
-    "other": "db",
-    "name": "Orders database",
-    "label": null,
-    "glyph": "→"
-   }
-  ],
-  "note": false
- },
- {
-  "kind": "row",
   "id": "payh",
   "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pr is-hit",
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-pr is-hit",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -416,39 +460,16 @@
  },
  {
   "kind": "row",
-  "id": "pay",
-  "depth": 1,
-  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-pa",
-  "toggle": {
-   "closed": false
-  },
-  "closed": false,
-  "icons": [],
-  "runs": [
-   [
-    {
-     "text": "Payments service",
-     "bold": false,
-     "italic": false
-    }
-   ]
-  ],
-  "count": null,
-  "rels": [],
-  "note": true
- },
- {
-  "kind": "row",
-  "id": "charge",
+  "id": "stock",
   "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pa is-selected",
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
   "runs": [
    [
     {
-     "text": "Charge API",
+     "text": "Stock check",
      "bold": false,
      "italic": false
     }
@@ -460,91 +481,15 @@
     "dir": "in",
     "other": "ord",
     "name": "Order handler",
-    "label": "charge",
-    "glyph": "←",
-    "plan": "added"
-   },
-   {
-    "dir": "out",
-    "other": "fraud",
-    "name": "Fraud check",
-    "label": null,
-    "glyph": "→"
-   },
-   {
-    "dir": "out",
-    "other": "ledger",
-    "name": "Payments ledger",
-    "label": null,
-    "glyph": "→"
-   },
-   {
-    "dir": "out",
-    "other": "psp",
-    "name": "Card provider",
-    "label": "card token",
-    "glyph": "→",
-    "plan": "added"
-   }
-  ],
-  "note": false
- },
- {
-  "kind": "row",
-  "id": "fraud",
-  "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-pa",
-  "toggle": null,
-  "closed": false,
-  "icons": [],
-  "runs": [
-   [
-    {
-     "text": "Fraud check",
-     "bold": false,
-     "italic": false
-    }
-   ]
-  ],
-  "count": null,
-  "rels": [
-   {
-    "dir": "in",
-    "other": "charge",
-    "name": "Charge API",
     "label": null,
     "glyph": "←"
-   }
-  ],
-  "note": false
- },
- {
-  "kind": "row",
-  "id": "ledger",
-  "depth": 2,
-  "cls": "mmv-lrow mmv-k2 mmv-l3 mmv-d2 mmv-c5 mmv-pa",
-  "toggle": null,
-  "closed": false,
-  "icons": [
-   "ph database"
-  ],
-  "runs": [
-   [
-    {
-     "text": "Payments ledger",
-     "bold": false,
-     "italic": false
-    }
-   ]
-  ],
-  "count": null,
-  "rels": [
+   },
    {
-    "dir": "in",
-    "other": "charge",
-    "name": "Charge API",
+    "dir": "out",
+    "other": "db",
+    "name": "Orders database",
     "label": null,
-    "glyph": "←"
+    "glyph": "→"
    }
   ],
   "note": false
@@ -553,7 +498,7 @@
   "kind": "row",
   "id": "db",
   "depth": 1,
-  "cls": "mmv-lrow mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [
@@ -590,18 +535,39 @@
  },
  {
   "kind": "row",
-  "id": "psp",
-  "depth": 0,
-  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0",
-  "toggle": null,
+  "id": "web",
+  "depth": 1,
+  "cls": "mmv-lrow mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": {
+   "closed": false
+  },
   "closed": false,
-  "icons": [
-   "ph globe"
-  ],
+  "icons": [],
   "runs": [
    [
     {
-     "text": "Card provider",
+     "text": "Web app",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "ui",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Storefront",
      "bold": false,
      "italic": false
     }
@@ -610,20 +576,54 @@
   "count": null,
   "rels": [
    {
-    "dir": "in",
-    "other": "payh",
-    "name": "Payment handler",
+    "dir": "out",
+    "other": "gw",
+    "name": "Gateway",
     "label": null,
-    "glyph": "←",
-    "plan": "removed"
+    "glyph": "→"
    },
    {
     "dir": "in",
-    "other": "charge",
-    "name": "Charge API",
-    "label": "card token",
-    "glyph": "←",
-    "plan": "added"
+    "other": "customer",
+    "name": "Customer",
+    "label": null,
+    "glyph": "←"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "cart",
+  "depth": 2,
+  "cls": "mmv-lrow mmv-k3 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Basket page",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "gw",
+    "name": "Gateway",
+    "label": null,
+    "glyph": "→"
+   },
+   {
+    "dir": "in",
+    "other": "customer",
+    "name": "Customer",
+    "label": null,
+    "glyph": "←"
    }
   ],
   "note": false

@@ -499,6 +499,26 @@ try {
       && Math.abs((q('o').x + q('o').w / 2) - (q('d').x - q('d').w / 2) - q('top').w) < 30, JSON.stringify([q('top'), q('d'), q('o')]));
     check('layers: a band runs left to right', Math.abs(p('a').y - p('b').y) < 1 && p('a').x !== p('b').x);
     check('stroke-width 0: no box (no border, no fill)', strokeStyle(lay.byId.people.stroke) === 'fill:none;stroke:none', strokeStyle(lay.byId.people.stroke));
+
+    // children with no arrows between them: a box's own direction holds (WO-37)
+    const own = parseMap(['# D', '```mermaid', 'flowchart TB', '  u["User"]', '  subgraph sys [System]', '    subgraph tier [Tier]', '      direction LR',
+      '      subgraph gl [Row]', '        direction LR', '        a1["A1"]', '        a2["A2"]', '        a3["A3"]', '      end',
+      '      subgraph gt [Column]', '        direction TB', '        b1["B1"]', '        b2["B2"]', '        b3["B3"]', '      end', '    end', '  end',
+      '  u --> a1 & a2 & a3', '  u --> b1 & b2 & b3', '```'].join('\n'), 'd.md');
+    const LD = layoutBoxes(own.root, (n) => n.children, size, { relations: own.views[0].relations, byId: own.byId, direction: own.direction });
+    const d = (id) => LD.pos.get(own.byId[id]);
+    const inRow = (ids) => ids.every((id, i) => !i || (Math.abs(d(id).y - d(ids[0]).y) < 1 && d(id).x > d(ids[i - 1]).x));
+    const inColumn = (ids) => ids.every((id, i) => !i || d(id).y > d(ids[i - 1]).y);
+    check('direction LR inside a box running the same way: its children with no arrows between them in a row', inRow(['a1', 'a2', 'a3']) && d('gl').x < d('gt').x,
+      JSON.stringify(['a1', 'a2', 'a3', 'gl', 'gt'].map((id) => [id, Math.round(d(id).x), Math.round(d(id).y)])));
+    check('direction TB inside a box running the same way: its children with no arrows between them in a column', inColumn(['b1', 'b2', 'b3']),
+      JSON.stringify(['b1', 'b2', 'b3'].map((id) => [id, Math.round(d(id).x), Math.round(d(id).y)])));
+    // no direction line: as before, they line up across the parent's flow
+    const turn = parseMap(['# T', '```mermaid', 'flowchart LR', '  u["User"]', '  subgraph sys [System]', '    c1["C1"]', '    c2["C2"]', '  end', '  u --> c1 & c2', '```'].join('\n'), 't.md');
+    const LT = layoutBoxes(turn.root, (n) => n.children, size, { relations: turn.views[0].relations, byId: turn.byId, direction: turn.direction });
+    const t = (id) => LT.pos.get(turn.byId[id]);
+    check('no direction line: children with no arrows between them still line up across the parent\'s flow', Math.abs(t('c1').x - t('c2').x) < 1 && t('c2').y > t('c1').y,
+      JSON.stringify([t('c1'), t('c2')]));
   }
 
   // ---- drilled into a box: neighbours round it ----

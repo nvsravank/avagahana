@@ -317,6 +317,13 @@ def render_fields(body: dict):
         if not isinstance(before, str) or len(before.encode("utf-8")) > BEFORE_MAX:
             return None, f"before must be the earlier map's text, at most {BEFORE_MAX // 1024} KB"
         out["before"] = before
+    text = body.get("text")
+    if text is not None:
+        # a draft: this text drawn in the map's place, for an agent trying changes on a
+        # file the reader never sees (WO-37); path still names the map
+        if not isinstance(text, str) or len(text.encode("utf-8")) > BEFORE_MAX:
+            return None, f"text must be a map's text, at most {BEFORE_MAX // 1024} KB"
+        out["text"] = text
     return out, None
 
 
@@ -505,7 +512,7 @@ class Relay:
         return hashlib.sha256(str(self.maps_dir).encode("utf-8")).hexdigest()
 
     def capabilities(self) -> list:
-        caps = ["tree", "map", "events", "show", "render", "themes", "before"]
+        caps = ["tree", "map", "events", "show", "render", "themes", "before", "draft"]
         if self.can_open:
             caps.append("open")
         if self.can_shutdown:
@@ -702,7 +709,7 @@ def make_handler(relay: Relay):
         def _render(self):
             """The agent asks for a picture: one open page draws it in a hidden viewer and
             sends the file back. Waits up to RENDER_WAIT_S."""
-            body = self.read_json(limit=BEFORE_MAX + 8192)
+            body = self.read_json(limit=2 * BEFORE_MAX + 8192)   # an earlier version and a draft
             if body is None:
                 return self.send_json(400, {"error": "a JSON object is expected"})
             out, problem = render_fields(body)
@@ -715,6 +722,7 @@ def make_handler(relay: Relay):
                 return self.send_json(200, {"status": "none"})
             rid = relay.renders.open()
             out["id"] = rid
+            out["pages"] = relay.hub.count()   # a lone page claims at once (WO-37)
             relay.hub.broadcast("render", out)
             result = relay.renders.wait(rid, RENDER_WAIT_S)
             if result and result.get("unclaimed"):
@@ -736,7 +744,7 @@ def make_handler(relay: Relay):
             body = self.read_json(RENDER_MAX_BYTES)
             if body is None:
                 return self.send_json(400, {"error": "a JSON object is expected"})
-            keep = {k: body[k] for k in ("format", "data", "encoding", "width", "height", "scaledDown", "report", "steps", "problems", "error") if k in body}
+            keep = {k: body[k] for k in ("format", "data", "encoding", "width", "height", "scaledDown", "report", "steps", "problems", "draft", "error") if k in body}
             if not keep.get("error"):
                 if keep.get("format") not in ("svg", "png") or not isinstance(keep.get("data"), str) or keep.get("encoding") not in ("utf-8", "base64"):
                     return self.send_json(400, {"error": "an answer needs format, data and encoding"})

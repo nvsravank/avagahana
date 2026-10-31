@@ -180,11 +180,12 @@ export function layoutBoxes(root, kids, size, input) {
     // children with no arrows between them line up across the way their box's own
     // arrows travel (its parent's flow), so each has a clear side towards them: when
     // the box runs the parent's way, they share a rank (LOOSE_RUN to a rank); when it
-    // runs across, one to a rank, along the box's flow (wrapping after LOOSE_RUN)
+    // runs across, one to a rank, along the box's flow (wrapping after LOOSE_RUN).
+    // A box that says its own direction (dirOwn: a `direction` line) runs them along it.
     const looseRanks = [];
     const p = up(b);
     const axis = (d) => (d === 'LR' || d === 'RL' ? 'x' : 'y');
-    if (p && axis(dirOf(b)) === axis(dirOf(p))) {
+    if (p && !b.dirOwn && axis(dirOf(b)) === axis(dirOf(p))) {
       for (let i = 0; i < loose.length; i += LOOSE_RUN) looseRanks.push(loose.slice(i, i + LOOSE_RUN));
     } else {
       const run = Math.min(loose.length, LOOSE_RUN);

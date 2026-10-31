@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-10-31 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), and the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-10-31 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -70,7 +70,7 @@ External maps folder. Relative slash-separated paths identify .md and .mmd files
 
 ### <a id="skill"></a>Shared map skills
 
-Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and three more are read only when needed: render.md (pictures for documents, render.py, the layout report), themes.md (a brand or house style, themes.py) and compare.md (two versions of a map: show.py and render.py --before, the changes as data); render.md also says when to send a snapshot (pack.py) instead of a picture. trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
+Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and three more are read only when needed: render.md (pictures for documents, render.py, the layout report), themes.md (a brand or house style, themes.py) and compare.md (two versions of a map: show.py and render.py --before, the changes as data); render.md also says when to send a snapshot (pack.py) instead of a picture; boxes.md says where the order of lines sets the picture and how to untangle crossings by trying orders on drafts (draft_report). trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
 
 
 ### <a id="checker"></a>Standalone format checker
@@ -80,7 +80,7 @@ Python 3.9+ standard library checker. Validates syntax, extension sections, iden
 
 ### <a id="relay"></a>Optional relay
 
-Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages. Beside it, pack.py needs no running server: it fills map-viewer/snapshot.html (the page the viewer's own pack.js fills by the same rules) with one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. /api/info carries build, the code's commit, for an export's generator tag. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
+Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), or the report for a draft's text drawn in the map's place (--draft, or draft_report() in-process for a trial script), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages. Beside it, pack.py needs no running server: it fills map-viewer/snapshot.html (the page the viewer's own pack.js fills by the same rules) with one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. /api/info carries build, the code's commit, for an export's generator tag. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
 
 
 ### <a id="atlas"></a>Atlas owns the outside world
@@ -407,7 +407,7 @@ Types declare modes, colour encodings, branch ordering and initial collapse beha
 
 ### <a id="layoutHook"></a>layout and buildScene
 
-mindmap/layout.js, flowchart/layout.js, sequence/layout.js and er/layout.js define placement. State uses graph layout with state scene/check support.
+mindmap/layout.js, flowchart/layout.js, sequence/layout.js and er/layout.js define placement. flowchart/layout.js orders by arrows where it can and keeps the file's order where it cannot (unlinked children, arrows leaving a box); a box's own direction holds for its unlinked children. State uses graph layout with state scene/check support.
 
 
 ### <a id="custom"></a>Optional rendering hooks
@@ -506,7 +506,7 @@ The maps folder's own themes (.themes/): from the relay (api/themes, font files 
 
 ### <a id="pageRender"></a>render.js
 
-Answers the agent's render: claims it (a focused page at once, others after 0.6 s), mounts a hidden second viewer with the state asked for (no reader marks, nothing selected; an earlier version when the render brings one), exports, posts the file back and destroys it. The reader's viewer never moves. Evidence: atlas/render.js; docs/relay-server-api.md.
+Answers the agent's render: claims it (a focused page or the only page listening at once, others after 0.6 s), mounts a hidden second viewer with the state asked for (no reader marks, nothing selected; an earlier version when the render brings one; a draft's text in place of the map's file, said back as draft), exports, posts the file back and destroys it. The reader's viewer never moves. Evidence: atlas/render.js; docs/relay-server-api.md.
 
 
 ### <a id="viewerHost"></a>Viewer public API
@@ -567,7 +567,7 @@ GET info/ping/tree/map/events/themes/theme-file/before and static files. POST sh
 
 ### <a id="renders"></a>Renders waiting
 
-POST /api/render checks the fields, sends a render event and waits: a page claims it within 3 s (else status none) and answers within 30 s (else 504). The first claim wins; a claimer quiet for 5 s may be replaced. Nothing is kept once it is answered. Evidence: serve_maps.py Renders.
+POST /api/render checks the fields, sends a render event (with how many pages listen) and waits: a page claims it within 3 s (else status none) and answers within 30 s (else 504). The first claim wins; a claimer quiet for 5 s may be replaced. Nothing is kept once it is answered. Evidence: serve_maps.py Renders.
 
 
 ### <a id="themesDir"></a>Themes folder
@@ -645,7 +645,7 @@ sequenceDiagram
   relay-)page: SSE render event
   page->>relay: Claim it
   relay-->>page: Claimed
-  page->>relay: Read map
+  page->>relay: Read map, unless a draft brings its text
   relay-->>page: Markdown text
   page->>hidden: mount with state, load, export
   hidden-->>page: SVG or PNG and report

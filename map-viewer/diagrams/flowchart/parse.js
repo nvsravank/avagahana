@@ -99,7 +99,7 @@ export function parseFlowchart(lines, start, title, warnings) {
       if (stack.length > 1) stack.pop(); else warnings.push(problem('subgraph-end-extra', `"end" with no subgraph open (line ${i + 1}).`));
       continue;
     }
-    if ((m = t.match(/^direction\s+(\w+)$/))) { stack[stack.length - 1].dir = DIRS[m[1].toUpperCase()] || null; continue; }
+    if ((m = t.match(/^direction\s+(\w+)$/))) { Object.assign(stack[stack.length - 1], { dir: DIRS[m[1].toUpperCase()] || null, dirOwn: true }); continue; }
     if ((m = t.match(/^classDef\s+([\w-]+(?:\s*,\s*[\w-]+)*)\s+(.*)$/))) {
       for (const name of m[1].split(',')) classDefs[name.trim()] = m[2].trim();
       continue;

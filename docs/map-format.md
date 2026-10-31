@@ -277,7 +277,15 @@ flowchart LR
   to right whatever the map's line; each level further in turns 90 degrees (the
   system's boxes stack their contents top to bottom, the boxes inside those run left
   to right, and so on). A box can set its own with a `direction TB` line inside it; the boxes
-  inside it turn from there.
+  inside it turn from there. Children with no arrows between them line up across the
+  way their box's arrows travel, unless the box sets its own direction: then they
+  follow it too.
+- **Order**: where the layout has nothing else to go on, the order of lines decides.
+  Children of one box with no arrows among them sit in the order they are first named,
+  along their line; arrows that leave or enter a node's box take their places on the
+  node's side in the order they are written. Elsewhere the layout orders things by
+  their arrows to cut crossings. So reordering lines can untangle arrows without
+  changing what the map says.
 - **Boxes**: `subgraph <id> [<Title>]` ... `end`, nested to any depth. `subgraph
   "<Title>"` and `subgraph <Title words>` also work. Arrows may start or end at a box.
 - **Nodes**: `<id>` followed by any shape from the list above (`["…"]`, `[("…")]`, …);

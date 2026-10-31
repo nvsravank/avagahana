@@ -107,7 +107,7 @@ export function parseState(lines, start, title, warnings) {
     if (!t || t.startsWith('%%')) continue;
     if (/^(hide\s+empty\s+description|scale\b|accTitle\b|accDescr\b|style\b)/.test(t)) continue;
     let m;
-    if ((m = t.match(/^direction\s+(\w+)$/))) { here().dir = DIRS[m[1].toUpperCase()] || null; continue; }
+    if ((m = t.match(/^direction\s+(\w+)$/))) { Object.assign(here(), { dir: DIRS[m[1].toUpperCase()] || null, dirOwn: true }); continue; }
     if ((m = t.match(/^classDef\s+([\w-]+(?:\s*,\s*[\w-]+)*)\s+(.*)$/))) {
       for (const name of m[1].split(',')) classDefs[name.trim()] = m[2].trim();
       continue;

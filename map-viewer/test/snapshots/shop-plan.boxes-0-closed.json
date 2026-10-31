@@ -7,7 +7,7 @@
    "y": 0,
    "w": 706.2,
    "h": 222,
-   "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+   "cls": "mmv-frame mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Shop system, level 1, 5 children, a box",
    "title": {
     "text": "Shop system",
@@ -39,7 +39,7 @@
    "y": 0,
    "w": 89,
    "h": 72,
-   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
+   "cls": "mmv-node mmv-k2 mmv-l1 mmv-d1 mmv-c3 mmv-p0 is-figure",
    "grow": 1,
    "name": "Customer, level 1",
    "marks": {
@@ -79,7 +79,7 @@
    "y": 19,
    "w": 78,
    "h": 60,
-   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
    "name": "Web app, level 2, 2 children, collapsed",
    "marks": {
@@ -115,7 +115,7 @@
    "y": 19,
    "w": 48,
    "h": 60,
-   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
    "name": "API, level 2, 2 children, collapsed",
    "marks": {
@@ -151,7 +151,7 @@
    "y": 19,
    "w": 132,
    "h": 60,
-   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
    "name": "Orders service, level 2, 3 children, collapsed",
    "marks": {
@@ -187,7 +187,7 @@
    "y": -41,
    "w": 171,
    "h": 60,
-   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-pa",
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-c0 mmv-pa",
    "grow": 1,
    "name": "Payments service, level 2, 3 children, collapsed, has a note",
    "marks": {
@@ -229,7 +229,7 @@
    "y": 41,
    "w": 171,
    "h": 60,
-   "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
+   "cls": "mmv-node mmv-k3 mmv-l2 mmv-d2 mmv-c5 mmv-p0",
    "grow": 1,
    "name": "Orders database, level 2",
    "marks": {
@@ -270,7 +270,7 @@
    "y": 0,
    "w": 137,
    "h": 72,
-   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
    "grow": 1,
    "name": "Card provider, level 1",
    "marks": {
@@ -305,31 +305,6 @@
   }
  ],
  "rels": [
-  {
-   "kind": "rel",
-   "id": "customer>web",
-   "d": "M-489.9,19 L-378.3,19",
-   "cls": "mmv-flow mmv-p0",
-   "head": "arrow",
-   "tail": null,
-   "label": {
-    "x": -445.1,
-    "y": 23,
-    "text": "2 links"
-   },
-   "items": [
-    {
-     "from": "customer",
-     "to": "ui",
-     "label": ""
-    },
-    {
-     "from": "customer",
-     "to": "cart",
-     "label": ""
-    }
-   ]
-  },
   {
    "kind": "rel",
    "id": "web>api",
@@ -373,23 +348,6 @@
   },
   {
    "kind": "rel",
-   "id": "orders>psp",
-   "d": "M21.3,39 L104.9,39 Q112.9,39 112.9,47 L112.9,87 Q112.9,95 120.9,95 L417.9,95 Q425.9,95 425.9,87 L425.9,18 Q425.9,10 433.9,10 L441.9,10",
-   "cls": "mmv-flow mmv-pr",
-   "plan": "removed",
-   "head": "arrow",
-   "tail": null,
-   "label": null,
-   "items": [
-    {
-     "from": "payh",
-     "to": "psp",
-     "label": ""
-    }
-   ]
-  },
-  {
-   "kind": "rel",
    "id": "orders>pay",
    "d": "M21.3,-1 L104.9,-1 Q112.9,-1 112.9,-9 L112.9,-33 Q112.9,-41 120.9,-41 L128.9,-41",
    "cls": "mmv-flow mmv-pa",
@@ -406,6 +364,31 @@
      "from": "ord",
      "to": "charge",
      "label": "charge"
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "customer>web",
+   "d": "M-489.9,19 L-378.3,19",
+   "cls": "mmv-flow mmv-p0",
+   "head": "arrow",
+   "tail": null,
+   "label": {
+    "x": -445.1,
+    "y": 23,
+    "text": "2 links"
+   },
+   "items": [
+    {
+     "from": "customer",
+     "to": "cart",
+     "label": ""
+    },
+    {
+     "from": "customer",
+     "to": "ui",
+     "label": ""
     }
    ]
   },
@@ -451,6 +434,23 @@
     {
      "from": "stock",
      "to": "db",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "orders>psp",
+   "d": "M21.3,39 L104.9,39 Q112.9,39 112.9,47 L112.9,87 Q112.9,95 120.9,95 L417.9,95 Q425.9,95 425.9,87 L425.9,18 Q425.9,10 433.9,10 L441.9,10",
+   "cls": "mmv-flow mmv-pr",
+   "plan": "removed",
+   "head": "arrow",
+   "tail": null,
+   "label": null,
+   "items": [
+    {
+     "from": "payh",
+     "to": "psp",
      "label": ""
     }
    ]

@@ -79,7 +79,7 @@
    "y": 0,
    "w": 137,
    "h": 72,
-   "cls": "mmv-node mmv-k3 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
+   "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
    "grow": 1,
    "name": "Card provider, level 1",
    "marks": {

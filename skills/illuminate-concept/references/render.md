@@ -37,6 +37,10 @@ The same flags as `show.py`, plus the picture's own:
   (removed things marked), `after` (the default) the map (added things marked). With
   `--report` the report's `changes` lists what changed, in the view drawn and in each view
   and deployment: the findings of a review, as data. See `compare.md`.
+- `--draft <file>` draws that file in the map's place, on the reader's page but out of
+  sight: try a change on a temp file (outside the maps folder) before making it. The
+  map path still names the map. For many tries, import `draft_report` from `render.py`
+  instead (`boxes.md`, "Crossing arrows").
 - `--theme <id>` (see `themes.md`), `--appearance light|dark`.
 - `--width <px>` or `--scale <x>`; `--background none` for a transparent background;
   `.png` (or `--format png` with `--steps`) for PNG. A PNG past the browser's limits
@@ -52,8 +56,9 @@ writes `<file>.report.json` beside the picture:
 
 - `cutLabels`, `overlaps`: fix the map (shorter labels, fewer boxes in a group, another
   view) and render again.
-- `crossings.count`: many crossings mean the picture needs splitting into views or a
-  `--crop`.
+- `crossings.count`: weigh it against `lines`. Many crossings mean the picture needs
+  splitting into views or a `--crop`; a few avoidable ones can often be untangled by
+  the order of lines (`boxes.md`, "Crossing arrows").
 - `touching`: lines closer than 2 px at the output size; a larger `--width` or a
   smaller picture (`--crop`, `--expand`) helps.
 - `smallestText.px`: under about 9 px the text will not read in the document; give a

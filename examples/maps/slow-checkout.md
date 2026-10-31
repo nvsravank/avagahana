@@ -2,31 +2,31 @@
 
 ```mermaid
 flowchart LR
-  customer(["Customer"])
+  psp(["Card provider"])
   subgraph shop [Shop system]
-    ui["Storefront"]
-    gw["Gateway"]
-    subgraph orders [Orders service]
-      ord["Order handler"]
-      stock["Stock check"]
-    end
+    db[("Orders database")]
     subgraph pay [Payments]
       payh["Payment handler"]
       fraud["Fraud check"]
     end
-    db[("Orders database")]
+    ui["Storefront"]
+    subgraph orders [Orders service]
+      stock["Stock check"]
+      ord["Order handler"]
+    end
+    gw["Gateway"]
   end
-  psp(["Card provider"])
+  customer(["Customer"])
 
-  customer --> ui
-  ui e1@--> gw
-  gw e2@-->|order| ord
-  gw e3@-->|stock| stock
-  ord e4@-->|charge| payh
-  ord e5@-->|score| fraud
-  payh e6@-->|card token| psp
   stock e7@-->|stock levels| db
+  ui e1@--> gw
   ord e8@-->|order rows| db
+  customer --> ui
+  payh e6@-->|card token| psp
+  ord e4@-->|charge| payh
+  gw e3@-->|stock| stock
+  gw e2@-->|order| ord
+  ord e5@-->|score| fraud
 
   class customer person
   class psp external
