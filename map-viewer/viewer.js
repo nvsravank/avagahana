@@ -128,6 +128,9 @@ export function mount(element, options = {}) {
   // the map's earlier version (WO-34): text, never fetched. With it the reader switches
   // between Before (that file) and After (the map), each marked with what differs.
   let beforeText = options.before == null || options.thumbnail ? null : String(options.before);
+  // for the whole map's export (WO-35): when the map was saved (asOf: the footer's
+  // "as of", per map like the earlier version), and the version for its generator tag
+  let asOf = options.asOf ?? null;
 
   // ---------- state ----------
   const S = {
@@ -1161,10 +1164,12 @@ export function mount(element, options = {}) {
     problems.add('theme', r.problems);
     if (!r.ok) return { ok: false, problems: r.problems };
     themes.set(r.theme.id, r.theme);
+    themeSources.set(r.theme.id, obj);   // as given: what a snapshot carries
     if (ready.done) buildThemePanel();
     return { ok: true, problems: r.problems };
   }
   const currentTheme = () => themes.get(S.themeId);
+  const themeSources = new Map();
   function effectiveAppearance(t = currentTheme()) {
     const has = Object.keys(t.appearances);
     if (has.length === 1) return has[0];
@@ -1648,6 +1653,29 @@ export function mount(element, options = {}) {
   $.printBtn.addEventListener('click', (e) => { e.currentTarget.blur(); closePanels(); hideNote(); exporter.print(); });
   $.exportSvg.addEventListener('click', (e) => { e.currentTarget.blur(); exporter.exportSvg(); });
   $.exportPng.addEventListener('click', (e) => { e.currentTarget.blur(); exporter.exportPng(); });
+  // the whole map (WO-35): an interactive file needs the viewer's own files beside it, so
+  // not with assets (a snapshot, whose modules have no folder); the Markdown is the text
+  $.exportHtml.hidden = !!options.assets;
+  $.exportHtml.addEventListener('click', async (e) => {
+    const b = e.currentTarget;
+    b.blur();
+    if (b.getAttribute('aria-busy') === 'true') return;
+    const note = $.exportHtmlNote.textContent;
+    b.setAttribute('aria-busy', 'true');
+    $.exportHtmlNote.textContent = 'packing…';
+    try {
+      exporter.save(new Blob([await snapshot()], { type: 'text/html' }), `${wholeName()}.html`);
+    } catch (x) {
+      hostProblem('snapshot-failed', `The interactive file could not be made (${x?.message || x}).`);
+    } finally {
+      b.removeAttribute('aria-busy');
+      $.exportHtmlNote.textContent = note;
+    }
+  });
+  $.exportMd.addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    if (S.map?.root) exporter.save(new Blob([S.text], { type: 'text/markdown' }), `${wholeName()}.md`);
+  });
   // the power button exists only when the host can shut down
   $.exitBtn.hidden = typeof host.shutdown !== 'function';
   $.exitBtn.addEventListener('click', () => {
@@ -1747,6 +1775,8 @@ export function mount(element, options = {}) {
     // the earlier version goes with its map: given with the load, else kept only for the same map
     if ('before' in context) beforeText = context.before == null || options.thumbnail ? null : String(context.before);
     else if (!keep && !firstLoad) beforeText = null;
+    if ('asOf' in context) asOf = context.asOf ?? null;
+    else if (!keep && !firstLoad) asOf = null;
     // a thumbnail is handed the file its page's viewer already read
     // (each diagram copied, as a viewer sets the relations of the view it shows on it;
     // the nodes are shared and only read)
@@ -1961,6 +1991,40 @@ export function mount(element, options = {}) {
     player.open(key, { step, play: false });
   }
 
+  // ---------- the whole map as one file (WO-35) ----------
+  // The file's name: the map file's own, else its title.
+  const wholeName = () => (S.path ? S.path.split('/').pop().replace(/\.(md|mmd)$/i, '') : S.file?.title || 'map').replace(/[^\w.-]+/g, '_') || 'map';
+  // A snapshot of the map shown (pack.js, as relay-server/pack.py makes one): every
+  // diagram, opening where the reader is. Kept: the diagram, view or deployment, mode,
+  // relations shown, colouring, theme and appearance, Before; a sequence opens at step 1.
+  // Dropped: a node page, a search, a selection, a drilled-in box, boxes opened by hand,
+  // and this reader's own "since you looked" marks (a host's since goes in).
+  async function snapshot() {
+    await ready;
+    if (!S.map?.root || options.thumbnail) throw new Error('There is no map to export.');
+    if (options.assets) throw new Error('An interactive file needs the viewer\'s own files beside it (not with assets).');
+    const env = viewNamed(S.relView)?.deploy ? S.relView : null;
+    const play = player.state();
+    const state = {
+      ...(S.part ? { part: S.part } : {}),
+      mode: S.mode,
+      ...(env ? { env } : S.relView ? { view: S.relView } : {}),
+      ...(S.rels === '1' ? { rels: true } : {}),
+      ...(play.seq ? { seq: play.seq, step: 1 } : {}),
+      ...(S.compare && S.perspective === 'before' ? { perspective: 'before' } : {}),
+    };
+    const marks = sinceText != null && options.marks !== false;
+    const opts = {
+      marks,
+      ...(marks ? { since: sinceText, ...(options.sinceLabel ? { sinceLabel: options.sinceLabel } : {}) } : {}),
+      ...(beforeText != null ? { before: beforeText } : {}),
+      state,
+      prefs: { ...(S.appearance !== 'auto' ? { appearance: S.appearance } : {}), colourBy: S.colourBy },
+    };
+    const { packSnapshot } = await import(new URL('./pack.js', import.meta.url).href);
+    return packSnapshot({ text: S.text, path: S.path, theme: themeSources.get(S.themeId) || currentTheme(), options: opts, asOf, version: options.version ?? null });
+  }
+
   // ---------- contents ----------
   // Everything a reader can open in the file, in file order: each diagram (a sequence
   // as kind sequence), then its relation views when it has more than one (the default
@@ -2048,6 +2112,8 @@ export function mount(element, options = {}) {
     // the picture as a file instead of a download (export.js): {format, width | scale,
     // background, crop, report} -> {format, type, data, width, height, scaledDown, report}
     async export(opts = {}) { await ready; return exporter.exportImage(opts); },
+    // the whole map as one HTML file that opens offline (WO-35), as the Export menu makes it
+    snapshot,
     get themes() { return [...themes.values()].map((t) => ({ id: t.id, label: t.label })); },
     ready,
     slot: $.slot,

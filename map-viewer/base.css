@@ -287,6 +287,8 @@ button.mmv-pill:hover { background: var(--mmv-chrome-hover); }
 .mmv-hov:hover .mmv-drop, .mmv-hov:focus-within .mmv-drop { display: block; }
 .mmv-hov::after { content: ""; position: absolute; left: 0; right: 0; top: 34px; height: 8px; }
 .mmv-hov .mmv-drop.mmv-left-drop { left: 0; right: auto; width: auto; min-width: 190px; padding: 6px; }
+/* the Export menu: each item on one line (Whole map's are long), never wider than the viewer */
+.mmv-hov[data-mmv="exportWrap"] .mmv-drop { width: max-content; max-width: calc(100cqw - 28px); }
 
 button.mmv-pill.is-active { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
 

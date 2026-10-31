@@ -60,6 +60,8 @@ async function mountViewer() {
     // on a phone the bar's chips list every view; wider, the picker is there as before
     viewPicker: 'wide',
     prefs: first?.prefs,
+    // the export's generator tag: the relay's commit
+    ...(info?.build ? { version: info.build } : {}),
     themes: themeSet?.themes || [],
     defaultTheme: themeSet?.settings.builtIn !== false,
     ...(themeSet?.settings.default ? { theme: themeSet.settings.default } : {}),
@@ -221,12 +223,18 @@ async function openMap(path, state = {}, prefs = null) {
     return;
   }
   if (my !== seq) return;
-  await viewer.load(text, path, { sourceId, signal: controller.signal, before });
+  await viewer.load(text, path, { sourceId, signal: controller.signal, before, asOf: savedAt(path) });
   if (my === seq) pendingNavigation = 0;
   if (my !== seq || shown?.path !== path) return;
   viewer.setState(state);
   if (prefs) usePrefs(prefs);
 }
+
+// when the map was last saved (the list's mtime, in seconds): the export's "as of"
+const savedAt = (path) => {
+  const t = maps.find((m) => m.path === path)?.mtime;
+  return typeof t === 'number' ? t * 1000 : null;
+};
 
 // the map's earlier version the agent sent (WO-34: Before and After), or null
 const readBefore = (path) => (source.readBefore ? source.readBefore(path).catch(() => null) : Promise.resolve(null));
@@ -258,7 +266,7 @@ async function onChange() {
   try {
     const [text, before] = await Promise.all([src.read(path), readBefore(path)]);
     if (!current() || shown?.path !== path) return;
-    await viewer.load(text, path, { sourceId: id, signal: controller.signal, before });
+    await viewer.load(text, path, { sourceId: id, signal: controller.signal, before, asOf: savedAt(path) });
   } catch (_) { /* gone between list and read: wait for the next change */ }
 }
 

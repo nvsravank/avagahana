@@ -1,0 +1,45 @@
+<!--
+snapshot.html — the page of a snapshot: one map in one HTML file that opens from disk
+with no network and no server. Two packers fill it, with the same rules:
+relay-server/pack.py (an agent, from the command line) and map-viewer/pack.js (the
+viewer's Export menu, "Interactive HTML"). This comment, everything before the
+doctype, is left out of the file.
+
+  {{name}}   filled in once, left to right, never searched again: policy, generator,
+             title, mark, map_title, when, iso, shown, data, start (HTML-escaped but
+             policy, mark, data and start)
+
+What goes in data (JSON, every "<" written as < so nothing in it can end a tag):
+  order, modules  every module reachable from index.js, deepest first, each relative
+                  import swapped for @@avagahana-module:<path>@@ (not on a // or * comment line)
+  files           base.css; icons.json and vendor-icons.json as compact JSON, the cloud
+                  index cut to the icons the map's text names; the Phosphor files for every
+                  named code, every "ph <name>" in the map's texts and the modules, and
+                  circle-dashed (only those that exist); the cloud icon files used
+  theme, fonts    "default" or the theme object (font faces as {weight, style}), and each
+                  face's bytes as base64
+  options         text, path, marks (only with since), since, sinceLabel, before, state, prefs
+start: map-viewer/snapshot.js, the only script the policy allows (by its SHA-256 hash).
+The footer always says "Built with Avagahana" with the mark, linking home; no theme or
+setting hides or replaces it (user, 2026-10-31: "I am not looking for a white label
+solution"). The version is only in the generator tag, never shown.
+-->
+<!doctype html>
+<html lang="en"><head>
+<meta http-equiv="Content-Security-Policy" content="{{policy}}">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="{{generator}}">
+<title>{{title}}</title>
+<style>html,body{margin:0;height:100%}body{display:flex;flex-direction:column;font:12px system-ui,sans-serif;color:#555;background:#fff}
+#avagahana-map{flex:1;min-height:280px}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 16px;padding:4px 12px;border-top:1px solid #ddd}
+footer a{display:inline-flex;align-items:center;gap:5px;color:inherit;text-decoration:none}footer a:hover{text-decoration:underline}
+.av-mark{height:1.2em;width:auto}
+@media (prefers-color-scheme:dark){body{color:#aaa;background:#111}footer{border-color:#333}}</style>
+</head><body>
+<div id="avagahana-map"></div>
+<footer><a class="av-brand" href="https://sravannerella.com/avagahana/" target="_blank" rel="noopener noreferrer">{{mark}}Built with Avagahana</a><span class="av-about">{{map_title}} · {{when}} <time datetime="{{iso}}">{{shown}}</time></span></footer>
+<script type="application/json" id="avagahana-data">{{data}}</script>
+<script type="module">{{start}}</script>
+</body></html>

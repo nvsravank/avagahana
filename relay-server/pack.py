@@ -28,7 +28,6 @@ import html
 import json
 import posixpath
 import re
-import subprocess
 import sys
 from pathlib import Path
 from urllib.parse import unquote
@@ -37,7 +36,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 VIEWER = ROOT / "map-viewer"
 sys.path.insert(0, str(HERE))
-from serve_maps import COLOUR_BY, MAP_DIR_ENV, THEMES_DIR, read_themes, resolve_maps_dir, safe_join, status_line  # noqa: E402
+from serve_maps import COLOUR_BY, build_version, MAP_DIR_ENV, THEMES_DIR, read_themes, resolve_maps_dir, safe_join, status_line  # noqa: E402
 
 # a module's relative import: from './x.js', import('./x.js'), import './x.js'
 IMPORT = re.compile(r"""(\bfrom\s*|\bimport\s*\(\s*|^\s*import\s+)(['"])(\.{1,2}/[^'"]+)\2""", re.M)
@@ -45,35 +44,28 @@ TOKEN = "@@avagahana-module:{}@@"
 ICON_CODE = re.compile(r"\bph ([a-z0-9-]+)")
 VENDOR_CODE = re.compile(r"\b(aws|azure|gcp) ([a-z0-9-]+)")
 
+# The page (map-viewer/snapshot.html, footer included) and its start-up script are shared
+# with the viewer's own packer, map-viewer/pack.js, which follows the same rules (the
+# template's comment lists them): a change to how modules, icons, fonts or the page are
+# chosen is made in both, and a browser test packs one map with each and compares them.
+TEMPLATE = (VIEWER / "snapshot.html").read_text(encoding="utf-8")
+TEMPLATE = TEMPLATE[TEMPLATE.index("<!doctype"):]
+FIELD = re.compile(r"\{\{(\w+)\}\}")
 # the start-up script; its hash is the only inline script the policy allows
 START = (VIEWER / "snapshot.js").read_text(encoding="utf-8")
-# the footer: always "Built with Avagahana" with the mark, linking home; no theme or
-# setting hides or replaces it (user, 2026-10-31: "I am not looking for a white label solution")
-HOME = "https://sravannerella.com/avagahana/"
-MARK = re.sub(r"<title>.*?</title>", "", (ROOT / "atlas/brand/mark.svg").read_text(encoding="utf-8").strip(), flags=re.S)
+# the footer's mark (a copy of atlas/brand/mark.svg that check.sh keeps identical)
+MARK = re.sub(r"<title>.*?</title>", "", (VIEWER / "mark.svg").read_text(encoding="utf-8").strip(), flags=re.S)
 MARK = MARK.replace("<svg ", '<svg class="av-mark" aria-hidden="true" focusable="false" ', 1)
 
-PAGE = """<!doctype html>
-<html lang="en"><head>
-<meta http-equiv="Content-Security-Policy" content="{policy}">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="{generator}">
-<title>{title}</title>
-<style>html,body{{margin:0;height:100%}}body{{display:flex;flex-direction:column;font:12px system-ui,sans-serif;color:#555;background:#fff}}
-#avagahana-map{{flex:1;min-height:280px}}
-footer{{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 16px;padding:4px 12px;border-top:1px solid #ddd}}
-footer a{{display:inline-flex;align-items:center;gap:5px;color:inherit;text-decoration:none}}footer a:hover{{text-decoration:underline}}
-.av-mark{{height:1.2em;width:auto}}
-@media (prefers-color-scheme:dark){{body{{color:#aaa;background:#111}}footer{{border-color:#333}}}}</style>
-</head><body>
-<div id="avagahana-map"></div>
-<footer><a class="av-brand" href="{home}" target="_blank" rel="noopener noreferrer">{mark}Built with Avagahana</a>\
-<span class="av-about">{map_title} · {when} <time datetime="{iso}">{shown}</time></span></footer>
-<script type="application/json" id="avagahana-data">{data}</script>
-<script type="module">{start}</script>
-</body></html>
-"""
+
+def compact(value):
+    """JSON as both packers write it: no spaces, non-ASCII as is."""
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
+def is_comment(text, at):
+    """Whether the line holding position at is a // or * comment up to there."""
+    return text[text.rfind("\n", 0, at) + 1:at].lstrip().startswith(("//", "*"))
 
 
 def viewer_modules():
@@ -87,8 +79,8 @@ def viewer_modules():
 
         def swap(m, path=path, found=found):
             target = posixpath.normpath(posixpath.join(posixpath.dirname(path), m.group(3)))
-            if target not in texts:
-                return m.group(0)   # an example path in a comment
+            if is_comment(text, m.start()) or target not in texts:
+                return m.group(0)   # an example in a comment
             found.append(target)
             return f"{m.group(1)}{m.group(2)}{TOKEN.format(target)}{m.group(2)}"
         out[path] = IMPORT.sub(swap, text)
@@ -119,7 +111,7 @@ def icon_files(texts, modules):
     names = {c["ph"] for c in index.get("codes", {}).values() if isinstance(c, dict) and c.get("ph")}
     names |= set(ICON_CODE.findall(text + "\n".join(modules.values())))
     names.add("circle-dashed")   # the unknown icon (icons.js)
-    files = {"base.css": (VIEWER / "base.css").read_text(encoding="utf-8"), "icons.json": json.dumps(index)}
+    files = {"base.css": (VIEWER / "base.css").read_text(encoding="utf-8"), "icons.json": compact(index)}
     for name in sorted(names):
         f = VIEWER / "vendor/phosphor/duotone" / f"{name}-duotone.svg"
         if f.is_file():
@@ -140,7 +132,7 @@ def icon_files(texts, modules):
         for src in (entry[0], entry[2] if len(entry) > 2 else None):
             if src:
                 files[f"vendor/{src}"] = (VIEWER / "vendor" / src).read_text(encoding="utf-8")
-    files["vendor-icons.json"] = json.dumps(dict(vendor, sets=sets))
+    files["vendor-icons.json"] = compact(dict(vendor, sets=sets))
     return files
 
 
@@ -169,19 +161,6 @@ def folder_theme(maps_dir, theme_id):
     return theme, fonts
 
 
-def version():
-    """The commit the viewer is packed from: git when this is a checkout, else the plugin
-    folder's name (an installed plugin's folder is its commit); None when neither."""
-    try:
-        out = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short=12", "HEAD"],
-                             capture_output=True, text=True, timeout=5)
-        if out.returncode == 0 and out.stdout.strip():
-            return out.stdout.strip()
-    except (OSError, subprocess.SubprocessError):
-        pass
-    return ROOT.name if re.fullmatch(r"[0-9a-f]{7,40}", ROOT.name) else None
-
-
 def map_title(text, fallback):
     m = re.search(r"^# +(.+?) *$", text, re.M)
     return m.group(1).strip() if m else fallback
@@ -196,19 +175,20 @@ def pack(map_text, map_path, theme, fonts, options, saved=None, now=None):
     files = icon_files(texts, modules)
     title = map_title(map_text, Path(map_path).stem)
     when = (saved or now or datetime.datetime.now()).astimezone()
-    v = version()
+    v = build_version()
     data = {"order": order, "modules": modules, "files": files, "theme": theme, "fonts": fonts,
             "options": dict(options, text=map_text, path=map_path)}
     # as JSON inside <script>: no "<" at all, so nothing in it can end or open a tag
-    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+    payload = compact(data).replace("<", "\\u003c")
     digest = base64.b64encode(hashlib.sha256(START.encode("utf-8")).digest()).decode()
     policy = (f"default-src 'none'; script-src 'sha256-{digest}' blob:; connect-src 'none'; "
               "style-src 'unsafe-inline'; img-src data: blob:; font-src data: blob:; "
               "base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'")
-    return PAGE.format(policy=policy, title=html.escape(title), home=HOME, mark=MARK,
-                       generator=html.escape(f"Avagahana pack.py {v}" if v else "Avagahana pack.py"), map_title=html.escape(title),
-                       when="as of" if saved else "exported", iso=when.isoformat(timespec="seconds"),
-                       shown=f"{when.day} {when.strftime('%b %Y, %H:%M')}", data=payload, start=START)
+    fields = {"policy": policy, "generator": html.escape(f"Avagahana pack.py {v}" if v else "Avagahana pack.py"),
+              "title": html.escape(title), "mark": MARK, "map_title": html.escape(title),
+              "when": "as of" if saved else "exported", "iso": when.isoformat(timespec="seconds"),
+              "shown": html.escape(f"{when.day} {when.strftime('%b %Y, %H:%M')}"), "data": payload, "start": START}
+    return FIELD.sub(lambda m: fields[m.group(1)], TEMPLATE)
 
 
 def read_file(flag, name):

@@ -19,7 +19,7 @@ Contract: docs/relay-server-api.md.
 Serves, on 127.0.0.1 only:
   /                     atlas/ (index.html and its files)   --atlas-dir
   /map-viewer/<file>    the map viewer's files              --viewer-dir
-  GET  /api/info        {app, version, capabilities}
+  GET  /api/info        {app, version, build, capabilities}  (build: the code's commit, or null)
   GET  /api/ping        {app, version, root}: identity, so a second launch can reuse this server
   GET  /api/tree        {state, maps: [{path, title, mtime, size}]}
   GET  /api/map?p=<rel> raw text of one map (path-traversal guarded)
@@ -57,6 +57,23 @@ from urllib.parse import parse_qs, quote, unquote, urlencode, urlsplit
 
 VERSION = "0.1.0"
 APP_ID = "avagahana-relay"
+_build = []
+
+
+def build_version():
+    """The commit this code is: git when it is a checkout, else the plugin folder's name
+    (an installed plugin's folder is its commit); None when neither. Read once."""
+    if not _build:
+        root, found = Path(__file__).resolve().parent.parent, None
+        try:
+            out = subprocess.run(["git", "-C", str(root), "rev-parse", "--short=12", "HEAD"],
+                                 capture_output=True, text=True, timeout=5)
+            if out.returncode == 0 and out.stdout.strip():
+                found = out.stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            pass
+        _build.append(found or (root.name if re.fullmatch(r"[0-9a-f]{7,40}", root.name) else None))
+    return _build[0]
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parent
 DEFAULT_PORT = 18300
@@ -564,7 +581,7 @@ def make_handler(relay: Relay):
             parts = urlsplit(self.path)
             path, query = parts.path, parts.query
             if path == "/api/info":
-                return self.send_json(200, {"app": APP_ID, "version": VERSION, "capabilities": relay.capabilities(), "sourceId": relay.source_id()})
+                return self.send_json(200, {"app": APP_ID, "version": VERSION, "build": build_version(), "capabilities": relay.capabilities(), "sourceId": relay.source_id()})
             if path == "/api/ping":
                 return self.send_json(200, {"app": APP_ID, "version": VERSION, "root": str(relay.maps_dir), "config": relay.config()})
             if path == "/api/tree":

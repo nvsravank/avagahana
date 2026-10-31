@@ -354,13 +354,14 @@ export function createExporter(v) {
 
   const build = (opts) => (S.mode === 'list' ? buildList(opts) : buildDrawn(opts));
   const fileName = (ext) => `${(S.map?.title || 'map').replace(/[^\w.-]+/g, '_')}.${ext}`;
-  function download(blob, ext) {
+  function save(blob, name) {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = fileName(ext);
+    a.download = name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
+  const download = (blob, ext) => save(blob, fileName(ext));
   const dataUrl = (text) => `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(text)))}`;
 
   // The picture as a file, not downloaded: viewer.export(). opts: {format: 'svg' | 'png',
@@ -450,5 +451,5 @@ export function createExporter(v) {
     win.print();
   }
 
-  return { exportImage, exportSvg, exportPng, print, destroy: () => { frame?.remove(); frame = null; } };
+  return { exportImage, exportSvg, exportPng, print, save, destroy: () => { frame?.remove(); frame = null; } };
 }

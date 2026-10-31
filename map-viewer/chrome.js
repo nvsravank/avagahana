@@ -126,10 +126,15 @@ export function chromeHtml(uid) {
   <div class="mmv-hov" data-mmv="exportWrap">
     <button class="mmv-pill mmv-icon" data-mmv="exportBtn" title="Export">${ic('download')}</button>
     <div class="mmv-panel mmv-drop mmv-left-drop">
+      <div class="mmv-menu-head">This view</div>
       <button class="mmv-menu-item" data-mmv="exportSvg">SVG <span>sharp, editable</span></button>
       <button class="mmv-menu-item" data-mmv="exportPng">PNG <span>pastes anywhere</span></button>
       <hr class="mmv-menu-sep">
       <button class="mmv-menu-item" data-mmv="printBtn"><span class="mmv-mi-label">${ic('print')}Print</span><span data-mmv="printKey"></span></button>
+      <hr class="mmv-menu-sep">
+      <div class="mmv-menu-head">Whole map</div>
+      <button class="mmv-menu-item" data-mmv="exportHtml">Interactive HTML <span data-mmv="exportHtmlNote">explore offline</span></button>
+      <button class="mmv-menu-item" data-mmv="exportMd">Source file <span>edit with your agent</span></button>
     </div>
   </div>
   <button class="mmv-pill mmv-persp" data-mmv="perspBtn" hidden>${ic('perspective')}<span data-mmv="perspName"></span></button>

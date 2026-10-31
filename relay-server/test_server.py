@@ -129,6 +129,9 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(info["app"], "avagahana-relay")
         self.assertEqual(info["version"], serve_maps.VERSION)
+        # the code's commit (this is a checkout), for the generator tag of an export
+        self.assertEqual(info["build"], serve_maps.build_version())
+        self.assertRegex(info["build"] or "", r"^[0-9a-f]{12}$")
         self.assertEqual(info["capabilities"], ["tree", "map", "events", "show", "render", "themes", "before", "open", "shutdown"])
 
     def test_source_identity(self):

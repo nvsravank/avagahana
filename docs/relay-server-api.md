@@ -62,7 +62,7 @@ python3 relay-server/serve_maps.py [--port N] [--maps-dir DIR] [--map <rel path>
 |---|---|
 | `GET /` and `GET /<file>` | The atlas (`index.html` and its files). |
 | `GET /map-viewer/<file>` | The map viewer's files. |
-| `GET /api/info` | `{app, version, capabilities, sourceId}`. `capabilities` is a list of `tree`, `map`, `events`, `show`, `render`, `themes`, `before`, `open`, `shutdown` (`render` and `themes` added in WO-32, `before` in WO-34). |
+| `GET /api/info` | `{app, version, build, capabilities, sourceId}`. `build`: the commit of the code the relay runs (a git checkout's, or an installed plugin folder's name), or `null`; the atlas passes it to the viewer for an export's generator tag (added in WO-35). `capabilities` is a list of `tree`, `map`, `events`, `show`, `render`, `themes`, `before`, `open`, `shutdown` (`render` and `themes` added in WO-32, `before` in WO-34). |
 | `GET /api/ping` | `{app, version, root, config}`: identity, so a second launch can reuse this server. Kept for older skills. |
 | `GET /api/tree` | `{state, maps: [{path, title, mtime, size}]}` (see `map-source.md`). Hidden files and folders are left out. |
 | `GET /api/map?p=<path>` | Raw text of one map, `text/plain; charset=utf-8`. `404` if not a map. |

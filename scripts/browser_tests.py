@@ -182,18 +182,26 @@ def pack(name, out, *args, maps_dir=EXAMPLES):
     return run.stdout.strip(), out
 
 
-def open_snapshot(browser, path, act=None):
+def open_snapshot(browser, path, act=None, downloads=None):
     """Open a snapshot from file:// in a fresh profile: (drawn, act's answer, errors).
     act(evaluate, click) runs once it has drawn. errors: console errors, exceptions and
-    blocked loads (a security-policy report is an error too)."""
+    blocked loads (a security-policy report is an error too). downloads: a folder files
+    the page saves go to."""
+    return drive(browser, path.resolve().as_uri(), act, downloads=downloads)
+
+
+def drive(browser, url, act=None, wait_drawn=True, downloads=None):
+    """open_snapshot for any URL; wait_drawn False runs act once the page has loaded."""
     with tempfile.TemporaryDirectory() as profile, chrome_pipe(browser, profile) as (send, events):
-        target = send("Target.createTarget", {"url": path.resolve().as_uri(), "width": 1200, "height": 900, "newWindow": True})["targetId"]
+        if downloads:
+            send("Browser.setDownloadBehavior", {"behavior": "allow", "downloadPath": str(downloads)})
+        target = send("Target.createTarget", {"url": url, "width": 1200, "height": 900, "newWindow": True})["targetId"]
         session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
         send("Runtime.enable", session=session)
         send("Log.enable", session=session)
 
-        def evaluate(expression):
-            got = send("Runtime.evaluate", {"expression": expression, "returnByValue": True, "awaitPromise": True}, session)
+        def evaluate(expression, wait=30):
+            got = send("Runtime.evaluate", {"expression": expression, "returnByValue": True, "awaitPromise": True}, session, wait=wait)
             return got.get("result", {}).get("value")
 
         def click(selector):
@@ -207,9 +215,9 @@ def open_snapshot(browser, path, act=None):
         drawn = 0
         end = time.time() + 30
         while time.time() < end and not drawn:
-            drawn = evaluate(DRAWN) or 0
+            drawn = evaluate(DRAWN if wait_drawn else "document.readyState === 'complete' && (window.packReady || 0)") or 0
             time.sleep(0.25)
-        time.sleep(1)   # icons, fonts and glides settle
+        time.sleep(1 if wait_drawn else 0)   # icons, fonts and glides settle
         answer = act(evaluate, click) if act and drawn else None
         errors = [e["params"]["entry"]["text"] for e in events if e["method"] == "Log.entryAdded" and e["params"]["entry"]["level"] == "error"]
         errors += [e["params"]["exceptionDetails"].get("text", "exception") for e in events if e["method"] == "Runtime.exceptionThrown"]
@@ -217,7 +225,107 @@ def open_snapshot(browser, path, act=None):
         return drawn, answer, errors
 
 
-def snapshot_tests(browser):
+def payload(page):
+    """A snapshot's packed data."""
+    return json.loads(re.search(r'<script type="application/json" id="avagahana-data">(.*?)</script>', page, re.S).group(1))
+
+
+def differences(a, b):
+    """Where two packed data differ, briefly ([] when they are the same)."""
+    out = []
+    for key in sorted(set(a) | set(b)):
+        x, y = a.get(key), b.get(key)
+        if x == y:
+            continue
+        if isinstance(x, dict) and isinstance(y, dict):
+            out += [f"{key}.{k}" for k in sorted(set(x) | set(y)) if x.get(k) != y.get(k)][:5]
+        else:
+            out.append(key)
+    return out
+
+
+# the viewer's state and looks as pack.py's flags
+FLAGS = {"part": "--part", "mode": "--mode", "view": "--view", "env": "--env", "seq": "--seq", "step": "--step",
+         "colourBy": "--colour-by", "appearance": "--appearance"}
+
+
+def viewer_pack_tests(browser, base, tmp, check):
+    """WO-35: the viewer's packer (map-viewer/pack.js) makes what pack.py makes for the
+    same map and state, and its files open from file://."""
+    page = base + "map-viewer/test/pack.html"
+    maps = tmp / "viewer-themed"
+    (maps / ".themes").mkdir(parents=True)
+    font = "AtkinsonHyperlegibleNext-Bold.woff2"
+    shutil.copy(ROOT / "map-viewer/themes/default/fonts" / font, maps / ".themes" / font)
+    sample = json.loads((ROOT / "format" / "theme-samples" / "clean.json").read_text(encoding="utf-8"))["theme"]
+    (maps / ".themes" / "brand.json").write_text(json.dumps(dict(sample, font={"family": "Brand", "faces": [{"file": font, "weight": 700, "style": "normal"}]})), encoding="utf-8")
+    (maps / "garden.md").write_text((EXAMPLES / "garden.md").read_text(encoding="utf-8"), encoding="utf-8")
+    sys.path.insert(0, str(ROOT / "relay-server"))
+    from serve_maps import read_themes   # noqa: E402
+    brand = next(t for t in read_themes(maps)["themes"] if t["id"] == "brand")
+    for face in brand["font"]["faces"]:
+        face["fontUrl"] = f"../themes/default/fonts/{font}"
+    before = (EXAMPLES / "checkout-release-before.md").read_text(encoding="utf-8")
+    cases = [
+        ("garden, as it opens", "garden.md", {}),
+        ("garden in List mode, a node page open", "garden.md", {"act": {"mode": "list", "page": "n38"}}),
+        ("a deployment with cloud icons", "checkout-release-after.md", {"state": {"env": "Production"}}),
+        ("a sequence at step 3", "job-race.md", {"act": {"seq": "main", "step": 3}}),
+        ("an earlier version and a host's since", "checkout-release-after.md", {"before": before, "since": before, "sinceLabel": "last release"}),
+        ("dark, coloured by level", "garden.md", {"prefs": {"appearance": "dark", "colourBy": "level"}}),
+        ("a .themes theme with its font", "garden.md", {"theme": brand}),
+    ]
+    for name, md, req in cases:
+        text = ((maps if req.get("theme") else EXAMPLES) / md).read_text(encoding="utf-8")
+        ask = json.dumps(dict(req, text=text, path=md))
+        _, made, errors = drive(browser, page, lambda ev, _c, ask=ask: ev(f"packWith({ask})", wait=60), wait_drawn=False)
+        if not made:
+            check(f"the viewer packs: {name}", False, errors[:3])
+            continue
+        mine = payload(made)
+        args = []
+        for key, value in {**mine["options"].get("state", {}), **mine["options"].get("prefs", {})}.items():
+            if key in FLAGS:
+                args += [FLAGS[key], str(value)]
+        for flag in ("before", "since"):
+            if flag in mine["options"]:
+                (tmp / f"{flag}.md").write_text(mine["options"][flag], encoding="utf-8")
+                args += [f"--{flag}", str(tmp / f"{flag}.md")]
+        if "sinceLabel" in mine["options"]:
+            args += ["--since-label", mine["options"]["sinceLabel"]]
+        if req.get("theme"):
+            args += ["--theme", "brand"]
+        line, out = pack(md, tmp / "theirs.html", *args, maps_dir=maps if req.get("theme") else EXAMPLES)
+        theirs = payload(out.read_text(encoding="utf-8")) if line.startswith("STATUS=packed") else {}
+        # rels and perspective are the viewer's only (pack.py takes no flag for them)
+        state = {k: v for k, v in mine["options"].get("state", {}).items() if k not in ("rels", "perspective")}
+        mine_cmp = dict(mine, options=dict(mine["options"], state=state))
+        if not state:
+            mine_cmp["options"].pop("state")
+        if "prefs" in mine_cmp["options"] and "prefs" not in theirs.get("options", {}):
+            mine_cmp["options"].pop("prefs")
+        diff = differences(mine_cmp, theirs)
+        check(f"both packers make the same data: {name}", not diff, f"{line}; differ: {diff}")
+        mine_file = tmp / "mine.html"
+        mine_file.write_text(made, encoding="utf-8")
+        drawn, _, errors = open_snapshot(browser, mine_file)
+        check(f"the viewer's file opens from file:// with no errors: {name}", drawn and not errors, f"{drawn} nodes; {errors[:3]}")
+
+    # what the viewer's file carries: where the reader was, and what it drops
+    ask = json.dumps({"text": (EXAMPLES / "job-race.md").read_text(encoding="utf-8"), "path": "job-race.md", "version": "abc123", "act": {"seq": "main", "step": 3}})
+    _, made, _ = drive(browser, page, lambda ev, _c: ev(f"packWith({ask})", wait=60), wait_drawn=False)
+    (tmp / "seq.html").write_text(made or "", encoding="utf-8")
+    _, step, errors = open_snapshot(browser, tmp / "seq.html", lambda ev, _c: ev("document.querySelector('#avagahana-map .mmv-count-long')?.textContent"))
+    check("the viewer's file: a sequence opens at step 1", (step or "").startswith("Step 1 of") and not errors, f"{step!r}; {errors[:3]}")
+    check("the viewer's file: the version only in the generator tag", made and '<meta name="generator" content="Avagahana pack.js abc123">' in made and "abc123" not in made.split("<footer>")[1].split("</footer>")[0])
+    ask = json.dumps({"text": (EXAMPLES / "garden.md").read_text(encoding="utf-8"), "path": "garden.md", "act": {"mode": "list", "page": "n38", "node": "n38"}})
+    _, made, _ = drive(browser, page, lambda ev, _c: ev(f"packWith({ask})", wait=60), wait_drawn=False)
+    (tmp / "list.html").write_text(made or "", encoding="utf-8")
+    drawn, got, errors = open_snapshot(browser, tmp / "list.html", lambda ev, _c: ev("[!document.querySelector('#avagahana-map .mmv-list').hidden, document.querySelector('#avagahana-map .mmv').classList.contains('is-paged'), !!document.querySelector('#avagahana-map .is-selected')]"))
+    check("the viewer's file: List mode kept, no node page or selection", got == [True, False, False] and not errors, f"{got}; {errors[:3]}")
+
+
+def snapshot_tests(browser, base=None):
     """Every example packed and opened offline, plus the snapshot's own behaviour."""
     results = []
 
@@ -288,6 +396,19 @@ def snapshot_tests(browser):
         })()"""
         drawn, said, _ = open_snapshot(browser, planted, lambda ev, _c: ev(probe))
         check("the policy blocks a planted script, fetches and images", drawn and said == "blocked blocked blocked blocked blocked", said)
+
+        # inside a snapshot (WO-35): no interactive file; the Markdown saves under the policy
+        saved = tmp / "saved"
+        saved.mkdir()
+        menu = "[...document.querySelectorAll('#avagahana-map [data-mmv=exportWrap] .mmv-menu-item')].filter((b) => !b.hidden).map((b) => b.dataset.mmv).join(' ')"
+        drawn, items, errors = open_snapshot(browser, garden, lambda ev, _c: [ev(menu), ev("document.querySelector('[data-mmv=exportMd]').click()"), time.sleep(2)][0], downloads=saved)
+        check("inside a snapshot: SVG, PNG, Print and Markdown, no interactive file", items == "exportSvg exportPng printBtn exportMd", items)
+        got = saved / "garden.md"
+        check("inside a snapshot: Source file saves the map's text, allowed by the policy",
+              got.is_file() and got.read_text(encoding="utf-8") == (EXAMPLES / "garden.md").read_text(encoding="utf-8") and not errors, f"{sorted(p.name for p in saved.iterdir())}; {errors[:3]}")
+
+        if base:
+            viewer_pack_tests(browser, base, tmp, check)
     return results
 
 
@@ -354,18 +475,18 @@ def main():
                 for line in text.splitlines():
                     if line.strip().startswith("✗") or line.strip().startswith("- ") or "->" in line:
                         print("     " + line.strip()[:300])
-    server.shutdown()
 
     if os.name == "posix":
-        results = snapshot_tests(browser)
+        results = snapshot_tests(browser, base)
         ok = sum(1 for _, good, _ in results if good)
-        print(f"{'ok  ' if ok == len(results) else 'FAIL'} snapshots (relay-server/pack.py, file://): {ok} / {len(results)}")
+        print(f"{'ok  ' if ok == len(results) else 'FAIL'} snapshots (pack.py and the viewer's pack.js, file://): {ok} / {len(results)}")
         for name, good, detail in results:
             if not good:
                 failed += 1
                 print(f"     ✗ {name}: {detail}"[:300])
     else:
         print("snapshots: SKIPPED (they need the DevTools pipe, macOS or Linux)")
+    server.shutdown()
     return 1 if failed else 0
 
 

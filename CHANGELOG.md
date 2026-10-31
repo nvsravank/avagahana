@@ -6,6 +6,20 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** The whole map from the viewer: the Export menu has This view (SVG, PNG,
+  Print) and Whole map: Interactive HTML (explore offline), a snapshot made in the browser
+  with no server or atlas, and Source file (edit with your agent), the map's Markdown. `viewer.snapshot()`; options `asOf` (the
+  footer's "as of" time) and `version` (the generator tag only), `load` context `asOf`.
+  The file opens where the reader was (diagram, view or deployment, mode, colouring,
+  theme, appearance, Before; a sequence at step 1), without a node page, search,
+  selection or the reader's own marks. Inside a snapshot there is no HTML item; the
+  source file stays (WO-35).
+- The viewer's packer `map-viewer/pack.js` and `relay-server/pack.py` fill one page,
+  `map-viewer/snapshot.html` (footer included), by the same rules; a browser test packs
+  the same maps with both and compares them. The footer's mark is `map-viewer/mark.svg`,
+  kept identical to `atlas/brand/mark.svg` by `check.sh` (WO-35).
+- **Contract** Relay: `GET /api/info` has `build`, the code's commit (WO-35).
+
 - Snapshots: `relay-server/pack.py` packs one map into one HTML file that opens from disk
   with no server and no network: the map as data, the viewer's modules (turned into
   `blob:` modules by `map-viewer/snapshot.js`, which puts each module's URL into the

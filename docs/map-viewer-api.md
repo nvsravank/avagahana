@@ -35,6 +35,8 @@ const viewer = mount(element, {
                         // 'wide': not while the toolbar is narrow
   assets: null,         // (path) => Promise<text>: the viewer's own files from the host (below)
   crossMapNote: null,   // without host.openMap: said beside a link to another map
+  asOf: null,           // when the first map was saved (Date, ISO text or ms): the export's footer
+  version: null,        // the code's version, for the export's generator tag only
 });
 ```
 
@@ -48,7 +50,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 
 | Member | What it does |
 |---|---|
-| `viewer.load(text, path, context?)` | Show a map; returns a promise. The same `path` again is a live reload: the viewer keeps the user's place (focus, selection, open branches). `context.before`: the map's earlier version (text, or `null` for none); without it a reload of the same map keeps the earlier version and another map has none (added in WO-34). |
+| `viewer.load(text, path, context?)` | Show a map; returns a promise. The same `path` again is a live reload: the viewer keeps the user's place (focus, selection, open branches). `context.before`: the map's earlier version (text, or `null` for none); without it a reload of the same map keeps the earlier version and another map has none (added in WO-34). `context.asOf`: when that map was saved, as the `asOf` option, kept the same way (added in WO-35). |
 | `viewer.setBefore(text)` | Set the shown map's earlier version (text), or clear it (`null`), and draw again; a promise (added in WO-34). |
 | `viewer.setState(partial)` | Change state from outside, e.g. to point at a node. With `seq: null` the sequence stops first and the other fields still apply (`{seq: null, view: 'Events'}` stops and switches view). With a sequence to play, the sequence chooses its diagram and view, so only `seq` and `step` are read. |
 | `viewer.state` | The current state (a copy). |
@@ -58,6 +60,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.views` | The names of the map's relation views, the default first (`[]` when it has none). The default's name is `Relations`; readers see it as "Overview", and `setState({view})` takes either. |
 | `viewer.contents()` | Everything a reader can open in the map, in file order (below). A new array each call. |
 | `viewer.export(opts)` | The picture as a file instead of a download: a promise of `{format, type, data, width, height, scaledDown, report}`. Below (added in WO-32). The toolbar's SVG and PNG buttons use it. |
+| `viewer.snapshot()` | The whole map as one HTML file that opens offline: a promise of its text, as the Export menu's "Interactive HTML" makes it. Below (added in WO-35). |
 | `viewer.problems` | The current problems, below. |
 | `viewer.themes` | `[{id, label}]` of the registered themes. |
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
@@ -444,6 +447,42 @@ Smaller, it shows a message saying so and nothing else, until it is made larger.
 in the slot), the toolbar leaves out Export and Search (class `is-narrow`). Switching
 views, hovering or playing never changes it.
 
+## The whole map (added in WO-35)
+
+The Export menu has two groups:
+
+```
+This view     SVG, PNG, Print            pictures of what is shown (above)
+Whole map     Interactive HTML           explore offline: every diagram, one file
+              Source file                edit with your agent: the map's Markdown
+```
+
+**Source file** saves the map's Markdown text as the viewer was given it, under the map
+file's name (`<name>.md`, or its title when there is no path).
+
+**Interactive HTML** (`viewer.snapshot()`) packs a snapshot, as `relay-server/pack.py`
+does (below), with no server and no atlas: `map-viewer/pack.js`, loaded on first use,
+reads the viewer's own files beside it. The file holds every diagram, view, deployment
+and play, Before and After when the host gave an earlier version, and opens where the
+reader is:
+
+- Kept: the diagram, view or deployment, mode, relations shown, colouring, theme and
+  appearance, Before or After. A sequence that was playing opens at step 1.
+- Dropped: an open node page, a search, a selection, a drilled-in box, boxes opened by
+  hand. The reader's own "since you looked" marks never go in; a host's `since` does
+  (with `sinceLabel`), and then every reader of the file sees the same marks.
+
+Its footer always reads "Built with Avagahana" with the mark, linking to the Avagahana
+page (no option or theme hides it), and on the right the map's title and "as of
+<time>" when the host gave `asOf` (the atlas gives each map's saved time), else
+"exported <time>", shown in the reader's own time zone. `version` goes only in the
+page's `<meta name="generator">` tag, never on screen.
+
+Not offered with `assets` (inside a snapshot): an interactive file needs the viewer's
+own files beside it, and `snapshot()` rejects. The source file and the pictures stay. The
+file carries every note in full, as the Markdown does; there is no option to turn the
+group off yet. Thumbnails have no menu.
+
 ## Assets and network
 
 - The viewer's own files (stylesheet, icons, built-in theme and its font) load
@@ -458,9 +497,11 @@ views, hovering or playing never changes it.
   viewer given `assets` serves them for all. Without it nothing changes. The built-in
   theme's font is not asked for: a host that has no files beside the viewer passes its
   own theme objects (their faces' `data()`).
-- A snapshot (`relay-server/pack.py`) is one HTML file holding the map, the viewer's
-  modules and the files it needs, which opens from disk with no server and no network.
-  `map-viewer/snapshot.js` is its start-up script, not a module the viewer imports. No
+- A snapshot (`relay-server/pack.py`, or the viewer's own `map-viewer/pack.js`) is one
+  HTML file holding the map, the viewer's modules and the files it needs, which opens
+  from disk with no server and no network. Both packers fill `map-viewer/snapshot.html`
+  (its comment lists what goes in) by the same rules. `map-viewer/snapshot.js` is its
+  start-up script, not a module the viewer imports. No
   viewer module computes a URL from `import.meta.url` when it loads (a snapshot's
   `blob:` URL is no base for one), so a snapshot runs the viewer's modules unchanged.
 - `crossMapNote` (added in WO-33): with no `host.openMap`, a link to another map is

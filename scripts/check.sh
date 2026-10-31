@@ -14,7 +14,8 @@
 #      in format/samples/ gets exactly the problem codes it expects; every code in
 #      format/problems.json has a sample. (The browser tests hold the viewer to the same.)
 #   4. Cloud icon notices: every set in map-viewer/vendor/ other than phosphor has a NOTICE.md
-#      (the vendor's terms; scripts/import_vendor_icons.py writes it).
+#      (the vendor's terms; scripts/import_vendor_icons.py writes it). The snapshot
+#      footer's mark, map-viewer/mark.svg, is identical to atlas/brand/mark.svg.
 #   6. Emoji forms (scripts/check_emoji.py): no character a system may draw as an emoji
 #      in map-viewer/ or atlas/ (test fixtures and vendor/ left out); the check itself
 #      must fail on a planted U+21A9.
@@ -123,6 +124,8 @@ for d in "$ROOT"/map-viewer/vendor/*/; do
   [ "$set_name" = phosphor ] && continue
   [ -f "$d/NOTICE.md" ] || { echo "notice: map-viewer/vendor/$set_name/ has no NOTICE.md (python3 scripts/import_vendor_icons.py --notices)"; fail=1; }
 done
+# the snapshot footer's mark (map-viewer/mark.svg: the viewer loads nothing outside its folder)
+cmp -s "$ROOT/map-viewer/mark.svg" "$ROOT/atlas/brand/mark.svg" || { echo "mark: map-viewer/mark.svg differs from atlas/brand/mark.svg (copy it over)"; fail=1; }
 
 # ---- 6. emoji forms ----
 python3 -I "$ROOT/scripts/check_emoji.py" || fail=1

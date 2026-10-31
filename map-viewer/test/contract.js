@@ -6,6 +6,7 @@ import { testDiagramLinks } from './diagram-links.js';
 import { testContents } from './contents.js';
 import { testChangeMarks } from './change-marks.js';
 import { testRender } from './render.js';
+import { testWholeMap } from './whole-map.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
@@ -30,6 +31,7 @@ try {
   await testContents(check);
   await testChangeMarks(check, wait);
   await testRender(check);
+  await testWholeMap(check);
   // Zoom changes label detail, never box geometry or the precomputed routes.
   for (const [kind, body] of [
     ['flowchart', 'flowchart LR\n  a[Top level] --> b{Decision}\n  subgraph group[Group]\n    c[Nested label] --> d[Another label]\n  end\n  b --> c'],

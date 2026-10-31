@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-10-31 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), and portable snapshots: one map in one HTML file that opens from disk with no server (WO-33). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-10-31 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), and the whole map from the viewer's Export menu, packed in the browser (WO-35). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -80,17 +80,17 @@ Python 3.9+ standard library checker. Validates syntax, extension sections, iden
 
 ### <a id="relay"></a>Optional relay
 
-Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages. Beside it, pack.py needs no running server: it packs one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
+Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages. Beside it, pack.py needs no running server: it fills map-viewer/snapshot.html (the page the viewer's own pack.js fills by the same rules) with one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. /api/info carries build, the code's commit, for an export's generator tag. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
 
 
 ### <a id="atlas"></a>Atlas owns the outside world
 
-Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its quick-links bar above the viewer lists what the map holds, from viewer.contents(). Mounts the viewer with the maps folder's themes, passes a map's earlier version from the relay, and answers the agent's renders in a hidden second viewer. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
+Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its quick-links bar above the viewer lists what the map holds, from viewer.contents(). Mounts the viewer with the maps folder's themes and the relay's build, passes a map's earlier version and saved time (asOf, for an export's footer) from the relay, and answers the agent's renders in a hidden second viewer. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
 
 
 ### <a id="viewer"></a>Embeddable viewer
 
-mount(element, options) returns load, setState, on, ready, contents, export, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url when used, or come from the host's assets option (a snapshot); crossMapNote marks links to maps a page cannot open. CSS is scoped to .mmv. Evidence: map-viewer/index.js, viewer.js, base.css; docs/map-viewer-api.md.
+mount(element, options) returns load, setState, on, ready, contents, export, snapshot, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url when used, or come from the host's assets option (a snapshot); crossMapNote marks links to maps a page cannot open. CSS is scoped to .mmv. Evidence: map-viewer/index.js, viewer.js, base.css; docs/map-viewer-api.md.
 
 
 ### <a id="reader"></a>Reader interaction
@@ -219,6 +219,7 @@ mindmap
       cmp("Before and After")
     outputGroup("**Output**")
       ex("Export and print")
+      pk("Pack the whole map")
 ```
 
 
@@ -275,6 +276,11 @@ Validates theme objects, fills defaults, manages shared CSS and FontFace data. C
 ### <a id="ex"></a>export.js
 
 viewer.export() returns SVG text or PNG bytes (the toolbar's buttons download them); print uses the same drawing. Files name what they show (role img, a root title; data-id and a title on every node, box and line), hold no links, and leave out change marks, selection and controls. With report: true, report.js reads the drawing for cut labels, overlaps, crossings, lines under 2 px apart, the smallest text and each box's fill, outline and why. Picture state (expand, close, highlight, crop) shapes what is drawn. Evidence: export.js, report.js; docs/map-viewer-api.md.
+
+
+### <a id="pk"></a>pack.js
+
+The Export menu's Whole map group: Source file saves the map's Markdown text (for the reader's own agent); Interactive HTML (viewer.snapshot()) packs a snapshot in the browser, with no server or atlas. pack.js, loaded on first use, reads the viewer's modules, icons and font beside it and fills snapshot.html by pack.py's rules (a browser test compares the two). The file opens where the reader was (diagram, view, mode, colouring, theme, Before; a sequence at step 1) without a node page, selection or the reader's own marks. Not offered inside a snapshot (assets). Evidence: pack.js, snapshot.html, viewer.js; docs/map-viewer-api.md.
 
 
 ### <a id="nt"></a>notes.js and icons.js
