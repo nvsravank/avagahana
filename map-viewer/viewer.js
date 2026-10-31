@@ -31,7 +31,9 @@ const APPEARANCES = ['light', 'dark', 'auto'];
 const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'look', 'rels', 'infoClosed', 'stepSeconds'];
 // below this the viewer shows a message and nothing else
 const MIN_W = 320;
-const MIN_H = 360;
+const MIN_H = 280;
+// below this the toolbar is always narrow (a phone upright); wider, only when it does not fit
+const NARROW_W = 480;   // a phone in landscape (Safari's bars counted) draws the map
 const FONT_WAIT_MS = 2000;
 // the button's cycle, closest first; the map opens in default
 const EXPAND_ORDER = ['one', 'two', 'default', 'all'];
@@ -93,6 +95,11 @@ export function mount(element, options = {}) {
   root.innerHTML = chromeHtml(uid);
   element.appendChild(root);
   const $ = collect(root);
+  // a host that lists the diagrams and views itself (the atlas's chips) turns these off
+  const showTitle = options.title !== false;
+  const showViewPicker = options.viewPicker !== false;
+  // 'wide': the view picker only at 480 px and wider (a host whose own list covers phones)
+  if (options.viewPicker === 'wide') root.classList.add('mmv-views-wide');
 
   // ---------- events ----------
   const listeners = new Map();
@@ -193,6 +200,19 @@ export function mount(element, options = {}) {
     },
   };
   v.sinceWords = sinceWords;
+  // what colour alone may say about a node, in words (List mode reads them): its class,
+  // its planned change, an ER table's role
+  v.wordsOf = (n) => {
+    if (!n) return [];
+    const out = [];
+    const cls = n.kind && S.map?.classes?.[n.kind];
+    if (n.kind) out.push(cls?.label || n.kind);
+    if (n.plan) out.push(`planned: ${n.plan}`);
+    const role = diagram().categoryKey && S.map ? diagram().categoryKey(S.map).find((x) => x.k === categoryOf(n)) : null;
+    if (role && n.parent === S.map.root) out.push(role.label);
+    return out;
+  };
+  v.renderNote = (note, el) => { if (note?.body != null) renderNoteBody(note.body, el, wireLink); };
   // the picture's name: the map, and the diagram when it is not the file's first
   v.fullTitle = () => (!S.map ? 'Map' : S.file && S.map !== S.file && S.file.title && S.file.title !== S.map.title ? `${S.file.title}: ${S.map.title}` : S.map.title || 'Map');
   const painter = createPainter(v);
@@ -1305,10 +1325,11 @@ export function mount(element, options = {}) {
     const views = S.map?.views || [];
     // diagrams no link leads to (a map problem): still shown, from the first diagram's picker
     const lost = !S.part && !S.thumb ? (S.file?.unlinked || []).map((a) => S.file.parts.get(a)).filter(Boolean) : [];
-    $.viewWrap.hidden = views.length < 2 && !lost.length;
-    if (views.length < 2 && !lost.length) return;
+    $.viewWrap.hidden = !showViewPicker || (views.length < 2 && !lost.length);
+    if ($.viewWrap.hidden) return;
     const current = viewNamed(S.relView) || views[0];
     $.viewName.textContent = labelOf(current) || 'Views';
+    fitTopSoon();
     const item = (text, on, fn) => {
       const b = Object.assign(document.createElement('button'), { className: `mmv-menu-item${on ? ' is-on' : ''}`, textContent: text });
       b.addEventListener('click', () => { b.blur(); fn(); });
@@ -1531,7 +1552,7 @@ export function mount(element, options = {}) {
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
     if (!page.isOpen() && !e.metaKey && !e.ctrlKey && player.key(e)) { e.preventDefault(); return; }
     if (e.key === 'Escape') { closePanels(); hideNote(); if (page.isOpen()) page.close(); }
-    if (e.key === '/' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); sInput.focus(); }
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && sInput.offsetParent) { e.preventDefault(); sInput.focus(); }
     if (e.key === 'p' && (IS_MAC ? e.metaKey : e.ctrlKey) && S.map?.root) { e.preventDefault(); closePanels(); hideNote(); exporter.print(); }
     if (e.key === '0' && !e.metaKey && !e.ctrlKey) fitOrCenter();
     if (e.key === 'Backspace' && S.focus) { const p = viewRoot().parent; drill(p ? p.id : S.map.root.id); }
@@ -1546,8 +1567,32 @@ export function mount(element, options = {}) {
     root.classList.toggle('is-small', small);
     $.small.textContent = small ? `Too small to show a map: needs at least ${MIN_W} × ${MIN_H} pixels.` : '';
   }
+  // narrow: the top row does not fit or the viewer is under 480 px; the toolbar then leaves
+  // out Export, Search and (viewPicker 'wide') the views. Measured at its widest, as if all
+  // of it always showed: the longest view name, every layout mode, search open, the play
+  // button. So switching views, hovering or playing never flips it; menus stay shut.
+  function fitTop() {
+    if (S.thumb) return;
+    const tl = root.querySelector('.mmv-tl'), tr = root.querySelector('.mmv-tr');
+    const shown = $.viewName.textContent;
+    const names = [...(S.map?.views || []).map(labelOf), ...(S.file?.unlinked || []).map((a) => S.file.parts.get(a)?.title)].filter(Boolean);
+    if (names.length) $.viewName.textContent = names.reduce((a, b) => (b.length > a.length ? b : a));
+    // no transitions while measuring, and none on the way back (search would animate shut)
+    root.classList.add('is-measuring', 'is-still');
+    root.classList.remove('is-narrow');
+    const over = tl.getBoundingClientRect().right + 8 > tr.getBoundingClientRect().left;
+    root.classList.remove('is-measuring');
+    $.viewName.textContent = shown;
+    root.classList.toggle('is-narrow', over || (root.clientWidth > 0 && root.clientWidth < NARROW_W));
+    void tl.offsetWidth;   // the real widths are set while transitions are still off
+    root.classList.remove('is-still');
+  }
+  let fitFrame = 0;
+  const fitTopSoon = () => { if (!fitFrame) fitFrame = requestAnimationFrame(() => { fitFrame = 0; fitTop(); }); };
+  v.fitTop = fitTopSoon;
   const ro = new ResizeObserver(() => {
     sizeCheck();
+    fitTop();
     page.resize();
     if (S.noteOpen) placeNote();
     if (S.layout && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
@@ -1668,6 +1713,7 @@ export function mount(element, options = {}) {
     }
     markInfoBtn();
     emit('load', { path, title: file.title, warnings: file.warnings.slice() });
+    fitTopSoon();   // the host may have changed its button in the slot
     emitContents();
     emitState();
   }
@@ -1719,7 +1765,7 @@ export function mount(element, options = {}) {
       S.hits = S.hits.filter((id) => map.byId[id]);
       updateExpandBtn();
     }
-    $.title.textContent = map.title;
+    $.title.textContent = showTitle ? map.title : '';
     buildIconBar();
     renderInfo();
   }

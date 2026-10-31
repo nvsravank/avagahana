@@ -29,6 +29,9 @@ const viewer = mount(element, {
   marks: true,          // false: no change marks at all
   showProblems: 'map',  // 'map' | 'all' | 'none': which problems show on screen
   sequenceStepSeconds: 3,   // a sequence's step while playing: 2 to 5 s, by halves
+  title: true,          // false: no map title in the toolbar (a host that names the map itself)
+  viewPicker: true,     // false: no view picker (a host that lists the views itself);
+                        // 'wide': not while the toolbar is narrow
 });
 ```
 
@@ -56,7 +59,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
 | `viewer.setTheme(id)` | Switch to a registered theme. The reader keeps their place: the diagram, view, step and camera (pan and zoom) stay as they were. |
 | `viewer.setPrefs({appearance, colourBy, look})` | Change looks from outside (a link, the agent's show), not kept; a colour-by the map does not offer is ignored. E.g. `{colourBy: 'changes'}` for a plan (added in WO-13). |
-| `viewer.slot` | An empty element at the start of the toolbar for the host's own button (atlas puts its map picker there). While empty, it shows the map title. |
+| `viewer.slot` | An empty element at the start of the toolbar for the host's own button. While empty, it shows the map title (unless `title: false`). |
 | `viewer.destroy()` | Remove everything the viewer added to the element and the document: listeners, observers, styles no other viewer uses. |
 
 ## Host callbacks (`options.host`)
@@ -389,7 +392,7 @@ the id of a theme a viewer has registered. Returns `{ok, problems, release()}`.
 
 ### Classes a theme's `css` can use
 
-Root: `.mmv` with `data-theme`, `data-appearance`, `data-colour-by`, `data-look`, `data-diagram` (`mindmap`, `flowchart`, `sequence`, `state` or `er`), `data-boxes` (a box diagram: flowchart, state, er). Drawing: `mmv-node`, `mmv-shape` (`is-solid`, `is-mark`: a state diagram's dots, bar and choice), `mmv-divider` (a state's description rule), `mmv-warn` (a state's path warning), `mmv-table` with `mmv-table-head`, `mmv-table-row`, `mmv-table-more`, `mmv-key`, `mmv-grain` (an ER table), `mmv-er-line` (`is-lit`), `mmv-er-end` (crow's-foot marks), `mmv-label`, `mmv-icon`, `mmv-edge`, `mmv-frame` (an open box), `mmv-frame-title`, `mmv-flow` (a box diagram's arrow; `is-dotted`, `is-thick`), `mmv-flow-label`,
+Root: `.mmv` (`is-narrow` while the toolbar leaves out Export, Search and a `'wide'` view picker: under 480 px, or the top row does not fit; a host may style its own slot button by it) with `data-theme`, `data-appearance`, `data-colour-by`, `data-look`, `data-diagram` (`mindmap`, `flowchart`, `sequence`, `state` or `er`), `data-boxes` (a box diagram: flowchart, state, er). Drawing: `mmv-node`, `mmv-shape` (`is-solid`, `is-mark`: a state diagram's dots, bar and choice), `mmv-divider` (a state's description rule), `mmv-warn` (a state's path warning), `mmv-table` with `mmv-table-head`, `mmv-table-row`, `mmv-table-more`, `mmv-key`, `mmv-grain` (an ER table), `mmv-er-line` (`is-lit`), `mmv-er-end` (crow's-foot marks), `mmv-label`, `mmv-icon`, `mmv-edge`, `mmv-frame` (an open box), `mmv-frame-title`, `mmv-flow` (a box diagram's arrow; `is-dotted`, `is-thick`), `mmv-flow-label`,
 `mmv-rel`, `mmv-rel-label`, `mmv-dot`, `mmv-rel-dot`, `mmv-bar`,
 `mmv-mark-hit`, `mmv-mark-sel`. Colour classes: `mmv-c<n>` (a node's class: its slot, `mmv-cm` external, `mmv-c0` none; box diagrams), `mmv-k<n>` (category, 0 = centre),
 `mmv-l<n>` (level), `mmv-d0|1|2` (depth band), `mmv-pa|pc|pr|p0` (planned change: added,
@@ -401,8 +404,12 @@ the text colour on it.
 
 ## Size
 
-The viewer needs at least 320 × 360 pixels (its mount element). Smaller, it shows a
-message saying so and nothing else, until it is made larger.
+The viewer needs at least 320 × 280 pixels (its mount element; a phone in landscape).
+Smaller, it shows a message saying so and nothing else, until it is made larger. Below
+480 pixels wide (a phone upright), or wider when the top row would not fit at its widest
+(the longest view name, every layout mode, search open, the play button, a host's button
+in the slot), the toolbar leaves out Export and Search (class `is-narrow`). Switching
+views, hovering or playing never changes it.
 
 ## Assets and network
 
@@ -413,13 +420,30 @@ message saying so and nothing else, until it is made larger.
   web server (the relay server or any static one).
 - Map icons are the bundled Phosphor set; hosts never supply icons.
 
-## Accessibility
+## Screen readers and keyboard
 
-The drawing is an SVG group named after the map (`<title>`), with a `<desc>` saying
-what it shows ("Mind map of 23 nodes."). Each node is an image with a spoken name:
-its label, its level, how many children it has, whether it is collapsed and whether
-it has a note ("Site, level 1, 3 children"). Lines and related links are hidden from
-screen readers. List mode is the plain-HTML outline of the same map.
+What works and what does not; no claim of conformance to any standard.
+
+- **List mode** reads the map as an outline, with a screen reader and with the keyboard
+  only. It is one tree (`role="tree"`, one Tab stop): Up and Down move, Right opens a
+  branch or goes into it, Left closes it or goes to its parent, Home and End go to the
+  first and last row, Enter opens the node page, Space selects, a letter jumps to the next
+  node starting with it. Each row is read in full: its label, what its icons mean, its
+  class, its planned change, an ER table's role, "has a note", how many children and
+  arrows. Under a node: its note (Right or Enter opens it in place) and its arrows ("to
+  Payments: card charge"; Enter goes to the other end, Right opens the arrow's note).
+  Coloured by class, each row also shows its class's name.
+- **The node page** is a modal dialog: focus moves into it when it opens, Tab stays
+  inside, Escape closes it and focus goes back where it was.
+- **The toolbar**: every button has a name; every control shows a focus ring.
+- **The drawing** needs a pointer or touch. It is an SVG group named after the map
+  (`<title>`), with a `<desc>` saying what it shows and that List mode reads it as an
+  outline ("Mind map of 23 nodes. List mode reads this map as an outline."). Each node is
+  an image with a spoken name: its label, its level, how many children, whether it is
+  collapsed, whether it has a note. Lines and related links are not read; there is no
+  keyboard walking of the drawing.
+- **Motion**: with reduced motion asked for, the camera, the node page and the
+  transitions do not animate.
 
 ## Safety
 

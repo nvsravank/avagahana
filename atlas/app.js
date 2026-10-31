@@ -38,14 +38,14 @@ const first = parseHash(location.hash);
 let themeSet = info?.capabilities.includes('themes') ? await serverThemes(base) : null;
 let viewer = null;
 let picker = null;
-// the logo opens the map list, or closes it (the list closes itself on any press
-// outside it, before the click: what it was is read first)
+// on a phone the bar's map name opens the map list, or closes it (the list closes itself
+// on any press outside it, before the click: what it was is read first)
 let pickerWasOpen = false;
 addEventListener('pointerdown', () => { pickerWasOpen = !!picker?.isOpen; }, true);
 const logoOff = new URLSearchParams(location.search).get('logo') === '0';
 const bar = contentsBar(document.getElementById('bar'), {
   logo: !logoOff && themeSet?.settings.logo !== false,
-  onLogo: (e) => ((e.detail ? pickerWasOpen : picker.isOpen) ? picker.close() : picker.open()),   // detail 0: a key
+  onName: (e) => ((e.detail ? pickerWasOpen : picker.isOpen) ? picker.close() : picker.open()),   // detail 0: a key
   onPick: (state) => viewer.setState(state),
 });
 let pageTheme = null;
@@ -57,6 +57,8 @@ async function mountViewer() {
   picker?.destroy();
   viewer?.destroy();
   viewer = mount(document.getElementById('app'), {
+    // on a phone the bar's chips list every view; wider, the picker is there as before
+    viewPicker: 'wide',
     prefs: first?.prefs,
     themes: themeSet?.themes || [],
     defaultTheme: themeSet?.settings.builtIn !== false,
@@ -68,6 +70,7 @@ async function mountViewer() {
       ...(info?.capabilities.includes('shutdown') ? { shutdown } : {}),
     },
   });
+  // the map list's button in the viewer (a phone: the bar's map name instead)
   picker = mapPanel(viewer.slot, { onPick: (path) => goTo(path, {}) });
   // the bar and the page behind everything follow the viewer's theme and appearance
   viewer.on('theme', (t) => {
@@ -81,6 +84,7 @@ async function mountViewer() {
     const m = maps.find((x) => x.path === path);
     shown = { path, mtime: m?.mtime, size: m?.size };
     picker.setCurrent(path, title);
+    bar.setTitle(title);
     bar.setState(viewer.state);
     document.title = `${title} · Avagahana`;
     // the viewer reports state only when it differs, and the last map's may match
@@ -98,7 +102,7 @@ addEventListener('hashchange', () => {
   if (!h || !source) return;
   // a link names the whole place: no focus means the whole map, no node none selected
   if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...h.state }); usePrefs(h.prefs); }
-  else openMap(h.path, h.state, h.prefs);
+  else { picker.close(); openMap(h.path, h.state, h.prefs); }   // a failed open shows the list again
 });
 
 if (info) start(serverSource(base, info));

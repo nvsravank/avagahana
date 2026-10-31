@@ -11,7 +11,7 @@ Rule: imports the viewer only through `map-viewer/index.js`.
 | `app.js` | Picks the source, mounts the viewer, keeps the URL and the viewer in step, live reload, "look here", host callbacks. |
 | `sources.js` | `detectServer`, `serverSource`, `folderSource`, and remembering the picked folder. |
 | `hash.js` | The URL: `parseHash`, `buildHash`, `ownMapLink`. Pure functions. |
-| `tree.js` | The map picker in the viewer's toolbar slot: filter and folder tree. |
+| `tree.js` | The map picker in the viewer's toolbar slot: filter and folder tree. While the viewer's toolbar is narrow its button hides and the bar's map name opens it. |
 | `atlas.css` | Its look, from the viewer's theme variables (`--mmv-*`). |
 | `test/` | Browser-run checks: open `test/index.html` through any static server or the relay. |
 

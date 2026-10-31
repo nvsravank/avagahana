@@ -199,7 +199,7 @@ export function createPainter(v) {
     if (moving) glide(before, view0, leaving);
     animate = false;
     $.mapTitle.textContent = v.fullTitle();
-    $.mapDesc.textContent = `${v.diagram().modes.find((m) => m.id === S.mode)?.label || 'Diagram'} of ${scene.nodes.length} ${scene.nodes.length === 1 ? 'node' : 'nodes'}.`;
+    $.mapDesc.textContent = `${v.diagram().modes.find((m) => m.id === S.mode)?.label || 'Diagram'} of ${scene.nodes.length} ${scene.nodes.length === 1 ? 'node' : 'nodes'}. List mode reads this map as an outline.`;
     v.afterDraw?.();   // a sequence playing over the drawing marks it again (player.js)
     return scene;
   }

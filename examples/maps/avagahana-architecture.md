@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-10-30 for the contents bar (WO-30), change marks (WO-31) and rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-10-30 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), and narrow screens and the keyboard outline (WO-17). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -228,7 +228,7 @@ mindmap
 
 Responsibility breakdown, not an import graph: branches group related jobs rather than execution order. viewer.js coordinates them. See [Render pipeline](#render-pipeline) for the drawing flow.
 
-Per-instance closure coordinates model, state, DOM, redraw and event subscriptions. mount only throws for a programming mistake such as a missing Element. Minimum mount size is 320 by 360; smaller mounts show a size message. Evidence: viewer.js.
+Per-instance closure coordinates model, state, DOM, redraw and event subscriptions. mount only throws for a programming mistake such as a missing Element. Minimum mount size is 320 by 280 (a phone in landscape); smaller mounts show a size message. Options title: false and viewPicker: false leave out the title and view picker for a host that lists them itself. Evidence: viewer.js.
 
 
 ### <a id="m"></a>model/map.js
@@ -248,7 +248,7 @@ Mount-relative camera, pan, pointer zoom, fit and semantic level of detail. Whee
 
 ### <a id="pg"></a>page.js and aspects.js
 
-Node pages show note, connections, linked diagrams, views, deployment placement, sequence participation and change removals. aspects.js supports these derived views. Evidence: page.js and aspects.js.
+Node pages show note, connections, linked diagrams, views, deployment placement, sequence participation and change removals. A page is a modal dialog: it takes focus, keeps Tab inside and gives focus back on close. aspects.js supports these derived views. Evidence: page.js and aspects.js.
 
 
 ### <a id="pl"></a>player.js
@@ -286,7 +286,7 @@ Notes become DOM through a Markdown subset, never raw map HTML. safeHref allows 
 
 ### <a id="c"></a>Toolbar and controls
 
-`chrome.js` supplies the viewer's static interface markup, control collection, UI icons and shortcut definitions. `viewer.js` wires controls to viewer state and behavior. Map text is not inserted into this static markup as raw HTML.
+`chrome.js` supplies the viewer's static interface markup, control collection, UI icons and shortcut definitions. `viewer.js` wires controls to viewer state and behavior. Below 480 px wide, or when the top row does not fit (viewer.js fitTop, class is-narrow), Export and Search are left out. Every control shows a focus ring. Map text is not inserted into this static markup as raw HTML.
 
 ## Render pipeline
 
@@ -390,7 +390,7 @@ Every type supplies type, label, header recognition and parseBody. Separate pars
 
 ### <a id="modesHook"></a>modes and colourBy
 
-Types declare modes, colour encodings, branch ordering and initial collapse behavior. Shared list rendering is replaceable; sequences provide sequence/list.js.
+Types declare modes, colour encodings, branch ordering and initial collapse behavior. Shared list rendering (list.js) is a keyboard and screen-reader tree: rows read in full, notes open in place, arrows as rows. It is replaceable; sequences provide sequence/list.js.
 
 
 ### <a id="layoutHook"></a>layout and buildScene
@@ -459,7 +459,7 @@ parseHash/buildHash own #/path and mode, part, focus, node, page, view, env, seq
 
 ### <a id="tree"></a>tree.js
 
-Map picker mounts in viewer.slot. Rebuilds folders from source path prefixes; selection opens maps through atlas rather than viewer filesystem knowledge. Evidence: atlas/tree.js.
+Map picker mounts in viewer.slot; while the viewer's toolbar is narrow its button hides and the bar's map name opens it. Rebuilds folders from source path prefixes; selection opens maps through atlas rather than viewer filesystem knowledge. Evidence: atlas/tree.js.
 
 
 ### <a id="interface"></a>Map source interface
@@ -484,7 +484,7 @@ Remembers picked directory handle. Permission is checked/requested on revisit; a
 
 ### <a id="bar"></a>bar.js
 
-The quick-links bar, 44 px above the viewer. The logo (outside the scroller) opens the map list; the scroller holds the word mark, the "Quick links" label and a chip per diagram, view, deployment and play, built from viewer.contents() and refreshed on its contents event. The current chip is marked; a chip whose contents changed takes the viewer's small sparkle (changeMarkSvg). Fades and arrows show more, no scroll bar. Colours from the theme's frame group. Evidence: atlas/bar.js; atlas/atlas.css.
+The quick-links bar, 44 px above the viewer. The logo (outside the scroller) is a picture only. When the viewer's toolbar is narrow (is-narrow), the map's name beside the logo opens the map list and the word mark and label go; the scroller holds the word mark, the "Quick links" label and a chip per diagram, view, deployment and play, built from viewer.contents() and refreshed on its contents event. The current chip is marked; a chip whose contents changed takes the viewer's small sparkle (changeMarkSvg). Fades and arrows show more, no scroll bar. Colours from the theme's frame group. Evidence: atlas/bar.js; atlas/atlas.css.
 
 
 ### <a id="themesJs"></a>themes.js

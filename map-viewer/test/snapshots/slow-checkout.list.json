@@ -216,6 +216,7 @@
     "name": "Fraud check",
     "label": "score",
     "glyph": "→",
+    "note": true,
     "icons": [
      "hypothesis"
     ]
@@ -330,6 +331,7 @@
     "name": "Card provider",
     "label": "card token",
     "glyph": "→",
+    "note": true,
     "icons": [
      "unsourced"
     ]
@@ -364,6 +366,7 @@
     "name": "Order handler",
     "label": "score",
     "glyph": "←",
+    "note": true,
     "icons": [
      "hypothesis"
     ]
@@ -440,6 +443,7 @@
     "name": "Payment handler",
     "label": "card token",
     "glyph": "←",
+    "note": true,
     "icons": [
      "unsourced"
     ]

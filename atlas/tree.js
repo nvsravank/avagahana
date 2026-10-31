@@ -1,5 +1,5 @@
 // tree.js — the map picker: a button in the viewer's toolbar slot and a panel with a
-// filter box and the folder tree. Same behaviour as the old viewer's map panel:
+// filter box and the folder tree (on a phone the button hides; the bar's map name opens it). Same behaviour as the old viewer's map panel:
 // folders start closed each time it opens, typing a filter opens the folders that
 // hold matches, the current map is highlighted.
 
@@ -44,6 +44,7 @@ export function mapPanel(slot, { onPick }) {
 
   let maps = [];
   let current = null;
+  let opener = null;   // what had focus when it opened: it gets it back on Escape
   const openFolders = new Set();
 
   function render() {
@@ -89,6 +90,8 @@ export function mapPanel(slot, { onPick }) {
 
   function open() {
     if (!panel.hidden) return;
+    // focus goes back to what opened it (the button, or the bar's map name on a phone)
+    opener = btn.offsetParent ? btn : document.activeElement;
     // every time the panel opens, all folders start closed again
     openFolders.clear();
     filter.value = '';
@@ -105,7 +108,7 @@ export function mapPanel(slot, { onPick }) {
   btn.addEventListener('click', () => (panel.hidden ? open() : close()));
   filter.addEventListener('input', render);
   filter.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { e.stopPropagation(); close(); btn.focus(); }
+    if (e.key === 'Escape') { e.stopPropagation(); close(); opener?.focus?.(); }
     if (e.key === 'Enter') treeEl.querySelector('.atlas-map')?.click();
   });
   // a click anywhere else closes it

@@ -1,7 +1,9 @@
 // bar.js — the atlas's contents bar, one row above the viewer: the logo (opens the map
-// list), then a scroller with the word mark, the label "Quick links" and a chip for each
-// diagram, view, deployment and play the viewer lists (viewer.contents()). The first
-// diagram's chip is "Overview" (the map's title is already the viewer's own name pill).
+// mark only, never a control), then a scroller with the word mark, the label "Quick links"
+// and a chip for each diagram, view, deployment and play the viewer lists
+// (viewer.contents()). The first diagram's chip is "Overview". When the viewer's toolbar
+// is narrow, the map's name (beside the logo, not scrolling) opens the map list, and the
+// word mark and the label go.
 // No scroll bar: a soft fade and a small arrow on an edge say there is more that way.
 import { applyTheme, changeMarkSvg } from '../map-viewer/index.js';
 
@@ -50,19 +52,18 @@ function chevron(d) {
   return s;
 }
 
-// mount: the bar element; onLogo(event): the logo was clicked; onPick(state): a chip was clicked.
-// -> {setContents(list), setState(state), setTheme({id, appearance}), setLogo(on)}
-export function contentsBar(mount, { onLogo, onPick, logo = true }) {
+// mount: the bar element; onName(event): the map's name was clicked (a phone: it opens the
+// map list); onPick(state): a chip was clicked.
+// -> {setTitle(text), setContents(list), setState(state), setTheme({id, appearance}), setLogo(on)}
+export function contentsBar(mount, { onName, onPick, logo = true }) {
   mount.classList.add('atlas-bar');
   mount.setAttribute('role', 'navigation');
   mount.setAttribute('aria-label', 'Map contents');
 
-  const logoBtn = el('button', 'atlas-logo');
-  logoBtn.type = 'button';
-  logoBtn.title = 'Maps';
-  logoBtn.setAttribute('aria-label', 'Maps');
+  // the website's mark: a picture, not a control
+  const logoBtn = el('span', 'atlas-logo');
+  logoBtn.setAttribute('aria-hidden', 'true');
   logoBtn.appendChild(brandMark());
-  logoBtn.addEventListener('click', (e) => onLogo(e));
 
   const wrap = el('div', 'atlas-scroll-wrap');
   const scroller = el('div', 'atlas-scroll');
@@ -73,15 +74,24 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
     b.tabIndex = -1;   // the chips themselves take the keyboard
     b.setAttribute('aria-label', label);
     b.appendChild(chevron(d));
-    b.addEventListener('click', () => scroller.scrollBy({ left: (b === left ? -1 : 1) * scroller.clientWidth * 0.8, behavior: 'smooth' }));
+    b.addEventListener('click', () => scroller.scrollBy({ left: (b === left ? -1 : 1) * scroller.clientWidth * 0.8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
   }
   // the word mark, set as on the website: lower case, the theme's font, semibold
   const wordmark = el('span', 'atlas-wordmark', 'avagahana');
+  // on a phone, the map's name in its place: a button that opens the map list
+  const name = el('button', 'atlas-mapname');
+  name.type = 'button';
+  name.hidden = true;
+  name.setAttribute('aria-haspopup', 'true');
+  const nameText = el('span', 'atlas-mapname-text');
+  name.append(nameText, chevron('m6 9 6 6 6-6'));
+  name.addEventListener('click', (e) => onName?.(e));
   const label = el('span', 'atlas-label', 'Quick links');
   const chips = el('div', 'atlas-chips');
   scroller.append(wordmark, label, chips);
   wrap.append(left, scroller, right);
-  mount.append(logoBtn, wrap);
+  // the name stays put beside the logo (the chips scroll); it is the way to the map list
+  mount.append(logoBtn, name, wrap);
 
   let items = [];
   let buttons = [];
@@ -186,6 +196,7 @@ export function contentsBar(mount, { onLogo, onPick, logo = true }) {
   setLogo(logo);
 
   return {
+    setTitle(text) { nameText.textContent = text || ''; name.title = text ? `Maps: ${text}` : 'Maps'; name.hidden = !text; },
     setContents(list) {
       const next = Array.isArray(list) ? list : [];
       // only the marks changed: the chips stay where they are (no scroll back)

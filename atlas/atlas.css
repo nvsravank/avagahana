@@ -34,6 +34,8 @@ html, body { background: var(--mmv-bg, #fff); }
   background: var(--mmv-bg); color: var(--mmv-ink); font: inherit;
 }
 .atlas-filter:focus { border-color: var(--mmv-accent); }
+.atlas-picker :focus-visible { outline: 2px solid var(--mmv-accent); outline-offset: -2px; }
+@media (prefers-reduced-motion: reduce) { .atlas-picker *, .atlas-bar * { transition-duration: 0s !important; } }
 .atlas-folder, .atlas-map {
   display: flex; align-items: center; gap: 6px; width: 100%; padding: 4px 6px;
   border: 0; border-radius: 6px; background: none; color: inherit; font: inherit;
@@ -84,16 +86,12 @@ html, body { background: var(--mmv-bg, #fff); }
   border-bottom: 1px solid color-mix(in srgb, var(--mmv-frame-ink) 12%, var(--mmv-frame-bg));
 }
 .atlas-bar button:focus-visible { outline: 2px solid var(--mmv-frame-accent); outline-offset: 1px; }
-.atlas-logo {
-  flex: none; display: grid; place-items: center; width: 42px; height: 42px; padding: 0;
-  border: 0; border-radius: 10px; background: none; cursor: pointer;
-}
+.atlas-logo { flex: none; display: grid; place-items: center; width: 42px; height: 42px; }
 .atlas-logo svg { display: block; overflow: visible; }
 /* the website's mark: the two waves meet in gold on dark, in brown on light */
 .atlas-waves { isolation: isolate; }
 .atlas-wave { mix-blend-mode: multiply; }
 .atlas-bar[data-appearance="dark"] .atlas-wave { mix-blend-mode: screen; }
-.atlas-logo:hover { background: color-mix(in srgb, var(--mmv-frame-ink) 7%, transparent); }
 .atlas-logo[hidden] { display: none; }
 .atlas-scroll-wrap { position: relative; flex: 1; min-width: 0; height: 100%; }
 .atlas-scroll {
@@ -114,8 +112,22 @@ html, body { background: var(--mmv-bg, #fff); }
 .atlas-arrow.is-right { right: 0; }
 .atlas-arrow[hidden] { display: none; }
 .atlas-wordmark { flex: none; font-weight: 600; font-size: 19px; line-height: 1; color: var(--mmv-frame-ink); }
+/* on a phone the map's name takes the word mark's place and opens the map list */
+.atlas-mapname { display: none; flex: none; align-items: center; gap: 2px; max-width: 45vw; height: 32px; padding: 0 6px; margin: 0;
+  border: 0; border-radius: 8px; background: none; color: var(--mmv-frame-ink); font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+.atlas-mapname:hover { background: color-mix(in srgb, var(--mmv-frame-ink) 7%, transparent); }
+.atlas-mapname-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-mapname svg { flex: none; opacity: .7; }
 .atlas-label { flex: none; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mmv-frame-muted); white-space: nowrap; }
 .atlas-label[hidden] { display: none; }
+/* a phone upright: the chips need the room */
+/* the viewer's toolbar is narrow (is-narrow: a phone, or the top row does not fit) */
+body:has(.mmv.is-narrow) .atlas-bar:has(.atlas-mapname:not([hidden])) :is(.atlas-label, .atlas-wordmark) { display: none; }
+body:has(.mmv.is-narrow) .atlas-mapname:not([hidden]) { display: inline-flex; }
+/* the map list's own button leaves the viewer; its list opens from the top */
+.mmv.is-narrow .atlas-picker { position: absolute; top: 0; left: 0; }
+.mmv.is-narrow .atlas-picker > .atlas-pill { display: none; }
+.mmv.is-narrow .atlas-picker > .atlas-panel { top: 0; }
 .atlas-chips { display: flex; align-items: center; gap: 10px; }
 .atlas-chips:empty { display: none; }
 .atlas-group { display: flex; align-items: center; gap: 6px; }

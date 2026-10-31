@@ -164,12 +164,18 @@ export function createPage(v, h) {
   async function open(nid, { instant = false } = {}) {
     const n = S.map?.byId[nid];
     if (!n) return;
-    if (el) close({ instant: true });
+    // focus goes back where it was when the page closes (not to a page it replaces)
+    const was = document.activeElement;
+    if (!el?.contains(was)) returnTo = root.contains(was) ? was : null;
+    if (el) close({ instant: true, keepFocus: true });
     id = nid;
     el = document.createElement('div');
     el.className = 'mmv-page';
     el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-label', n.plain || 'Node');
+    el.tabIndex = -1;
+    el.addEventListener('keydown', trap);
     const body = build(n);
     el.appendChild(body);
     root.classList.add('is-paged', 'is-faded');
@@ -180,6 +186,7 @@ export function createPage(v, h) {
     const from = nodeAt(nid);
     if (from.stroke && from.stroke !== 'none') el.style.borderColor = from.stroke;
     root.appendChild(el);
+    if (!S.thumb) el.focus({ preventScroll: true });
     if (instant) return;
     body.style.opacity = '0';
     // the box grows out of the node, looking like it, as the drawing fades
@@ -198,12 +205,13 @@ export function createPage(v, h) {
     h.changed();
     body.animate([{ transform: 'translateX(24px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: ms(200), easing: EASE });
   }
-  async function close({ instant = false } = {}) {
+  async function close({ instant = false, keepFocus = false } = {}) {
     if (!el) return;
     const e = el;
     const nid = id;
     el = null;
     id = null;
+    if (!keepFocus) giveBack(e, nid);
     root.classList.remove('is-faded');
     const done = () => {
       e.remove();
@@ -244,6 +252,27 @@ export function createPage(v, h) {
       ghost.remove();
     }
     if (close) await closePage();
+  }
+
+  // Tab stays inside the page while it is open
+  let returnTo = null;
+  function trap(e) {
+    if (e.key !== 'Tab') return;
+    const all = [...el.querySelectorAll('a[href], button:not(:disabled), input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter((x) => x.offsetParent);
+    if (!all.length) { e.preventDefault(); return; }
+    const first = all[0], last = all[all.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === el)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+  // focus back where it was: that element, or (List mode drew anew) the node's row
+  function giveBack(e, nid) {
+    const t = returnTo;
+    returnTo = null;
+    const inPage = e.contains(document.activeElement) || document.activeElement === document.body;
+    if (!inPage) return;
+    const row = root.querySelector(`.mmv-list [data-key="n:${CSS.escape(nid)}"]`);
+    const to = t?.isConnected ? t : row || root;
+    to.focus({ preventScroll: true });
   }
 
   // a click on the faded canvas round the page closes it

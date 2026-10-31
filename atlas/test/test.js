@@ -269,7 +269,8 @@ try {
   barEl.style.width = '420px';
   document.body.appendChild(barEl);
   const picks = [];
-  const bar = contentsBar(barEl, { onLogo() {}, onPick: (s) => picks.push(s) });
+  let names = 0;
+  const bar = contentsBar(barEl, { onName() { names++; }, onPick: (s) => picks.push(s) });
   const items = [
     { kind: 'diagram', label: 'Shop', part: null, first: true, state: { seq: null, part: null, view: null } },
     { kind: 'view', label: 'Overview', part: null, diagram: 'Shop', state: { seq: null, part: null, view: null } },
@@ -308,6 +309,11 @@ try {
   check('bar: one diagram with views: its Overview view keeps its chip', show(chipText()) === show(['Overview', 'Data flow', 'Production']), show(chipText()));
   bar.setState({ part: null, view: null });
   check('bar: and it is marked', current() === 'Overview', current());
+  bar.setTitle('Shop platform');
+  check('bar: the word mark leads the scroller; the map name (shown when narrow) sits beside the logo, not scrolling', barEl.querySelector('.atlas-scroll').firstElementChild.textContent === 'avagahana' && barEl.querySelector('.atlas-logo + .atlas-mapname')?.textContent === 'Shop platform' && !barEl.querySelector('.atlas-mapname').hidden);
+  check('bar: the logo is a picture, never a control', barEl.querySelector('.atlas-logo').tagName === 'SPAN' && !barEl.querySelector('.atlas-logo button, button.atlas-logo'));
+  barEl.querySelector('.atlas-mapname').click();
+  check('bar: the map name is the control', names === 1 && barEl.querySelector('.atlas-mapname').tagName === 'BUTTON');
   bar.setLogo(false);
   check('bar: the logo can be hidden; the word mark stays', barEl.querySelector('.atlas-logo').hidden && barEl.querySelector('.atlas-wordmark')?.textContent === 'avagahana');
   check('bar: the mark is the website\'s two waves', barEl.querySelectorAll('.atlas-logo .atlas-wave').length === 2);

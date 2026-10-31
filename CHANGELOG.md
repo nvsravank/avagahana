@@ -6,6 +6,26 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Viewer options `title: false` and `viewPicker: false` leave out the map's
+  title and the view picker, for a host that names the map and lists its views itself
+  (the website gallery); `viewPicker: 'wide'` drops the picker only while the toolbar is narrow
+  (the atlas, whose chips cover phones). Defaults keep both (WO-17).
+- **Contract** The viewer's minimum size is 320 × 280 (was 320 × 360), so a phone in
+  landscape draws the map. The toolbar leaves out Export and Search below 480 px wide, or
+  wider when its top row would not fit at its widest (the longest view name, every mode,
+  search open, play; root class `is-narrow`).
+- The atlas when the viewer's toolbar is narrow (a phone, or names too long to fit): the map's name takes the word mark's place in the
+  bar and opens the map list (the list's button leaves the viewer), "Quick links" is
+  hidden. Wider, the bar and toolbar are as before. The logo is a picture only; it no
+  longer opens the map list.
+- List mode is a keyboard and screen-reader outline: one tree, arrow keys, each row read
+  in full (icons in words, class, planned change, note, children, arrows), notes open in
+  place, arrows as rows. Coloured by class, rows show their class's name.
+- The node page is a modal dialog: focus moves in, Tab stays inside, focus goes back on
+  close. Focus rings on every control; reduced motion stops the small transitions too.
+- Docs: "Accessibility" is now "Screen readers and keyboard", stating plainly what works
+  and what does not.
+
 - **Contract** Map format: an underscore inside a word is just an underscore in a label
   (`ORDER_SUPERVISION_TRIGGER`, release ids, constants); before, a pair of them made the
   text between italic and the underscores vanished. `\_` and `\*` keep the mark, and
