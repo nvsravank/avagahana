@@ -9,7 +9,6 @@ import { fontFaces, familyName, registered } from './themes/theme.js';
 import { collectFacts, layoutReport } from './report.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
-const BASE = new URL('.', import.meta.url);
 const STYLE_PROPS = {
   all: ['fill', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'opacity', 'color', 'paint-order'],
   text: ['font-family', 'font-size', 'font-weight', 'font-style'],
@@ -428,7 +427,8 @@ export function createExporter(v) {
       body = `<img src="${dataUrl(text)}" style="display:block;max-width:100%;max-height:95vh;margin:0 auto">`;
     } else {
       const themeCss = [...document.querySelectorAll('style[data-mmv-theme], style[data-mmv-fallback]')].map((s) => s.textContent).join('\n');
-      head += `<link rel="stylesheet" href="${new URL('base.css', BASE)}"><style>${themeCss}</style>`;
+      const base = document.querySelector('style[data-mmv-base]');
+      head += `${base ? `<style>${base.textContent}</style>` : `<link rel="stylesheet" href="${new URL('base.css', import.meta.url)}">`}<style>${themeCss}</style>`;
       const a = root.dataset;
       body = `<div class="mmv mmv-printing" data-theme="${a.theme}" data-appearance="${a.appearance}" data-colour-by="${a.colourBy}" data-look="${a.look}"><div class="mmv-list">${$.list.innerHTML}</div></div>`;
     }

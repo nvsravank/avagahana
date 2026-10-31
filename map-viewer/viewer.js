@@ -15,7 +15,7 @@ import { createStage } from './stage.js';
 import { createExporter } from './export.js';
 import { createPage } from './page.js';
 import { createPlayer } from './player.js';
-import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml } from './icons.js';
+import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml, useAssets } from './icons.js';
 import { createSeen } from './seen.js';
 import { summarize } from './model/changes.js';
 import { compareFiles, markFile, changesIn, changesOf } from './model/compare.js';
@@ -24,7 +24,6 @@ import { problemList, mapProblems } from './problems.js';
 import { checkTheme, acquire, release, loadFont } from './themes/theme.js';
 import { clearMeasureCache } from './measure.js';
 
-const BASE = new URL('.', import.meta.url);
 const LOOKS = ['fade', 'outline'];
 const CHANGE_ICONS = ['ph sparkle'];   // new or changed (seen.js)
 const FRESH_MS = 2500;   // how long what a load brought counts as just arrived (it glows)
@@ -55,10 +54,17 @@ const PLAIN_THEME = {
 let cssLink = null;
 let cssReady = null;
 let cssUsers = 0;
-function useCss() {
+// assets (a snapshot): the stylesheet's text comes from the host, as a <style>
+function useCss(assets) {
   cssUsers++;
+  if (!cssLink && assets) {
+    cssLink = Object.assign(document.createElement('style'), { textContent: '' });
+    cssLink.dataset.mmvBase = '';
+    document.head.appendChild(cssLink);
+    cssReady = assets('base.css').then((text) => { cssLink.textContent = text; }, () => {});
+  }
   if (!cssLink) {
-    const href = new URL('base.css', BASE).href;
+    const href = new URL('base.css', import.meta.url).href;
     cssLink = [...document.querySelectorAll('link[rel="stylesheet"]')].find((l) => l.href === href) || null;
     if (cssLink) {
       cssReady = Promise.resolve();
@@ -861,6 +867,10 @@ export function mount(element, options = {}) {
     el.className = 'mmv-relrow';
     el.textContent = text;
     if (canOpen) el.insertAdjacentHTML('beforeend', ` ${opensSvg()}`);
+    // a host that cannot open other maps may say why (a snapshot: "Not in this snapshot")
+    else if (typeof options.crossMapNote === 'string' && options.crossMapNote) {
+      el.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-elsewhere', textContent: ` (${options.crossMapNote})` }));
+    }
     if (canOpen) {
       el.addEventListener('click', () => {
         Promise.resolve().then(() => host.openMap(file, { focus: node || null, node: null })).catch((x) => {
@@ -1994,7 +2004,8 @@ export function mount(element, options = {}) {
   // ---------- start ----------
   let destroyed = false;
   const ready = (async () => {
-    await Promise.all([useCss(), loadIconIndex()]);
+    if (options.assets) useAssets(options.assets);
+    await Promise.all([useCss(options.assets), loadIconIndex()]);
     // the change marks' icons (seen.js) and those diagram types draw themselves (an ER key)
     await ensureIcons([...CHANGE_ICONS, ...DIAGRAMS.flatMap((d) => d.icons || [])]);
     const loadBuiltIn = async () => {

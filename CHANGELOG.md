@@ -6,6 +6,18 @@ marked **Contract**.
 
 ## Unreleased
 
+- Snapshots: `relay-server/pack.py` packs one map into one HTML file that opens from disk
+  with no server and no network: the map as data, the viewer's modules (turned into
+  `blob:` modules by `map-viewer/snapshot.js`, which puts each module's URL into the
+  modules that import it), only the icons the map uses, the theme and its font. A
+  security policy loads nothing from outside the file and lets it send nothing. No marks
+  unless `--since`; `--before` packs Before and After; links to other maps say "Not in
+  this snapshot". The footer always reads "Built with Avagahana" with the mark, linking to
+  the Avagahana page, and on the right the map's title and when it was saved, in the
+  reader's own time zone. The version is in the page's `generator` tag only (WO-33).
+- **Contract** Viewer options `assets` (the viewer's own files from the host) and
+  `crossMapNote`. No URL is computed from `import.meta.url` when a module loads (WO-33).
+
 - **Contract** Map format: a planned-change class (`added`, `changed`, `removed`) stays on
   the node or arrow that names it; it no longer flows down to what is inside a box (a
   removed box's children may move elsewhere). `examples/maps/shop-plan.md` marks each

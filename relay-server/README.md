@@ -11,9 +11,18 @@ python3 relay-server/serve_maps.py --maps-dir <folder>         # start, or reuse
 python3 relay-server/show.py "Topic/Map.md" --node n12          # look here
 python3 relay-server/render.py "Topic/Map.md" --out map.svg     # a picture, drawn by the open page
 python3 relay-server/themes.py list                             # the folder's themes (check, derive)
+python3 relay-server/pack.py "Topic/Map.md" --out map.html      # a snapshot: one file to send, no server
 python3 relay-server/serve_maps.py --maps-dir <folder> --stop   # stop
 python3 relay-server/test_server.py                             # tests
 ```
 
+`pack.py` needs no running server: it writes one HTML file that opens from disk with no
+network (the map as data, the viewer's modules, only the icons the map uses, the theme
+and its font, a strict security policy). Options as `render.py` (`--part --view --env
+--focus --node --page --mode --colour-by --seq --step --theme --appearance`), plus
+`--since FILE [--since-label TEXT]` (every reader sees what changed since it) and
+`--before FILE` (Before and After). Prints `STATUS=packed FILE=... SIZE=...` or
+`STATUS=failed ERROR=...`.
+
 Rule: no JavaScript here; it only serves the other components' files, and works without
-them.
+them. A snapshot's start-up script is the viewer's (`map-viewer/snapshot.js`).

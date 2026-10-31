@@ -70,3 +70,20 @@ writes `<file>.report.json` beside the picture:
 - SVG for documents and slides that take it (sharp, editable, every node has its label
   as a title and its id as `data-id`); PNG for anything else.
 - Each picture gets a sentence in the text saying what it shows.
+
+## Sending a map
+
+- A person who should explore the map (open boxes, switch views, play a sequence) and
+  has no atlas: a snapshot, one HTML file that opens from disk with no server.
+
+  ```bash
+  python3 "<plugin root>/relay-server/pack.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" --out "<file>.html" [options]
+  ```
+
+  It needs no open page. Options as above (`--part --view --env --focus --mode
+  --colour-by --seq --step --theme --appearance`), plus `--since <older file>` to show
+  every reader what changed since that version and `--before <older file>` for Before
+  and After. It prints `STATUS=packed FILE=... SIZE=...` or `STATUS=failed ERROR=...`.
+- A document or slide: SVG or PNG (above).
+- Some email and chat services block HTML attachments: when unsure, send the SVG as
+  well. A snapshot is a copy, not a signature: anyone can edit it.

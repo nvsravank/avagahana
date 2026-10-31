@@ -9,7 +9,14 @@
 // colours as the vendor made it, above a node's name, with the product's name as its
 // title. A cloud name not in the set is left out (the checker names the nearest).
 
-const BASE = new URL('.', import.meta.url);
+// where the files come from: beside this module, or the host's assets option (a
+// snapshot, whose modules have no folder). A path -> a promise of the file's text.
+const nearby = (path) => fetch(new URL(path, import.meta.url)).then((r) => {
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.text();
+});
+let read = nearby;
+export function useAssets(assets) { read = assets || nearby; }
 const PH_NAME = /^ph ([a-z0-9-]+)$/;
 export const VENDOR_NAME = /^(aws|azure|gcp) ([a-z0-9-]+)$/;
 const FALLBACK = { label: 'Unknown icon', swatch: 'grey', ph: 'circle-dashed' };
@@ -26,9 +33,9 @@ const pictures = new Map();
 export function loadIconIndex() {
   if (!indexLoad) {
     indexLoad = Promise.all([
-      fetch(new URL('icons.json', BASE)).then((r) => r.json()).then((d) => { index = d; })
+      read('icons.json').then(JSON.parse).then((d) => { index = d; })
         .catch(() => { /* icons fall back to "unknown" */ }),
-      fetch(new URL('vendor-icons.json', BASE)).then((r) => r.json()).then((d) => { vendorSets = d.sets || {}; })
+      read('vendor-icons.json').then(JSON.parse).then((d) => { vendorSets = d.sets || {}; })
         .catch(() => { /* no cloud icons: they are left out */ }),
     ]);
   }
@@ -79,8 +86,7 @@ export function ensureIcons(codes, legend) {
   const files = new Set(defs.flatMap((d) => [d.src, d.dark]).filter(Boolean));
   return Promise.all([...[...files].map((src) => {
     if (!pending.has(`v:${src}`)) {
-      pending.set(`v:${src}`, fetch(new URL(`vendor/${src}`, BASE))
-        .then((r) => (r.ok ? r.text() : ''))
+      pending.set(`v:${src}`, read(`vendor/${src}`)
         .then((t) => { pictures.set(src, /<svg[\s>]/.test(t) ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(t)}` : null); })
         .catch(() => { pictures.set(src, null); }));
     }
@@ -88,8 +94,7 @@ export function ensureIcons(codes, legend) {
   }), ...[...names].map((name) => {
     if (markup.has(name)) return null;
     if (!pending.has(name)) {
-      pending.set(name, fetch(new URL(`vendor/phosphor/duotone/${name}-duotone.svg`, BASE))
-        .then((r) => (r.ok ? r.text() : ''))
+      pending.set(name, read(`vendor/phosphor/duotone/${name}-duotone.svg`)
         .then((t) => { markup.set(name, (/<svg[^>]*>([\s\S]*)<\/svg>/.exec(t) || [])[1] || null); })
         .catch(() => { markup.set(name, null); }));
     }

@@ -33,6 +33,8 @@ const viewer = mount(element, {
   title: true,          // false: no map title in the toolbar (a host that names the map itself)
   viewPicker: true,     // false: no view picker (a host that lists the views itself);
                         // 'wide': not while the toolbar is narrow
+  assets: null,         // (path) => Promise<text>: the viewer's own files from the host (below)
+  crossMapNote: null,   // without host.openMap: said beside a link to another map
 });
 ```
 
@@ -448,7 +450,21 @@ views, hovering or playing never changes it.
   relative to `import.meta.url`, never from a fixed path, and only when needed.
   Nothing goes to the internet.
 - ES modules do not run from `file://`, so a page using the viewer needs some local
-  web server (the relay server or any static one).
+  web server (the relay server or any static one), or is a snapshot (below).
+- `assets: (path) => Promise<text>` (added in WO-33): the viewer asks the host for its
+  stylesheet (`base.css`, put in a `<style data-mmv-base>`), icon indexes (`icons.json`,
+  `vendor-icons.json`) and icon files (`vendor/…`) instead of fetching them beside
+  itself; a rejected promise is a missing file. Icons are per document, so the last
+  viewer given `assets` serves them for all. Without it nothing changes. The built-in
+  theme's font is not asked for: a host that has no files beside the viewer passes its
+  own theme objects (their faces' `data()`).
+- A snapshot (`relay-server/pack.py`) is one HTML file holding the map, the viewer's
+  modules and the files it needs, which opens from disk with no server and no network.
+  `map-viewer/snapshot.js` is its start-up script, not a module the viewer imports. No
+  viewer module computes a URL from `import.meta.url` when it loads (a snapshot's
+  `blob:` URL is no base for one), so a snapshot runs the viewer's modules unchanged.
+- `crossMapNote` (added in WO-33): with no `host.openMap`, a link to another map is
+  listed, not clickable, followed by `(<note>)`; a snapshot says "Not in this snapshot".
 - Map icons are the bundled Phosphor set; hosts never supply icons.
 
 ## Screen readers and keyboard

@@ -16,6 +16,7 @@ Without a browser it says so and exits 0, so it never blocks anyone.
 into map-viewer/test/snapshots/. Review them in the git diff before committing.
 """
 import argparse
+import contextlib
 import functools
 import queue
 import html
@@ -78,8 +79,28 @@ def dump_virtual(browser, url, profile):
 
 def dump_pipe(browser, url, profile, limit=180):
     """The page's DOM once window.testResults is set (or after limit seconds), waiting in
-    real time. Chrome's DevTools protocol over --remote-debugging-pipe: it reads commands
-    on fd 3 and writes on fd 4, each a JSON message ending in a NUL byte."""
+    real time."""
+    try:
+        with chrome_pipe(browser, profile) as (send, _events):
+            target = send("Target.createTarget", {"url": url})["targetId"]
+            session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
+            done = "window.testResults ? document.documentElement.outerHTML : null"
+            end = time.time() + limit
+            while time.time() < end:
+                value = send("Runtime.evaluate", {"expression": done, "returnByValue": True}, session).get("result", {}).get("value")
+                if value:
+                    return value
+                time.sleep(0.25)
+            return send("Runtime.evaluate", {"expression": "document.documentElement.outerHTML", "returnByValue": True}, session).get("result", {}).get("value") or ""
+    except RuntimeError:
+        return ""
+
+
+@contextlib.contextmanager
+def chrome_pipe(browser, profile):
+    """(send, events) for a headless Chrome over its DevTools protocol on
+    --remote-debugging-pipe: it reads commands on fd 3 and writes on fd 4, each a JSON
+    message ending in a NUL byte. events collects the messages that answer no command."""
     import fcntl
     to_r, to_w = os.pipe()
     from_r, from_w = os.pipe()
@@ -96,6 +117,7 @@ def dump_pipe(browser, url, profile, limit=180):
     os.close(to_r)
     os.close(from_w)
     messages = queue.Queue()
+    events = []
 
     def reader():
         buf = b""
@@ -125,24 +147,15 @@ def dump_pipe(browser, url, profile, limit=180):
                 break
             if got is None:
                 raise RuntimeError("the browser closed")
-            if got.get("id") == mid:
+            if "id" not in got:
+                events.append(got)
+            elif got["id"] == mid:
                 if "error" in got:
                     raise RuntimeError(f"{method}: {got['error']}")
                 return got.get("result", {})
         raise RuntimeError(f"{method}: no answer")
     try:
-        target = send("Target.createTarget", {"url": url})["targetId"]
-        session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
-        done = "window.testResults ? document.documentElement.outerHTML : null"
-        end = time.time() + limit
-        while time.time() < end:
-            value = send("Runtime.evaluate", {"expression": done, "returnByValue": True}, session).get("result", {}).get("value")
-            if value:
-                return value
-            time.sleep(0.25)
-        return send("Runtime.evaluate", {"expression": "document.documentElement.outerHTML", "returnByValue": True}, session).get("result", {}).get("value") or ""
-    except RuntimeError:
-        return ""
+        yield send, events
     finally:
         try:
             send("Browser.close", wait=5)
@@ -154,6 +167,128 @@ def dump_pipe(browser, url, profile, limit=180):
             proc.kill()
         os.close(to_w)
         os.close(from_r)
+
+
+# ---------- snapshots: relay-server/pack.py's files, opened from disk with no server ----------
+SNAPSHOT_MAX = 1_500_000   # bytes, agreed for the examples (WO-33)
+EXAMPLES = ROOT / "examples" / "maps"
+DRAWN = "document.querySelectorAll('#avagahana-map [data-id]').length"
+
+
+def pack(name, out, *args, maps_dir=EXAMPLES):
+    """pack.py as the skill runs it: (its line, the file)."""
+    run = subprocess.run([sys.executable, str(ROOT / "relay-server" / "pack.py"), name, "--out", str(out),
+                          "--maps-dir", str(maps_dir), *args], capture_output=True, text=True, timeout=60)
+    return run.stdout.strip(), out
+
+
+def open_snapshot(browser, path, act=None):
+    """Open a snapshot from file:// in a fresh profile: (drawn, act's answer, errors).
+    act(evaluate, click) runs once it has drawn. errors: console errors, exceptions and
+    blocked loads (a security-policy report is an error too)."""
+    with tempfile.TemporaryDirectory() as profile, chrome_pipe(browser, profile) as (send, events):
+        target = send("Target.createTarget", {"url": path.resolve().as_uri(), "width": 1200, "height": 900, "newWindow": True})["targetId"]
+        session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
+        send("Runtime.enable", session=session)
+        send("Log.enable", session=session)
+
+        def evaluate(expression):
+            got = send("Runtime.evaluate", {"expression": expression, "returnByValue": True, "awaitPromise": True}, session)
+            return got.get("result", {}).get("value")
+
+        def click(selector):
+            at = evaluate(f"(() => {{ const r = document.querySelector({json.dumps(selector)})?.getBoundingClientRect(); return r && [r.x + r.width / 2, r.y + r.height / 2]; }})()")
+            if not at:
+                return False
+            for kind in ("mousePressed", "mouseReleased"):
+                send("Input.dispatchMouseEvent", {"type": kind, "x": at[0], "y": at[1], "button": "left", "clickCount": 1}, session)
+            time.sleep(0.6)
+            return True
+        drawn = 0
+        end = time.time() + 30
+        while time.time() < end and not drawn:
+            drawn = evaluate(DRAWN) or 0
+            time.sleep(0.25)
+        time.sleep(1)   # icons, fonts and glides settle
+        answer = act(evaluate, click) if act and drawn else None
+        errors = [e["params"]["entry"]["text"] for e in events if e["method"] == "Log.entryAdded" and e["params"]["entry"]["level"] == "error"]
+        errors += [e["params"]["exceptionDetails"].get("text", "exception") for e in events if e["method"] == "Runtime.exceptionThrown"]
+        errors += [str(e["params"]["args"][:1]) for e in events if e["method"] == "Runtime.consoleAPICalled" and e["params"]["type"] == "error"]
+        return drawn, answer, errors
+
+
+def snapshot_tests(browser):
+    """Every example packed and opened offline, plus the snapshot's own behaviour."""
+    results = []
+
+    def check(name, ok, detail=""):
+        results.append((name, bool(ok), detail))
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        for md in sorted(EXAMPLES.glob("*.md")):
+            line, out = pack(md.name, tmp / f"{md.stem}.html")
+            if not line.startswith("STATUS=packed"):
+                check(f"{md.name} packs", False, line)
+                continue
+            size = out.stat().st_size
+            check(f"{md.name} is under {SNAPSHOT_MAX:,} bytes", size < SNAPSHOT_MAX, f"{size:,}")
+            drawn, font, errors = open_snapshot(browser, out, lambda ev, _c: ev("document.fonts.check('16px \"Atkinson Hyperlegible Next\"')"))
+            check(f"{md.name} draws from file:// with no errors", drawn and not errors, f"{drawn} nodes; {errors[:3]}")
+            check(f"{md.name} has its font", font is True)
+
+        garden = tmp / "garden.html"
+        _, icons, _ = open_snapshot(browser, garden, lambda ev, _c: ev("document.querySelectorAll('#avagahana-map symbol').length"))
+        check("garden draws its icons", (icons or 0) >= 5, f"{icons} symbols")
+        _, when, _ = open_snapshot(browser, garden, lambda ev, _c: ev("document.querySelector('footer time').textContent"))
+        check("the footer's time is shown in the reader's own form", when and "T" not in when and when.strip(), when)
+        _, out = pack("checkout-release-after.md", tmp / "clouds.html", "--env", "Production")
+        _, clouds, _ = open_snapshot(browser, out, lambda ev, _c: ev("document.querySelectorAll('#avagahana-map image[href^=\"data:image/svg\"]').length"))
+        check("cloud icons draw", (clouds or 0) > 0, f"{clouds} images")
+
+        _, out = pack("job-race.md", tmp / "seq.html", "--seq", "main", "--step", "2")
+        drawn, bar, errors = open_snapshot(browser, out, lambda ev, _c: ev("!document.querySelector('.mmv-stepbar').hidden"))
+        check("a sequence opens at its step", bar is True and not errors, errors[:3])
+        _, out = pack("garden.md", tmp / "list.html", "--mode", "list")
+        drawn, rows, errors = open_snapshot(browser, out, lambda ev, _c: ev("document.querySelector('#avagahana-map .mmv-list')?.textContent.includes('Herb spiral')"))
+        check("list mode", rows is True and not errors, errors[:3])
+
+        _, out = pack("checkout-release-after.md", tmp / "before.html", "--before", str(EXAMPLES / "checkout-release-before.md"))
+        drawn, persp, errors = open_snapshot(browser, out, lambda ev, _c: ev("!document.querySelector('.mmv-persp').hidden"))
+        check("--before offers Before and After", persp is True and not errors, errors[:3])
+
+        old = tmp / "garden-old.md"
+        old.write_text((EXAMPLES / "garden.md").read_text(encoding="utf-8").replace("Herb spiral", "Herb bed"), encoding="utf-8")
+        _, out = pack("garden.md", tmp / "since.html", "--since", str(old))
+        sparks = "document.querySelectorAll('#avagahana-map .mmv-change').length"
+        first = open_snapshot(browser, out, lambda ev, _c: ev(sparks))[1]
+        second = open_snapshot(browser, out, lambda ev, _c: ev(sparks))[1]
+        check("--since marks the same for every reader", first and first == second, f"{first} and {second}")
+        check("no marks without --since", open_snapshot(browser, garden, lambda ev, _c: ev(sparks))[1] == 0)
+
+        _, out = pack("garden.md", tmp / "cross.html", "--focus", "n38")
+        drawn, note, _ = open_snapshot(browser, out, lambda ev, click: click('#avagahana-map [data-rel="n41"]') and ev("document.querySelector('.mmv-elsewhere')?.textContent"))
+        check("a link to another map says it is not in the snapshot", note == " (Not in this snapshot)", repr(note))
+
+        maps = tmp / "themed"
+        (maps / ".themes").mkdir(parents=True)
+        (maps / "garden.md").write_text((EXAMPLES / "garden.md").read_text(encoding="utf-8"), encoding="utf-8")
+        sample = json.loads((ROOT / "format" / "theme-samples" / "clean.json").read_text(encoding="utf-8"))["theme"]
+        (maps / ".themes" / "brand.json").write_text(json.dumps(sample), encoding="utf-8")
+        _, out = pack("garden.md", tmp / "brand.html", "--theme", "brand", maps_dir=maps)
+        drawn, theme, errors = open_snapshot(browser, out, lambda ev, _c: ev("document.querySelector('.mmv').dataset.theme"))
+        check("a .themes theme", drawn and theme == "brand" and not errors, f"{theme}; {errors[:3]}")
+
+        planted = tmp / "planted.html"
+        planted.write_text(garden.read_text(encoding="utf-8").replace("<body>", "<body><script>window.planted = 1</script>", 1), encoding="utf-8")
+        probe = """(async () => {
+          const tries = ['https://example.com/', location.href, URL.createObjectURL(new Blob(['x']))];
+          const got = await Promise.all(tries.map((u) => fetch(u).then(() => 'sent', () => 'blocked')));
+          const img = await new Promise((r) => { const i = new Image(); i.onload = () => r('loaded'); i.onerror = () => r('blocked'); i.src = 'https://example.com/x.png'; });
+          return [window.planted ? 'ran' : 'blocked', ...got, img].join(' ');
+        })()"""
+        drawn, said, _ = open_snapshot(browser, planted, lambda ev, _c: ev(probe))
+        check("the policy blocks a planted script, fetches and images", drawn and said == "blocked blocked blocked blocked blocked", said)
+    return results
 
 
 def stopped(dom):
@@ -220,6 +355,17 @@ def main():
                     if line.strip().startswith("✗") or line.strip().startswith("- ") or "->" in line:
                         print("     " + line.strip()[:300])
     server.shutdown()
+
+    if os.name == "posix":
+        results = snapshot_tests(browser)
+        ok = sum(1 for _, good, _ in results if good)
+        print(f"{'ok  ' if ok == len(results) else 'FAIL'} snapshots (relay-server/pack.py, file://): {ok} / {len(results)}")
+        for name, good, detail in results:
+            if not good:
+                failed += 1
+                print(f"     ✗ {name}: {detail}"[:300])
+    else:
+        print("snapshots: SKIPPED (they need the DevTools pipe, macOS or Linux)")
     return 1 if failed else 0
 
 

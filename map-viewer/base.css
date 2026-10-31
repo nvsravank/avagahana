@@ -353,6 +353,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-note-body .mmv-relrow { display: block; border: 0; background: none; color: var(--mmv-accent); cursor: pointer; padding: 2px 0; text-align: left; }
 .mmv-note-body span.mmv-relrow { color: var(--mmv-ink); cursor: default; }
 .mmv-note-body .mmv-missing { color: var(--mmv-bad); font-size: 12px; margin-left: 4px; }
+.mmv-note-body .mmv-elsewhere { color: var(--mmv-muted); font-size: 12px; }
 .mmv-note-body code { font: 12px/1.3 ui-monospace, Menlo, Consolas, monospace; background: var(--mmv-chrome-hover); padding: 1px 4px; border-radius: 4px; }
 /* cloud icons with a dark twin: the one for the appearance shown */
 .mmv[data-appearance="dark"] .mmv-vendor-ic.is-light, .mmv[data-appearance="dark"] .mmv-vendor-ic .is-light,

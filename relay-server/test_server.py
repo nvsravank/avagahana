@@ -7,9 +7,13 @@ Most tests run the server in this process on a free port against a copy of
 examples/maps; the launcher and show.py are run as separate processes, as the
 skill runs them.
 """
+import base64
+import datetime
+import hashlib
 import http.client
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -540,6 +544,126 @@ class LauncherTests(unittest.TestCase):
         finally:
             self.run_cmd("serve_maps.py", *common, "--stop")
             shutil.rmtree(tmp, ignore_errors=True)
+
+
+class PackTests(unittest.TestCase):
+    """pack.py, run as the skill runs it. Opening a snapshot in a browser: scripts/browser_tests.py."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="avagahana-pack-test-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+
+    def pack(self, *args, maps_dir=EXAMPLES):
+        out = subprocess.run([sys.executable, str(HERE / "pack.py"), *args, "--maps-dir", str(maps_dir)],
+                             capture_output=True, text=True, timeout=60)
+        return out.returncode, out.stdout.strip()
+
+    def packed(self, name, *args, maps_dir=EXAMPLES):
+        out = self.tmp / (name.replace("/", "_") + ".html")
+        code, line = self.pack(name, "--out", str(out), *args, maps_dir=maps_dir)
+        self.assertEqual(code, 0, line)
+        page = out.read_text(encoding="utf-8")
+        data = json.loads(re.search(r'<script type="application/json" id="avagahana-data">(.*?)</script>', page, re.S).group(1))
+        return line, out, page, data
+
+    def test_every_example_packs_small(self):
+        for path in sorted(EXAMPLES.glob("*.md")):
+            line, out, page, data = self.packed(path.name)
+            self.assertRegex(line, r"^STATUS=packed FILE=\S+ SIZE=\d+$")
+            self.assertEqual(int(line.rsplit("SIZE=", 1)[1]), out.stat().st_size)
+            self.assertLess(out.stat().st_size, 1_500_000, path.name)
+            self.assertEqual(data["options"]["text"], path.read_text(encoding="utf-8"))
+            self.assertFalse(data["options"]["marks"])
+
+    def test_policy_first_and_only_the_start_script(self):
+        _, _, page, data = self.packed("garden.md")
+        head = page[page.index("<head>"):]
+        self.assertTrue(head.startswith('<head>\n<meta http-equiv="Content-Security-Policy"'))
+        policy = re.search(r'content="([^"]+)"', head).group(1)
+        for part in ("default-src 'none'", "connect-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-src 'none'", "object-src 'none'"):
+            self.assertIn(part, policy)
+        start = re.search(r'<script type="module">(.*?)</script>', page, re.S).group(1)
+        self.assertEqual(start, (HERE.parent / "map-viewer" / "snapshot.js").read_text(encoding="utf-8"))
+        digest = base64.b64encode(hashlib.sha256(start.encode("utf-8")).digest()).decode()
+        self.assertIn(f"script-src 'sha256-{digest}' blob:;", policy)
+        self.assertEqual(page.count("<script"), 2)
+        # every relative import is a token the start-up script fills in
+        for path, text in data["modules"].items():
+            code = re.sub(r"^\s*//.*$", "", text, flags=re.M)
+            self.assertNotRegex(code, r"""(from\s*|import\s*\(\s*)['"]\.{1,2}/""", path)
+        self.assertEqual(data["order"][-1], "index.js")
+
+    def test_map_text_is_data_never_markup(self):
+        maps = self.tmp / "maps"
+        maps.mkdir()
+        (maps / "x.md").write_text('# A </script><script>alert(1)</script> map\n\n```mermaid\nmindmap\n  n1("<img src=x onerror=alert(2)>")\n```\n', encoding="utf-8")
+        _, _, page, data = self.packed("x.md", maps_dir=maps)
+        self.assertNotIn("<script>alert", page)
+        self.assertNotIn("<img src=x", page)
+        self.assertIn("<img src=x", data["options"]["text"])
+        self.assertIn("<title>A &lt;/script&gt;&lt;script&gt;alert(1)&lt;/script&gt; map</title>", page)
+
+    def test_only_the_icons_used(self):
+        _, _, _, data = self.packed("checkout-release-after.md")
+        text = (EXAMPLES / "checkout-release-after.md").read_text(encoding="utf-8")
+        vendor = json.loads(data["files"]["vendor-icons.json"])["sets"]
+        used = {f"{s} {n}" for s, v in vendor.items() for n in v["icons"]}
+        self.assertTrue(used)
+        for code in used:
+            self.assertIn(code, text)
+        self.assertLess(sum(1 for f in data["files"] if f.endswith(".svg")), 80)
+        _, _, _, garden = self.packed("garden.md")
+        self.assertIn("vendor/phosphor/duotone/brain-duotone.svg", garden["files"])   # from the map's own legend
+        self.assertEqual(json.loads(garden["files"]["vendor-icons.json"])["sets"], {})
+
+    def test_state_since_before_and_footer(self):
+        old = self.tmp / "old.md"
+        old.write_text((EXAMPLES / "garden.md").read_text(encoding="utf-8").replace("Herb spiral", "Herb bed"), encoding="utf-8")
+        _, _, page, data = self.packed("garden.md", "--since", str(old), "--since-label", "v1", "--before", str(old),
+                                       "--focus", "n6", "--colour-by", "level", "--appearance", "dark")
+        o = data["options"]
+        self.assertTrue(o["marks"])
+        self.assertEqual((o["since"], o["sinceLabel"], o["before"]), (old.read_text(encoding="utf-8"), "v1", old.read_text(encoding="utf-8")))
+        self.assertEqual(o["state"], {"focus": "n6"})
+        self.assertEqual(o["prefs"], {"appearance": "dark", "colourBy": "level"})
+        footer = re.search(r"<footer>(.*?)</footer>", page, re.S).group(1)
+        # always the mark and "Built with Avagahana", linking home; the map's saved time; the
+        # version only in the page's generator tag, never in the footer
+        self.assertRegex(footer, r'^<a class="av-brand" href="https://sravannerella.com/avagahana/"[^>]*><svg class="av-mark"[^>]*>.*</svg>Built with Avagahana</a>')
+        self.assertRegex(footer, r'<span class="av-about">Community garden · as of <time datetime="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}">')
+        saved = datetime.datetime.fromtimestamp((EXAMPLES / "garden.md").stat().st_mtime).astimezone()
+        self.assertIn(f'datetime="{saved.isoformat(timespec="seconds")}"', footer)
+        self.assertRegex(page, r'<meta name="generator" content="Avagahana pack.py( [0-9a-f]+)?">')
+        self.assertNotIn("tabindex", footer)
+
+    def test_folder_theme_with_its_font(self):
+        maps = self.tmp / "maps"
+        (maps / ".themes").mkdir(parents=True)
+        shutil.copy(EXAMPLES / "garden.md", maps / "garden.md")
+        theme = json.loads((HERE.parent / "format" / "theme-samples" / "clean.json").read_text(encoding="utf-8"))["theme"]
+        font = HERE.parent / "map-viewer" / "themes" / "default" / "fonts" / "AtkinsonHyperlegibleNext-Bold.woff2"
+        shutil.copy(font, maps / ".themes" / "brand.woff2")
+        theme["font"] = {"family": "Brand", "faces": [{"file": "brand.woff2", "weight": 700}]}
+        (maps / ".themes" / "brand.json").write_text(json.dumps(theme), encoding="utf-8")
+        _, _, _, data = self.packed("garden.md", "--theme", "brand", maps_dir=maps)
+        self.assertEqual(data["theme"]["id"], "brand")
+        self.assertEqual(data["theme"]["font"], {"family": "Brand", "faces": [{"weight": 700, "style": "normal"}]})
+        self.assertEqual(base64.b64decode(data["fonts"][0]), font.read_bytes())
+        _, _, _, plain = self.packed("garden.md")
+        self.assertEqual((plain["theme"], len(plain["fonts"])), ("default", 6))
+
+    def test_failures_say_why(self):
+        out = str(self.tmp / "x.html")
+        self.assertEqual(self.pack("nope.md", "--out", out), (1, f'STATUS=failed ERROR="no map nope.md in {EXAMPLES.resolve()}"'))
+        code, line = self.pack("garden.md", "--out", out, "--theme", "nope")
+        self.assertEqual(code, 1)
+        self.assertTrue(line.startswith('STATUS=failed ERROR="no theme nope in .themes/'), line)
+        self.assertEqual(self.pack("../garden.md", "--out", out)[0], 1)
+        self.assertEqual(self.pack("garden.md", "--out", out, "--step", "2"), (1, 'STATUS=failed ERROR="--step needs --seq"'))
+        code, line = self.pack("garden.md", "--out", out, "--since", str(self.tmp / "missing.md"))
+        self.assertEqual(code, 1)
+        self.assertIn("cannot read --since", line)
+        self.assertFalse(Path(out).exists())
 
 
 if __name__ == "__main__":

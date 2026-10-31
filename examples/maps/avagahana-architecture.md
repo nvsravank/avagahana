@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-10-30 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), and plan marks and Before and After from an earlier version (WO-34). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-10-31 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), and portable snapshots: one map in one HTML file that opens from disk with no server (WO-33). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -70,7 +70,7 @@ External maps folder. Relative slash-separated paths identify .md and .mmd files
 
 ### <a id="skill"></a>Shared map skills
 
-Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and three more are read only when needed: render.md (pictures for documents, render.py, the layout report), themes.md (a brand or house style, themes.py) and compare.md (two versions of a map: show.py and render.py --before, the changes as data). trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
+Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and three more are read only when needed: render.md (pictures for documents, render.py, the layout report), themes.md (a brand or house style, themes.py) and compare.md (two versions of a map: show.py and render.py --before, the changes as data); render.md also says when to send a snapshot (pack.py) instead of a picture. trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
 
 
 ### <a id="checker"></a>Standalone format checker
@@ -80,7 +80,7 @@ Python 3.9+ standard library checker. Validates syntax, extension sections, iden
 
 ### <a id="relay"></a>Optional relay
 
-Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
+Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages. Beside it, pack.py needs no running server: it packs one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
 
 
 ### <a id="atlas"></a>Atlas owns the outside world
@@ -90,7 +90,7 @@ Imports mount/applyTheme through map-viewer/index.js. Owns location, document.ti
 
 ### <a id="viewer"></a>Embeddable viewer
 
-mount(element, options) returns load, setState, on, ready, contents, export, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url; CSS is scoped to .mmv. Evidence: map-viewer/index.js, viewer.js, base.css; docs/map-viewer-api.md.
+mount(element, options) returns load, setState, on, ready, contents, export, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url when used, or come from the host's assets option (a snapshot); crossMapNote marks links to maps a page cannot open. CSS is scoped to .mmv. Evidence: map-viewer/index.js, viewer.js, base.css; docs/map-viewer-api.md.
 
 
 ### <a id="reader"></a>Reader interaction
