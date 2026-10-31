@@ -192,9 +192,11 @@ export function chromeHtml(uid) {
 
 <div class="mmv-float mmv-bl">
   <button class="mmv-pill mmv-icon" data-mmv="infoBtn" title="What the icons mean">${ic('info')}</button>
+  <button class="mmv-pill mmv-icon" data-mmv="sparklesBtn" title="Changes since you looked" aria-label="Sparkles: changes since you looked" aria-pressed="false" hidden><span class="mmv-ic"><svg viewBox="16 8 240 232" fill="currentColor" aria-hidden="true"><path d="${SPARKLE_PATH}"/></svg></span></button>
   <button class="mmv-pill mmv-icon" data-mmv="changesBtn" title="What changed in this view" hidden>${ic('changes')}</button>
 </div>
 <div class="mmv-panel mmv-bl-panel" data-mmv="infoPanel" hidden></div>
+<div class="mmv-panel mmv-bl-panel mmv-changes mmv-sparkles" data-mmv="sparklesPanel" role="region" aria-label="Changes since you looked" hidden></div>
 <div class="mmv-panel mmv-bl-panel mmv-changes" data-mmv="changesPanel" role="region" aria-label="What changed" hidden></div>
 
 <div class="mmv-note" data-mmv="note" hidden>

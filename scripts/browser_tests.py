@@ -368,9 +368,14 @@ def snapshot_tests(browser, base=None):
         old.write_text((EXAMPLES / "garden.md").read_text(encoding="utf-8").replace("Herb spiral", "Herb bed"), encoding="utf-8")
         _, out = pack("garden.md", tmp / "since.html", "--since", str(old))
         sparks = "document.querySelectorAll('#avagahana-map .mmv-change').length"
-        first = open_snapshot(browser, out, lambda ev, _c: ev(sparks))[1]
-        second = open_snapshot(browser, out, lambda ev, _c: ev(sparks))[1]
-        check("--since marks the same for every reader", first and first == second, f"{first} and {second}")
+        # hidden until the reader shows them (WO-36): the button, then Show sparkles
+        show = ("(async () => { const q = (s) => document.querySelector(`#avagahana-map [data-mmv=${s}]`); q('sparklesBtn').click();"
+                " await new Promise((r) => setTimeout(r, 50)); q('showSparkles').click(); await new Promise((r) => setTimeout(r, 200)); return "
+                + sparks + "; })()")
+        first = open_snapshot(browser, out, lambda ev, _c: [ev(sparks), ev("!document.querySelector('#avagahana-map [data-mmv=sparklesBtn]').hidden"), ev(show)])[1]
+        second = open_snapshot(browser, out, lambda ev, _c: ev(show))[1]
+        check("--since opens with sparkles hidden, the sparkles button shown", first[0] == 0 and first[1] is True, first)
+        check("--since marks the same for every reader", first[2] and first[2] == second, f"{first[2]} and {second}")
         check("no marks without --since", open_snapshot(browser, garden, lambda ev, _c: ev(sparks))[1] == 0)
 
         _, out = pack("garden.md", tmp / "cross.html", "--focus", "n38")

@@ -25,9 +25,9 @@ const viewer = mount(element, {
   storageKey: 'avagahana-viewer-prefs',   // where preferences are kept, and (as `<key>-seen`) what
                                        // the reader has seen of each map; null keeps none
   since: null,          // an older map text: mark what changed since it (below); nothing kept
-  sinceLabel: 'the earlier version',   // with since: "Since <label>" in the info panel
+  sinceLabel: 'the earlier version',   // with since: "Since <label>" in the sparkles panel
   before: null,         // the map's earlier version as text: Before and After (below); never fetched
-  marks: true,          // false: no change marks at all
+  marks: true,          // false: no change marks and no sparkles button
   showProblems: 'map',  // 'map' | 'all' | 'none': which problems show on screen
   sequenceStepSeconds: 3,   // a sequence's step while playing: 2 to 5 s, by halves
   title: true,          // false: no map title in the toolbar (a host that names the map itself)
@@ -160,8 +160,20 @@ a sequence shown as itself has one too. Playing:
 The viewer remembers, per map path and per reader, what the reader has seen (in the
 browser, under `<storageKey>-seen`, the 50 maps opened last), and marks what differs
 when a map is rewritten (a live reload) or opened again. The agent writes nothing for
-this and learns nothing back. (WO-13, WO-31.)
+this and learns nothing back. (WO-13, WO-31, WO-36.)
 
+- **Sparkles are hidden until the reader shows them** (WO-36). While a map has changes
+  since you looked, a sparkle button sits at the bottom left beside the info button
+  (no count); it is the only sign. Its panel has **Show sparkles** (kept with the
+  reader's preferences, `sparkles`; for the visit when `storageKey` is null), what
+  changed in this view and in the whole map, this view's removals one per line (each
+  with the node it was under), **Clear this view** and **Clear whole map**. The button
+  is lit while sparkles show and goes when nothing is left.
+- Hidden, nothing is marked anywhere: no badges, no small sparkles on diagram icons or
+  the expand button, `contents()` `changed` false, no "since you looked" lines on a
+  page. A load still glows what it brought and shrinks out what it took away. Hidden,
+  reading clears nothing: only the Clear buttons do. Every host starts hidden, `since`
+  and snapshots included; there is no option to start shown.
 - The first look at a map marks nothing.
 - One mark: a sparkle badge at a box's top-left (an arrow's: before its label, else at
   its middle) for anything new or changed (label, place, class, icons, note, links, a
@@ -170,26 +182,26 @@ this and learns nothing back. (WO-13, WO-31.)
 - Only the topmost new thing is marked: inside a new node nothing is (its children, its
   arrows, its places are new with it). Changed things keep their own marks.
 - A removed node or arrow marks the node it was under (an arrow: its start); that
-  node's page lists "Removed since you looked". The info panel's "Since you looked"
-  section counts new diagrams, new, changed and removed and names what went; the info
-  button has a ring while there are any.
+  node's page lists "Removed since you looked"; the sparkles panel lists those in the
+  view shown.
 - Only what is drawn is marked: a closed box or collapsed branch with a change inside
   has no mark; the expand button has a small sparkle while one hides a change.
 - A diagram with anything new or changed in it (closed boxes too) has a small sparkle on
   its icon: on the link icon of a node that opens it and that node's page thumbnail, and
   in `contents()` (`changed`). A whole new diagram has no marks inside; it is marked on
   its icon only, and opening it clears it in one go.
-- A mark stays until the reader opens the thing: selects the node or opens its page
-  (its removals and its deployment places too; a new node: everything inside it),
-  opens the arrow's note, plays the sequence, opens a whole new diagram; closing the info
-  panel clears removals at the top of a diagram; the info panel's "Clear changes in this
-  view" clears what the view shows. Marks build up over several rewrites until then; a
+- A mark stays until the reader opens the thing while sparkles show: selects the node
+  or opens its page (its removals and its deployment places too; a new node: everything
+  inside it), opens the arrow's note, plays the sequence, opens a whole new diagram.
+  Clear this view clears what the view shows (removals at the top of a diagram too);
+  Clear whole map clears every mark in the file. Marks build up over several rewrites until then; a
   change undone before the reader looks leaves none. A diagram's small sparkle goes when
   the last mark in it clears.
 - `since: <older map text>` compares with that text instead of what the reader saw: the
   marks are the same for every reader, nothing is kept (clearing lasts for the visit),
   and the wording reads "since <sinceLabel>" ("Since the earlier version" by default).
-- `marks: false` shows no marks at all (`changed` is always false).
+  Hidden by default like the reader's own.
+- `marks: false` shows no marks and no sparkles button (`changed` is always false).
 - `storageKey: null` keeps nothing: marks then last for the visit only. A map with more
   than 2,000 things to compare is compared for the visit only (a host problem says so).
   Thumbnails never mark.
@@ -434,7 +446,9 @@ Root: `.mmv` (`is-narrow` while the toolbar leaves out Export, Search and a `'wi
 `mmv-l<n>` (level), `mmv-d0|1|2` (depth band), `mmv-pa|pc|pr|p0` (planned change: added,
 changed, removed, none; WO-13). Changes since you looked: `mmv-change` (`is-new`,
 `is-changed`), `mmv-spark` (a diagram icon's small sparkle), `is-glow`, `is-gone`,
-`has-changes` on the info button, `has-marks` on the expand button. States: `is-dim`, `is-closed`,
+`has-marks` on the expand button; the sparkles button (`data-mmv="sparklesBtn"`, `is-on`
+and `aria-pressed` while they show) and its panel (`sparklesPanel`: `showSparkles`,
+`sparklesCounts`, `sparklesGone`, `clearView`, `clearMap`). States: `is-dim`, `is-closed`,
 `is-on`, `is-selected`, `is-hit`. Per node, `--n` and `--n-ink` hold its colour and
 the text colour on it.
 
@@ -470,7 +484,8 @@ reader is:
   appearance, Before or After. A sequence that was playing opens at step 1.
 - Dropped: an open node page, a search, a selection, a drilled-in box, boxes opened by
   hand. The reader's own "since you looked" marks never go in; a host's `since` does
-  (with `sinceLabel`), and then every reader of the file sees the same marks.
+  (with `sinceLabel`), and then every reader of the file sees the same marks, hidden
+  until they show them.
 
 Its footer always reads "Built with Avagahana" with the mark, linking to the Avagahana
 page (no option or theme hides it), and on the right the map's title and "as of

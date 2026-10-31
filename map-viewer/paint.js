@@ -258,7 +258,7 @@ export function createPainter(v) {
     }
     for (const inner of s.inners || []) {
       // Each quick link opens its own diagram; the note still opens the node page.
-      const ig = svgEl('g', { class: 'mmv-inner-ic', 'data-inner': s.id, 'data-anchor': inner.anchor, transform: `translate(${inner.x},${inner.y})` }, g);
+      const ig = svgEl('g', { class: 'mmv-inner-ic', 'data-inner': s.id, 'data-anchor': inner.anchor, 'data-size': inner.size, transform: `translate(${inner.x},${inner.y})` }, g);
       svgEl('rect', { class: 'mmv-hit', x: -5, y: -5, width: inner.size + 10, height: inner.size + 10 }, ig);
       svgEl('g', { transform: `scale(${inner.size / 24})` }, ig).innerHTML = UI[diagramOf({ type: inner.type }).modes[0].icon] || UI.list;
       svgEl('title', {}, ig).textContent = `${inner.title} (${diagramOf({ type: inner.type }).label.toLowerCase()})`;
@@ -502,6 +502,7 @@ export function createPainter(v) {
   // the marks again, nothing else (a page may be open over the drawing)
   function paintChanges() {
     v.root.querySelectorAll('[data-mmv=viewport] :is(.mmv-change, .mmv-plan)').forEach((e) => e.remove());
+    for (const ig of v.root.querySelectorAll('[data-mmv=viewport] .mmv-inner-ic')) if (v.partChanged?.(ig.dataset.anchor)) drawSpark(ig, +ig.dataset.size);
     for (const g of $.frames.children) markNode(g, true);
     for (const g of $.nodes.children) markNode(g, false);
     markArrows();

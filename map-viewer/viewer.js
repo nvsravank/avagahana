@@ -28,7 +28,7 @@ const LOOKS = ['fade', 'outline'];
 const CHANGE_ICONS = ['ph sparkle'];   // new or changed (seen.js)
 const FRESH_MS = 2500;   // how long what a load brought counts as just arrived (it glows)
 const APPEARANCES = ['light', 'dark', 'auto'];
-const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'look', 'rels', 'infoClosed', 'stepSeconds'];
+const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'look', 'rels', 'infoClosed', 'stepSeconds', 'sparkles'];
 // below this the viewer shows a message and nothing else
 const MIN_W = 320;
 const MIN_H = 280;
@@ -134,7 +134,7 @@ export function mount(element, options = {}) {
 
   // ---------- state ----------
   const S = {
-    themeId: null, appearance: 'auto', colourBy: 'category', look: 'fade', mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers',
+    themeId: null, appearance: 'auto', colourBy: 'category', look: 'fade', mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0',
     relNode: null, noteSticky: false, noteOpen: false,
     path: null, text: null, map: null, focus: null, collapsed: new Set(), selected: null,
     // a file may hold several diagrams (model/map.js): file is the first, map the one
@@ -376,9 +376,12 @@ export function mount(element, options = {}) {
   // marks the expand button, one in a diagram it opens that diagram's icon.
   // A diagram with planned changes shows those instead: no sparkle anywhere on it (WO-34).
   const planShown = () => !!S.map?.hasPlan;
-  v.changeOf = (id) => (seen && !planShown() && S.map?.byId[id] ? seen.nodeMark(partKey(), id, envName()) : null);
+  // Sparkles are hidden until the reader shows them (the sparkles panel, prefs sparkles;
+  // WO-36): hidden, nothing is marked and reading clears nothing. A load still glows.
+  const marked = () => (S.sparkles === '1' ? seen : null);
+  v.changeOf = (id) => (marked() && !planShown() && S.map?.byId[id] ? seen.nodeMark(partKey(), id, envName()) : null);
   // a diagram with anything new or changed in it (or new as a whole): its icon's small sparkle
-  v.partChanged = (anchor) => !planShown() && !!seen?.partMarked(anchor || '');
+  v.partChanged = (anchor) => !planShown() && !!marked()?.partMarked(anchor || '');
   // Planned changes a closed box (or collapsed branch, closed List row) hides: a node
   // under it with a mark, or a marked arrow of the view shown with an end under it
   // (drawn on the closed box, or inside it once open) (WO-34).
@@ -394,7 +397,7 @@ export function mount(element, options = {}) {
     if (S.map?.root) {
       (function walk(n) {
         if (S.collapsed.has(n.id) && n.children.length) {
-          if (seen && !planShown()) hidden ||= seen.inside(partKey(), n, envName());
+          if (marked() && !planShown()) hidden ||= seen.inside(partKey(), n, envName());
           planned ||= v.planInside(n.id);
           return;
         }
@@ -408,23 +411,41 @@ export function mount(element, options = {}) {
   }
   // the view's relations behind a drawn arrow (its shape lists copies)
   const relsOf = (shape) => (shownView()?.relations || []).filter((r) => shape.items.some((i) => i.from === r.from && i.to === r.to && i.label === r.label));
-  v.arrowChange = (shape) => (seen && !planShown() && shownView() ? seen.arrowMark(partKey(), shownView(), relsOf(shape)) : null);
+  v.arrowChange = (shape) => (marked() && !planShown() && shownView() ? seen.arrowMark(partKey(), shownView(), relsOf(shape)) : null);
   // just brought by a load: it glows once
   v.isFresh = (id) => S.fresh?.has(`${partKey()}|n|${id}`) || (envName() && S.fresh?.has(`${partKey()}|e|${envName()}|${id}`));
   v.arrowFresh = (shape) => !!shownView() && seen?.relationKeys(partKey(), shownView(), relsOf(shape)).some((k) => S.fresh?.has(k));
   // just taken away by a load: it leaves in red
   v.isGone = (id) => S.gone?.has(`${partKey()}|${id}`);
-  // The reader opened these: their marks go. Only the marks repaint (a page may be open).
-  function seenAck(keys) {
-    if (!seen?.ack(keys)) return;
+  // The reader opened these: their marks go, only while sparkles show (WO-36).
+  const seenAck = (keys) => { if (marked()) clearSeen(keys); };
+  // these marks go for good (opened, or a Clear button)
+  function clearSeen(keys) { if (seen?.ack(keys)) repaintMarks(); }
+  // Only the marks repaint (a page may be open).
+  function repaintMarks() {
     if (S.mode === 'list') renderList(v, listHandlers);
     else painter.paintChanges();
     markExpandBtn();
-    markInfoBtn();
-    if (!$.infoPanel.hidden) renderInfo();
+    markSparkles();
     emitContents();
   }
-  const markInfoBtn = () => $.infoBtn.classList.toggle('has-changes', !!seen?.any());
+  // the sparkles button: there only while the map has changes since you looked
+  function markSparkles() {
+    const any = !!seen?.any();
+    $.sparklesBtn.hidden = !any;
+    $.sparklesBtn.classList.toggle('is-on', S.sparkles === '1');
+    $.sparklesBtn.title = `Changes ${sinceWords}`;
+    $.sparklesBtn.setAttribute('aria-pressed', String(S.sparkles === '1'));
+    if (!any) $.sparklesPanel.hidden = true;
+    renderSparkles();
+  }
+  function setSparkles(on) {
+    const want = on ? '1' : '0';
+    if (want === S.sparkles) return;
+    S.sparkles = want;
+    savePrefs();
+    repaintMarks();
+  }
 
   function currentSeenKeys() {
     if (!seen || !S.map?.root) return [];
@@ -686,7 +707,7 @@ export function mount(element, options = {}) {
     hideNote();
     S.selected = id;
     paintMarks();
-    pageSince = seen ? { id, kind: seen.ownMark(partKey(), id, envName()), removed: seen.removedUnder(partKey(), id) } : null;
+    pageSince = marked() ? { id, kind: seen.ownMark(partKey(), id, envName()), removed: seen.removedUnder(partKey(), id) } : null;
     page.open(id);
     // its page read: the node's change marks go, and what was removed under it
     seenAck(seen?.nodeKeys(partKey(), id, envName()) || []);
@@ -1302,12 +1323,8 @@ export function mount(element, options = {}) {
   function hideError() { $.errorbar.hidden = true; }
 
   // ---------- panels ----------
-  const PANELS = ['warnPanel', 'infoPanel', 'changesPanel'];
-  function closePanels() {
-    // the info panel read: the removals it listed at the top of a diagram are seen
-    if (!$.infoPanel.hidden && seen) { $.infoPanel.hidden = true; seenAck(seen.removedTop().map((r) => r.key)); }
-    PANELS.forEach((p) => { $[p].hidden = true; });
-  }
+  const PANELS = ['warnPanel', 'infoPanel', 'sparklesPanel', 'changesPanel'];
+  function closePanels() { PANELS.forEach((p) => { $[p].hidden = true; }); }
   function togglePanel(id) { const open = $[id].hidden; closePanels(); $[id].hidden = !open; }
   $.relBtn.addEventListener('click', () => {
     S.rels = S.rels === '1' ? '0' : '1';
@@ -1318,6 +1335,7 @@ export function mount(element, options = {}) {
   });
   $.warnBtn.addEventListener('click', () => togglePanel('warnPanel'));
   $.infoBtn.addEventListener('click', () => { togglePanel('infoPanel'); renderInfo(); });
+  $.sparklesBtn.addEventListener('click', () => { togglePanel('sparklesPanel'); renderSparkles(); });
   $.changesBtn.addEventListener('click', () => { togglePanel('changesPanel'); renderChanges(); });
   $.perspBtn.addEventListener('click', () => switchPerspective(S.perspective === 'before' ? 'after' : 'before'));
 
@@ -1339,6 +1357,58 @@ export function mount(element, options = {}) {
     $.perspBtn.title = before ? 'Showing the earlier version: show the later one' : 'Showing the later version: show the earlier one';
     $.perspBtn.setAttribute('aria-label', `${before ? 'Before' : 'After'}: switch to ${before ? 'after' : 'before'}`);
     renderChanges();
+  }
+  // The sparkles panel (WO-36): show or hide them, what changed in this view and in the
+  // whole map, this view's removals one per line, and clearing this view or all of it.
+  function renderSparkles() {
+    const panel = $.sparklesPanel;
+    if (panel.hidden || !seen?.any()) return;
+    // rebuilt on every change: the control the reader was on keeps the focus
+    const focused = panel.contains(document.activeElement) ? document.activeElement.dataset.mmv : null;
+    panel.replaceChildren();
+    const el = (tag, cls, text) => Object.assign(document.createElement(tag), { className: cls, ...(text != null ? { textContent: text } : {}) });
+    panel.appendChild(el('div', 'mmv-legend-head', sinceWords[0].toUpperCase() + sinceWords.slice(1)));
+    const label = el('label', 'mmv-sparkles-show');
+    const box = Object.assign(document.createElement('input'), { type: 'checkbox', checked: S.sparkles === '1' });
+    box.dataset.mmv = 'showSparkles';
+    box.addEventListener('change', () => setSparkles(box.checked));
+    label.append(box, 'Show sparkles');
+    panel.appendChild(label);
+    const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+    const words = (c) => [c.diagrams && n(c.diagrams, 'new diagram', 'new diagrams'), c.new && `${c.new} new`, c.changed && `${c.changed} changed`, c.removed && `${c.removed} removed`].filter(Boolean).join(', ');
+    const keys = currentSeenKeys();
+    const here = seen.counts(keys);
+    const all = seen.counts();
+    const total = all.new + all.changed + all.removed + all.diagrams;
+    const p = el('div', 'mmv-sparkles-counts');
+    p.dataset.mmv = 'sparklesCounts';
+    p.append(el('div', '', `This view: ${seen.partNew(partKey()) ? 'a new diagram' : words(here) || 'nothing'}`),
+      el('div', '', `Whole map: ${n(total, 'change', 'changes')}${all.parts > 1 ? ` in ${all.parts} diagrams` : ''}`));
+    panel.appendChild(p);
+    const gone = seen.removedIn(keys);
+    if (gone.length) {
+      panel.appendChild(el('h4', '', 'Removed'));
+      const ul = el('ul', 'mmv-sparkles-gone');
+      ul.dataset.mmv = 'sparklesGone';
+      for (const r of gone) {
+        const li = el('li', '', r.label);
+        if (r.under) li.appendChild(el('span', 'mmv-sparkles-under', `in ${r.under}`));
+        ul.appendChild(li);
+      }
+      panel.appendChild(ul);
+    }
+    const row = el('div', 'mmv-sparkles-clear');
+    const button = (id, text, title, onClick, disabled) => {
+      const b = el('button', 'mmv-clear-seen', text);
+      Object.assign(b, { title, disabled });
+      b.dataset.mmv = id;
+      b.addEventListener('click', onClick);
+      row.appendChild(b);
+    };
+    button('clearView', 'Clear this view', 'Mark the changes in this diagram and view as seen', () => clearSeen(keys), !keys.length);
+    button('clearMap', 'Clear whole map', 'Mark every change in the map as seen', () => clearSeen(seen.allKeys()), false);
+    panel.appendChild(row);
+    if (focused) panel.querySelector(`[data-mmv="${focused}"]`)?.focus();
   }
   // What changed in the diagram and view shown, grouped; read only (WO-34: no clicking).
   function renderChanges() {
@@ -1379,7 +1449,7 @@ export function mount(element, options = {}) {
   // like the other menus, the panels close on a click anywhere else (in the host page too)
   function outsidePanels(e) {
     const t = e.target;
-    if (PANELS.some((p) => !$[p].hidden) && ![$.infoPanel, $.warnPanel, $.changesPanel, $.infoBtn, $.warnBtn, $.changesBtn, $.perspBtn].some((el) => el.contains(t))) closePanels();
+    if (PANELS.some((p) => !$[p].hidden) && ![$.infoPanel, $.warnPanel, $.sparklesPanel, $.changesPanel, $.infoBtn, $.warnBtn, $.sparklesBtn, $.changesBtn, $.perspBtn].some((el) => el.contains(t))) closePanels();
   }
   document.addEventListener('pointerdown', outsidePanels, true);
   // the mode buttons come from the diagram type
@@ -1563,20 +1633,6 @@ export function mount(element, options = {}) {
       box.appendChild(r);
     };
     const swatchOf = (cls) => `<svg viewBox="0 0 18 18" width="18" height="18" class="${cls}" aria-hidden="true"><rect x="2" y="3" width="14" height="12" rx="3" style="fill:color-mix(in srgb, var(--n) 25%, var(--mmv-bg));stroke:var(--n);stroke-width:2"/></svg>`;
-    // changes since you looked (seen.js): how many, and the names of what went
-    if (seen?.any()) {
-      section('since', sinceWords[0].toUpperCase() + sinceWords.slice(1));
-      const c = seen.counts();
-      const parts = [c.diagrams && `${c.diagrams} new ${c.diagrams === 1 ? 'diagram' : 'diagrams'}`, c.new && `${c.new} new`, c.changed && `${c.changed} changed`, c.removed && `${c.removed} removed`].filter(Boolean);
-      box.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-legend-since', textContent: parts.join(', ') || 'Changes inside' }));
-      const gone = seen.removedNames();
-      if (gone.length) box.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-legend-since', textContent: `Removed: ${gone.join(', ')}` }));
-      const clear = Object.assign(document.createElement('button'), { className: 'mmv-clear-seen', textContent: 'Clear changes in this view', disabled: !currentSeenKeys().length });
-      clear.dataset.mmv = 'clearSeen';
-      clear.title = 'Mark changes in this diagram and current view as seen';
-      clear.addEventListener('click', () => seenAck(currentSeenKeys()));
-      box.appendChild(clear);
-    }
     // colour key for a box diagram coloured by its top-level boxes
     if (S.colourBy === 'category' && diagram().categoryKey && S.map?.root) {
       section('colours', 'Colours');
@@ -1753,6 +1809,7 @@ export function mount(element, options = {}) {
   }
   function emitState() {
     renderChanges();   // the view shown may be another
+    renderSparkles();
     const s = currentState();
     const key = JSON.stringify(s);
     if (key === lastState) return;
@@ -1876,7 +1933,7 @@ export function mount(element, options = {}) {
       if (keep) painter.animateNext();   // a live reload: boxes glide to their new places
       render(keep ? false : 'levels');
     }
-    markInfoBtn();
+    markSparkles();
     markPerspective();
     emit('load', { path, title: file.title, warnings: file.warnings.slice() });
     fitTopSoon();   // the host may have changed its button in the slot
@@ -1893,7 +1950,7 @@ export function mount(element, options = {}) {
     S.map = map;
     map.base ||= { root: map.root, byId: map.byId };   // the diagram's own tree (a deployment view swaps it)
     // a whole new diagram opened: seen in one go (nothing inside it is marked)
-    if (seen?.partNew(partKey()) && seen.ack(seen.partKeys(partKey()))) { markInfoBtn(); queueMicrotask(emitContents); }
+    if (marked()?.partNew(partKey()) && seen.ack(seen.partKeys(partKey()))) { markSparkles(); queueMicrotask(emitContents); }
     // the diagram type decides the modes and the colour-by choices
     const d = diagram();
     if (!modeIds().includes(S.mode)) S.mode = d.modes[0].id;
@@ -2044,15 +2101,15 @@ export function mount(element, options = {}) {
       if (!m.root) continue;
       const part = m === f ? null : m.anchor;
       const mark = { ...(m === f ? { first: true } : {}), ...(part && unlinked.has(part) ? { unlinked: true } : {}) };
-      const changed = !!seen?.partMarked(part || '');
+      const changed = !!marked()?.partMarked(part || '');
       if (m.type === 'sequence') { out.push({ kind: 'sequence', label: m.title, part, type: m.type, state: { seq: part || 'main', step: 1 }, steps: m.sequence?.steps.length || 0, changed, ...mark }); continue; }
       out.push({ kind: 'diagram', label: m.title, part, type: m.type, state: { seq: null, part, view: null }, changed, ...mark });
       const own = { part, type: m.type, diagram: m.title };
-      const viewChanged = (x) => !!seen?.viewMarked(part || '', x.name);
+      const viewChanged = (x) => !!marked()?.viewMarked(part || '', x.name);
       const views = (m.views || []).filter((x) => !x.deploy);
       if (views.length > 1) for (const x of views) out.push({ kind: x.join ? 'join' : 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name }, changed: viewChanged(x) });
       for (const x of m.views || []) if (x.deploy) out.push({ kind: 'deployment', label: x.name, ...own, state: { seq: null, part, env: x.name }, changed: viewChanged(x) });
-      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 }, steps: w.sequence?.steps.length || 0, changed: !!seen?.partMarked(w.anchor) });
+      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 }, steps: w.sequence?.steps.length || 0, changed: !!marked()?.partMarked(w.anchor) });
     }
     return out;
   }

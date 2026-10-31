@@ -1,7 +1,7 @@
 // seen.js — changes since this reader last looked (WO-13, WO-31), for one viewer: the
 // baseline (what the reader has seen, model/changes.js) per map, kept in the browser,
 // and the marks the drawing, the node page, the diagram icons, the expand button and
-// the info panel show. The agent knows nothing of this: the viewer compares on its own.
+// the sparkles panel show (the viewer shows them only when the reader asks, WO-36). The agent knows nothing of this: the viewer compares on its own.
 //
 // Only the topmost new thing is marked: what is inside a new node (its children, its
 // arrows, its places) is new with it, and a whole new diagram is marked only on its
@@ -205,13 +205,9 @@ export function createSeen(opts) {
   });
   // what was removed under a node, by name (once each: a deployment repeats arrows)
   const removedUnder = (part, id) => [...new Set(removed.filter((r) => r.parent === id && r.key.startsWith(`${part}|`)).map((r) => r.label))];
-  // every removal by name, once each
-  const removedNames = () => [...new Set(removed.map((r) => r.label))];
-  // removals at the top of a diagram (no parent left to report them)
-  const removedTop = () => removed.filter((r) => !r.parent || r.parent === '_map');
-  // counts for the info panel: each node and arrow once (deployments repeat them), only
-  // the marks shown; whole new diagrams apart
-  function counts() {
+  // counts for the sparkles panel: each node and arrow once (deployments repeat them),
+  // only the marks shown; whole new diagrams apart. keys: only these (a view's), else all.
+  function counts(keys = null) {
     const once = (list) => {
       const seen = new Map();
       for (const [k, kind] of list) {
@@ -221,16 +217,33 @@ export function createSeen(opts) {
       }
       return [...seen.values()];
     };
-    const m = once([...marks].map(([k]) => [k, shown(k)]).filter(([, kind]) => kind));
-    const parts = new Set([...marks.keys()].map((k) => parseKey(k).part));
+    const only = keys && new Set(keys);
+    const m = once([...marks].filter(([k]) => !only || only.has(k)).map(([k]) => [k, shown(k)]).filter(([, kind]) => kind));
+    const parts = new Set([...marks.keys(), ...removed.map((r) => r.key)].filter((k) => !only || only.has(k)).map((k) => parseKey(k).part));
     return {
       new: m.filter((x) => x === 'new').length,
       changed: m.filter((x) => x === 'changed').length,
-      removed: once(removed.filter((r) => !partNew(parseKey(r.key).part)).map((r) => [r.key, 'removed'])).length,
+      removed: once(removed.filter((r) => (!only || only.has(r.key)) && !partNew(parseKey(r.key).part)).map((r) => [r.key, 'removed'])).length,
       diagrams: [...parts].filter(partNew).length,
+      parts: parts.size,
     };
   }
+  // the removals among these keys, once each: {label, under} (under: the name of the
+  // node it was under, an arrow: none)
+  function removedIn(keys) {
+    const only = new Set(keys), out = new Map();
+    for (const r of removed) {
+      if (!only.has(r.key)) continue;
+      const p = parseKey(r.key);
+      const under = p.type === 'a' || !r.parent || r.parent === '_map' ? null
+        : (summary.items[`${p.part}|n|${r.parent}`] || baseline.items[`${p.part}|n|${r.parent}`])?.[1] || null;
+      out.set(`${r.label}\u0001${under || ''}`, { label: r.label, under });
+    }
+    return [...out.values()];
+  }
+  // every mark and removal in the file (Clear whole map)
+  const allKeys = () => [...marks.keys(), ...removed.map((r) => r.key)];
   const any = () => marks.size > 0 || removed.length > 0;
 
-  return { load, ack, scopeKeys, ownMark, nodeMark, nodeKeys, partKeys, partNew, relationKeys, arrowMark, inside, partMarked, viewMarked, removedUnder, removedTop, removedNames, counts, any };
+  return { load, ack, scopeKeys, ownMark, nodeMark, nodeKeys, partKeys, partNew, relationKeys, arrowMark, inside, partMarked, viewMarked, removedUnder, removedIn, allKeys, counts, any };
 }

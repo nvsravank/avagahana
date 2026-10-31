@@ -171,10 +171,9 @@ svg.mmv-plan { flex: none; vertical-align: middle; margin-right: 4px; overflow: 
 @keyframes mmv-glow { 40% { stroke: var(--mmv-highlight); stroke-width: 5; stroke-opacity: 1; filter: drop-shadow(0 0 6px var(--mmv-highlight)); } }
 .is-gone :is(.mmv-shape, rect:not(.mmv-hit)) { stroke: var(--mmv-bad) !important; fill: color-mix(in srgb, var(--mmv-bad) 22%, var(--mmv-bg)) !important; }
 @media (prefers-reduced-motion: reduce) { .mmv-node.is-glow > :is(.mmv-shape, .mmv-bar), .mmv-frame.is-glow > rect, .mmv-flow.is-glow { animation: none; } }
-/* the info button while there are changes: a small ring */
-.mmv .mmv-pill.has-changes { position: relative; }
-.mmv .mmv-pill.has-changes::after { content: ""; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
-  background: var(--mmv-chrome-bg, var(--mmv-bg)); border: 2px solid var(--mmv-highlight); }
+/* the sparkles button (WO-36): there while the map has changes, lit while they show */
+.mmv [data-mmv="sparklesBtn"] { color: var(--mmv-highlight); }
+.mmv [data-mmv="sparklesBtn"].is-on { background: var(--mmv-highlight); color: var(--mmv-bg); }
 /* the expand button while closed boxes hide planned changes: a dashed ring */
 .mmv .mmv-pill.has-plan { position: relative; }
 .mmv .mmv-pill.has-plan::after { content: ""; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
@@ -189,6 +188,13 @@ svg.mmv-plan { flex: none; vertical-align: middle; margin-right: 4px; overflow: 
 .mmv-since { margin: 2px 0 8px; color: var(--mmv-highlight); font-weight: 600; font-size: 13px; }
 .mmv-since-gone { margin: 2px 0 8px; }
 .mmv-legend-since { padding: 2px 8px 6px; }
+/* the sparkles panel: the toggle, the counts, this view's removals one per line, the Clear buttons */
+.mmv-sparkles-show { display: flex; align-items: center; gap: 8px; margin: 6px 0 8px; font-size: 13px; cursor: pointer; }
+.mmv-sparkles-show input { margin: 0; accent-color: var(--mmv-highlight); }
+.mmv-sparkles-counts { font-size: 13px; display: grid; gap: 2px; margin-bottom: 4px; }
+.mmv-sparkles-under { color: var(--mmv-muted); margin-left: 8px; }
+.mmv-sparkles-clear { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.mmv-sparkles-clear .mmv-clear-seen { margin: 0; }
 .mmv-clear-seen { margin: 4px 8px 8px; padding: 7px 10px; border: 1px solid var(--mmv-chrome-border); border-radius: 7px; background: var(--mmv-chrome-bg); color: var(--mmv-ink); font: inherit; cursor: pointer; }
 .mmv-clear-seen:hover:not(:disabled) { background: var(--mmv-chrome-hover); }
 .mmv-clear-seen:disabled { opacity: 0.5; cursor: default; }

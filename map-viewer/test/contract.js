@@ -4,7 +4,7 @@
 import { testErConnections } from './er-connections.js';
 import { testDiagramLinks } from './diagram-links.js';
 import { testContents } from './contents.js';
-import { testChangeMarks } from './change-marks.js';
+import { testChangeMarks, showSparkles } from './change-marks.js';
 import { testRender } from './render.js';
 import { testWholeMap } from './whole-map.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
@@ -135,11 +135,11 @@ try {
     check('cancelled load leaves current map', v.title === 'Latest' && loads.length === 1);
     await v.load(SAMPLE, 'same.md', { sourceId: 'folder-a' });
     await v.load(SAMPLE.replace('Raised beds', 'Changed beds'), 'same.md', { sourceId: 'folder-b' });
-    check('new source has no false change marks', !document.querySelector('#a .has-changes'));
+    check('new source has no false change marks', document.querySelector('#a [data-mmv=sparklesBtn]').hidden);
     const stored = JSON.parse(localStorage.getItem('review-history-seen'));
     check('source baselines have separate identities', !!stored.maps[JSON.stringify(['folder-a', 'same.md'])] && !!stored.maps[JSON.stringify(['folder-b', 'same.md'])]);
     await v.load(SAMPLE.replace('Raised beds', 'Changed beds'), 'same.md', { sourceId: 'folder-a' });
-    check('returning source compares its own baseline', !!document.querySelector('#a .has-changes'));
+    check('returning source compares its own baseline', !document.querySelector('#a [data-mmv=sparklesBtn]').hidden);
     v.destroy();
     localStorage.removeItem('review-history-seen');
     localStorage.removeItem('review-history');
@@ -1074,29 +1074,33 @@ try {
     const edited = shopText.replace('fraud["Fraud check"]', 'risk["Risk score"]').replace('payh --> fraud', 'payh --> risk')
       .replace('stock["Stock check"]', 'stock["Stock lookup"]').replace('    queue[["Event queue"]]\n', '    queue[["Event queue"]]\n    cache[("Cache")]\n').replace('  stock --> db\n', '  stock --> db\n  stock --> cache\n');
     localStorage.removeItem('avagahana-test-seen-seen');
+    localStorage.removeItem('avagahana-test-seen');
     const sv = mount(document.getElementById('a'), { storageKey: 'avagahana-test-seen' });
     const q = (sel) => document.querySelector(`#a ${sel}`);
     const marks = () => Object.fromEntries([...document.querySelectorAll('#a [data-mmv=nodes] .mmv-change, #a [data-mmv=frames] .mmv-change')]
       .map((e) => [e.closest('[data-id]').dataset.id, e.getAttribute('class').replace('mmv-change is-', '')]));
     await sv.load(shopText, 'shop.md');
-    check('a first look marks nothing', !document.querySelector('#a .mmv-change') && !q('[data-mmv=infoBtn]').classList.contains('has-changes'));
+    check('a first look marks nothing', !document.querySelector('#a .mmv-change') && q('[data-mmv=sparklesBtn]').hidden);
     await sv.load(edited, 'shop.md');
+    check('what just arrived glows, sparkles hidden (WO-36)', q('.mmv-node[data-id="risk"]').classList.contains('is-glow') && !q('.mmv-node[data-id="ord"]').classList.contains('is-glow')
+      && !document.querySelector('#a .mmv-change'));
+    check('the sparkles button says there are changes', !q('[data-mmv=sparklesBtn]').hidden);
+    await showSparkles(document.getElementById('a'), wait);
     let m = marks();
     check('a rewrite marks what is new and changed since the reader looked', m.risk === 'new' && m.cache === 'new' && m.stock === 'changed' && !m.ord, JSON.stringify(m));
     check('a removal marks where it was (the box it was in, the arrow\'s start)', m.pay === 'changed' && m.payh === 'changed', JSON.stringify(m));
-    check('what just arrived glows', q('.mmv-node[data-id="risk"]').classList.contains('is-glow') && !q('.mmv-node[data-id="ord"]').classList.contains('is-glow'));
-    check('the info button says there are changes', q('[data-mmv=infoBtn]').classList.contains('has-changes'));
     check('contents() marks views with changes (a deployment\'s places); the picker has no rings (WO-31)', !q('[data-mmv=viewBtn]').classList.contains('has-changes')
       && sv.contents().find((x) => x.kind === 'deployment' && x.label === 'Production')?.changed === true && !document.querySelector('#a [data-mmv=viewMenu] .has-changes'));
     sv.setState({ focus: 'pay' });
     await wait(50);
     check('drilled in, no crumb has a ring (WO-31)', !document.querySelector('#a [data-mmv=crumbs] .has-changes') && !!document.querySelector('#a [data-mmv=crumbs] button'));
     sv.setState({ focus: null });
-    q('[data-mmv=infoBtn]').click();
+    q('[data-mmv=sparklesBtn]').click();
     await wait(50);
-    check('the info panel counts them and names what went', /Since you looked/.test(q('[data-mmv=infoPanel]').textContent) && /Removed: Fraud check/.test(q('[data-mmv=infoPanel]').textContent),
-      q('[data-mmv=infoPanel]').textContent.slice(0, 200));
-    q('[data-mmv=infoBtn]').click();
+    const gone = [...document.querySelectorAll('#a [data-mmv=sparklesGone] li')].map((li) => li.textContent);
+    check('the sparkles panel counts them and lists what went, one per line', /This view: .*new.*changed.*removed/.test(q('[data-mmv=sparklesCounts]').textContent)
+      && gone.some((x) => /^Fraud check/.test(x)) && gone.length >= 2, `${q('[data-mmv=sparklesCounts]').textContent} ${JSON.stringify(gone)}`);
+    q('[data-mmv=sparklesBtn]').click();
     sv.setState({ page: 'pay' });
     await wait(400);
     check('its page says what went from under it', /Removed since you looked/.test(q('.mmv-page')?.textContent || '') && /Fraud check/.test(q('.mmv-page')?.textContent || ''));
@@ -1131,20 +1135,21 @@ try {
     const sv4 = mount(document.getElementById('a'), { storageKey: null });
     await sv4.load(shopText, 'shop.md');
     await sv4.load(edited, 'shop.md');
+    await showSparkles(document.getElementById('a'), wait);
     check('storageKey null: marks for the visit (a live reload)', marks().risk === 'new');
     sv4.destroy();
     const sv5 = mount(document.getElementById('a'), { storageKey: null });
     await sv5.load(edited, 'shop.md');
-    check('storageKey null: nothing kept for the next visit', !document.querySelector('#a .mmv-change'));
+    check('storageKey null: nothing kept for the next visit', q('[data-mmv=sparklesBtn]').hidden);
     sv5.destroy();
     localStorage.removeItem('avagahana-test-seen-seen');
     const sv6 = mount(document.getElementById('a'), { storageKey: 'avagahana-test-seen' });
     await sv6.load(shopText, 'shop.md');
     await sv6.load(edited, 'shop.md');
-    q('[data-mmv=infoBtn]').click();
+    q('[data-mmv=sparklesBtn]').click();
     await wait(50);
-    const clear = q('[data-mmv=clearSeen]');
-    check('the info panel offers to clear this view\'s changes', !!clear && !clear.disabled);
+    const clear = q('[data-mmv=clearView]');
+    check('the sparkles panel offers to clear this view\'s changes', !!clear && !clear.disabled);
     clear?.click();
     await wait(50);
     check('clearing marks this view seen and leaves other views\' changes', !Object.keys(marks()).length

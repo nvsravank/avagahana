@@ -6,6 +6,14 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** Sparkles (changes since you looked) are hidden until the reader shows them.
+  A sparkle button beside the info button appears while a map has changes; its panel
+  has Show sparkles (kept with the preferences as `sparkles`), this view's and the whole
+  map's counts, this view's removals one per line, Clear this view and Clear whole map.
+  Hidden, nothing is marked (`contents()` `changed` false) and reading clears nothing; a
+  load still glows. The info panel loses its "Since you looked" section and the info
+  button its `has-changes` ring; closing the info panel clears nothing. A host's `since`
+  and snapshots start hidden too (WO-36).
 - **Contract** The whole map from the viewer: the Export menu has This view (SVG, PNG,
   Print) and Whole map: Interactive HTML (explore offline), a snapshot made in the browser
   with no server or atlas, and Source file (edit with your agent), the map's Markdown. `viewer.snapshot()`; options `asOf` (the
