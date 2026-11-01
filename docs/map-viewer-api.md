@@ -219,8 +219,10 @@ this and learns nothing back. (WO-13, WO-31, WO-36.)
 Given the map's earlier version (`before`, `load`'s `context.before` or `setBefore`), the
 viewer compares the two by id, in each diagram, view and deployment:
 
-- A toggle in the top row, next to the view picker (the first thing in the row when
-  narrow), switches between **Before** (the earlier file) and **After** (the map). The
+- A switch in the top row, next to the view picker (the first thing in the row when
+  narrow), of two icon buttons (WO-42): **Before** (a rough stone: the earlier file) and
+  **After** (a cut diamond: the map). The version on screen is pressed (`aria-pressed`);
+  the other switches; the tooltips and labels name each, the group is "Version". The
   diagram, view, deployment and selection stay; what stayed glides to its new place, what
   goes fades out, what comes fades in (reduced motion: no glide).
 - Both are marked with the planned-change signs (map format, Planned changes): After

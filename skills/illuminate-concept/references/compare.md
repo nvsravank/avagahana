@@ -6,7 +6,8 @@ v1.4", before and after a migration.
 ## What the reader gets
 
 Given the map and its earlier version, the viewer offers **Before** and **After** (a
-toggle beside the view picker). Switching keeps the view and selection; what moved slides
+switch of two icons beside the view picker: a rough stone for Before, a cut diamond for
+After; the one on screen is pressed). Switching keeps the view and selection; what moved slides
 from its old place to its new one, what went fades out, what came fades in. Both are
 marked with the ringed +, ~ and − signs. A changes button beside the info button lists
 what changed in the view shown: Removed, Added, Moved (`Orders service: EKS on Fargate →

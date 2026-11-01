@@ -11,6 +11,18 @@ import { iconDef } from '../icons.js';
 import { mount } from '../index.js';
 
 export async function testErConnections(check) {
+  // a table drilled into (focus) in Tables mode: it and its neighbours, never a blank canvas (WO-42)
+  {
+    const host = document.body.appendChild(Object.assign(document.createElement('div'), { style: 'width:1200px;height:700px' }));
+    const fv = mount(host, { storageKey: null, state: { mode: 'tables', focus: 'ORDER_LINE', node: 'ORDER_LINE' } });
+    await fv.load(await fetch('../../examples/maps/sales-warehouse.md').then((r) => r.text()), 'sales-warehouse.md');
+    await new Promise((r) => setTimeout(r, 60));
+    const drawn = [...host.querySelectorAll('[data-mmv=nodes] > g')].map((g) => g.dataset.id).sort().join();
+    check('ER focus in Tables mode: the table and its neighbours', drawn === 'CUSTOMER,DATE,ORDER_LINE,PRODUCT,STORE', drawn);
+    check('ER focus in Tables mode: nothing placed at NaN', !host.querySelector('[transform*="NaN"]'));
+    fv.destroy();
+    host.remove();
+  }
   const iconMap = parseMap(await fetch('../../format/samples/good-icon-namespaces.md').then((r) => r.text()), 'icons.md');
   check('namespaced icons stay together in mind maps and node icons', iconMap.byId.root.icons.join(',') === 'ph database,verified' && iconMap.byId.child.icons.join(',') === 'ph cloud,ph gear-six,thinking,ph lightning');
   check('namespaced class and legend bases parse consistently', iconMap.classes.store.icons.join(',') === 'ph hard-drives,verified' && iconMap.iconLegend.thinking.base === 'ph brain' && iconMap.iconLegend['ph database'].label === 'Database');

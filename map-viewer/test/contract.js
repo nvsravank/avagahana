@@ -1075,13 +1075,20 @@ try {
     await bv.load(now, 'release.md');
     check('no earlier version: no toggle, no changes button', q('[data-mmv=perspBtn]').hidden && q('[data-mmv=changesBtn]').hidden && !('perspective' in bv.state));
     await bv.setBefore(was);
-    check('with an earlier version: the toggle says After, the changes button shows', !q('[data-mmv=perspBtn]').hidden && q('[data-mmv=perspBtn]').textContent.trim() === 'After' && !q('[data-mmv=changesBtn]').hidden && bv.state.perspective === 'after');
+    const pressed = () => ['perspBefore', 'perspAfter'].filter((x) => q(`[data-mmv=${x}]`).getAttribute('aria-pressed') === 'true' && q(`[data-mmv=${x}]`).classList.contains('is-on'));
+    check('with an earlier version: the switch shows, After pressed, the changes button shows', !q('[data-mmv=perspBtn]').hidden && pressed().join() === 'perspAfter' && !q('[data-mmv=changesBtn]').hidden && bv.state.perspective === 'after', pressed().join());
+    check('the switch: a group of two named buttons (WO-42)', q('[data-mmv=perspBtn]').getAttribute('role') === 'group' && q('[data-mmv=perspBtn]').getAttribute('aria-label') === 'Version'
+      && q('[data-mmv=perspBefore]').getAttribute('aria-label') === 'Before: the earlier version' && q('[data-mmv=perspAfter]').getAttribute('aria-label') === 'After: this version' && !q('[data-mmv=perspBtn]').textContent.trim());
+    q('[data-mmv=perspAfter]').click();
+    await wait(30);
+    check('the switch: pressing the version on screen does nothing', bv.state.perspective === 'after');
     const sign = (id) => q(`[data-mmv=viewport] [data-id="${id}"] > .mmv-plan`)?.classList[1] || null;
     check('After marks what came and what changed, nothing removed is drawn', !q('[data-id="waf"]') && sign('pay') === 'is-changed', sign('pay'));
     bv.setState({ node: 'orders' });
     await bv.setState({ perspective: 'before', env: 'Production' });
     await wait(50);
     check('Before draws the earlier file: the firewall, marked removed', bv.state.perspective === 'before' && sign('waf') === 'is-removed' && bv.title === 'Checkout platform, release 1.4', `${sign('waf')} ${bv.title}`);
+    check('the switch: Before pressed while it is shown', pressed().join() === 'perspBefore', pressed().join());
     check('switching keeps the view and the selection', bv.state.env === 'Production' && bv.state.node === 'orders', JSON.stringify(bv.state));
     check('a moved node is marked changed in the deployment', sign('orders') === 'is-changed', sign('orders'));
     check('no sparkle while comparing', !document.querySelector('#a [data-mmv=viewport] .mmv-change'));
@@ -1089,10 +1096,10 @@ try {
     await wait(30);
     const listed = q('[data-mmv=changesPanel]').textContent;
     check('the changes list: the view\'s changes in four groups', /Removed \(3\).*Added \(3\).*Moved \(1\).*Changed \(2\)/s.test(listed) && /EKS on Fargate → Orders hosts, EC2/.test(listed), listed.slice(0, 200));
-    q('[data-mmv=perspBtn]').click();
+    q('[data-mmv=perspAfter]').click();
     // the switch is a load, then the glide: what went fades out
     for (let i = 0; i < 60 && (bv.state.perspective !== 'after' || q('[data-id="waf"]')); i++) await wait(50);
-    check('the toggle switches back to After, the list stays open', bv.state.perspective === 'after' && !q('[data-mmv=changesPanel]').hidden && !q('[data-id="waf"]'),
+    check('the After button switches back, the list stays open', bv.state.perspective === 'after' && !q('[data-mmv=changesPanel]').hidden && !q('[data-id="waf"]'),
       JSON.stringify([bv.state.perspective, q('[data-mmv=changesPanel]').hidden, !!q('[data-id="waf"]'), q('[data-id="waf"]')?.getAttribute('class')]));
     const rep = (await bv.export({ format: 'svg', report: true })).report;
     check('the layout report lists the changes, per view', rep.changes?.perspective === 'after' && rep.changes.views.length === 2

@@ -6,6 +6,15 @@ marked **Contract**.
 
 ## Unreleased
 
+- Fix: opening a table in Tables mode (the viewer's `focus` on an ER table, as a drill or
+  a link does) left the canvas empty and logged `translate(NaN,NaN)`: the table has no
+  children to lay out. It now shows the table and the tables its relationships in the
+  view reach (WO-42, found while checking WO-44).
+- Before and After: the toggle becomes a switch of two icon buttons, a rough stone
+  (Before) and a cut diamond (After), with the version on screen pressed; the tooltips
+  and labels name each ("Before: the earlier version", "After: this version"). The
+  one-pill toggle with the swap arrows read as where a click goes, not what is shown
+  (WO-42).
 - Fix: a changed or planned arrow's ringed sign could cover the arrow's end marks (the
   crow's feet in ER). The label now takes room for the sign, so placing the label keeps
   both clear of the ends; the text moves right by the sign's width. A column's sparkle

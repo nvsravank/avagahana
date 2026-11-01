@@ -278,7 +278,6 @@ button.mmv-pill:hover { background: var(--mmv-chrome-hover); }
 .mmv .mmv-bl { display: flex; gap: 6px; }
 /* Before and After (WO-34): next to the view name; the first thing in the top row when narrow */
 .mmv.is-narrow [data-mmv="perspBtn"] { order: -1; }
-.mmv .mmv-persp.is-before { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
 .mmv-changes h4 { margin: 8px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--mmv-muted); display: flex; align-items: center; gap: 6px; }
 .mmv-changes h4:first-child { margin-top: 0; }
 .mmv-changes ul { margin: 0; padding: 0 0 0 4px; list-style: none; }

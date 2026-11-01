@@ -1462,7 +1462,9 @@ export function mount(element, options = {}) {
   $.infoBtn.addEventListener('click', () => { togglePanel('infoPanel'); renderInfo(); });
   $.sparklesBtn.addEventListener('click', () => { togglePanel('sparklesPanel'); renderSparkles(); });
   $.changesBtn.addEventListener('click', () => { togglePanel('changesPanel'); renderChanges(); });
-  $.perspBtn.addEventListener('click', () => switchPerspective(S.perspective === 'before' ? 'after' : 'before'));
+  // the Before / After switch (WO-42): the version on screen is pressed; the other switches
+  $.perspBefore.addEventListener('click', () => switchPerspective('before'));
+  $.perspAfter.addEventListener('click', () => switchPerspective('after'));
 
   // ---------- Before and After (WO-34) ----------
   // The other version: loaded in place of this one (a live reload, so what stayed glides,
@@ -1477,10 +1479,10 @@ export function mount(element, options = {}) {
     $.changesBtn.hidden = !S.compare;
     if (!S.compare) { $.changesPanel.hidden = true; return; }
     const before = S.perspective === 'before';
-    $.perspName.textContent = before ? 'Before' : 'After';
-    $.perspBtn.classList.toggle('is-before', before);
-    $.perspBtn.title = before ? 'Showing the earlier version: show the later one' : 'Showing the later version: show the earlier one';
-    $.perspBtn.setAttribute('aria-label', `${before ? 'Before' : 'After'}: switch to ${before ? 'after' : 'before'}`);
+    for (const [b, on] of [[$.perspBefore, before], [$.perspAfter, !before]]) {
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', String(on));
+    }
     renderChanges();
   }
   // The sparkles panel (WO-36): show or hide them, what changed in this view and in the
@@ -1898,8 +1900,6 @@ export function mount(element, options = {}) {
     if (S.thumb) return;
     const tl = root.querySelector('.mmv-tl'), tr = root.querySelector('.mmv-tr');
     const shown = $.viewName.textContent;
-    const persp = $.perspName.textContent;
-    $.perspName.textContent = 'Before';   // the wider label
     const names = [...(S.map?.views || []).map(labelOf), ...(S.file?.unlinked || []).map((a) => S.file.parts.get(a)?.title)].filter(Boolean);
     if (names.length) $.viewName.textContent = names.reduce((a, b) => (b.length > a.length ? b : a));
     // no transitions while measuring, and none on the way back (search would animate shut)
@@ -1908,7 +1908,6 @@ export function mount(element, options = {}) {
     const over = tl.getBoundingClientRect().right + 8 > tr.getBoundingClientRect().left;
     root.classList.remove('is-measuring');
     $.viewName.textContent = shown;
-    $.perspName.textContent = persp;
     root.classList.toggle('is-narrow', over || (root.clientWidth > 0 && root.clientWidth < NARROW_W));
     void tl.offsetWidth;   // the real widths are set while transitions are still off
     root.classList.remove('is-still');

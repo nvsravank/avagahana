@@ -28,10 +28,15 @@ const REFINE_MAX = 150;  // more tables than this: no refining (it compares ever
 const ANGLES = 16;       // places tried round each neighbour
 
 export function layoutTables(root, size, input) {
-  const rels = input.relations.filter((r) => !r.cross);
+  // A table drilled into (the viewer's focus) has nothing inside it: it shows itself and
+  // the tables its relationships in this view reach, laid out as the diagram is.
+  const table = !root.children.length && root.parent ? root : null;
+  const near = table && new Set([table.id, ...input.relations.filter((r) => !r.cross && (r.from === table.id || r.to === table.id)).flatMap((r) => [r.from, r.to])]);
+  const rels = input.relations.filter((r) => !r.cross && (!near || (near.has(r.from) && near.has(r.to))));
+  if (table) root = table.parent;
   // a view shows the tables its relationships use; a view with none shows all
   const used = new Set(rels.flatMap((r) => [r.from, r.to]));
-  const tables = root.children.filter((n) => !rels.length || used.has(n.id));
+  const tables = root.children.filter((n) => (near ? near.has(n.id) : !rels.length || used.has(n.id)));
   const index = new Map(tables.map((n, i) => [n.id, i]));
   const dims = new Map(tables.map((n) => {
     const g = size(n);

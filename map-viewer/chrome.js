@@ -43,7 +43,9 @@ export const UI = {
   views: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
   openOut: '<path d="M7 17 17 7M9 7h8v8"/>',
   // Before and After (WO-34): two versions swapping places; the changes list: rows with + and ~
-  perspective: '<path d="M4 8h13M14 5l3 3-3 3"/><path d="M20 16H7M10 13l-3 3 3 3"/>',
+  // the Before / After switch (WO-42): a rough stone, then the cut diamond
+  stone: '<path d="M2.8 15.8 5.2 8.6l5.4-4.6 6.4 1.2 4.4 5.6-1.1 6.4-6.4 3.6-6.8-1.2z"/><path d="M10.6 4 9.6 11 2.8 15.8M9.6 11l7.2 1.9 4.4-1.7"/>',
+  gem: '<path d="M7 4.5h10l4.5 5.5L12 20.5 2.5 10z"/><path d="M2.5 10h19M7 4.5 9.5 10 12 20.5M17 4.5 14.5 10 12 20.5M9.5 10 12 4.5l2.5 5.5"/>',
   changes: '<path d="M11 6h10M11 12h10M11 18h10"/><path d="M3 6h5M5.5 3.5v5M3 12.5c.8-1.2 1.7-1.2 2.5 0s1.7 1.2 2.5 0M3 18h5"/>',
 };
 const lightIcons = new Set(['mindmap', 'flowchart', 'state', 'tables', 'lifelines', 'note']);
@@ -137,7 +139,10 @@ export function chromeHtml(uid) {
       <button class="mmv-menu-item" data-mmv="exportMd">Source file <span>edit with your agent</span></button>
     </div>
   </div>
-  <button class="mmv-pill mmv-persp" data-mmv="perspBtn" hidden>${ic('perspective')}<span data-mmv="perspName"></span></button>
+  <div class="mmv-seg mmv-persp" data-mmv="perspBtn" role="group" aria-label="Version" hidden>
+    <button data-mmv="perspBefore" title="Before: the earlier version" aria-label="Before: the earlier version" aria-pressed="false">${ic('stone')}</button>
+    <button data-mmv="perspAfter" title="After: this version" aria-label="After: this version" aria-pressed="true">${ic('gem')}</button>
+  </div>
   <div class="mmv-hov" data-mmv="viewWrap" hidden>
     <button class="mmv-pill" data-mmv="viewBtn" title="Relation view">${ic('views')}<span data-mmv="viewName"></span></button>
     <div class="mmv-panel mmv-drop mmv-left-drop" data-mmv="viewMenu"></div>
