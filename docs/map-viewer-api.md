@@ -115,7 +115,7 @@ them, `state` does not report them; another diagram clears `highlight` and `crop
   are ignored.
 - `viewer.on('state', fn)` reports every change, with the full state.
 - **The viewer never reads or writes `location` or `document.title`.** The host maps
-  state to and from its URL (atlas uses `#/<path>?mode=…&part=…&focus=…&page=…&view=…&env=…&seq=…&step=…`).
+  state to and from its URL (atlas uses `#/<path>?mode=…&part=…&focus=…&page=…&view=…&env=…&seq=…&step=…&before=…`; `before` names a map picked as Before, WO-43).
 
 `load` accepts optional context `{sourceId, signal}`. A stable `sourceId` separates
 reader baselines for equal relative paths in different sources. Changing it starts

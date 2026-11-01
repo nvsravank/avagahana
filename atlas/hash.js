@@ -2,7 +2,8 @@
 // (part: which of the file's diagrams, by its heading's anchor; none for the first;
 // page: the node whose page is open; seq: the sequence playing over the view, by its
 // anchor, 'main' for the first diagram; step: its step, from 1; perspective=before: the
-// map's earlier version, when the agent sent one)
+// map's earlier version, when the agent sent one; before: another map of the same source
+// picked as the earlier version (WO-43))
 //
 // Pure functions, no DOM, so test/ can check them on their own. The format is the one
 // the Simple Mind Maps viewer used, so old links still open; the relay server's
@@ -15,7 +16,7 @@ const STATE_KEYS = ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq
 
 const decode = (s) => { try { return decodeURIComponent(s); } catch (_) { return s; } };
 
-// '#/Topic/My map.md?node=n3' -> {path, state, prefs}, or null when no map is named.
+// '#/Topic/My map.md?node=n3' -> {path, state, prefs, before}, or null when no map is named.
 // state holds only the fields the link gives; prefs are the looks a link may fix
 // (passed to the viewer as options.prefs, never saved).
 export function parseHash(hash) {
@@ -48,13 +49,14 @@ export function parseHash(hash) {
   if (colourBy) prefs.colourBy = colourBy;
   const look = p.get('look');
   if (look) prefs.look = look;
-  return { path, state, prefs };
+  return { path, state, prefs, ...(p.get('before') ? { before: p.get('before') } : {}) };
 }
 
 // (path, viewer state) -> '#/Topic/My%20map.md?mode=mindmap&focus=n8'. Like the old
 // viewer it always names the mode; empty fields and rels off are left out. prefs: a
 // colour-by to open in (colourBy=changes for a plan), a theme by id, from the agent's show.
-export function buildHash(path, state = {}, prefs = null) {
+// before: the path of the map picked as the earlier version.
+export function buildHash(path, state = {}, prefs = null, before = null) {
   const p = new URLSearchParams();
   p.set('mode', MODE.test(state.mode || '') ? state.mode : 'mindmap');
   for (const k of ['part', 'focus', 'node', 'page', 'view', 'env', 'seq']) if (state[k]) p.set(k, state[k]);
@@ -63,6 +65,7 @@ export function buildHash(path, state = {}, prefs = null) {
   if (state.perspective === 'before') p.set('perspective', 'before');
   if (prefs?.colourBy) p.set('colourBy', prefs.colourBy);
   if (prefs?.theme) p.set('theme', prefs.theme);
+  if (before) p.set('before', before);
   return `#/${encodeURIComponent(path).replace(/%2F/g, '/')}?${p}`;
 }
 

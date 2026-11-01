@@ -67,6 +67,8 @@ try {
   check('hash: layers mode and the diagram (part)', same(h.state, { mode: 'layers', part: 'shop-system-containers', focus: 'ord' }), show(h.state));
   check('hash: an open node page round trip', parseHash('#/a.md?mode=boxes&page=orders').state.page === 'orders'
     && buildHash('a.md', { mode: 'boxes', node: 'orders', page: 'orders' }) === '#/a.md?mode=boxes&node=orders&page=orders', buildHash('a.md', { mode: 'boxes', page: 'orders' }));
+  check('hash: a map picked as Before round-trips (WO-43)', buildHash('r/after.md', { mode: 'tables' }, null, 'r/before.md') === '#/r/after.md?mode=tables&before=r%2Fbefore.md'
+    && parseHash('#/r/after.md?mode=tables&before=r%2Fbefore.md').before === 'r/before.md' && !('before' in parseHash('#/a.md')));
   check('hash: the diagram (part) round trip', buildHash('a.md', { mode: 'boxes', part: 'ideas', node: 'x' }) === '#/a.md?mode=boxes&part=ideas&node=x', buildHash('a.md', { mode: 'boxes', part: 'ideas', node: 'x' }));
   // the viewer checks a mode against the map's type; the URL keeps any well-formed one
   check('hash: a malformed mode is dropped', !('mode' in parseHash('#/a.md?mode=No%20pe!').state));

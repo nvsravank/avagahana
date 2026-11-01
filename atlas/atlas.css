@@ -44,6 +44,11 @@ html, body { background: var(--mmv-bg, #fff); }
 .atlas-folder { font-weight: 600; color: var(--mmv-muted); }
 .atlas-folder:hover, .atlas-map:hover { background: var(--mmv-chrome-hover); }
 .atlas-map.is-on { background: var(--mmv-chrome-active); color: var(--mmv-chrome-active-ink); }
+.atlas-row { display: flex; align-items: center; gap: 2px; }
+.atlas-row .atlas-map { flex: 1; min-width: 0; }
+.atlas-stone { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 28px; height: 28px; border: 0; border-radius: 6px; background: none; color: var(--mmv-muted); cursor: pointer; }
+.atlas-stone:hover { background: var(--mmv-chrome-hover); color: inherit; }
+@media (pointer: coarse) { .atlas-stone { width: 44px; height: 44px; } }
 .atlas-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .atlas-chev { display: inline-flex; transition: transform .12s; }
 .atlas-chev.is-closed { transform: rotate(-90deg); }

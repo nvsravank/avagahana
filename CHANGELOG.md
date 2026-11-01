@@ -6,6 +6,11 @@ marked **Contract**.
 
 ## Unreleased
 
+- Atlas (WO-43): pick another map of the same folder as Before. Each row of the map list has
+  a stone, "Pick as Before", while nothing is being compared; picking a map by its name
+  opens it with no Before (the open map's own name clears it). The link keeps the pick
+  (`before=<path>`, an addition), so reload, Back and a shared link keep the comparison;
+  a live reload of either file keeps it. No viewer, relay or format change.
 - **Contract** (map format, viewer API): ER diagrams lose the Role colouring and its
   inference from relationship counts, which read an application's schema as a
   warehouse (Order and Payment as dimensions). An ER diagram is coloured by class, as a

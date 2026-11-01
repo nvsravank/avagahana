@@ -7,6 +7,8 @@ const SVG = {
   folder: '<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4l2 2h9A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/>',
   file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
   chev: '<path d="m6 9 6 6 6-6"/>',
+  // the viewer's Before icon (WO-42), copied: the atlas loads the viewer only through index.js
+  stone: '<path d="M2.8 15.8 5.2 8.6l5.4-4.6 6.4 1.2 4.4 5.6-1.1 6.4-6.4 3.6-6.8-1.2z"/><path d="M10.6 4 9.6 11 2.8 15.8M9.6 11l7.2 1.9 4.4-1.7"/>',
 };
 export function icon(name, size = 16) {
   return `<svg class="atlas-ic" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVG[name]}</svg>`;
@@ -19,8 +21,10 @@ const el = (tag, cls, text) => {
   return e;
 };
 
-// slot: the viewer's toolbar slot. onPick(path) when a map is chosen.
-export function mapPanel(slot, { onPick }) {
+// slot: the viewer's toolbar slot. onPick(path) when a map is chosen; onPickBefore(path)
+// when a map's stone picks it as the open map's earlier version (WO-43: not offered while
+// comparing, nor on the open map).
+export function mapPanel(slot, { onPick, onPickBefore }) {
   const wrap = el('div', 'atlas-picker');
   const btn = el('button', 'atlas-pill');
   btn.type = 'button';
@@ -44,6 +48,7 @@ export function mapPanel(slot, { onPick }) {
 
   let maps = [];
   let current = null;
+  let comparing = false;
   let opener = null;   // what had focus when it opened: it gets it back on Escape
   const openFolders = new Set();
 
@@ -81,7 +86,16 @@ export function mapPanel(slot, { onPick }) {
         row.innerHTML = icon('file', 15);
         row.appendChild(el('span', 'atlas-name', m.title));
         row.addEventListener('click', () => { close(); onPick(m.path); });
-        parent.appendChild(row);
+        if (comparing || !current || m.path === current || !onPickBefore) { parent.appendChild(row); continue; }
+        const line = el('div', 'atlas-row');
+        const stone = el('button', 'atlas-stone');
+        stone.type = 'button';
+        stone.title = 'Pick as Before';
+        stone.setAttribute('aria-label', `Pick ${m.title} as Before`);
+        stone.innerHTML = icon('stone', 15);
+        stone.addEventListener('click', () => { close(); onPickBefore(m.path); });
+        line.append(row, stone);
+        parent.appendChild(line);
       }
     };
     draw(root, treeEl, '');
@@ -128,6 +142,8 @@ export function mapPanel(slot, { onPick }) {
       btn.title = path ? `Maps: ${path}` : 'Maps';
       if (!panel.hidden) render();
     },
+    // comparing (Before and After shown): the list only opens maps, no stones
+    setComparing(on) { if (comparing === !!on) return; comparing = !!on; if (!panel.hidden) render(); },
     // a line at the top of the panel, e.g. "No map "x" here."; null clears it
     say(text) { message.textContent = text || ''; message.hidden = !text; },
     // the panel's last line: the host's own elements (e.g. "Choose another folder")

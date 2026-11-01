@@ -34,6 +34,10 @@ Rule: imports the viewer only through `map-viewer/index.js`.
 - Same shape as the old Simple Mind Maps viewer, so old links open. Old looks in a link
   (`theme=light|dark`, `scheme=colorful|blues`, `look=`) still set the looks; they are
   not kept in the URL afterwards.
+- `before=<path>`: another map of the same source picked as the open map's earlier
+  version (WO-43). Each row of the map list has a stone, "Pick as Before", while nothing
+  is being compared; picking a map by its name opens it with no Before (the open map's
+  own name clears it). A `before=` that names no map is dropped, with a line in the list.
 - Opening another map adds a history entry (Back returns); moving around in a map
   replaces the URL.
 - A link with no `focus` shows the whole map; no `node` selects nothing.

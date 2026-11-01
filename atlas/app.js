@@ -24,7 +24,8 @@ const screenEl = document.getElementById('screen');
 let source = null;
 let stops = [];          // unsubscribe functions of the current source
 let maps = [];           // the source's list
-let shown = null;        // {path, mtime, size} of the map on screen
+let shown = null;        // {path, mtime, size, bt} of the map on screen (bt: its picked Before's stamp)
+let picked = null;       // the map picked as Before in the list (its path), kept in the link (WO-43)
 let sourceId = null;
 let navigationAbort = new AbortController();
 let reloadAbort = new AbortController();
@@ -73,7 +74,16 @@ async function mountViewer() {
     },
   });
   // the map list's button in the viewer (a phone: the bar's map name instead)
-  picker = mapPanel(viewer.slot, { onPick: (path) => goTo(path, {}) });
+  picker = mapPanel(viewer.slot, {
+    // a name opens that map with no Before (the open map's own name too: Before cleared)
+    onPick: (path) => {
+      if (path !== shown?.path || !viewer.state.perspective) { goTo(path, {}); return; }
+      picked = null;
+      viewer.setBefore(null);
+    },
+    // a stone: the open map stays After, that one is its Before (a history entry)
+    onPickBefore: (path) => { if (shown) location.hash = buildHash(shown.path, viewer.state, null, path); },
+  });
   // the bar and the page behind everything follow the viewer's theme and appearance
   viewer.on('theme', (t) => {
     bar.setTheme(t);
@@ -84,18 +94,20 @@ async function mountViewer() {
   await viewer.ready;
   viewer.on('load', ({ path, title }) => {
     const m = maps.find((x) => x.path === path);
-    shown = { path, mtime: m?.mtime, size: m?.size };
+    shown = { path, mtime: m?.mtime, size: m?.size, bt: stamp(picked) };
     picker.setCurrent(path, title);
+    picker.setComparing(!!viewer.state.perspective);
     bar.setTitle(title);
     bar.setState(viewer.state);
     document.title = `${title} · Avagahana`;
     // the viewer reports state only when it differs, and the last map's may match
-    history.replaceState(null, '', buildHash(path, viewer.state));
+    history.replaceState(null, '', buildHash(path, viewer.state, null, picked));
   });
   // state -> URL, without a history entry (opening another map adds one, in goTo)
   viewer.on('state', (s) => {
     bar.setState(s);
-    if (shown) history.replaceState(null, '', buildHash(shown.path, s));
+    picker.setComparing(!!s.perspective);
+    if (shown) history.replaceState(null, '', buildHash(shown.path, s, null, picked));
   });
 }
 // URL -> state: Back, Forward, a pasted link, goTo
@@ -103,8 +115,8 @@ addEventListener('hashchange', () => {
   const h = parseHash(location.hash);
   if (!h || !source) return;
   // a link names the whole place: no focus means the whole map, no node none selected
-  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...h.state }); usePrefs(h.prefs); }
-  else { picker.close(); openMap(h.path, h.state, h.prefs); }   // a failed open shows the list again
+  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...h.state }); usePrefs(h.prefs); if ((h.before || null) !== picked) useBefore(h.path, h.before || null); }
+  else { picker.close(); openMap(h.path, h.state, h.prefs, h.before || null); }   // a failed open shows the list again
 });
 
 if (info) start(serverSource(base, info));
@@ -145,7 +157,7 @@ async function start(src) {
   if (source.onRender && info?.capabilities.includes('render')) stops.push(source.onRender((d) => { if (source === src) answerRender(d, { source: src, themeSet }); }));
   const h = parseHash(location.hash);
   if (h && maps.some((m) => m.path === h.path)) {
-    await openMap(h.path, h.state);
+    await openMap(h.path, h.state, null, h.before || null);
   } else {
     picker.open();
     if (h) picker.say(`No map "${h.path}" here.`);
@@ -206,15 +218,17 @@ function goTo(path, state) {
 }
 
 // prefs: looks a link or the agent asks for (colourBy=changes for a plan), not kept
-async function openMap(path, state = {}, prefs = null) {
+// before: the path of a map picked as its earlier version (the link's before=)
+async function openMap(path, state = {}, prefs = null, before = null) {
   const my = ++seq;
   pendingNavigation = my;
   navigationAbort.abort();
   reloadAbort.abort();
   const controller = navigationAbort = new AbortController();
-  let text, before;
+  picked = before;
+  let text;
   try {
-    [text, before] = await Promise.all([source.read(path), readBefore(path)]);
+    [text, before] = await Promise.all([source.read(path), picked ? readPicked(path, picked) : readBefore(path)]);
   } catch (x) {
     if (my !== seq) return;
     pendingNavigation = 0;
@@ -228,6 +242,7 @@ async function openMap(path, state = {}, prefs = null) {
   if (my !== seq || shown?.path !== path) return;
   viewer.setState(state);
   if (prefs) usePrefs(prefs);
+  sayLost();
 }
 
 // when the map was last saved (the list's mtime, in seconds): the export's "as of"
@@ -238,6 +253,32 @@ const savedAt = (path) => {
 
 // the map's earlier version the agent sent (WO-34: Before and After), or null
 const readBefore = (path) => (source.readBefore ? source.readBefore(path).catch(() => null) : Promise.resolve(null));
+
+// WO-43: a map picked as Before; one that cannot be read leaves the map alone, says so
+// in the list and drops before= from the link
+const stamp = (path) => { const m = path && maps.find((x) => x.path === path); return m ? `${m.mtime}/${m.size}` : null; };
+const readPicked = (path, before) => source.read(before).catch(() => {
+  if (picked !== before) return null;
+  picked = null;
+  if (shown?.path === path) history.replaceState(null, '', buildHash(path, viewer.state));
+  lost = before;
+  return null;
+});
+// said once the map is drawn (opening it closes the list)
+let lost = null;
+function sayLost() {
+  if (!lost) return;
+  picker.open();
+  picker.say(`No map "${lost}" to compare with.`);
+  lost = null;
+}
+// the link's before= changed on the open map (a stone, Back, a pasted link)
+async function useBefore(path, before) {
+  picked = before;
+  const text = before ? await readPicked(path, before) : await readBefore(path);
+  if (shown?.path === path && picked === before) await viewer.setBefore(text);
+  sayLost();
+}
 
 // looks from a link or the agent's show: appearance, colour-by, look, and a theme by id
 // (one this atlas has; the reader's own choice from then on, as if picked in the panel)
@@ -262,9 +303,9 @@ async function onChange() {
   if (!shown || pendingNavigation === seq) return;
   const path = shown.path;
   const m = maps.find((x) => x.path === path);
-  if (!m || (m.mtime === shown.mtime && m.size === shown.size)) return;
+  if (!m || (m.mtime === shown.mtime && m.size === shown.size && stamp(picked) === shown.bt)) return;
   try {
-    const [text, before] = await Promise.all([src.read(path), readBefore(path)]);
+    const [text, before] = await Promise.all([src.read(path), picked ? readPicked(path, picked) : readBefore(path)]);
     if (!current() || shown?.path !== path) return;
     await viewer.load(text, path, { sourceId: id, signal: controller.signal, before, asOf: savedAt(path) });
   } catch (_) { /* gone between list and read: wait for the next change */ }
@@ -279,7 +320,7 @@ async function onShow(d) {
   if (d.path === shown?.path) {
     picker.close();
     // an earlier version sent or forgotten: the viewer takes it, then the rest
-    if ('before' in d) await viewer.setBefore(await readBefore(d.path));
+    if ('before' in d) { picked = null; await viewer.setBefore(await readBefore(d.path)); }
     viewer.setState(state);
     usePrefs(prefs);
     return;
