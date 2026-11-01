@@ -6,6 +6,19 @@ marked **Contract**.
 
 ## Unreleased
 
+- README shows what Avagahana does: one section and one picture each, light and dark,
+  the pictures on the website (made by its own script), install after (WO-39).
+- Example `cache-miss.md`: two sequences over one small view, a stampede and a single
+  rebuild with a lock; in the website gallery, which opens on a sequence from `?seq=`
+  (WO-39).
+- **Contract** Relay: `GET /api/before?p=…&empty=1` answers `204` (empty) when there is
+  no earlier version, instead of `404`, so a browser's console shows no error; the atlas
+  asks that way. Without `empty=1`, unchanged (WO-39).
+- `render.py --seq` with a name the map does not have draws without it, as before, and
+  now says so in `WARNING=`, listing the map's names (`check_map.seq_names`) (WO-39).
+- Fix: a node page opened in light kept a light background after a switch to dark (and
+  the other way); its grow-out animation held its end colours (WO-39).
+
 - **Contract** Map format: a node's **main icon** (WO-38): its first cloud icon, else
   its class's first cloud icon, else the icon `## Node icons` or `## Classes` marks with
   the reserved word `main` (`- sched : main ph clock`). Further cloud icons are tags

@@ -77,6 +77,32 @@ def anchor_of(heading):
     return re.sub(r"[^\w\- ]", "", heading.lower().strip()).replace(" ", "-")
 
 
+def seq_names(text):
+    """The names --seq takes for this map (render.py, show.py): each sequence's heading
+    anchor, `main` when the first diagram is one, and each walk as `<diagram anchor>-walk-<name>`
+    (map-viewer/model/map.js), the first diagram's anchor being its # title's."""
+    title = re.search(r"^# (.+)$", text, re.M)
+    current = heading_anchor = anchor_of(title.group(1)) if title else ""
+    names, first = set(), True
+    for t in re.finditer(r"^(#{2,6})\s+(.+)$|^```mermaid[^\n]*\n([\s\S]*?)\n```", text, re.M):
+        if t.group(2) is not None:
+            heading = t.group(2).strip()
+            walk = re.match(r"walks\s*:\s*([^|]+)", heading, re.I)
+            if walk:
+                names.add(f"{current}-walk-{anchor_of(walk.group(1))}")
+            elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|joins)\b", heading, re.I):
+                heading_anchor = anchor_of(heading)
+            continue
+        if not first:
+            current = heading_anchor
+        if t.group(3).lstrip().startswith("sequenceDiagram"):
+            names.add(current)
+            if first:
+                names.add("main")
+        first = False
+    return names
+
+
 def phosphor_ok(code):
     m = re.fullmatch(r"ph ([a-z0-9-]+)", code)
     return bool(m) and (PHOSPHOR / f"{m.group(1)}-duotone.svg").is_file()

@@ -80,8 +80,10 @@ export function createPage(v, h) {
     const mid = { left: null, top: null, width: null, height: null };
     const frames = [{ ...a, offset: 0 }, { ...Object.fromEntries(Object.entries(a).filter(([k]) => !(k in mid))), offset: 0.7 }, { ...b, offset: 1 }];
     e.style.overflow = 'hidden';
-    return settle(e.animate(reverse ? frames.reverse().map((f) => ({ ...f, offset: 1 - f.offset })) : frames, { duration: ms(GROW_MS), easing: EASE, fill: 'both' }), ms(GROW_MS))
-      .then(() => { e.style.overflow = ''; });
+    const anim = e.animate(reverse ? frames.reverse().map((f) => ({ ...f, offset: 1 - f.offset })) : frames, { duration: ms(GROW_MS), easing: EASE, fill: 'both' });
+    // grown, the box hands its colours back to the stylesheet: held, the end frame's
+    // colours (the appearance at opening) would outlast a switch of light and dark
+    return settle(anim, ms(GROW_MS)).then(() => { e.style.overflow = ''; if (!reverse) anim.cancel(); });
   }
   const fade = (e, a, b, t = FADE_MS) => settle(e.animate([{ opacity: a }, { opacity: b }], { duration: ms(t), fill: 'both' }), ms(t));
 

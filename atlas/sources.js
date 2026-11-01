@@ -53,8 +53,9 @@ export function serverSource(base, info = { capabilities: [] }, fetchFn = fetch)
     // the map's earlier version the agent sent (show --before), or null
     async readBefore(path) {
       if (!caps.has('before')) return null;
-      const res = await fetchFn(url(`api/before?p=${encodeURIComponent(path)}`), { cache: 'no-store' });
-      return res.ok ? res.text() : null;
+      // empty=1: a relay with no earlier version answers 204, which no console shows as an error
+      const res = await fetchFn(url(`api/before?p=${encodeURIComponent(path)}&empty=1`), { cache: 'no-store' });
+      return res.status === 200 ? res.text() : null;
     },
     // Server-Sent Events while the stream holds; polling /api/tree while it does not.
     watch(fn) {

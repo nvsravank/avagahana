@@ -67,7 +67,7 @@ python3 relay-server/serve_maps.py [--port N] [--maps-dir DIR] [--map <rel path>
 | `GET /api/tree` | `{state, maps: [{path, title, mtime, size}]}` (see `map-source.md`). Hidden files and folders are left out. |
 | `GET /api/map?p=<path>` | Raw text of one map, `text/plain; charset=utf-8`. `404` if not a map. |
 | `GET /api/events` | Server-Sent Events, below. |
-| `GET /api/before?p=<path>` | The map's earlier version that a show sent (`before`), as text; `404` when there is none. Added in WO-34. |
+| `GET /api/before?p=<path>` | The map's earlier version that a show sent (`before`), as text; `404` when there is none, or `204` (empty) when the request adds `&empty=1` (added in WO-39). Added in WO-34. |
 | `POST /api/show` | Body `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?}`. Tells every open page to show that map and node; `part` names one of the file's further diagrams by its heading's anchor (added in WO-07); `page` opens that node's page (added in WO-08); `seq` plays a sequence by its heading's anchor (`main` for the first diagram) over the view it is linked to, at `step` (a whole number from 1); `mode` may be `lifelines` (added in WO-12). `colourBy` (`category`, `level`, `class` or `changes`) opens the map in that colouring, e.g. `changes` for a plan (added in WO-13). `before`: the map's earlier version as text (2 MB at most), kept in the server's memory for that map until another, `null` (forget it) or a restart; `perspective` (`before` or `after`) which of the two to show (added in WO-34). `{delivered: <number of pages told>}`; `404` for no such map, `400` for a bad field. Stores nothing else. |
 | `GET /api/themes` | `{themes, settings, problems}`: the maps folder's `.themes/` (below). `themes`: each `<id>.json` with `id` (its file name) and `label` (its `name`) set and its font faces as `{weight, style, url}`; `settings`: `{builtIn, default, logo}` with defaults filled in; `problems`: files it could not read. Empty lists when there is no `.themes/`. Added in WO-32. |
 | `GET /api/theme-file?f=<file>` | A font file (`.woff2 .woff .ttf .otf`) in `.themes/`; `404` for anything else. Added in WO-32. |
@@ -201,6 +201,9 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   is beside the file (`<file>.report.json`). With `--steps all` (or `3-5`), `--out` is a
   folder: `step-01.svg`, `step-02.svg`, … each with its step lit (`--format png` for PNG);
   `FILE=<folder>/step-01.svg..step-08.svg STEPS=8`.
+  A `--seq` the map does not have (by the checker's names: a sequence's anchor, `main`,
+  `<diagram anchor>-walk-<name>`) is no failure: the picture is drawn without it and
+  `WARNING=` says so, with the names the map has (added in WO-39).
 - `STATUS=none URL=…`: no page is open; open the URL, then ask again.
 - `STATUS=not_running ERROR=…`: no relay server for this maps folder; start it.
 - `STATUS=failed ERROR=…`: no such map, a bad flag, or the page could not draw it.

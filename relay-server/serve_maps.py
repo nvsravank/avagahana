@@ -28,7 +28,7 @@ Serves, on 127.0.0.1 only:
   GET  /api/theme-file?f=<file>  a font file from .themes/
   POST /api/show        {path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?, before?}: tell open pages to show it
                         (before: an earlier version's text, kept in memory for that map; null forgets it)
-  GET  /api/before?p=   that map's earlier version as text (404: none)
+  GET  /api/before?p=   that map's earlier version as text (404: none; 204 with &empty=1)
   POST /api/render      {path, state?, theme?, appearance?, look?, format?, width?|scale?, background?, report?}:
                         one open page draws it and sends the file back (render.py)
   POST /api/render/<id>/claim, POST /api/render/<id>   the page's side of a render
@@ -612,6 +612,9 @@ def make_handler(relay: Relay):
                 with relay.befores_lock:
                     text = relay.befores.get(rel)
                 if text is None:
+                    # empty=1: none is an answer, not an error (a 404 is red in a browser's console)
+                    if (parse_qs(query).get("empty") or [""])[0] == "1":
+                        return self.send_payload(204, b"", "text/plain; charset=utf-8")
                     return self.not_found()
                 return self.send_payload(200, text.encode("utf-8"), "text/plain; charset=utf-8")
             if path == "/api/themes":

@@ -42,6 +42,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from serve_maps import COLOUR_BY, DEFAULT_PORT, MAP_DIR_ENV, RENDER_WAIT_S, find_running, map_url, resolve_maps_dir, status_line  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "format"))
+from check_map import seq_names  # noqa: E402
 
 
 def ids(text):
@@ -190,6 +192,16 @@ def main(argv=None) -> int:
                                 "close": ids(args.close), "highlight": ids(args.highlight), "crop": args.crop,
                                 "seq": args.seq, "step": args.step if args.seq and not args.steps else None,
                                 "perspective": args.perspective if args.before else None}.items() if v is not None}
+    # an unknown --seq: the page quietly draws the diagram without it; the checker's names say so
+    warnings = []
+    if args.seq:
+        try:
+            names = seq_names((maps_dir / args.map).read_text(encoding="utf-8"))
+        except OSError:
+            names = None
+        if names is not None and args.seq not in names:
+            have = ", ".join(sorted(names)) or "none"
+            warnings.append(f"unknown --seq '{args.seq}', drawn without it (this map has: {have})")
     before = None
     if args.before:
         try:
@@ -219,7 +231,6 @@ def main(argv=None) -> int:
             return None, "the open page drew the map, not the draft: reload the page (and restart an older relay), then run again"
         return {"answer": answer, "report": write(answer, target, args.report)}, None
 
-    warnings = []
     if not args.steps:
         got, error = one(state, out)
         if error:
@@ -228,7 +239,7 @@ def main(argv=None) -> int:
         if got.get("none"):
             print(status_line("none", url=map_url(port, args.map, part=args.part, view=args.view, env=args.env, focus=args.focus, mode=args.mode)))
             return 0
-        warnings = got["answer"].get("problems") or []
+        warnings += got["answer"].get("problems") or []
         print(status_line("rendered", file=out, report=got["report"], warning="; ".join(warnings) or None))
         return 0
 
@@ -257,7 +268,7 @@ def main(argv=None) -> int:
         if error or got.get("none"):
             print(status_line("failed", error=error or "the page closed while rendering"))
             return 1
-    warnings = first["answer"].get("problems") or []
+    warnings += first["answer"].get("problems") or []
     print(status_line("rendered", file=f"{out}/step-{steps[0]:02d}.{fmt}..step-{steps[-1]:02d}.{fmt}", steps=len(steps), warning="; ".join(warnings) or None))
     return 0
 

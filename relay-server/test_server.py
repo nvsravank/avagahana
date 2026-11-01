@@ -232,6 +232,13 @@ class RelayTests(unittest.TestCase):
         self.assertEqual((res.status, res.read().decode("utf-8")), (200, "# Old garden\n"))
         conn.close()
         self.assertEqual(self.s.json("GET", "/api/before?p=tools.md")[0], 404)
+        # empty=1 (WO-39): none is 204, no error in a browser; a stored one is served as before
+        for p, want in (("tools.md", (204, "")), ("garden.md", (200, "# Old garden\n"))):
+            conn = http.client.HTTPConnection("127.0.0.1", self.s.port, timeout=5)
+            conn.request("GET", f"/api/before?p={p}&empty=1", headers={"Host": f"127.0.0.1:{self.s.port}"})
+            res = conn.getresponse()
+            self.assertEqual((res.status, res.read().decode("utf-8")), want)
+            conn.close()
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "before": None})[0], 200)
         self.assertEqual(self.s.json("GET", "/api/before?p=garden.md")[0], 404)
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "before": 12})[0], 400)

@@ -52,7 +52,7 @@ function fromContents(list) {
   };
 }
 
-const EXAMPLES = ['garden', 'shapes', 'slow-checkout', 'shop-plan', 'job-race', 'order-states', 'sales-warehouse', 'shop-layers', 'tools'];
+const EXAMPLES = ['garden', 'shapes', 'slow-checkout', 'shop-plan', 'job-race', 'order-states', 'sales-warehouse', 'shop-layers', 'tools', 'cache-miss'];
 
 export async function testContents(check) {
   const host = document.createElement('div');

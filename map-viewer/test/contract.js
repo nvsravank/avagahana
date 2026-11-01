@@ -756,6 +756,22 @@ try {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
     await wait(800);
     check('back from that diagram stops at the page', pv.state.part === null && pv.state.page === 'orders' && !!document.querySelector('#a .mmv-page'), `${pv.state.part} ${pv.state.page}`);
+    {
+      // a page grown out of its node, then light to dark and back
+      pv.setState({ page: null });
+      await wait(700);
+      pv.setPrefs({ appearance: 'light' });
+      pv.setState({ page: 'orders' });
+      await wait(700);
+      const bg = () => getComputedStyle(document.querySelector('#a .mmv-page')).backgroundColor;
+      const light = bg();
+      pv.setPrefs({ appearance: 'dark' });
+      await wait(50);
+      const dark = bg();
+      pv.setPrefs({ appearance: 'light' });
+      await wait(50);
+      check('an open page follows a switch of appearance, both ways', light !== dark && bg() === light, `${light} ${dark} ${bg()}`);
+    }
     pv.destroy();
     const tiny = document.createElement('div');
     Object.assign(tiny.style, { width: '300px', height: '300px', position: 'absolute', left: '-9999px' });

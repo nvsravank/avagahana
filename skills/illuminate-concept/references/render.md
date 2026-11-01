@@ -12,7 +12,9 @@ python3 "<plugin root>/relay-server/render.py" "<Topic>/<Name>.md" --maps-dir "<
 
 It prints:
 
-- `STATUS=rendered FILE=... [REPORT=...] [WARNING=...]`: the file is written.
+- `STATUS=rendered FILE=... [REPORT=...] [WARNING=...]`: the file is written. A `--seq` the
+  map does not have is drawn without it; the warning lists the names it has (a walk is
+  `<diagram anchor>-walk-<name>`).
 - `STATUS=none URL=...`: no page is open. Open the URL (or give it to the user), then
   run it again.
 - `STATUS=not_running`: start the server first (`serve_maps.py`, as for showing a map).

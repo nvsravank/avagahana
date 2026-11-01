@@ -8,6 +8,7 @@
   (`<!-- expect: code code -->`; none for a clean map), of those the checker reports
   (side both or checker), and fails exactly when one of them is an error.
 - Every code the checker can report has a sample (unless the list says sample: false).
+- check_map.seq_names gives the viewer's sequence and walk names for two examples.
 - Every sample theme (format/theme-samples/) gets exactly the codes it expects from
   relay-server/themes.py check, of those the viewer reports too (theme-slots.json
   checks.both); every such code has a sample. A theme derived from brand colours is clean.
@@ -57,6 +58,13 @@ def main():
         if p["side"] in ("both", "checker") and p.get("sample", True) and code not in covered:
             bad.append(f"code {code}: no sample in format/samples/ expects it")
     bad += theme_samples()
+    # the names render.py takes for --seq, as the viewer names them (model/map.js)
+    for name, want in (("job-race.md", {"main", "job-queue-race"}),
+                       ("shop-layers.md", {"checkout", "order-lifecycle-walk-soft-decline-then-paid",
+                                           "orders-data-walk-paid-amount-per-line", "orders-data-walk-payment-to-shipment"})):
+        got = check_map.seq_names((ROOT / "examples" / "maps" / name).read_text(encoding="utf-8"))
+        if got != want:
+            bad.append(f"seq_names {name}: {sorted(got)}, expected {sorted(want)}")
     for line in bad:
         print(line)
     if not bad:
