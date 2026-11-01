@@ -5,7 +5,11 @@ export const LABEL_H = 16;    // an arrow label's height (12px text)
 // an arrow's label: a little over the real width, and room for its icons and a note
 // mark after it
 const NOTE_MARK = 16;
-export const labelWidth = (w) => w.text.trim().length * 6.8 + 10 + (w.icons + (w.note ? 1 : 0)) * NOTE_MARK + (w.lines ? PLAY_BADGE : 0);
+// a changed or planned arrow's ringed sign is drawn before its label (paint.js): the label
+// takes room for it, so placing the label keeps the sign off the arrow's ends too, and the
+// scene draws the text SIGN_W / 2 to the right of the label's centre
+export const SIGN_W = 22;
+export const labelWidth = (w) => w.text.trim().length * 6.8 + 10 + (w.icons + (w.note ? 1 : 0)) * NOTE_MARK + (w.lines ? PLAY_BADGE : 0) + (w.sign ? SIGN_W : 0);
 // a sequence played over the view labels an arrow with its messages: the calls on one
 // line, the returns on a second under it (player.js); each line starts with a number
 const PLAY_BADGE = 30;

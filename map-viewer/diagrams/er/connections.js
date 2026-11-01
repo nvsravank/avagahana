@@ -37,6 +37,27 @@ export function parseConnection(line, byId, warnings, join = false) {
     ...(join ? { join: true } : { fromCard: LEFT[tail], toCard: RIGHT[head] }) };
 }
 
+// ## Renames: a column renamed since the earlier version, new name first, so a comparison
+// reads it as one column renamed rather than one removed and another added:
+//   - ORDER.customer_id was cust_id
+// -> Map(table id -> Map(new name -> old name))
+const RENAME = new RegExp(`^\\s*[-*]\\s*(${ID})\\.(${COL})\\s+was\\s+(${COL})\\s*$`);
+export function parseRenames(text, byId, warnings) {
+  const out = new Map();
+  for (const line of text.split('\n')) {
+    if (!line.trim()) continue;
+    const m = line.match(RENAME);
+    if (!m) { warnings.push(problem('rename-syntax', `Rename not understood: "${line.trim()}" (want "- TABLE.new_name was old_name").`)); continue; }
+    const [, id, now, was] = m;
+    const table = byId[id]?.attrs ? byId[id] : null;
+    if (!table || !table.attrs.some((a) => a.name === now)) { warnings.push(problem('rename-unknown-column', `Rename ${id}.${now}: ${table ? 'no such column in the table' : 'no such table'}.`)); continue; }
+    const own = out.get(id) || new Map();
+    if (now === was || own.has(now) || [...own.values()].includes(was)) { warnings.push(problem('rename-syntax', `Rename ${id}.${now} was ${was}: ${now === was ? 'the same name' : 'a column renamed twice'}.`)); continue; }
+    out.set(id, own.set(now, was));
+  }
+  return out;
+}
+
 export function parseErViews(sections, byId, warnings, own = []) {
   const views = [{ name: 'Relations', label: DEFAULT_VIEW_LABEL, relations: own.slice() }];
   const ids = new Map();

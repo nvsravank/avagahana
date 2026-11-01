@@ -63,12 +63,21 @@ export function summarize(file) {
       const seen = [n.plain || n.label || '', n.parent?.id || '', n.cls || '', [...(n.icons || [])].sort().join(' '), n.shape || '',
         noteText(n), (n.inners || []).map((x) => x.anchor).join(' ')].join('\u0001');
       items[`${part}|n|${n.id}`] = [hash(seen), cut(n.plain || n.label || n.id), n.parent?.id || null];
+      // an ER table's columns, each a thing of its own (WO-22 follow-up): under its table,
+      // which the sparkles panel names ("legacy_flag in Order")
+      if (n.attrs && !n.synthetic) {
+        for (const a of n.attrs) {
+          items[`${part}|c|${n.id}|${a.name}`] = [hash(`${a.type}\u0001${[...a.keys].sort().join(',')}\u0001${a.comment ?? ''}`), cut(a.name), n.id];
+        }
+      }
     }
     for (const v of m.views || []) {
       for (const [r, key] of arrowKeys(v)) {
         const seen = [r.from, r.to, kindOf(r), r.label || '', r.cls || '', [...(r.icons || [])].sort().join(' '), r.note?.body ?? ''].join('\u0001');
         const name = r.label ? `${r.label} (${tree[r.from]?.plain || r.from} to ${tree[r.to]?.plain || r.to})` : `${tree[r.from]?.plain || r.from} to ${tree[r.to]?.plain || r.to}`;
         items[`${part}|a|${v.name}|${key}`] = [hash(seen), cut(name), r.from, r.to];
+        // a column connection's pairs: a change marks the arrow (diff)
+        if (r.fromColumns) items[`${part}|p|${v.name}|${key}`] = [hash(r.fromColumns.map((c, k) => `${c}=${r.toColumns[k]}`).sort().join(',')), cut(name), r.from, r.to];
       }
       if (v.deploy) {
         for (const n of Object.values(v.deploy.byId)) {
@@ -87,34 +96,68 @@ export function summarize(file) {
 
 // What differs: marks for new and changed items, and the removed ones.
 // -> {marks: Map(key -> 'new' | 'changed'), removed: [{key, label, parent}]}
+// A column connection's pairs (type p) are not marked themselves: changed, they mark
+// their arrow; a column removed with its table is not listed apart from it.
 export function diff(baseline, summary) {
   const marks = new Map();
   const removed = [];
   const was = baseline?.items || {};
   const now = summary.items;
   for (const [key, [h]] of Object.entries(now)) {
+    const p = key.split('|');
+    if (p[1] === 'p') {
+      const arrow = [p[0], 'a', ...p.slice(2)].join('|');
+      if (key in was && was[key][0] !== h && !marks.has(arrow)) marks.set(arrow, 'changed');
+      continue;
+    }
     if (!(key in was)) marks.set(key, 'new');
     else if (was[key][0] !== h) marks.set(key, 'changed');
   }
-  for (const [key, [, label, parent]] of Object.entries(was)) if (!(key in now)) removed.push({ key, label, parent });
+  for (const [key, [, label, parent]] of Object.entries(was)) {
+    if (key in now) continue;
+    const p = key.split('|');
+    if (p[1] === 'p' || (p[1] === 'c' && !(`${p[0]}|n|${p[2]}` in now))) continue;
+    removed.push({ key, label, parent });
+  }
   return { marks, removed };
+}
+
+// A baseline from before columns and pairs were kept (or a table that had none): it
+// takes them as seen, so nothing sparkles at once for being newly counted.
+// -> the baseline (a new one when anything was taken)
+export function adopt(baseline, summary) {
+  const was = baseline.items;
+  const tables = new Set(Object.keys(was).filter((k) => k.split('|')[1] === 'c').map((k) => k.split('|').slice(0, 3).join('|')));
+  let items = null;
+  for (const [key, item] of Object.entries(summary.items)) {
+    if (key in was) continue;
+    const p = key.split('|');
+    const take = (p[1] === 'c' && `${p[0]}|n|${p[2]}` in was && !tables.has(p.slice(0, 3).join('|')))
+      || (p[1] === 'p' && [p[0], 'a', ...p.slice(2)].join('|') in was);
+    if (take) (items ||= { ...was })[key] = item;
+  }
+  return items ? { items } : baseline;
 }
 
 // The reader has opened these items: the baseline takes their current state (a
 // removed one leaves it). -> a new baseline
 export function acknowledge(baseline, summary, keys) {
   const items = { ...baseline.items };
-  for (const key of keys) {
+  // an arrow takes its column pairs with it (its mark may be theirs)
+  const all = keys.flatMap((k) => { const p = k.split('|'); return p[1] === 'a' ? [k, [p[0], 'p', ...p.slice(2)].join('|')] : [k]; });
+  for (const key of all) {
     if (key in summary.items) items[key] = summary.items[key];
     else delete items[key];
   }
   return { items };
 }
 
-// The pieces of a key: {part, type ('n' | 'a' | 'e' | 's'), view, id}
+// The pieces of a key: {part, type ('n' | 'c' | 'a' | 'p' | 'e' | 's'), view, id, col}
+// (a column: id its table, col its name)
 export function parseKey(key) {
   const [part, type, a, ...rest] = key.split('|');
   if (type === 'n') return { part, type, id: a };
+  if (type === 'c') return { part, type, id: a, col: rest.join('|') };
   if (type === 's') return { part, type };
   return { part, type, view: a, id: rest.join('|') };
 }

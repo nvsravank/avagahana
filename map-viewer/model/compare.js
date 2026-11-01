@@ -12,6 +12,13 @@
 // parent's name to the new one's. An arrow is changed when its label, note, class, line
 // kind or either end differs. A diagram or view only one file has is added or removed
 // as a whole: named once, its things not marked one by one.
+//
+// An ER table's columns are matched by name (WO-22 follow-up): one is changed when its
+// type, keys, comment or grain differ; a different name is one removed and one added,
+// unless the later file's `## Renames` says it was renamed. A column connection (by its
+// id) is changed when its set of column pairs differs (pair order apart, renames
+// followed); a relationship's ends are said as cardinality and identifying, not line.
+// A table any column of which changed is changed ("columns").
 import { arrowKeys } from './changes.js';
 import { CHANGE_CLASSES } from './classes.js';
 
@@ -22,6 +29,65 @@ const ownClass = (n) => (n.cls || '').split(/\s+/).filter((c) => c && !CHANGE_CL
 const icons = (x) => [...(x.icons || [])].sort().join(' ');
 const kindOf = (r) => `${r.tail || ''}${r.line || ''}${r.head || ''}`;
 const nodesOf = (m) => Object.values(m.byId).filter((n) => !(n === m.root && n.id === '_map'));
+const CARD = { 'zero-one': 'zero or one', one: 'exactly one', 'zero-many': 'zero or more', 'one-many': 'one or more' };
+const keyList = (a) => [...a.keys].sort().join(', ');
+// the comment apart from the grain mark ("grain" is said as grain)
+const commentOf = (a) => (a.grain ? '' : a.comment ?? '');
+
+// One column in both versions -> what differs, in words
+function columnWhat(a, b) {
+  const out = [];
+  if (a.type !== b.type) out.push(`type ${a.type} → ${b.type}`);
+  const added = [...b.keys].filter((k) => !a.keys.has(k)).sort(), gone = [...a.keys].filter((k) => !b.keys.has(k)).sort();
+  if (added.length || gone.length) out.push(`keys ${keyList(a) || 'none'} → ${keyList(b) || 'none'}`);
+  if (commentOf(a) !== commentOf(b)) out.push('comment');
+  if (!a.grain && b.grain) out.push('now grain');
+  if (a.grain && !b.grain) out.push('no longer grain');
+  return out;
+}
+
+// The columns of the tables both versions have, with the later file's renames.
+// -> {columns: Map(table id -> Map(key -> {state, name, was?, what: []})), warnings: [problem]}
+//    key: the later name (an added, changed or renamed column), else the earlier one
+//    (a removed column); was: the earlier name (changed, renamed and removed columns)
+function compareColumns(was, now) {
+  const columns = new Map();
+  const warnings = [];
+  for (const b of nodesOf(now)) {
+    const a = was.byId[b.id];
+    if (!a?.attrs || !b.attrs) continue;
+    const before = new Map(a.attrs.map((x) => [x.name, x]));
+    const after = new Map(b.attrs.map((x) => [x.name, x]));
+    const renamed = new Map();   // later name -> earlier name
+    for (const [to, from] of now.renames?.get(b.id) || []) {
+      if (!before.has(from) || after.has(from) || before.has(to)) {
+        const why = !before.has(from) ? `the earlier version has no column ${from}` : after.has(from) ? `${from} is still a column` : `the earlier version already has ${to}`;
+        warnings.push({ code: 'rename-stale', message: `Rename ${b.id}.${to} was ${from}: ${why}; read as one column removed and one added.` });
+        continue;
+      }
+      renamed.set(to, from);
+    }
+    const out = new Map();
+    for (const [name, x] of after) {
+      const from = renamed.get(name) ?? name;
+      const old = before.get(from);
+      if (!old) { out.set(name, { state: 'added', name, what: [] }); continue; }
+      const what = [...(from !== name ? [`renamed from ${from}`] : []), ...columnWhat(old, x)];
+      if (what.length) out.set(name, { state: 'changed', name, was: from, what });
+    }
+    const taken = new Set(renamed.values());
+    for (const name of before.keys()) if (!after.has(name) && !taken.has(name)) out.set(name, { state: 'removed', name, was: name, what: [] });
+    if (out.size) columns.set(b.id, out);
+  }
+  return { columns, warnings };
+}
+
+// a connection's column pairs as a set of "from = to", in later names (renames followed)
+function pairsOf(r, rename = null) {
+  if (!r.fromColumns) return null;
+  const to = (id, c) => (rename?.get(id)?.get(c) ?? c);
+  return r.fromColumns.map((c, k) => `${to(r.from, c)} = ${to(r.to, r.toColumns[k])}`).sort();
+}
 
 // The words for what differs between two versions of a node (its parent apart).
 function nodeWhat(a, b) {
@@ -32,11 +98,23 @@ function nodeWhat(a, b) {
   if ((a.note?.body ?? '') !== (b.note?.body ?? '')) out.push('note');
   return out;
 }
-function arrowWhat(a, b) {
+// rename: Map(table id -> Map(earlier name -> later name)), for column pairs.
+// names: (id) -> a table's name, for the words.
+function arrowWhat(a, b, rename = null, names = (id) => id) {
   const out = [];
   if (a.from !== b.from || a.to !== b.to) out.push('ends');
   if ((a.label || '') !== (b.label || '')) out.push('label');
-  if (kindOf(a) !== kindOf(b)) out.push('line');
+  if (a.fromCard && b.fromCard) {
+    // an ER relationship: its ends in words
+    if (a.fromCard !== b.fromCard) out.push(`cardinality at ${names(b.from)}: ${CARD[a.fromCard]} → ${CARD[b.fromCard]}`);
+    if (a.toCard !== b.toCard) out.push(`cardinality at ${names(b.to)}: ${CARD[a.toCard]} → ${CARD[b.toCard]}`);
+    if (a.line !== b.line) out.push(b.line === 'solid' ? 'not identifying → identifying' : 'identifying → not identifying');
+  } else if (kindOf(a) !== kindOf(b)) out.push('line');
+  const pa = pairsOf(a, rename), pb = pairsOf(b);
+  if (pa && pb && (a.from === b.from && a.to === b.to) && pa.join('\u0001') !== pb.join('\u0001')) {
+    const say = (p) => (p.length > 1 ? `(${p.join(', ')})` : p[0]);
+    out.push(`columns ${say(pa)} → ${say(pb)}`);
+  }
   if ((a.cls || '') !== (b.cls || '')) out.push('class');
   if (icons(a) !== icons(b)) out.push('icon');
   if ((a.note?.body ?? '') !== (b.note?.body ?? '')) out.push('note');
@@ -49,11 +127,16 @@ function arrowWhat(a, b) {
 //   places: Map(deployment name -> Map(id -> {state: 'added'|'removed'|'moved', label, from?, to?}))
 //   views: {added: [name], removed: [name]}
 function comparePart(was, now) {
+  const { columns, warnings } = compareColumns(was, now);
+  // the later file's renames, earlier name -> later name, for column pairs
+  const rename = new Map([...columns].map(([id, cols]) => [id, new Map([...cols.values()].filter((c) => c.was && c.was !== c.name && c.state === 'changed').map((c) => [c.was, c.name]))]));
+  const names = (id) => nameOf(now.byId[id]) || id;
   const nodes = new Map();
   for (const b of nodesOf(now)) {
     const a = was.byId[b.id];
     if (!a) { nodes.set(b.id, { state: 'added', label: nameOf(b), what: [] }); continue; }
     const what = nodeWhat(a, b);
+    if (columns.has(b.id)) what.push('columns');
     const moved = (a.parent?.id || null) !== (b.parent?.id || null);
     if (moved) nodes.set(b.id, { state: 'moved', label: nameOf(b), what, from: nameOf(a.parent), to: nameOf(b.parent) });
     else if (what.length) nodes.set(b.id, { state: 'changed', label: nameOf(b), what });
@@ -75,7 +158,7 @@ function comparePart(was, now) {
       const a = before.get(k);
       if (!a) out.set(k, { state: 'added', label: arrowName(r, now), what: [] });
       else {
-        const what = arrowWhat(a, r);
+        const what = arrowWhat(a, r, rename, names);
         if (what.length) out.set(k, { state: 'changed', label: arrowName(r, now), what });
       }
     }
@@ -95,10 +178,11 @@ function comparePart(was, now) {
     }
   }
   for (const v of was.views) if (!viewOf(now, v.name)) views.removed.push(v.name);
-  return { nodes, arrows, places, views };
+  return { nodes, arrows, places, views, columns, warnings };
 }
 
-// -> {parts: Map(part key -> comparePart), added: [{part, title}], removed: [{part, title}]}
+// -> {parts: Map(part key -> comparePart), added: [{part, title}], removed: [{part, title}],
+//     warnings: [{code, message}] (a stale ## Renames line)}
 export function compareFiles(was, now) {
   const parts = new Map();
   const before = new Map(partsOf(was));
@@ -109,7 +193,7 @@ export function compareFiles(was, now) {
     else added.push({ part: k, title: m.title });
   }
   for (const [k, m] of before) if (!after.has(k)) removed.push({ part: k, title: m.title });
-  return { parts, added, removed };
+  return { parts, added, removed, warnings: [...parts.values()].flatMap((p) => p.warnings) };
 }
 
 // The mark a thing takes in one perspective: the later file shows what it adds and
@@ -133,6 +217,13 @@ export function markFile(file, cmp, perspective) {
     for (const n of nodesOf(m)) {
       n.plan = markOf(pd.nodes.get(n.id)?.state, perspective);
       any ||= !!n.plan;
+      // a table's columns, by their name in the version shown
+      const cols = pd.columns.get(n.id);
+      for (const a of n.attrs || []) {
+        const c = cols && [...cols.values()].find((x) => (perspective === 'after' ? x.state !== 'removed' && x.name === a.name : x.state !== 'added' && (x.was ?? x.name) === a.name));
+        a.plan = markOf(c?.state, perspective);
+        a.planWhat = a.plan ? c.what : null;
+      }
     }
     for (const v of m.views) {
       const marks = pd.arrows.get(v.name);
@@ -169,6 +260,14 @@ export function changesIn(cmp, part, viewName, isDeploy) {
     else if (x.state === 'changed') lines.changed.push(`${x.label}${what(x)}`);
     else lines[x.state].push(x.label);
   }
+  // a table's columns, after the table's own line ("Order: columns")
+  for (const [id, cols] of pd.columns) {
+    const table = pd.nodes.get(id)?.label || id;
+    for (const c of cols.values()) {
+      if (c.state === 'changed') lines.changed.push(`${table}.${c.name}${what(c)}`);
+      else lines[c.state].push(`${table}.${c.name}`);
+    }
+  }
   for (const [, p] of places || []) {
     if (p.state === 'moved') lines.moved.push(`${p.label}: ${p.from} → ${p.to} (${viewName})`);
     else lines[p.state].push(`${p.label} (${viewName})`);
@@ -190,6 +289,9 @@ export function changesOf(cmp, part, id, envName) {
   if (x?.what?.length) out.push(`Changed: ${x.what.join(', ')}`);
   if (x?.state === 'added') out.push('Added');
   if (x?.state === 'removed') out.push('Removed');
+  for (const c of pd.columns.get(id)?.values() || []) {
+    out.push(c.state === 'changed' ? `Column ${c.name}: ${c.what.join(', ')}` : `Column ${c.name}: ${c.state}`);
+  }
   const p = envName && pd.places.get(envName)?.get(id);
   if (p?.state === 'moved') out.push(`Moved in ${envName}: ${p.from} → ${p.to}`);
   return out;

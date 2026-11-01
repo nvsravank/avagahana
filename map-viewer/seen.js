@@ -3,7 +3,8 @@
 // and the marks the drawing, the node page, the diagram icons, the expand button and
 // the sparkles panel show (the viewer shows them only when the reader asks, WO-36). The agent knows nothing of this: the viewer compares on its own.
 //
-// Only the topmost new thing is marked: what is inside a new node (its children, its
+// Only the topmost new thing is marked (an ER table's column is a thing of its own: new
+// or changed in a table that is not, it is marked on its row): what is inside a new node (its children, its
 // arrows, its places) is new with it, and a whole new diagram is marked only on its
 // icon (partMarked). The marks behind are kept: they clear with what they are in.
 //
@@ -12,7 +13,7 @@
 // reloads). A map of more than MAX_ITEMS items is compared for the visit only.
 // base (a summary, the viewer's `since` option): the baseline every map starts from
 // instead of the stored one; nothing is kept, and clearing lasts for the visit.
-import { summarize, diff, acknowledge, arrowKeys, parseKey } from './model/changes.js';
+import { summarize, diff, acknowledge, adopt, arrowKeys, parseKey } from './model/changes.js';
 
 const KEEP_MAPS = 50;
 export const MAX_ITEMS = 2000;
@@ -62,6 +63,8 @@ export function createSeen(opts) {
       save();
       return { fresh: new Set(), gone: new Set() };
     }
+    const adopted = adopt(baseline, summary);
+    if (adopted !== baseline) { baseline = adopted; save(); }
     ({ marks, removed } = diff(baseline, summary));
     memory.set(path, baseline);
     const fresh = new Set([...marks.keys()].filter((k) => !before.has(k)));
@@ -98,6 +101,7 @@ export function createSeen(opts) {
       if (p.part !== part) return false;
       const gone = !summary.items[key];
       if (p.type === 'n') return nodes.has(p.id) || (gone && removedHere(p.id));
+      if (p.type === 'c') return nodes.has(p.id);
       if (p.type === 's') return sequence;
       // a removed arrow marks its start in every view (nodeMark), so it clears with it
       if (p.type === 'a' && gone && removedHere(baseline.items[key][2])) return true;
@@ -130,6 +134,7 @@ export function createSeen(opts) {
     if (kind !== 'new') return kind;
     const item = summary.items[k];
     if (p.type === 'n') return item[2] && newish(p.part, item[2]) ? null : kind;
+    if (p.type === 'c') return newish(p.part, p.id) ? null : kind;
     if (p.type === 'e') return item[2] && marks.get(`${p.part}|e|${p.view}|${item[2]}`) === 'new' ? null : kind;
     if (p.type === 'a') return newish(p.part, item[2]) || newish(p.part, item[3]) ? null : kind;
     return kind;
@@ -145,7 +150,7 @@ export function createSeen(opts) {
     return removed.some((r) => r.parent === id && r.key.startsWith(`${part}|`) && keyFits(r.key, env)) ? 'changed' : null;
   }
   // a removal shows in the view it was in: a node's anywhere, an arrow's or a place's in its view
-  const keyFits = (k, env) => { const p = parseKey(k); return p.type === 'n' || p.type === 's' || (p.type === 'e' && p.view === env) || p.type === 'a'; };
+  const keyFits = (k, env) => { const p = parseKey(k); return p.type === 'n' || p.type === 'c' || p.type === 's' || (p.type === 'e' && p.view === env) || p.type === 'a'; };
   // the keys behind a node's mark (what opening its page acknowledges)
   // (its place in every deployment too: one look at the node is enough). A new node:
   // everything new with it too (what is under it, its arrows, their places).
@@ -161,7 +166,7 @@ export function createSeen(opts) {
     const out = [...under].map((x) => `${part}|n|${x}`);
     for (const k of [...marks.keys(), ...removed.map((r) => r.key)]) {
       const p = parseKey(k);
-      if (p.part === part && p.type === 'e' && under.has(p.id)) out.push(k);
+      if (p.part === part && (p.type === 'e' || p.type === 'c') && under.has(p.id)) out.push(k);
       if (isNew && p.part === part && p.type === 'a' && marks.get(k) === 'new' && (under.has(summary.items[k][2]) || under.has(summary.items[k][3]))) out.push(k);
     }
     for (const r of removed) if (r.parent === id && r.key.startsWith(`${part}|`)) out.push(r.key);
@@ -188,6 +193,8 @@ export function createSeen(opts) {
     const ms = relationKeys(part, view, rels).map(shown).filter(Boolean);
     return ms.includes('changed') ? 'changed' : ms.length ? 'new' : null;
   }
+  // a column's mark in its table's row (a new table's columns: none) -> 'new' | 'changed' | null
+  const columnMark = (part, table, col) => shown(`${part}|c|${table}|${col}`);
   // something marked under a node (a closed box, a collapsed branch: the expand
   // button says so): its descendants' marks, or a removal under one of them
   function inside(part, node, env = null) {
@@ -212,7 +219,7 @@ export function createSeen(opts) {
       const seen = new Map();
       for (const [k, kind] of list) {
         const p = parseKey(k);
-        const id = p.type === 'a' ? `a|${p.part}|${p.id}` : p.type === 's' ? `s|${p.part}` : `n|${p.part}|${p.id}`;
+        const id = p.type === 'a' ? `a|${p.part}|${p.id}` : p.type === 's' ? `s|${p.part}` : p.type === 'c' ? `c|${p.part}|${p.id}|${p.col}` : `n|${p.part}|${p.id}`;
         if (!seen.has(id) || kind === 'changed') seen.set(id, kind);
       }
       return [...seen.values()];
@@ -245,5 +252,5 @@ export function createSeen(opts) {
   const allKeys = () => [...marks.keys(), ...removed.map((r) => r.key)];
   const any = () => marks.size > 0 || removed.length > 0;
 
-  return { load, ack, scopeKeys, ownMark, nodeMark, nodeKeys, partKeys, partNew, relationKeys, arrowMark, inside, partMarked, viewMarked, removedUnder, removedIn, allKeys, counts, any };
+  return { load, ack, scopeKeys, ownMark, nodeMark, columnMark, nodeKeys, partKeys, partNew, relationKeys, arrowMark, inside, partMarked, viewMarked, removedUnder, removedIn, allKeys, counts, any };
 }

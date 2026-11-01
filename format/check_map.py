@@ -39,7 +39,7 @@ from check_common import Map, check_label, MAX_LINE, MAX_LABEL, EMOJI, PROBLEMS 
 from check_state import read_state  # noqa: E402
 from check_er import read_er  # noqa: E402
 from check_common import icon_codes
-from check_connections import check_connections
+from check_connections import check_connections, check_renames
 from check_walks import check_walks  # noqa: E402
 from check_vendor import VENDOR_CODE, nearest, vendor_ok  # noqa: E402
 
@@ -59,7 +59,7 @@ SHAPES = [
 BUILT_IN_CLASSES = {"person", "database", "external", "added", "changed", "removed"}
 # planned changes (map-viewer/model/classes.js): built in, one per node or arrow
 CHANGE_CLASSES = ("added", "changed", "removed")
-RESERVED = re.compile(r"^(relations|joins|classes|details|notes|icons|node icons)\b", re.I)
+RESERVED = re.compile(r"^(relations|joins|renames|classes|details|notes|icons|node icons)\b", re.I)
 DIRS = {"LR", "RL", "TB", "TD", "BT"}
 # box diagrams: their own arrows are the default view; sequences and walks play over them
 BOX_KINDS = {"flowchart", "state", "er"}
@@ -90,7 +90,7 @@ def seq_names(text):
             walk = re.match(r"walks\s*:\s*([^|]+)", heading, re.I)
             if walk:
                 names.add(f"{current}-walk-{anchor_of(walk.group(1))}")
-            elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|joins)\b", heading, re.I):
+            elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|joins|renames)\b", heading, re.I):
                 heading_anchor = anchor_of(heading)
             continue
         if not first:
@@ -534,12 +534,12 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     seen = {}
     for title, _, hl in secs:
         key = title.lower()
-        single = key in ("details", "notes", "icons", "node icons", "classes", "plays over")
+        single = key in ("details", "notes", "icons", "node icons", "classes", "plays over", "renames")
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
         if not single and not re.match(r"^(relations\s*(:.*)?|joins\s*:.*|deployment\s*:.*|walks?\s*:.*|look\s*:.*)$", title, re.I):
-            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations[: name], Deployment: <env>, Walks: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over), and no Mermaid block follows")
+            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations[: name], Deployment: <env>, Walks: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over, Renames), and no Mermaid block follows")
         if key == "plays over" and kind != "sequence":
             m.report(hl, "plays-over-not-sequence", "## Plays over is for a sequence diagram")
     # ## Look: the look a flowchart opens in (WO-38)
@@ -609,6 +609,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         for title, _, hl in secs:
             if re.fullmatch(r'joins\s*:\s*(.+)', title, re.I):
                 m.report(hl, 'relation-syntax', 'Join views are for ER diagrams')
+            if title.lower() == 'renames':
+                m.report(hl, 'rename-syntax', 'Renames are for ER diagrams')
 
     # relation views
     walk_views = {"relations": ("Relations", list(read["arrows"]))}
@@ -683,6 +685,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
                 m.report(ln, 'class-unknown', f'unknown line class {cm.group(1)}')
             return {'from': a, 'to': b, 'eid': eid, 'line': ln}
         connections = check_connections(m, part, secs, legacy_connection)
+        check_renames(m, part, secs)
         for key, (name, arrows) in connections.items():
             views[key] = (name, part['line'])
             view_rels[key] = (name, [(r['from'], r['to']) for r in arrows])

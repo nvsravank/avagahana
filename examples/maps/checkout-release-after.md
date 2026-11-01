@@ -29,6 +29,7 @@ flowchart LR
   class customer person
   class psp external
   class db database
+  click db "#orders-data"
   class vault secrets
 ```
 
@@ -94,3 +95,57 @@ work. Outside PCI scope.
 ### <a id="pci"></a>PCI cluster, EC2
 
 The only hosts in scope for PCI: hardened images, no shell access, patched monthly.
+
+## Orders data
+
+```mermaid
+erDiagram
+  CUSTOMER["Customer"] {
+    int id PK
+    string email UK
+  }
+  ORDER["Order"] {
+    int id PK
+    int customer_id FK
+    decimal(10,2) total "in euros"
+    timestamp placed_at
+  }
+  ORDER_LINE["Order line"] {
+    int order_id FK "grain"
+    int line_no "grain"
+    int product_id
+    int quantity
+  }
+  PAYMENT["Payment"] {
+    int id PK
+    int order_id FK
+    string psp_token "kept **90 days**,<br>for refunds"
+    date? token_expires_on
+    string status
+  }
+  REFUND["Refund"] {
+    int id PK
+    int payment_id FK
+    decimal(10,2) amount
+  }
+  ORDER_LINE:::fact
+```
+
+## Relations
+
+- ORDER.customer_id order-customer@}o--|| CUSTOMER.id : placed by
+- ORDER_LINE.order_id line-order@}|--|| ORDER.id : belongs to
+- PAYMENT.order_id payment-order@}o--|| ORDER.id : pays
+- REFUND.payment_id refund-payment@}o--|| PAYMENT.id : refunds
+
+## Renames
+
+- PAYMENT.psp_token was card_token
+
+## Details
+
+### <a id="PAYMENT"></a>Payment
+
+A declined card can be retried, so an order may have several payments. The migration:
+rename the token column, add `token_expires_on` and backfill it from the payment date
+plus 90 days, then turn on retries.

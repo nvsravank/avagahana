@@ -9,7 +9,7 @@ from check_common import check_label
 ID = r"[A-Za-z_][\w-]*"
 REL = re.compile(rf"^({ID})\s*(\|o|\|\||\}}o|\}}\|)(--|\.\.)(o\||\|\||o\{{|\|\{{)\s*({ID})\s*:\s*(.*)$")
 ENTITY = re.compile(rf'^({ID})(?:\s*\[\s*"?([^"\]]*)"?\s*\])?(?:\s*:::\s*([\w-]+))?\s*(\{{)?\s*(\}})?$')
-ATTR = re.compile(r'^([\w(),.\[\]-]+)\s+([A-Za-z_*][\w-]*)\s*((?:PK|FK|UK)(?:\s*,\s*(?:PK|FK|UK))*)?\s*(?:"([^"]*)")?$')
+ATTR = re.compile(r'^([\w(),.\[\]-]+\??)\s+([A-Za-z_*][\w-]*)\s*((?:PK|FK|UK)(?:\s*,\s*(?:PK|FK|UK))*)?\s*(?:"([^"]*)")?$')
 SKIP = re.compile(r"^(direction\b|accTitle\b|accDescr\b)")
 
 

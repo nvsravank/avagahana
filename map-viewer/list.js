@@ -138,6 +138,9 @@ export function renderList(v, on) {
     // coloured by class: the class in words too, so the colour is not the only cue
     if (v.S.colourBy === 'class' && n?.kind) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lclass', textContent: v.S.map.classes?.[n.kind]?.label || n.kind }));
     if (s.count != null) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lcount', textContent: `${s.count} more` }));
+    // an ER table's columns that changed (WO-22 follow-up): compared, or since you looked
+    const cols = (n?.attrs || []).map((a) => (a.plan ? `${a.name} ${a.plan}` : v.columnChange?.(s.id, a.name) ? `${a.name} ${v.columnChange(s.id, a.name)}` : null)).filter(Boolean);
+    if (cols.length) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lcols', textContent: `Columns: ${cols.join(', ')}` }));
     const planInside = s.count != null && v.planInside?.(s.id);
     if (planInside) label.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lplan-inside', textContent: 'planned changes inside' }));
     row.appendChild(label);

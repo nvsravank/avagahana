@@ -181,7 +181,13 @@ this and learns nothing back. (WO-13, WO-31, WO-36.)
   deployment's place). What a load brought glows once; what it took away shrinks out in
   red. Live reloads glide.
 - Only the topmost new thing is marked: inside a new node nothing is (its children, its
-  arrows, its places are new with it). Changed things keep their own marks.
+  arrows, its places are new with it). Changed things keep their own marks. An ER
+  table's column is a thing of its own (WO-22 follow-up): new or changed in a table that
+  is not, its sparkle is in its row between its name and its type (a closed table's: after
+  `+ N columns`); a
+  new table's columns are new with it. A removed column is listed in the panel under its
+  table, which reads changed. A changed column connection marks its line. A reader's
+  baseline from before columns were kept takes them as seen. Renames are not read here.
 - A removed node or arrow marks the node it was under (an arrow: its start); that
   node's page lists "Removed since you looked"; the sparkles panel lists those in the
   view shown.
@@ -229,6 +235,18 @@ viewer compares the two by id, in each diagram, view and deployment:
 - Changed means a different label, icon, class (not a planned-change class), note or
   parent for a node; label, note, class, line kind, icons or an end for an arrow. A new
   id is a removal and an addition: keep ids stable across versions.
+- An ER table's columns (WO-22 follow-up) are matched by name, a declared rename
+  (`## Renames`) followed; a column is changed when its type, keys, comment or grain
+  differ. Each changed row has the ringed sign after its type (its tooltip says what);
+  the table is changed ("columns"); a closed table's `+ N columns` row carries the sign
+  of the columns it hides (one kind, else changed). A column connection is changed when
+  its set of column pairs differs (pair order apart), with the sign on its line; a
+  relationship's ends read in ER words (`cardinality at Order: zero or more → one or
+  more`, `identifying → not identifying`). Lines: `Order.amount: type int → decimal`,
+  `Order.customer_id: renamed from cust_id, now grain`, `Arrow Order → Customer: placed
+  by: columns cust_id = id → customer_id = id`. The node page lists each column and its
+  sign; List mode names the table's changed columns. A stale rename is a warning
+  (`map-rename-stale`) and reads as a removal and an addition.
 - A map with planned-change classes of its own shows those only.
 - `state` carries `perspective` (`'before'` or `'after'`) while comparing, and
   `setState({perspective})` and `options.state.perspective` switch it.

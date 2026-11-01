@@ -47,7 +47,7 @@ export const pageSections = tablePage;
 export const layout = (mode, root, kids, size, input) => layoutTables(root, size, input);
 export { buildScene, relationShapes };
 
-export { parseErViews as parseViews } from './connections.js';
+export { parseErViews as parseViews, parseRenames } from './connections.js';
 
 // The stage must redraw when the smaller column text crosses its bar threshold.
 export const detailSizes = [16, 14, 12];

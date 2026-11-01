@@ -23,3 +23,6 @@ erDiagram
 
 ## Walks: Composite walk | Composite
 - A composite@--> B : Match both columns.
+
+## Renames
+- A.other_id was second_id

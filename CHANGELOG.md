@@ -6,6 +6,33 @@ marked **Contract**.
 
 ## Unreleased
 
+- Fix: a changed or planned arrow's ringed sign could cover the arrow's end marks (the
+  crow's feet in ER). The label now takes room for the sign, so placing the label keeps
+  both clear of the ends; the text moves right by the sign's width. A column's sparkle
+  sits between its name and its type, clear of the lines at the table's sides
+  (WO-22 follow-up).
+- Example: the release review (`checkout-release-before.md` / `-after.md`) gains an Orders
+  data ER diagram, opened from the Orders database: a renamed token column (`## Renames`),
+  a nullable column, a type change, a dropped column, retries as a cardinality change and
+  a new Refund table (WO-22 follow-up).
+- **Contract** (map format, addition): `## Renames` after an ER diagram says a column was
+  renamed since the earlier version (`- ORDER.customer_id was cust_id`); checker
+  problems `rename-syntax`, `rename-unknown-column`; the viewer warns `rename-stale` when
+  a line does not fit the earlier version. ER types may end in `?` (nullable, as Mermaid
+  reads them); the table's label and column comments read `**bold**`, `_italic_` and
+  `<br>`, and the title strip grows a line per `<br>` (WO-22 follow-up).
+- **Contract** (viewer, Before and After): ER columns are compared by name (type, keys,
+  comment, grain; declared renames followed) and column connections by their pairs;
+  cardinality and identifying read in ER words, not `line`. A changed row has its sign
+  after its type, a closed table's `+ N columns` carries the sign of what it hides, the
+  table reads changed ("columns"), a changed connection signs its line; the changes
+  list, node page, List mode and render report say what (old → new). Tables now draw
+  their own sign (WO-22 follow-up).
+- **Contract** (viewer, since you looked): an ER table's column is a thing of its own: a
+  new or changed column in an existing table sparkles on its row (on `+ N columns` while
+  hidden); a changed column connection marks its line; a removed column is listed under
+  its table. A baseline kept before this takes columns as seen (WO-22 follow-up).
+
 - Fix: a box's title broke no lines: a `<br>` drew as a space and a long title ran past
   the box. It now breaks at `<br>` and wraps as a node's label does; the title strip and
   the box grow to fit, and a box below the first level is sized for its semibold title

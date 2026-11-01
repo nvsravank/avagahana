@@ -58,7 +58,10 @@ erDiagram
   `}o` zero or more, `}|` one or more (mirrored on the right). `--` identifying, `..`
   not. Mermaid's word forms are not read.
 - Columns: `type name [PK, FK, UK] ["comment"]`. The comment `"grain"` marks the
-  columns that together say what one row is; mark it, readers rely on it.
+  columns that together say what one row is; mark it, readers rely on it. `string?`
+  marks a type that may be empty. Names are plain words: no quotes, no spaces (Mermaid
+  and GitHub reject them). The table's label (`ORDER["**Order**<br>_line_"]`) and
+  comments may use `**bold**`, `_italic_` and `<br>`.
 - Classes `fact`, `dimension`, `bridge` set a table's role; otherwise the viewer infers
   it. Other classes (subject areas) colour the Class scheme.
 - Layout is the viewer's; nothing in the map sets it.

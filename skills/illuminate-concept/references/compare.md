@@ -27,6 +27,25 @@ version:
 - Do not add `added` / `changed` / `removed` classes for a comparison: a map with its own
   planned changes shows those instead.
 
+### ER diagrams: columns and renames
+
+Columns are matched by name in each table (type, keys, comment and grain compared); a
+column connection by its id, its column pairs compared as a set. A schema migration is
+just this: the current schema as the earlier version, the proposed one as the map.
+
+- A renamed column reads as one removed and one added unless you say it in the later
+  file, new name first (never guess one):
+
+  ```markdown
+  ## Renames
+  - ORDER.customer_id was cust_id
+  ```
+
+- Remove the Renames lines once the change has landed: a line whose old name is not in
+  the earlier version is ignored with a warning.
+- Steps, backfills and order of a migration go in the table's or column's note, not in
+  the diagram.
+
 ## Commands
 
 The earlier version can be any file, often from git:

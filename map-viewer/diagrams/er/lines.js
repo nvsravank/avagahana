@@ -138,17 +138,18 @@ function improveChannels(paths, sides) {
 
 // Unmapped connections use the header; mapped columns are always visible.
 function rowY(geo, box, col) {
-  if (!col) return box.y - box.h / 2 + HEAD / 2;
-  let y = box.y - box.h / 2 + HEAD;
+  const head = geo.head ?? HEAD;
+  if (!col) return box.y - box.h / 2 + head / 2;
+  let y = box.y - box.h / 2 + head;
   for (const row of geo.rows) {
     if (row.a.name === col) return y + row.h / 2;
     y += row.h;
   }
-  return box.y - box.h / 2 + HEAD / 2;
+  return box.y - box.h / 2 + head / 2;
 }
 
 export function connectionLabel(r, key, byId, playLabel) {
-  const w = writtenLabel({ key, a: byId[r.from], z: byId[r.to], text: r.label || (r.note || r.icons?.length ? ' ' : null), icons: r.icons?.length || 0, note: !!r.note }, r);
+  const w = writtenLabel({ key, a: byId[r.from], z: byId[r.to], text: r.label || (r.note || r.icons?.length ? ' ' : null), icons: r.icons?.length || 0, note: !!r.note, sign: !!r.plan }, r);
   const playing = playLabel?.(r);
   if (playing) {
     const texts = [playing.fwd, playing.back].filter(Boolean);

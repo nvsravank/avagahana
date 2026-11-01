@@ -10,7 +10,7 @@
 // (layout.labels), else on the longest run.
 import { nodeShaper, nodeName, typeFor, planClass, passesFilter } from '../../geometry.js';
 import { strokeStyle } from '../../model/classes.js';
-import { labelLines } from '../../connection-labels.js';
+import { labelLines, SIGN_W } from '../../connection-labels.js';
 
 const TITLE_X = 12;
 const TITLE_Y = 18;
@@ -135,8 +135,8 @@ export function relationShapes(input) {
       cls: `mmv-flow${kind.line === 'dotted' ? ' is-dotted' : kind.line === 'thick' ? ' is-thick' : ''}${slot != null ? ` is-kind mmv-lc${slot}` : ''} ${planClass(plan)}${dim ? ' is-dim' : ''}`,
       ...(slot != null ? { slot } : {}), ...(plan ? { plan } : {}), ...(lineCls?.stroke ? { style: strokeStyle(lineCls.stroke) } : {}),
       head: kind.head || null, tail: kind.tail || null,
-      label: items.length > 1 ? { x: mid[0], y: mid[1], text: `${items.length} links`, ...(icons.length ? { icons } : {}) }
-        : first.label || noteMark || icons.length ? { x: mid[0], y: mid[1], text: first.label, ...labelLines(first, `${input.byId[first.from]?.plain || first.from} → ${input.byId[first.to]?.plain || first.to}`), ...(noteMark ? { note: true } : {}), ...(icons.length ? { icons } : {}) } : null,
+      label: items.length > 1 ? { x: mid[0] + (plan ? SIGN_W / 2 : 0), y: mid[1], text: `${items.length} links`, ...(icons.length ? { icons } : {}) }
+        : first.label || noteMark || icons.length ? { x: mid[0] + (plan ? SIGN_W / 2 : 0), y: mid[1], text: first.label, ...labelLines(first, `${input.byId[first.from]?.plain || first.from} → ${input.byId[first.to]?.plain || first.to}`), ...(noteMark ? { note: true } : {}), ...(icons.length ? { icons } : {}) } : null,
       ...(dim ? { dim } : {}),
       items: items.map((r) => ({ from: r.from, to: r.to, label: r.label, ...(r.note ? { note: r.note } : {}), ...(r.icons?.length ? { icons: r.icons.slice() } : {}) })),
     });

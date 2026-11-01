@@ -1,7 +1,19 @@
 // page.js — what an ER table's node page says about it: its role and what one row is
-// (the grain sentence), then every column (keys marked, type, comment).
+// (the grain sentence), then every column (keys marked, type, comment). A comment reads
+// **bold**, _italic_ and <br> as Mermaid draws it, built as elements (never as HTML).
+// Compared with an earlier version, a changed column's ringed sign says what changed.
 // -> [{title, el}] for page.js
 import { grainSentence, ROLE_LABELS } from './roles.js';
+import { inlineRuns } from '../../model/labels.js';
+import { planSignSvg, PLAN_WORD } from '../../chrome.js';
+
+// a comment's lines and emphasis, into a cell
+function commentInto(cell, text) {
+  text.replace(/\\n/g, '\n').replace(/<br\s*\/?>/gi, '\n').split('\n').forEach((line, i) => {
+    if (i) cell.appendChild(document.createElement('br'));
+    for (const r of inlineRuns(line.trim())) cell.appendChild(Object.assign(document.createElement(r.bold ? 'strong' : r.italic ? 'em' : 'span'), { textContent: r.text }));
+  });
+}
 
 export function tablePage(n) {
   if (!n.attrs) return [];
@@ -17,7 +29,16 @@ export function tablePage(n) {
   for (const a of n.attrs) {
     const r = rows.insertRow();
     const keys = [...a.keys, ...(a.grain ? ['grain'] : [])].join(', ');
-    for (const text of [keys, a.name, a.type, a.grain ? '' : a.comment || '']) r.insertCell().textContent = text;
+    r.insertCell().textContent = keys;
+    const name = r.insertCell();
+    if (a.plan) {
+      // our own sign (chrome.js), the column's words after it as text
+      name.insertAdjacentHTML('beforeend', planSignSvg(a.plan, 14));
+      name.title = `${PLAN_WORD[a.plan]} since the earlier version${a.planWhat?.length ? `: ${a.planWhat.join(', ')}` : ''}`;
+    }
+    name.appendChild(document.createTextNode(a.name));
+    r.insertCell().textContent = a.type;
+    commentInto(r.insertCell(), a.grain ? '' : a.comment || '');
   }
   const wrap = document.createElement('div');
   wrap.append(about, table);

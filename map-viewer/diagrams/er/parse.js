@@ -8,6 +8,7 @@
 //                                         or .. (not), and its label (may be "")
 //     ORDER["Order"] {                    an entity (a label in brackets) and its columns:
 //       int id PK                         type, name, keys (PK, FK, UK, comma separated)
+//       string? note                      (a type ending in ? may be empty, Mermaid 11.16+)
 //       int customer_id FK "grain"        and a comment; the comment "grain" marks the
 //     }                                   columns that together say what one row is
 //     ORDER:::fact                        classes, as in a flowchart; fact, dimension and
@@ -24,7 +25,7 @@ const LEFT = { '|o': 'zero-one', '||': 'one', '}o': 'zero-many', '}|': 'one-many
 const RIGHT = { 'o|': 'zero-one', '||': 'one', 'o{': 'zero-many', '|{': 'one-many' };
 const REL = new RegExp(`^(${ID})\\s*(\\|o|\\|\\||\\}o|\\}\\|)(--|\\.\\.)(o\\||\\|\\||o\\{|\\|\\{)\\s*(${ID})\\s*:\\s*(.*)$`);
 const ENTITY = new RegExp(`^(${ID})(?:\\s*\\[\\s*"?([^"\\]]*)"?\\s*\\])?(?:\\s*:::\\s*([\\w-]+))?\\s*(\\{)?\\s*(\\})?$`);
-const ATTR = /^([\w(),.[\]-]+)\s+([A-Za-z_*][\w-]*)\s*((?:PK|FK|UK)(?:\s*,\s*(?:PK|FK|UK))*)?\s*(?:"([^"]*)")?$/;
+const ATTR = /^([\w(),.[\]-]+\??)\s+([A-Za-z_*][\w-]*)\s*((?:PK|FK|UK)(?:\s*,\s*(?:PK|FK|UK))*)?\s*(?:"([^"]*)")?$/;
 
 export function parseEr(lines, start, title, warnings) {
   const shortened = [];

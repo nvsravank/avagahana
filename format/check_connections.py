@@ -113,3 +113,33 @@ def check_connections(m, part, secs, legacy):
     part['connection_views'] = views
     read['arrows'] = views['relations'][1]
     return views
+
+
+RENAME = re.compile(rf'^\s*[-*]\s*({ID})\.({COL})\s+was\s+({COL})\s*$')
+
+
+def check_renames(m, part, secs):
+    """## Renames: `- TABLE.new_name was old_name`, as diagrams/er/connections.js reads it.
+    The new column must be in the table; the old name is matched against the earlier
+    version only when the viewer compares the two (a stale line is the viewer's warning)."""
+    ids = part['read']['ids']
+    for title, body, hl in secs:
+        if title.lower() != 'renames':
+            continue
+        seen = {}
+        for i, line in enumerate(body.split('\n')):
+            if not line.strip():
+                continue
+            mm = RENAME.fullmatch(line)
+            if not mm:
+                m.report(hl + i, 'rename-syntax', f'rename not understood: {line.strip()} (want "- TABLE.new_name was old_name")')
+                continue
+            table, now, was = mm.groups()
+            if table not in ids or now not in ids[table].get('attrs', ()):
+                m.report(hl + i, 'rename-unknown-column', f'rename {table}.{now}: ' + ('no such column in the table' if table in ids else 'no such table'))
+                continue
+            own = seen.setdefault(table, {})
+            if now == was or now in own or was in own.values():
+                m.report(hl + i, 'rename-syntax', f'rename {table}.{now} was {was}: ' + ('the same name' if now == was else 'a column renamed twice'))
+                continue
+            own[now] = was

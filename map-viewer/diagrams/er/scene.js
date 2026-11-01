@@ -9,7 +9,14 @@ import { HEAD } from './table.js';
 import { cardinalityWords, grainSentence } from './roles.js';
 
 import { connectionPaths, connectionLabels } from './lines.js';
-import { labelLines } from '../../connection-labels.js';
+import { labelLines, SIGN_W } from '../../connection-labels.js';
+
+function hiddenPlan(rows) {
+  const plans = new Set(rows.map((r) => r.a.plan).filter(Boolean));
+  if (!plans.size) return {};
+  const names = rows.filter((r) => r.a.plan).map((r) => r.a.name);
+  return { plan: plans.size === 1 ? [...plans][0] : 'changed', planCols: names };
+}
 
 export function buildScene(input) {
   const { layout: L } = input;
@@ -20,20 +27,27 @@ export function buildScene(input) {
     const geo = input.geom(n);
     const open = !input.collapsed.has(n.id);
     const rows = [];
-    let y = HEAD;
+    let y = geo.head;
     for (const r of open ? geo.rows : geo.rows.slice(0, geo.shownCount)) {
-      rows.push({ y, h: r.h, size: r.size, weight: r.weight, name: r.a.name, type: r.a.type, mark: r.a.keys.has('PK') ? 'pk' : r.a.grain ? 'grain' : null, fk: r.a.keys.has('FK'), bar: far(r.size) });
+      rows.push({ y, h: r.h, size: r.size, weight: r.weight, name: r.a.name, type: r.a.type, mark: r.a.keys.has('PK') ? 'pk' : r.a.grain ? 'grain' : null, fk: r.a.keys.has('FK'), bar: far(r.size), ...(r.a.plan ? { plan: r.a.plan, planWhat: r.a.planWhat } : {}) });
       y += r.h;
     }
     const s = {
       kind: 'node', id: n.id, x: p.x, y: p.y, w: p.w, h: p.h, custom: 'table', grow: 1,
       cls: `mmv-node mmv-table ${shaper.tone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}`,
       ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
+      // compared with an earlier version, or a planned change: its ringed sign (paint.js)
+      ...(n.plan ? { plan: n.plan } : {}),
       name: `${nodeName(n, 1, false)}, ${n.role === 'table' ? 'table' : `${n.role} table`}, ${n.attrs.length} columns`,
       marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
-      title: { text: n.plain, size: geo.type.size, weight: geo.type.weight, bar: far(geo.type.size) },
+      title: { text: n.plain, size: geo.type.size, weight: geo.type.weight, bar: far(geo.type.size),
+        ...(geo.titleLines.length > 1 || geo.titleLines.some((l) => l.runs.some((r) => r.bold || r.italic)) ? { lines: geo.titleLines.map((l) => l.runs), lh: geo.lh } : {}) },
+      ...(geo.head !== HEAD ? { head: geo.head } : {}), ...(geo.signW ? { signW: geo.signW } : {}),
       rows,
-      more: geo.hidden ? { y, h: p.h - y, open, text: open ? 'Fewer columns' : `+ ${geo.hidden} column${geo.hidden > 1 ? 's' : ''}`, bar: far(12) } : null,
+      more: geo.hidden ? { y, h: p.h - y, open, text: open ? 'Fewer columns' : `+ ${geo.hidden} column${geo.hidden > 1 ? 's' : ''}`, bar: far(12),
+        // closed: the compared columns behind it lend it their sign, as a lifted line
+        // carries the marks of the lines it stands for (one kind, else changed)
+        ...(open ? {} : hiddenPlan(geo.rows.slice(geo.shownCount))), hiddenCols: geo.rows.slice(geo.shownCount).map((r) => r.a.name) } : null,
     };
     if (n.note) s.note = { x: p.w - 22, y: (HEAD - 16) / 2, size: 16 };
     // the grain sentence under a selected table
@@ -67,8 +81,10 @@ export function relationShapes(input) {
       ...(r.plan ? { plan: r.plan } : {}), ...(r.stroke ? { style: strokeStyle(r.stroke) } : {}),
       head: r.head, tail: r.tail,
       hint: cardinalityWords(r, input.byId),
-      label: !pair && (r.label || r.note || r.icons?.length) ? { x: r2(mid[0]), y: r2(mid[1] + 4), text: r.label, ...labelLines(r, `${input.byId[r.from]?.plain || r.from} → ${input.byId[r.to]?.plain || r.to}`), ...(r.note ? { note: true } : {}), ...(r.icons?.length ? { icons: r.icons } : {}) } : null,
+      label: !pair && (r.label || r.note || r.icons?.length) ? { x: r2(mid[0] + (r.plan ? SIGN_W / 2 : 0)), y: r2(mid[1] + 4), text: r.label, ...labelLines(r, `${input.byId[r.from]?.plain || r.from} → ${input.byId[r.to]?.plain || r.to}`), ...(r.note ? { note: true } : {}), ...(r.icons?.length ? { icons: r.icons } : {}) } : null,
       ...(dim ? { dim } : {}),
+      // a composite connection's further pairs: one sign for the connection, on its first
+      ...(pair ? { pairOf: true } : {}),
       items: [{ from: r.from, to: r.to, eid: r.eid, label: r.label, words: cardinalityWords(r, input.byId), ...(r.note ? { note: r.note } : {}), ...(r.icons?.length ? { icons: r.icons.slice() } : {}) }],
     });
   }

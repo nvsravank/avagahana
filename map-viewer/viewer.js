@@ -413,6 +413,8 @@ export function mount(element, options = {}) {
   // WO-36): hidden, nothing is marked and reading clears nothing. A load still glows.
   const marked = () => (S.sparkles === '1' ? seen : null);
   v.changeOf = (id) => (marked() && !planShown() && S.map?.byId[id] ? seen.nodeMark(partKey(), id, envName()) : null);
+  // an ER column's mark, on its row (or on its closed table's "+ N columns")
+  v.columnChange = (id, col) => (marked() && !planShown() && S.map?.byId[id] ? seen.columnMark(partKey(), id, col) : null);
   // a diagram with anything new or changed in it (or new as a whole): its icon's small sparkle
   v.partChanged = (anchor) => !planShown() && !!marked()?.partMarked(anchor || '');
   // Planned changes a closed box (or collapsed branch, closed List row) hides: a node
@@ -1982,6 +1984,8 @@ export function mount(element, options = {}) {
     hideError();
     const maps = [file, ...file.parts.values()];
     const extra = [];
+    // a ## Renames line that does not fit the earlier version: ignored (model/compare.js)
+    for (const w of compare?.warnings || []) extra.push({ level: 'warning', code: `map-${w.code}`, message: w.message, where: null });
     for (const m of maps) {
       const used = [];
       const walk = (n) => { used.push(...n.icons); n.children.forEach(walk); };

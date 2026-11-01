@@ -556,18 +556,41 @@ export function createPainter(v) {
         const p = hit.getPointAtLength(hit.getTotalLength() / 2);
         at = [p.x, p.y];
       }
-      if (s.plan) drawPlan($.rels, s.plan, at[0], at[1]).dataset.arrow = id;
+      if (s.plan && !s.pairOf) drawPlan($.rels, s.plan, at[0], at[1]).dataset.arrow = id;
       if (kind) drawChange($.rels, kind, at[0], at[1]).dataset.arrow = id;
     }
   }
   // the marks again, nothing else (a page may be open over the drawing)
   function paintChanges() {
-    v.root.querySelectorAll('[data-mmv=viewport] :is(.mmv-change, .mmv-plan)').forEach((e) => e.remove());
+    // (an ER row's sign is part of its table's drawing: diagrams/er/paint.js)
+    v.root.querySelectorAll('[data-mmv=viewport] :is(.mmv-change, .mmv-plan):not(.mmv-row-plan)').forEach((e) => e.remove());
     for (const ig of v.root.querySelectorAll('[data-mmv=viewport] .mmv-inner-ic')) if (v.partChanged?.(ig.dataset.anchor)) drawSpark(ig, +ig.dataset.size);
     for (const sg of v.root.querySelectorAll('[data-mmv=viewport] .mmv-inner-spot')) if (sg.dataset.anchors.split(' ').some((a) => v.partChanged?.(a))) drawSpark(sg, +sg.dataset.size);
     for (const g of $.frames.children) markNode(g, true);
     for (const g of $.nodes.children) markNode(g, false);
+    for (const at of $.nodes.querySelectorAll('.mmv-row-at')) markRow(at);
     markArrows();
+  }
+  // an ER column's sparkle, just after its name (clear of the key marks and of the lines
+  // at the table's sides); a closed table's "+ N columns" takes those of the columns it
+  // hides (changed over new), after its words
+  function markRow(at) {
+    const id = at.closest('[data-id]')?.dataset.id;
+    if (!id || !v.columnChange) return;
+    const cols = at.dataset.col != null ? [at.dataset.col] : (at.dataset.cols || '').split(' ').filter(Boolean);
+    const kinds = cols.map((c) => v.columnChange(id, c)).filter(Boolean);
+    const kind = kinds.includes('changed') ? 'changed' : kinds[0];
+    if (!kind) return;
+    const words = at.dataset.col != null ? at.parentNode.querySelector(`.mmv-table-col[data-col="${CSS.escape(at.dataset.col)}"]`) : at.parentNode.querySelector('.mmv-table-more text');
+    // in the gap between the name and its type (table.js keeps 14 px there), else after the words
+    const type = at.dataset.col != null ? words?.parentNode.querySelector(`.mmv-table-type[data-col="${CSS.escape(at.dataset.col)}"]`) : null;
+    let x = 0;
+    try {
+      const b = words.getBBox();
+      const t = type?.getBBox();
+      x = t ? (b.x + b.width + t.x) / 2 : b.x + b.width + 8;
+    } catch (_) { /* not drawn yet: the row's start */ }
+    drawChange(at, kind, 0, 0).setAttribute('transform', `translate(${x},0) scale(0.5)`);
   }
 
   // a step number on a sequence's arrow (lifelines here, the player's over a view)

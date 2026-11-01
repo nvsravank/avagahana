@@ -398,6 +398,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-llabel .mmv-d0 { font-size: 20px; font-weight: 700; }
 .mmv-llabel .mmv-d1 { font-size: 16px; font-weight: 600; }
 .mmv-lcount { color: var(--mmv-muted); font-size: 12px; margin-left: 6px; }
+.mmv-lcols { color: var(--mmv-muted); font-size: 12px; margin-left: 6px; }
 .mmv-lrel { display: block; width: 100%; box-sizing: border-box; text-align: left; color: var(--mmv-ink); font-size: 13px; border: 0; background: none; padding: 1px 0; font-family: inherit; cursor: pointer; border-radius: 6px; }
 /* List mode is a tree for the keyboard: the row with focus shows a ring */
 .mmv-list-inner :is(.mmv-lrow, .mmv-lrel, .mmv-lnote):focus { outline: none; }

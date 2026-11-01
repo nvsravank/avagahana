@@ -8,6 +8,7 @@ import { testChangeMarks, showSparkles } from './change-marks.js';
 import { testRender } from './render.js';
 import { testWholeMap } from './whole-map.js';
 import { testPoster } from './poster.js';
+import { testErCompare } from './er-compare.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
@@ -34,6 +35,7 @@ try {
   await testRender(check);
   await testWholeMap(check);
   await testPoster(check, wait);
+  await testErCompare(check, wait);
   // Zoom changes label detail, never box geometry or the precomputed routes.
   for (const [kind, body] of [
     ['flowchart', 'flowchart LR\n  a[Top level] --> b{Decision}\n  subgraph group[Group]\n    c[Nested label] --> d[Another label]\n  end\n  b --> c'],

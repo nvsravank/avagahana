@@ -150,6 +150,8 @@ export function layoutBoxes(root, kids, size, input) {
   // (Poster, WO-38: no icons or note mark on the line; the arrow's pop-up has them)
   for (const w of arrows.values()) {
     w.note = !input.poster && w.items.length === 1 && !!w.items[0].note;
+    // its ringed sign before the label: when its relations share one (scene.js)
+    w.sign = !!w.items[0].plan && w.items.every((r) => r.plan === w.items[0].plan);
     w.icons = input.poster ? 0 : w.items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), w.items[0].icons || []).length;
     w.text = w.items.length > 1 ? `${w.items.length} links` : w.items[0].label || (w.note || w.icons ? ' ' : null);
     // a label of two lines (WO-41): its gap makes room for both; measured by its widest

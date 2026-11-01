@@ -252,6 +252,22 @@
    "side": "both",
    "what": "A relation line that cannot be read"
   },
+  "rename-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Renames line that cannot be read (want \"- TABLE.new_name was old_name\"), a column renamed twice, or Renames after a diagram that is not ER"
+  },
+  "rename-unknown-column": {
+   "level": "error",
+   "side": "both",
+   "what": "A ## Renames line whose table or new column is not in the ER diagram"
+  },
+  "rename-stale": {
+   "level": "warning",
+   "side": "viewer",
+   "what": "Comparing with an earlier version: a ## Renames line whose old name is not in the earlier version, or is still a column in this one; the line is ignored",
+   "sample": false
+  },
   "relation-unknown-node": {
    "level": "error",
    "side": "both",

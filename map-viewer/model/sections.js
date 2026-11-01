@@ -4,7 +4,8 @@
 // model/classes.js), `## Relations[: name]` and `## Deployment: <env>[, <env>]`
 // (model/deployments.js), after a sequence `## Plays over` (the views it plays over), and
 // after a state or ER diagram `## Walks: <name>` (model/walks.js), and `## Look: <look>`
-// (the look a flowchart opens in, WO-38).
+// (the look a flowchart opens in, WO-38), and after an ER diagram `## Renames` (columns
+// renamed since the earlier version, diagrams/er/connections.js).
 import { parseIconCodes, normalizeIconCode } from './icon-codes.js';
 import { problem } from './problem.js';
 import { takeMain, MAIN } from './main-icon.js';
@@ -25,6 +26,7 @@ export function splitSections(after) {
     if (h.name === 'node icons') out.nodeIcons = text;
     if (h.name === 'classes') out.classes = text;
     if (h.name === 'plays over') out.playsOver = text;
+    if (h.name === 'renames') out.renames = text;
     const rel = h.title.match(/^relations\s*(?::\s*(.+))?$/i);
     if (rel) out.relations.push({ name: rel[1] ? rel[1].trim() : null, text });
     const join = h.title.match(/^joins\s*:\s*(.+)$/i);

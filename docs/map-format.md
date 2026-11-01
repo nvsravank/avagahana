@@ -740,7 +740,12 @@ erDiagram
   in words ("Each Customer places zero or more Order. Each Order goes with exactly one
   Customer."). Mermaid's word forms (`one or more`, ...) are not read.
 - **Entities**: an id, labelled with `ID["Label"]`; columns in `{ ... }`, one per line:
-  `type name [PK, FK, UK] ["comment"]`.
+  `type name [PK, FK, UK] ["comment"]`. A type ending in `?` may be empty
+  (`string? middle_name`, as Mermaid 11.16 and later read it). A column name is a word
+  (letters, digits, `_`, `-`; Mermaid takes no quoted or spaced names).
+- **Emphasis**: the table's label and a column's comment read `**bold**`, `_italic_`
+  and `<br>` as a node's label does, as Mermaid draws them: the title strip grows a line
+  per `<br>`; a comment shows them on the table's page (WO-22 follow-up).
 - **Grain**: the comment `"grain"` marks the columns that together say what one row is
   (others call it the alternate or composite key; Mermaid has no such mark, so the
   comment carries it). Selecting a table with a grain says it: "One row per order and
@@ -765,7 +770,8 @@ erDiagram
   labels. All tables in the current view use the width needed by its widest table.
   Endpoint channels are allocated across all connections on each table side, and
   layout reserves their space. Tables line up where they can. Not set in the map.
-- Problems: `er-line-syntax`, `er-attr-syntax`, `er-not-closed`, `er-attr-twice`.
+- Problems: `er-line-syntax`, `er-attr-syntax`, `er-not-closed`, `er-attr-twice`; for
+  `## Renames`, `rename-syntax`, `rename-unknown-column`, `rename-stale` (viewer only).
 
 ## ER column relationships and join views
 
@@ -798,6 +804,27 @@ attached at the header rather than suggesting a particular column.
   or role inference. No SQL block, join execution order, LEFT or RIGHT is implied.
   Fan-out is known only when reusing a relationship with declared cardinality.
 - Definition IDs are unique within their diagram, independent of labels and file order.
+
+### `## Renames`: a column renamed since the earlier version
+
+When a map is compared with an earlier version (Before and After), columns are matched
+by name in each table: a different name reads as one column removed and another added.
+A column that was renamed says so in the later file, new name first:
+
+```markdown
+## Renames
+- ORDER.customer_id was cust_id
+```
+
+- The new column must be in the table (`rename-unknown-column`); a line that cannot be
+  read, a column renamed twice, or Renames after a diagram that is not ER is
+  `rename-syntax`. One `## Renames` section per diagram.
+- Compared, the column reads as one column renamed (its sign in both Before and After),
+  and a column connection on it is not changed by the rename. A line that does not fit
+  the earlier version (its old name is not there, or is still a column in this one) is
+  ignored with a viewer warning, `rename-stale`. With no earlier version the section is
+  checked and otherwise unused; remove it once the change has landed.
+- Renames are never guessed. Procedure (backfills, step order) belongs in a note.
   Reusing an ID in another view refers to the original object; it does not redefine it.
   Use existing `## Details` anchors (`### <a id="billing"></a>Billing address`) and
   `## Node icons` to annotate connection IDs. Names of views must be distinct,

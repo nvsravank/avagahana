@@ -170,6 +170,9 @@ function parsePart(text, fileName, shared) {
   for (const { n } of infra) own.set(n, classOf(n, classes, styleOnly));
   const views = diagram.parseViews ? diagram.parseViews(sections, byId, warnings, read.relations || []) : parseViews(sections.relations, byId, warnings, read.relations || null);
   if (sections.joins.length && !diagram.parseViews) warnings.push(problem('relation-syntax', 'Join views are for ER diagrams.'));
+  // ## Renames: columns renamed since an earlier version, used when comparing (model/compare.js)
+  const renames = sections.renames == null ? null : diagram.parseRenames ? diagram.parseRenames(sections.renames, byId, warnings) : null;
+  if (sections.renames != null && !diagram.parseRenames) warnings.push(problem('rename-syntax', 'Renames are for ER diagrams: not read.'));
   const allRels = views.flatMap((v) => v.relations);
   for (const id of new Set(allRels.map((r) => r.eid).filter((e) => e && byId[e]))) warnings.push(problem('arrow-id-is-node', `Arrow id ${id} is also a node's id: a note keyed by it goes on the node.`));
   // a note keyed by an infrastructure id goes on that box in every deployment
@@ -266,6 +269,7 @@ function parsePart(text, fileName, shared) {
     ...(diagram.type === 'sequence' ? { playsOver } : {}), notesText: sections.details || '',
     walks: WALK_TYPES.has(diagram.type) ? sections.walks : [],
     ...(look ? { look } : {}),
+    ...(renames ? { renames } : {}),
   };
 }
 
