@@ -57,16 +57,16 @@ python3 "<plugin root>/relay-server/show.py" "<Topic>/<Name>.md" --maps-dir "<ma
 ```
 
 The server keeps it in memory for that map (a reload keeps it; a restart drops it);
-`--before none` forgets it. `--perspective before` opens the earlier version.
+`--before none` forgets it. `--edition before` opens the earlier version.
 
-For a document: `render.py ... --before /tmp/name-v1.4.md [--perspective before|after]`
+For a document: `render.py ... --before /tmp/name-v1.4.md [--edition before|after]`
 draws a marked picture. Plain pictures of each version need nothing new: render each file.
 
 ## The changes as data
 
 `render.py ... --before /tmp/name-v1.4.md --report --out /tmp/x.svg` writes
 `/tmp/x.svg.report.json`; its `changes` holds what the reader's changes list shows:
-`{perspective, diagram, view, groups, views, diagramsAdded, diagramsRemoved}`, where
+`{edition, diagram, view, groups, views, diagramsAdded, diagramsRemoved}`, where
 `groups` is `[{state: removed|added|moved|changed, lines: [text]}]` for the view drawn and
 `views` the same for each view and deployment of that diagram (`--part` for another
 diagram). Base a written review on it, then check each finding in the source.

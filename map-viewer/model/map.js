@@ -11,7 +11,8 @@ import { assignDepth } from './tree.js';
 import { resolveMain } from './main-icon.js';
 import { parseClasses, mergeClasses, classOf, reservedTwice, assignSlots, strokeOf, withClassIcon, CHANGE_CLASSES, planOf } from './classes.js';
 import { readDeployment, infraOf, buildDeployment, syncWarnings } from './deployments.js';
-import { WALK_TYPES, readWalk, walkText } from './walks.js';
+import { SCENARIO_TYPES, readScenario, scenarioText } from './scenarios.js';
+import { readWalkthroughs } from './walkthroughs.js';
 
 // A big map is drawn in full, with a warning that drawing may be slow.
 export const LARGE_MAP = 5000;
@@ -44,7 +45,7 @@ export function parseMap(text, fileName) {
     const h = before.match(/(?:^|\n)(#{2,6})\s+(.+)$/);
     // a deployment's block belongs to the diagram above it (model/deployments.js)
     if (h && /^deployment\s*:/i.test(h[2].trim())) continue;
-    if (h && !/^(relations|joins|classes|details|notes|icons|node icons|look)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
+    if (h && !/^(relations|perspective|scenario|walkthrough|joins|classes|details|notes|icons|node icons|look)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
     else lost.push(f.index);
   }
   const main = parsePart(src.slice(0, cuts[0]?.start ?? src.length), fileName, null);
@@ -86,7 +87,9 @@ export function parseMap(text, fileName) {
       delete n.links;
     }
   }
-  addWalks(main, fileName);
+  addScenarios(main, fileName);
+  // walkthroughs belong to the file: each diagram's sections count (model/walkthroughs.js)
+  main.walkthroughs = readWalkthroughs([main, ...main.parts.values()].flatMap((p) => p.walkthroughs || []), main.warnings);
   linkSequences(main);
   main.unlinked = unreachable(main);
   for (const a of main.unlinked) main.warnings.push(problem('diagram-unreachable', `Diagram "${main.parts.get(a).title}" is linked from nowhere: no click, note link or Plays over leads to it from the first diagram.`));
@@ -185,7 +188,7 @@ function parsePart(text, fileName, shared) {
   for (const { n } of infra) firstInfra[n.id] ||= n;
   const messages = read.extra?.sequence?.messages || [];
   if (sections.details) attachNotes(sections.details, { ...firstInfra, ...byId }, warnings, [...allRels, ...messages]);
-  if (sections.walks.length && !WALK_TYPES.has(diagram.type)) warnings.push(problem('walks-not-here', 'Walks are for state and ER diagrams: not read.'));
+  if (sections.scenarios.length && !SCENARIO_TYPES.has(diagram.type)) warnings.push(problem('scenarios-not-here', 'Scenarios are for state and ER diagrams: not read.'));
   // ## Look: the look a flowchart opens in (WO-38); the reader can still switch
   let look = null;
   if (sections.looks) {
@@ -273,38 +276,39 @@ function parsePart(text, fileName, shared) {
     // planned changes anywhere in the diagram: the Changes colour-by is offered
     hasPlan: Object.values(byId).some((n) => n.plan) || infra.some(({ n }) => n.plan) || views.some((x) => x.relations.some((r) => r.plan)),
     ...(diagram.type === 'sequence' ? { playsOver } : {}), notesText: sections.details || '',
-    walks: WALK_TYPES.has(diagram.type) ? sections.walks : [],
+    scenarios: SCENARIO_TYPES.has(diagram.type) ? sections.scenarios : [],
+    walkthroughs: sections.walkthroughs,
     ...(look ? { look } : {}),
     ...(renames ? { renames } : {}),
   };
 }
 
-// a box diagram (flowchart, state): sequences and walks play over its views
+// a box diagram (flowchart, state): sequences and scenarios play over its views
 const isBoxes = (m) => !!DIAGRAMS.find((d) => d.type === m.type)?.boxes;
 
-// Each walk of a state or ER diagram (model/walks.js) becomes a further diagram of the
-// file: a sequence over the diagram's own view, anchored `<diagram anchor>-walk-<name>`,
-// marked walk: true (the player and the lists name it a walk), with walkOf (its
-// diagram's anchor, null for the first) and walkName.
-function addWalks(main, fileName) {
+// Each scenario of a state or ER diagram (model/scenarios.js) becomes a further diagram of the
+// file: a sequence over the diagram's own view, anchored `<diagram anchor>-scenario-<name>`,
+// marked scenario: true (the player and the lists name it a scenario), with scenarioOf (its
+// diagram's anchor, null for the first) and scenarioName.
+function addScenarios(main, fileName) {
   const mainAnchor = anchorOf(main.title);
   for (const m of [main, ...main.parts.values()]) {
-    for (const walk of m.walks || []) {
+    for (const scenario of m.scenarios || []) {
       if (!m.root || !m.views[0]) continue;
-      const steps = readWalk(m, walk, m.warnings);
+      const steps = readScenario(m, scenario, m.warnings);
       if (!steps.length) continue;
-      const anchor = `${m.anchor || mainAnchor}-walk-${anchorOf(walk.name)}`;
-      if (main.parts.has(anchor)) { m.warnings.push(problem('walk-twice', `Two walks are named "${walk.name}": only the first is used.`)); continue; }
+      const anchor = `${m.anchor || mainAnchor}-scenario-${anchorOf(scenario.name)}`;
+      if (main.parts.has(anchor)) { m.warnings.push(problem('scenario-twice', `Two scenarios are named "${scenario.name}": only the first is used.`)); continue; }
       // a step to the many side of a relationship (the type says: an ER diagram's fansOut)
       const many = DIAGRAMS.find((d) => d.type === m.type)?.fansOut || (() => false);
-      const part = parsePart(walkText(m, walk, steps, m.anchor || mainAnchor, many), fileName, null);
+      const part = parsePart(scenarioText(m, scenario, steps, m.anchor || mainAnchor, many), fileName, null);
       if (!part.root) continue;
       part.anchor = anchor;
-      part.walk = true;
-      part.walkOf = m === main ? null : m.anchor;
-      part.walkName = walk.name;
+      part.scenario = true;
+      part.scenarioOf = m === main ? null : m.anchor;
+      part.scenarioName = scenario.name;
       part.sequence.messages.forEach((msg, i) => { msg.connectionId = steps[i]?.rel.eid; });
-      part.walkVerb = m.type === 'state' ? 'moves to' : 'joins';
+      part.scenarioVerb = m.type === 'state' ? 'moves to' : 'joins';
       main.parts.set(anchor, part);
     }
   }

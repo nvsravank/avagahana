@@ -1,4 +1,4 @@
-<!-- expect: walk-not-step -->
+<!-- expect: scenario-not-step -->
 # Sample
 
 ```mermaid
@@ -8,5 +8,5 @@ stateDiagram-v2
   b --> [*]
 ```
 
-## Walks: Backwards
+## Scenario: Backwards
 - b --> a : no such transition

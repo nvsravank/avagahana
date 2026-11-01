@@ -37,7 +37,7 @@ stateDiagram-v2
   end note
 ```
 
-## Walks: Payment fails twice
+## Scenario: Payment fails twice
 
 - [*] --> Pending : The order is placed and waits for payment.
 - Pending --> Charging : The shopper submits the card.
@@ -48,9 +48,9 @@ stateDiagram-v2
 - Charging --> check : The gateway answers again.
 - check --> Retrying : Declined again.
 - Retrying --> Failed : No retries left: the order gives up.
-- Failed --> [*] : The walk ends, and the card hold is still in place.
+- Failed --> [*] : The scenario ends, and the card hold is still in place.
 
-## Walks: Happy path
+## Scenario: Happy path
 
 - [*] --> Pending : The order is placed.
 - Pending --> Charging : The shopper submits the card.

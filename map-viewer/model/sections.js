@@ -1,9 +1,9 @@
 // sections.js — the Markdown sections after a map's diagram block, shared by every
 // diagram type: `## Details` (notes), `## Icons` (the icon legend), `## Node icons`
 // (icons for nodes whose diagram has no ::icon line), `## Classes` (what classes mean:
-// model/classes.js), `## Relations[: name]` and `## Deployment: <env>[, <env>]`
+// model/classes.js), `## Relations`, `## Perspective: <name>` and `## Deployment: <env>[, <env>]`
 // (model/deployments.js), after a sequence `## Plays over` (the views it plays over), and
-// after a state or ER diagram `## Walks: <name>` (model/walks.js), and `## Look: <look>`
+// after a state or ER diagram `## Scenario: <name>` (model/scenarios.js), `## Walkthrough: <name>` (model/walkthroughs.js), and `## Look: <look>`
 // (the look a flowchart opens in, WO-38), and after an ER diagram `## Renames` (columns
 // renamed since the earlier version, diagrams/er/connections.js).
 import { parseIconCodes, normalizeIconCode } from './icon-codes.js';
@@ -11,10 +11,10 @@ import { problem } from './problem.js';
 import { takeMain, MAIN } from './main-icon.js';
 
 // -> {details, icons, nodeIcons, playsOver, relations: [{name, text}], deployments: [{names, text}],
-//     walks: [{name, text}]}
+//     scenarios: [{name, text}], walkthroughs: [{name, text}]}
 //    (a relation name null = unnamed)
 export function splitSections(after) {
-  const out = { relations: [], deployments: [], walks: [], joins: [] };
+  const out = { relations: [], deployments: [], scenarios: [], joins: [], walkthroughs: [] };
   const re = /^##\s+(.+?)\s*$/gm;
   const heads = [];
   let m;
@@ -27,18 +27,21 @@ export function splitSections(after) {
     if (h.name === 'classes') out.classes = text;
     if (h.name === 'plays over') out.playsOver = text;
     if (h.name === 'renames') out.renames = text;
-    const rel = h.title.match(/^relations\s*(?::\s*(.+))?$/i);
-    if (rel) out.relations.push({ name: rel[1] ? rel[1].trim() : null, text });
+    if (/^relations$/i.test(h.title)) out.relations.push({ name: null, text });
+    const persp = h.title.match(/^perspective\s*:\s*(.+)$/i);
+    if (persp) out.relations.push({ name: persp[1].trim(), text });
     const join = h.title.match(/^joins\s*:\s*(.+)$/i);
     if (join) out.joins.push({ name: join[1].trim(), text });
     const dep = h.title.match(/^deployment\s*:\s*(.+)$/i);
     if (dep) out.deployments.push({ names: dep[1].split(',').map((x) => x.trim()).filter(Boolean), text });
     const look = h.title.match(/^look\s*:\s*(.*)$/i);
     if (look) (out.looks ||= []).push(look[1].trim().toLowerCase());
-    const walk = h.title.match(/^walks?\s*:\s*(.+)$/i);
-    if (walk) {
-      const [name, view, extra] = walk[1].split('|').map((x) => x.trim());
-      out.walks.push({ name, ...(view ? { view } : {}), invalidHeader: !name || extra != null || (walk[1].includes('|') && !view), text });
+    const walkthrough = h.title.match(/^walkthrough\s*:\s*(.+)$/i);
+    if (walkthrough) out.walkthroughs.push({ name: walkthrough[1].trim(), text });
+    const scenario = h.title.match(/^scenario\s*:\s*(.+)$/i);
+    if (scenario) {
+      const [name, view, extra] = scenario[1].split('|').map((x) => x.trim());
+      out.scenarios.push({ name, ...(view ? { view } : {}), invalidHeader: !name || extra != null || (scenario[1].includes('|') && !view), text });
     }
   });
   return out;

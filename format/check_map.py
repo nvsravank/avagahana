@@ -18,7 +18,7 @@ What it checks (the format: docs/map-format.md):
   `## Classes`, `## Details` notes, `## Relations[: name]` views, `## Deployment: <env>`
   blocks, several diagrams per file and the `click` links between them, a sequence's
   `## Plays over` views (every participant shown there, an arrow for every message) and
-  `%% id:` message ids, a state or ER diagram's `## Walks: <name>` (check_walks.py).
+  `%% id:` message ids, a state or ER diagram's `## Scenario: <name>` (check_scenarios.py).
   Every further diagram is reachable from the first by links.
 - Every reference resolves: node and arrow ids, icon codes (map-viewer/icons.json, the
   bundled Phosphor icons, the cloud icon sets in map-viewer/vendor-icons.json, the map's legend), diagram anchors, maps that relations link
@@ -40,7 +40,7 @@ from check_state import read_state  # noqa: E402
 from check_er import read_er  # noqa: E402
 from check_common import icon_codes
 from check_connections import check_connections, check_renames
-from check_walks import check_walks  # noqa: E402
+from check_scenarios import check_scenarios  # noqa: E402
 from check_vendor import VENDOR_CODE, nearest, vendor_ok  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -59,9 +59,9 @@ SHAPES = [
 BUILT_IN_CLASSES = {"person", "database", "external", "added", "changed", "removed"}
 # planned changes (map-viewer/model/classes.js): built in, one per node or arrow
 CHANGE_CLASSES = ("added", "changed", "removed")
-RESERVED = re.compile(r"^(relations|joins|renames|classes|details|notes|icons|node icons)\b", re.I)
+RESERVED = re.compile(r"^(relations|perspective|scenario|walkthrough|joins|renames|classes|details|notes|icons|node icons)\b", re.I)
 DIRS = {"LR", "RL", "TB", "TD", "BT"}
-# box diagrams: their own arrows are the default view; sequences and walks play over them
+# box diagrams: their own arrows are the default view; sequences and scenarios play over them
 BOX_KINDS = {"flowchart", "state", "er"}
 LARGE_MAP = 5000   # the viewer draws more, with a warning (map-viewer/model/map.js)
 NODE_ID = r"[A-Za-z][\w-]*"
@@ -79,17 +79,22 @@ def anchor_of(heading):
 
 def seq_names(text):
     """The names --seq takes for this map (render.py, show.py): each sequence's heading
-    anchor, `main` when the first diagram is one, and each walk as `<diagram anchor>-walk-<name>`
+    anchor, `main` when the first diagram is one, and each scenario as `<diagram anchor>-scenario-<name>`
     (map-viewer/model/map.js), the first diagram's anchor being its # title's."""
     title = re.search(r"^# (.+)$", text, re.M)
     current = heading_anchor = anchor_of(title.group(1)) if title else ""
     names, first = set(), True
+    in_walkthrough = False   # its ### stops are no diagram or scenario heading
     for t in re.finditer(r"^(#{2,6})\s+(.+)$|^```mermaid[^\n]*\n([\s\S]*?)\n```", text, re.M):
         if t.group(2) is not None:
             heading = t.group(2).strip()
-            walk = re.match(r"walks\s*:\s*([^|]+)", heading, re.I)
-            if walk:
-                names.add(f"{current}-walk-{anchor_of(walk.group(1))}")
+            if len(t.group(1)) == 2:
+                in_walkthrough = bool(re.match(r"walkthrough\s*:", heading, re.I))
+            if in_walkthrough:
+                continue
+            scenario = re.match(r"scenario\s*:\s*([^|]+)", heading, re.I)
+            if scenario:
+                names.add(f"{current}-scenario-{anchor_of(scenario.group(1))}")
             elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|joins|renames)\b", heading, re.I):
                 heading_anchor = anchor_of(heading)
             continue
@@ -538,8 +543,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
-        if not single and not re.match(r"^(relations\s*(:.*)?|joins\s*:.*|deployment\s*:.*|walks?\s*:.*|look\s*:.*)$", title, re.I):
-            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations[: name], Deployment: <env>, Walks: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over, Renames), and no Mermaid block follows")
+        if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*)$", title, re.I):
+            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over, Renames), and no Mermaid block follows")
         if key == "plays over" and kind != "sequence":
             m.report(hl, "plays-over-not-sequence", "## Plays over is for a sequence diagram")
     # ## Look: the look a flowchart opens in (WO-38)
@@ -613,7 +618,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
                 m.report(hl, 'rename-syntax', 'Renames are for ER diagrams')
 
     # relation views
-    walk_views = {"relations": ("Relations", list(read["arrows"]))}
+    scenario_views = {"relations": ("Relations", list(read["arrows"]))}
     views = {}
     view_eids = set(eids)
     view_rels = {}   # name -> the view's arrows [(from, to)], for sequences that play over it
@@ -622,7 +627,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         views["relations"] = ("Relations", part["line"])
         view_rels["relations"] = ("Relations", [(a["from"], a["to"]) for a in read["arrows"]])
     for title, body, hl in secs:
-        rm = re.fullmatch(r"relations\s*(?::\s*(.+))?", title, re.I)
+        rm = re.fullmatch(r"relations|perspective\s*:\s*(.+)", title, re.I)
         if not rm or kind == "er":
             continue
         name = (rm.group(1) or "Relations").strip()
@@ -643,7 +648,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             count += 1
             frm, eid, to = mm.group(1), mm.group(2), mm.group(4)
             label_lines(m, ln, mm.group(5), "relation")
-            walk_views.setdefault(name.lower(), (name, []))[1].append({"from": frm, "to": to, "eid": eid})
+            scenario_views.setdefault(name.lower(), (name, []))[1].append({"from": frm, "to": to, "eid": eid})
             if cm and cm.group(1) in CHANGE_CLASSES:
                 view_plans.append((frm, to, cm.group(1), ln))
             if "#" not in to:
@@ -691,9 +696,9 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             view_rels[key] = (name, [(r['from'], r['to']) for r in arrows])
         view_eids.update(read['eids'])
 
-    part.setdefault("connection_views", walk_views)
+    part.setdefault("connection_views", scenario_views)
     part["view_rels"] = view_rels
-    check_walks(m, part, secs)
+    check_scenarios(m, part, secs)
 
     # a sequence's Plays over lines (checked against the other diagrams in check())
     part["plays_over"] = []
@@ -1110,6 +1115,61 @@ def check_links(m, parts, anchors):
 
 # ---------- a file ----------
 
+# walkthroughs: `## Walkthrough: <name>` sections, each stop a `### <Kind>: <name>` heading
+# that must name an item of the map (model/walkthroughs.js reads the same)
+WALK_KINDS = {"diagram": "diagram", "perspective": "view", "join": "join", "deployment": "deployment",
+              "scenario": "scenario", "sequence": "sequence"}
+
+
+def check_walkthroughs(m, src, parts, title):
+    """Every walkthrough: a name used once, at least one stop, each stop a known kind
+    naming an item the map has (a diagram's heading or title, a perspective, a join, a
+    deployment environment, a scenario, a sequence diagram)."""
+    names = {k: set() for k in set(WALK_KINDS.values())}
+    if title:
+        names["diagram"].add(title.lower())
+    for p in parts[1:]:
+        if p.get("heading"):
+            names["diagram"].add(p["heading"].strip().lower())
+            if p["kind"] == "sequence":
+                names["sequence"].add(p["heading"].strip().lower())
+    heads = list(re.finditer(r"^##\s+(.+?)\s*$", src, re.M))
+    for h in heads:
+        t = h.group(1)
+        for key, pat in (("view", r"perspective\s*:\s*(.+)"), ("join", r"joins\s*:\s*(.+)"),
+                         ("scenario", r"scenario\s*:\s*([^|]+)")):
+            mm = re.fullmatch(pat, t, re.I)
+            if mm:
+                names[key].add(mm.group(1).strip().lower())
+        mm = re.fullmatch(r"deployment\s*:\s*(.+)", t, re.I)
+        if mm:
+            names["deployment"].update(x.strip().lower() for x in mm.group(1).split(",") if x.strip())
+    seen = {}
+    for i, h in enumerate(heads):
+        mm = re.fullmatch(r"walkthrough\s*:\s*(.+)", h.group(1), re.I)
+        if not mm:
+            continue
+        line = m.line_at(h.start())
+        name = mm.group(1).strip()
+        end = heads[i + 1].start() if i + 1 < len(heads) else len(src)
+        if name.lower() in seen:
+            m.report(line, "walkthrough-twice", f'two walkthroughs are named "{name}" (first on line {seen[name.lower()]})')
+        seen.setdefault(name.lower(), line)
+        stops = list(re.finditer(r"^###\s+(.+?)\s*$", src[h.end():end], re.M))
+        if not stops:
+            m.report(line, "walkthrough-empty", f'walkthrough "{name}" has no stops')
+        for st in stops:
+            sline = m.line_at(h.end() + st.start())
+            sm = re.fullmatch(r"([A-Za-z]+)\s*:\s*(.+)", st.group(1))
+            kind = sm.group(1).lower() if sm else None
+            if not sm or kind not in WALK_KINDS:
+                m.report(sline, "walkthrough-stop-kind", f'walkthrough "{name}": stop "{st.group(1)}" must start with Diagram, Perspective, Deployment, Scenario, Join or Sequence')
+                continue
+            want = WALK_KINDS[kind]
+            if sm.group(2).strip().lower() not in names[want]:
+                m.report(sline, "walkthrough-stop-unknown", f'walkthrough "{name}": {kind} "{sm.group(2).strip()}" is not in this map')
+
+
 def check(path):
     path = Path(path)
     m = Map(path, path.read_text(encoding="utf-8"))
@@ -1188,6 +1248,7 @@ def check(path):
     if parts:
         parts[0]["anchor_self"] = anchor_of(tm.group(1)) if tm else None
         check_links(m, parts, anchors)
+    check_walkthroughs(m, src, parts, tm.group(1).strip() if tm else None)
     m.problems.sort(key=lambda x: x[0])
     return m.problems
 

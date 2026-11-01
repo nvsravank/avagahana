@@ -13,8 +13,8 @@ python3 "<plugin root>/relay-server/render.py" "<Topic>/<Name>.md" --maps-dir "<
 It prints:
 
 - `STATUS=rendered FILE=... [REPORT=...] [WARNING=...]`: the file is written. A `--seq` the
-  map does not have is drawn without it; the warning lists the names it has (a walk is
-  `<diagram anchor>-walk-<name>`).
+  map does not have is drawn without it; the warning lists the names it has (a scenario is
+  `<diagram anchor>-scenario-<name>`).
 - `STATUS=none URL=...`: no page is open. Open the URL (or give it to the user), then
   run it again.
 - `STATUS=not_running`: start the server first (`serve_maps.py`, as for showing a map).
@@ -31,11 +31,11 @@ The same flags as `show.py`, plus the picture's own:
 - `--highlight a,b` these nodes in colour, everything else grey: the part the text
   talks about.
 - `--crop <id>` that box and what it connects to, instead of the whole diagram.
-- `--seq <anchor> --step N` a sequence (or walk) at a step; `--seq <anchor> --steps all
+- `--seq <anchor> --step N` a sequence (or scenario) at a step; `--seq <anchor> --steps all
   --out <folder>` one file per step (`step-01.svg`, ...), each with its step lit: a
   storyboard. `--steps 3-5` for some.
 - `--before <file>` an earlier version of the map: the picture carries the ringed +, ~
-  and − marks of what differs; `--perspective before` draws the earlier file instead
+  and − marks of what differs; `--edition before` draws the earlier file instead
   (removed things marked), `after` (the default) the map (added things marked). With
   `--report` the report's `changes` lists what changed, in the view drawn and in each view
   and deployment: the findings of a review, as data. See `compare.md`.

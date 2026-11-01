@@ -85,11 +85,11 @@ export async function testWholeMap(check) {
     const before = await map('checkout-release-before.md');
     const v = mount(host, { storageKey: null, since: before, sinceLabel: 'last release', before });
     await v.load(after, 'checkout-release-after.md');
-    await v.setState({ perspective: 'before', env: 'Production' });
+    await v.setState({ edition: 'before', env: 'Production' });
     await wait(50);
     const p = payloadOf(await v.snapshot());
     check('snapshot: a host\'s since with its label', p.options.marks === true && p.options.since === before && p.options.sinceLabel === 'last release');
-    check('snapshot: the earlier version, Before shown', p.options.before === before && p.options.state.perspective === 'before', JSON.stringify(p.options.state));
+    check('snapshot: the earlier version, Before shown', p.options.before === before && p.options.state.edition === 'before', JSON.stringify(p.options.state));
     check('snapshot: the deployment', p.options.state.env === 'Production', JSON.stringify(p.options.state));
     check('snapshot: the cloud icons it names', Object.keys(p.files).some((f) => /^vendor\/(aws|azure|gcp)\//.test(f)) && JSON.parse(p.files['vendor-icons.json']).sets);
     v.destroy();

@@ -7,7 +7,7 @@ reader's open atlas page (no headless browser), without moving what the reader s
                                  [--mode MODE] [--colour-by category|level|class|changes]
                                  [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
                                  [--seq ANCHOR [--step N | --steps all|3-5]]
-                                 [--before FILE [--perspective before|after]] [--draft FILE]
+                                 [--before FILE [--edition before|after]] [--draft FILE]
                                  [--theme ID] [--appearance light|dark] [--look outline|poster]
                                  [--width PX | --scale X] [--background theme|none]
                                  [--report] [--port N] [--maps-dir DIR]
@@ -146,7 +146,7 @@ def main(argv=None) -> int:
     ap.add_argument("--step", type=int, help="the sequence's step, from 1")
     ap.add_argument("--steps", help="one file per step: all, or a range like 3-5 (--out is a folder)")
     ap.add_argument("--before", help="an earlier version of the map (any file): the picture marks what differs")
-    ap.add_argument("--perspective", choices=("before", "after"), help="with --before: draw the earlier file (before) or the map (after, the default)")
+    ap.add_argument("--edition", choices=("before", "after"), help="with --before: draw the earlier file (before) or the map (after, the default)")
     ap.add_argument("--draft", help="draw this file (any file) in the map's place: a change tried before it is made")
     ap.add_argument("--theme", help="a theme id (themes.py list)")
     ap.add_argument("--appearance", choices=("light", "dark"))
@@ -191,7 +191,7 @@ def main(argv=None) -> int:
                                 "mode": args.mode, "colourBy": args.colour_by, "expand": expand,
                                 "close": ids(args.close), "highlight": ids(args.highlight), "crop": args.crop,
                                 "seq": args.seq, "step": args.step if args.seq and not args.steps else None,
-                                "perspective": args.perspective if args.before else None}.items() if v is not None}
+                                "edition": args.edition if args.before else None}.items() if v is not None}
     # an unknown --seq: the page quietly draws the diagram without it; the checker's names say so
     warnings = []
     if args.seq:

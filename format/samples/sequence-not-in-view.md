@@ -7,7 +7,7 @@ flowchart LR
   c
 ```
 
-## Relations: Calls
+## Perspective: Calls
 
 - a --> b : calls
 

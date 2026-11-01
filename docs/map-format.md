@@ -254,21 +254,22 @@ diagram they are its arrows.
   maps root). Such a relation is not drawn; it is listed in the node's popover and opens
   that map drilled into that node.
 
-## Relation views: `## Relations: <name>`
+## Relation views: `## Perspective: <name>`
 
 A map can have several sets of relations over the same nodes ("calls", "data flow",
-"ownership"). `## Relations` is the default view; each `## Relations: <name>` section
+"ownership"). `## Relations` is the default view; each `## Perspective: <name>` section
 is a named view, in file order. In a box diagram, the arrows inside the block are the
 default view. Readers see the default view as **Overview** (the view picker, the atlas
 bar); its heading stays `## Relations`, and links and `setState` may name it either way.
 
 ```
-## Relations: Data flow
+## Perspective: Data flow
 - cart --> gw : order
 - psp --> payh : payment result
 ```
 
-- The viewer shows a view picker when a map has more than one view. Picking one shows
+- The viewer's picker lists the whole map: walkthroughs first, then every diagram with
+  its perspectives, joins, deployments and scenarios under it. Picking a perspective shows
   its relations; a box diagram is laid out again for it, showing only the boxes its
   arrows use and the boxes round them. Search looks through the whole map: a hit the
   current view leaves out opens the first view that shows it (a node no view shows is
@@ -334,7 +335,7 @@ flowchart LR
   class with `class <id> <name>` (Mermaid 11). A line class with a meaning (built in, or
   a line in `## Classes`) colours the line and its ends from the theme and is listed
   under "Lines" in the key; a `classDef` shapes it (dashes, width). Lines without a
-  class keep the default colour. In a `## Relations: <name>` view, end a line with
+  class keep the default colour. In a `## Perspective: <name>` view, end a line with
   `:::<name>`: `- orders --> payments : charge :::money`. `<id>@{ … }` lines are skipped.
 - **Classes**: `class <ids> <name>` (or `<id>:::<name>`) gives a node a meaning; see
   "Classes" below. A `classDef` may shape the outline of the nodes and boxes that name
@@ -480,7 +481,7 @@ flowchart LR
   click ord "#order-ideas"
 ```
 
-## Relations: Data flow
+## Perspective: Data flow
 - web --> ord : orders
 
 ## Order ideas
@@ -507,8 +508,8 @@ mindmap
 - Every further diagram must be reachable from the first by links: a `click`, a link in
   a note (`[t](#anchor)`, below), or a sequence's `## Plays over` (from the diagram it
   plays over). Chains count (context, then containers, then components). One that is
-  not reachable is a problem (`diagram-unreachable`); the viewer still lists it in the
-  first diagram's view picker under "Not linked".
+  not reachable is a problem (`diagram-unreachable`); the viewer still lists it in its
+  picker and the atlas with the other diagrams (no heading of its own).
 - A node may link to several diagrams: one `click` line each. Links are grouped by
   diagram type, preserving the authored order within each type.
   Mermaid itself keeps only the last, so the block still renders.
@@ -566,7 +567,7 @@ flowchart LR
   those holding none go last.
 - Warnings keep environments in step: a bare id that is no node, and a node placed in
   some environments but not in others.
-- The viewer lists the environments in the view picker under "Where it runs". A
+- The viewer lists the environments in its picker under their diagram, as deployments. A
   deployment shows the diagram's own arrows and every node it places; switching
   glides the same nodes to their new places. A node's page says where it runs in each
   environment.
@@ -858,13 +859,13 @@ A column that was renamed says so in the later file, new name first:
   unequal column-list lengths are checker errors (`relation-syntax`). The viewer skips
   invalid definitions and reports problems while drawing valid content.
 
-## Walks: `## Walks: <name>`
+## Scenario: `## Scenario: <name>`
 
 A path through a state or ER diagram that an agent writes to tell a story: how an order
 gets stuck, how a query joins its tables. Played over the diagram like a sequence.
 
 ````markdown
-## Walks: Payment fails twice
+## Scenario: Payment fails twice
 
 - [*] --> Pending : The order is placed and waits for payment.
 - Pending --> Charging : The shopper submits the card.
@@ -872,23 +873,59 @@ gets stuck, how a query joins its tables. Played over the diagram like a sequenc
 - check --> Retrying : Declined. The order waits and tries again.
 ````
 
-- After a state or ER diagram's block, one section per walk, a step per line:
+- After a state or ER diagram's block, one section per scenario, a step per line:
   `- A --> B : what happens`. In a state diagram a step is a transition, its way round
   (`[*]` for a start or end dot); in an ER diagram, a relationship, either way (a join).
-  A step not in the diagram is a problem (`walk-not-step`); a step that does not start
-  where the last ended is a warning (`walk-gap`).
+  A step not in the diagram is a problem (`scenario-not-step`); a step that does not start
+  where the last ended is a warning (`scenario-gap`).
 - Select a specific connection with `- A connection-id@--> B : explanation`.
   A table-only step must identify exactly one connection; missing or ambiguous
-  selections are checker errors (`walk-not-step`), never a first-match fallback.
-  Use `## Walks: <name> | <view name>` to walk a named relationship or join view;
+  selections are checker errors (`scenario-not-step`), never a first-match fallback.
+  Use `## Scenario: <name> | <view name>` to scenario a named relationship or join view;
   otherwise the default Relations view is used. The viewer skips invalid steps and
   reports problems. Join-only equalities do not claim a known fan-out.
-- The viewer offers each walk on the play button. Playing greys the diagram and lights
+- The viewer offers each scenario on the play button. Playing greys the diagram and lights
   each step's states or tables and its line in turn (a numbered step, the transition's
   event or the relationship's label), with the step's words in the side panel. A step
-  in an ER walk that reaches the many side of a relationship adds "Rows multiply here".
-- A walk is a further diagram of the file, anchored `<diagram anchor>-walk-<walk name
+  in an ER scenario that reaches the many side of a relationship adds "Rows multiply here".
+- A scenario is a further diagram of the file, anchored `<diagram anchor>-scenario-<scenario name
   anchor>` (`seq=` in links and `POST /api/show`).
+
+## Walkthrough: `## Walkthrough: <name>`
+
+A story for one audience (a security review, a new joiner) over the map's own items: its
+diagrams, perspectives, deployments, scenarios, joins and sequences. It belongs to the
+file, not to one diagram: write it after any diagram's sections (the usual place is the
+end of the file). The order is the order written. The reader moves through it with
+Previous and Next in a panel on the right; nothing plays by itself. Exploring inside a
+stop (a box opened, a node's page, another mode) stays on it; opening another stop's place
+moves to that stop; opening any other place is off the path, with Return to the stop.
+
+Each stop is a `### <Kind>: <name>` heading, with its note as Markdown underneath:
+
+- `Diagram` a diagram by its heading (or the `# Title` of the first one).
+- `Perspective` a relation view, `## Perspective: <name>`.
+- `Deployment` an environment, `## Deployment: <env>`.
+- `Scenario` a scenario, `## Scenario: <name>`.
+- `Join` an ER join view, `## Joins: <name>`.
+- `Sequence` a sequence diagram, by its heading.
+
+```markdown
+## Walkthrough: Payments for the security team
+
+### Diagram: Shop platform
+
+Start with the whole system. Card data leaves the shop only on its way to Payments.
+
+### Perspective: Checkout (synchronous)
+
+The calls on the way to payment, and which of them wait for an answer.
+```
+
+The name after the colon must be an item of this map, spelled as its heading. The note is
+plain Markdown (links, emphasis, lists); raw HTML is not shown. Several walkthroughs may
+share a map, one section each. Checker problems: `walkthrough-empty`, `walkthrough-twice`,
+`walkthrough-stop-kind`, `walkthrough-stop-unknown`.
 
 ## The node's page
 

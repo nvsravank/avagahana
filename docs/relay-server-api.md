@@ -68,7 +68,7 @@ python3 relay-server/serve_maps.py [--port N] [--maps-dir DIR] [--map <rel path>
 | `GET /api/map?p=<path>` | Raw text of one map, `text/plain; charset=utf-8`. `404` if not a map. |
 | `GET /api/events` | Server-Sent Events, below. |
 | `GET /api/before?p=<path>` | The map's earlier version that a show sent (`before`), as text; `404` when there is none, or `204` (empty) when the request adds `&empty=1` (added in WO-39). Added in WO-34. |
-| `POST /api/show` | Body `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?}`. Tells every open page to show that map and node; `part` names one of the file's further diagrams by its heading's anchor (added in WO-07); `page` opens that node's page (added in WO-08); `seq` plays a sequence by its heading's anchor (`main` for the first diagram) over the view it is linked to, at `step` (a whole number from 1); `mode` may be `lifelines` (added in WO-12). `colourBy` (`category`, `level`, `class` or `changes`) opens the map in that colouring, e.g. `changes` for a plan (added in WO-13). `before`: the map's earlier version as text (2 MB at most), kept in the server's memory for that map until another, `null` (forget it) or a restart; `perspective` (`before` or `after`) which of the two to show (added in WO-34). `{delivered: <number of pages told>}`; `404` for no such map, `400` for a bad field. Stores nothing else. |
+| `POST /api/show` | Body `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?}`. Tells every open page to show that map and node; `part` names one of the file's further diagrams by its heading's anchor (added in WO-07); `page` opens that node's page (added in WO-08); `seq` plays a sequence by its heading's anchor (`main` for the first diagram) over the view it is linked to, at `step` (a whole number from 1); `mode` may be `lifelines` (added in WO-12). `colourBy` (`category`, `level`, `class` or `changes`) opens the map in that colouring, e.g. `changes` for a plan (added in WO-13). `before`: the map's earlier version as text (2 MB at most), kept in the server's memory for that map until another, `null` (forget it) or a restart; `edition` (`before` or `after`) which of the two to show (added in WO-34). `{delivered: <number of pages told>}`; `404` for no such map, `400` for a bad field. Stores nothing else. |
 | `GET /api/themes` | `{themes, settings, problems}`: the maps folder's `.themes/` (below). `themes`: each `<id>.json` with `id` (its file name) and `label` (its `name`) set and its font faces as `{weight, style, url}`; `settings`: `{builtIn, default, logo}` with defaults filled in; `problems`: files it could not read. Empty lists when there is no `.themes/`. Added in WO-32. |
 | `GET /api/theme-file?f=<file>` | A font file (`.woff2 .woff .ttf .otf`) in `.themes/`; `404` for anything else. Added in WO-32. |
 | `POST /api/render` | Body `{path, state?, theme?, appearance?, look?, format?, width? or scale?, background?, report?, before?, text?}`: one open page draws the map and sends the file back (below). Added in WO-32; `text` in WO-37, `look` in WO-38. |
@@ -146,7 +146,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
                                [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID] [--mode MODE] [--colour-by NAME]
                                [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
                                [--seq ANCHOR [--step N | --steps all|3-5]]
-                               [--before FILE [--perspective before|after]] [--draft FILE]
+                               [--before FILE [--edition before|after]] [--draft FILE]
                                [--theme ID] [--appearance light|dark] [--look outline|poster] [--width PX | --scale X] [--background theme|none]
                                [--report] [--port N] [--maps-dir DIR]
 ```
@@ -167,7 +167,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   data, width, height, scaledDown, report?, steps?, problems?, draft?}`; `{status: "none"}`
   with no page; `422 {error}` when the page could not draw it; `400` for a bad field.
 - `state` takes the show fields (`part`, `view`, `env`, `focus`, `node`, `page`, `mode`,
-  `seq`, `step`, `colourBy`, `perspective`) and the picture's (`expand`: a whole number or `"all"`;
+  `seq`, `step`, `colourBy`, `edition`) and the picture's (`expand`: a whole number or `"all"`;
   `close`, `highlight`: node ids; `crop`: a node id). `format` `svg` (default) or `png`;
   `width` 16 to 16,000 px, or `scale` 0.1 to 8; `background` `theme` or `none`;
   `appearance` `light` or `dark`; `theme` a theme id (an unknown one: the default, and
@@ -176,8 +176,8 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   its own; without it, the map's `## Look:` line, else Outline; WO-38).
 - `steps` (with `seq`): the sequence's number of steps.
 - `before`: the map's earlier version as text; the picture marks what differs (and `report` gets `changes`), on the map
-  or (`state.perspective: "before"`) on the earlier file. `render.py --before FILE
-  [--perspective before|after]` (added in WO-34). Plain pictures of two versions need
+  or (`state.edition: "before"`) on the earlier file. `render.py --before FILE
+  [--edition before|after]` (added in WO-34). Plain pictures of two versions need
   nothing new: render each file.
 - `text`: a draft, a map's text (2 MB at most) drawn in the map's place; `path` still
   names the map (its folder for links, icons and themes). The agent tries a change on
@@ -202,7 +202,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   folder: `step-01.svg`, `step-02.svg`, … each with its step lit (`--format png` for PNG);
   `FILE=<folder>/step-01.svg..step-08.svg STEPS=8`.
   A `--seq` the map does not have (by the checker's names: a sequence's anchor, `main`,
-  `<diagram anchor>-walk-<name>`) is no failure: the picture is drawn without it and
+  `<diagram anchor>-scenario-<name>`) is no failure: the picture is drawn without it and
   `WARNING=` says so, with the names the map has (added in WO-39).
 - `STATUS=none URL=…`: no page is open; open the URL, then ask again.
 - `STATUS=not_running ERROR=…`: no relay server for this maps folder; start it.

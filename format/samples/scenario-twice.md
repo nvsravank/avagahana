@@ -1,4 +1,4 @@
-<!-- expect: walk-twice -->
+<!-- expect: scenario-twice -->
 # Sample
 
 ```mermaid
@@ -8,8 +8,8 @@ stateDiagram-v2
   b --> [*]
 ```
 
-## Walks: Same
+## Scenario: Same
 - [*] --> a
 
-## Walks: Same
+## Scenario: Same
 - a --> b

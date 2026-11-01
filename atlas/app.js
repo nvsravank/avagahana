@@ -58,8 +58,9 @@ async function mountViewer() {
   picker?.destroy();
   viewer?.destroy();
   viewer = mount(document.getElementById('app'), {
-    // on a phone the bar's chips list every view; wider, the picker is there as before
-    viewPicker: 'wide',
+    // the bar is the navigation (every diagram, walkthrough and what is under them), so the
+    // viewer shows no picker of its own; an exported snapshot, with no bar, keeps it
+    viewPicker: false,
     prefs: first?.prefs,
     // the export's generator tag: the relay's commit
     ...(info?.build ? { version: info.build } : {}),
@@ -77,7 +78,7 @@ async function mountViewer() {
   picker = mapPanel(viewer.slot, {
     // a name opens that map with no Before (the open map's own name too: Before cleared)
     onPick: (path) => {
-      if (path !== shown?.path || !viewer.state.perspective) { goTo(path, {}); return; }
+      if (path !== shown?.path || !viewer.state.edition) { goTo(path, {}); return; }
       picked = null;
       viewer.setBefore(null);
     },
@@ -96,7 +97,7 @@ async function mountViewer() {
     const m = maps.find((x) => x.path === path);
     shown = { path, mtime: m?.mtime, size: m?.size, bt: stamp(picked) };
     picker.setCurrent(path, title);
-    picker.setComparing(!!viewer.state.perspective);
+    picker.setComparing(!!viewer.state.edition);
     bar.setTitle(title);
     bar.setState(viewer.state);
     document.title = `${title} · Avagahana`;
@@ -106,7 +107,7 @@ async function mountViewer() {
   // state -> URL, without a history entry (opening another map adds one, in goTo)
   viewer.on('state', (s) => {
     bar.setState(s);
-    picker.setComparing(!!s.perspective);
+    picker.setComparing(!!s.edition);
     if (shown) history.replaceState(null, '', buildHash(shown.path, s, null, picked));
   });
 }
@@ -315,7 +316,7 @@ async function onChange() {
 // points at the node.
 async function onShow(d) {
   const state = {};
-  for (const k of ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'step', 'perspective']) if (d[k]) state[k] = d[k];
+  for (const k of ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'step', 'edition']) if (d[k]) state[k] = d[k];
   const prefs = d.colourBy || d.theme ? { ...(d.colourBy ? { colourBy: d.colourBy } : {}), ...(d.theme ? { theme: d.theme } : {}) } : null;
   if (d.path === shown?.path) {
     picker.close();

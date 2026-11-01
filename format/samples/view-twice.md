@@ -7,10 +7,10 @@ mindmap
     n2("Branch")
 ```
 
-## Relations: A
+## Perspective: A
 
 - n1 --> n2
 
-## Relations: A
+## Perspective: A
 
 - n2 --> n1

@@ -41,6 +41,8 @@ export const UI = {
   tables: '<rect x="1" y="3" width="8" height="18" rx="1"/><rect x="15" y="3" width="8" height="18" rx="1"/><path d="M1 8h8M1 13h8M1 17h8M15 8h8M15 13h8M15 17h8M9 11h3v4h3"/>',
   boxes: '<rect x="2.5" y="3.5" width="19" height="17" rx="2"/><rect x="5.5" y="8" width="5" height="4" rx="1"/><rect x="13.5" y="8" width="5" height="4" rx="1"/><rect x="9.5" y="15" width="5" height="3" rx="1"/><path d="M10.5 10h3"/>',
   views: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  // a walkthrough: a winding path between two stops
+  route: '<circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8.2 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.8"/>',
   openOut: '<path d="M7 17 17 7M9 7h8v8"/>',
   // Before and After (WO-34): two versions swapping places; the changes list: rows with + and ~
   // the Before / After switch (WO-42): a rough stone, then the cut diamond
@@ -167,6 +169,25 @@ export function chromeHtml(uid) {
   </div>
 </div>
 <div class="mmv-panel mmv-seq-panel" data-mmv="seqPanel" aria-live="polite" hidden></div>
+<aside class="mmv-panel mmv-stop-panel" data-mmv="stopPanel" aria-label="Walkthrough" hidden>
+  <div class="mmv-stop-head">
+    <span class="mmv-stop-walk" data-mmv="stopWalk"></span>
+    <button class="mmv-pill mmv-icon" data-mmv="stopMin" title="Minimise">${ic('close')}</button>
+  </div>
+  <div class="mmv-stop-count" data-mmv="stopCount"></div>
+  <div class="mmv-stop-kind" data-mmv="stopKind"></div>
+  <h3 class="mmv-stop-title" data-mmv="stopTitle"></h3>
+  <div class="mmv-stop-note" data-mmv="stopNote"></div>
+  <div class="mmv-stop-off" data-mmv="stopOff" role="status" hidden>
+    <span>You are off the path.</span>
+    <button class="mmv-pill" data-mmv="stopBack"></button>
+  </div>
+  <div class="mmv-stop-foot">
+    <button class="mmv-pill" data-mmv="stopPrev">Previous</button>
+    <button class="mmv-pill" data-mmv="stopNext">Next</button>
+  </div>
+</aside>
+<button class="mmv-pill mmv-icon mmv-stop-tab" data-mmv="stopTab" title="Show the walkthrough" aria-label="Show the walkthrough" hidden>${ic('route')}</button>
 
 <div class="mmv-float mmv-tr">
   <div class="mmv-search" data-mmv="search">

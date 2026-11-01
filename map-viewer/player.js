@@ -533,8 +533,8 @@ export function createPlayer(v, h) {
         const tint = m.reply ? 'reply' : 'call';
         putNumber(el('span', `mmv-seq-chip mmv-seq-${tint}${m.back || m.reply ? ' is-reply' : ''}`, null, box), m.num, m.back);
         el('strong', 'mmv-seq-label', m.label || (m.self ? 'to itself' : ''), box);
-        // a walk (model/walks.js) says how it moves: a state moves to the next, a table joins one
-        const verb = seqMap()?.walkVerb;
+        // a scenario (model/scenarios.js) says how it moves: a state moves to the next, a table joins one
+        const verb = seqMap()?.scenarioVerb;
         el('div', 'mmv-seq-who', m.self ? `${name(m.from)}, to itself` : `${name(m.from)} ${verb || (m.reply ? 'replies to' : m.head === 'async' ? 'tells' : 'calls')} ${name(m.to)}`);
         if (m.note) {
           const body = el('div', 'mmv-note-body mmv-seq-note-body');

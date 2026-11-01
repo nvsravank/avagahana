@@ -50,8 +50,8 @@ export async function navigationTests(check) {
     check('atlas: the contents bar shows the logo and word mark, and holds the map name for a phone', bar.classList.contains('atlas-bar') && !bar.querySelector('.atlas-logo').hidden
       && bar.querySelector('.atlas-wordmark') && bar.querySelector('.atlas-mapname')?.textContent === 'A');
     const vroot = w.document.querySelector('#app .mmv');
-    check('atlas: wide, the map list button with the map name is in the viewer; the view picker only wide', vroot.querySelector('.atlas-picker .atlas-pill')?.textContent === 'A' && vroot.classList.contains('mmv-views-wide'));
-    check('atlas: one diagram and nothing else: no chips', !bar.querySelector('.atlas-chip'));
+    check('atlas: wide, the map list button with the map name is in the viewer; no view picker (the bar is the navigation)', vroot.querySelector('.atlas-picker .atlas-pill')?.textContent === 'A' && vroot.querySelector('[data-mmv=viewWrap]').hidden);
+    check('atlas: one diagram and nothing else: no items', !bar.querySelector('.atlas-item'));
     check('atlas: the bar takes the frame colours of the viewer\'s theme', bar.dataset.theme === 'default' && w.getComputedStyle(bar).getPropertyValue('--mmv-frame-bg').trim() !== '');
 
     deferPath = 'a.md';

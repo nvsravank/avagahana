@@ -95,7 +95,7 @@ flowchart TB
   class catalogue,cart,orders,payments,stock,notify service
 ```
 
-## Relations: Checkout (synchronous)
+## Perspective: Checkout (synchronous)
 
 - shopper --> web : buys
 - web --> gateway : place order
@@ -106,7 +106,7 @@ flowchart TB
 - payments --> psp : card charge :::money
 - orders --> orderdb : save order
 
-## Relations: Events (asynchronous)
+## Perspective: Events (asynchronous)
 
 - orders -.-> bus : order placed
 - payments -.-> bus : payment taken
@@ -263,7 +263,7 @@ stateDiagram-v2
 One call to the card provider, with the order's idempotency key, so a retry can never
 charge twice. When and how to retry: [Payment retry ideas](#payment-retry-ideas).
 
-## Walks: Soft decline, then paid
+## Scenario: Soft decline, then paid
 
 - [*] --> Placed : The shopper places the order.
 - Placed --> Validating : The Orders service checks the basket.
@@ -363,11 +363,11 @@ erDiagram
 
 Payment attempts and shipments can be joined on order_id, but neither identifies the other. Multiple attempts and shipments can multiply rows. This join exists only in the Fulfilment view; it adds no schema relationship or cardinality.
 
-## Walks: Payment to shipment | Fulfilment
+## Scenario: Payment to shipment | Fulfilment
 
 - PAYMENT payment-shipment@--> SHIPMENT : Match order_id; this equality does not imply a foreign key between these tables.
 
-## Walks: Paid amount per line | Paid amount per line
+## Scenario: Paid amount per line | Paid amount per line
 
 - ORDER_LINE line-order@--> ORDER : Each line joins its order on order_id.
 - ORDER payment-order@--> PAYMENT : An order has one payment attempt per try, so a retried order's lines appear once per attempt. Filter to outcome = paid before summing.
@@ -468,3 +468,25 @@ total.
 
 Synchronous: the shopper waits. Times out after 10 seconds; the order is then rejected
 and stock released.
+
+## Walkthrough: Payments for the security team
+
+### Diagram: Shop platform
+
+Start with the whole system. Card data leaves the shop only on its way to Payments.
+
+### Perspective: Checkout (synchronous)
+
+The calls on the way to payment, and which of them wait for an answer.
+
+### Diagram: Order lifecycle
+
+Where a payment can fail and be tried again.
+
+### Scenario: Soft decline, then paid
+
+The retry a security reviewer will ask about first.
+
+### Join: Paid amount per line
+
+Which order lines a paid amount is counted against.

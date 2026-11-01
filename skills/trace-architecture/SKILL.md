@@ -45,6 +45,11 @@ this usually means some of:
 Skip a kind the project does not have. Prefer several kinds, each for its purpose,
 over many diagrams of one kind.
 
+When the map has more than a few diagrams, end with a walkthrough for its main reader
+(`## Walkthrough: Getting around <project>` for a new joiner, or one for the review's
+audience): the entry diagram first, then the parts and flows that matter, each stop
+saying what to notice. See `../illuminate-concept/references/walkthroughs.md`.
+
 ## 3. Work from the code
 
 - Every node and arrow comes from something you read: name the file or symbol in its

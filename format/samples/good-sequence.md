@@ -5,7 +5,7 @@ flowchart LR
   web --> api --> db
 ```
 
-## Relations: Calls
+## Perspective: Calls
 
 - web --> api : calls
 - api --> db : reads

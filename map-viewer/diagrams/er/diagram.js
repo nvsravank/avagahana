@@ -37,7 +37,7 @@ export const layoutByView = true;
 // a selected table says what one row is and lights its lines: selecting draws again
 export const drawsSelection = true;
 
-// a walk's step along r from `from` reaches its many side (model/walks.js)
+// a scenario's step along r from `from` reaches its many side (model/scenarios.js)
 export { fansOut };
 export const nodeGeometry = tableGeometry;
 export const paintNode = paintTable;

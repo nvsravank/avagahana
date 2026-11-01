@@ -1,17 +1,21 @@
-// bar.js — the atlas's contents bar, one row above the viewer: the logo (opens the map
-// mark only, never a control), then a scroller with the word mark, the label "Quick links"
-// and a chip for each diagram, view, deployment and play the viewer lists
-// (viewer.contents()). The first diagram's chip is "Overview". When the viewer's toolbar
-// is narrow, the map's name (beside the logo, not scrolling) opens the map list, and the
-// word mark and the label go.
-// No scroll bar: a soft fade and a small arrow on an edge say there is more that way.
+// bar.js — the atlas's contents bar, one row above the viewer: the logo (the map mark
+// only, never a control), then a scroller with the word mark and one plain item per
+// place to go (viewer.contents()): Walks (the map's walkthroughs) when it has any, then
+// each diagram, the first called "Overview". An item with more under it opens a popup of
+// two columns: its groups (a diagram's Perspectives, Joins, Deployments and Scenarios; for
+// Walks, the walkthroughs) and the entries of the group picked (for a walkthrough, its
+// stops in order). The popup opens on hover with a mouse, on a tap, and with Enter or
+// Space; Escape, a pick or a tap elsewhere closes it. When the viewer's toolbar is
+// narrow, the map's name (beside the logo, not scrolling) opens the map list and the word
+// mark goes. No scroll bar: a soft fade and a small arrow on an edge say there is more.
 import { applyTheme, changeMarkSvg } from '../map-viewer/index.js';
 
+// a diagram's groups in its popup, and the contents kinds in each
 const GROUPS = [
-  ['Diagrams', ['diagram']],
-  ['Views', ['view', 'join']],
+  ['Perspectives', ['view']],
+  ['Joins', ['join']],
   ['Deployments', ['deployment']],
-  ['Plays', ['sequence', 'walk']],
+  ['Scenarios', ['scenario']],
 ];
 const FIRST = 'Overview';
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -53,7 +57,7 @@ function chevron(d) {
 }
 
 // mount: the bar element; onName(event): the map's name was clicked (a phone: it opens the
-// map list); onPick(state): a chip was clicked.
+// map list); onPick(state): an item or a popup entry was picked.
 // -> {setTitle(text), setContents(list), setState(state), setTheme({id, appearance}), setLogo(on)}
 export function contentsBar(mount, { onName, onPick, logo = true }) {
   mount.classList.add('atlas-bar');
@@ -71,7 +75,7 @@ export function contentsBar(mount, { onName, onPick, logo = true }) {
   const right = el('button', 'atlas-arrow is-right');
   for (const [b, d, label] of [[left, 'M15 6l-6 6 6 6', 'Scroll left'], [right, 'M9 6l6 6-6 6', 'Scroll right']]) {
     b.type = 'button';
-    b.tabIndex = -1;   // the chips themselves take the keyboard
+    b.tabIndex = -1;   // the items themselves take the keyboard
     b.setAttribute('aria-label', label);
     b.appendChild(chevron(d));
     b.addEventListener('click', () => scroller.scrollBy({ left: (b === left ? -1 : 1) * scroller.clientWidth * 0.8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
@@ -86,18 +90,29 @@ export function contentsBar(mount, { onName, onPick, logo = true }) {
   const nameText = el('span', 'atlas-mapname-text');
   name.append(nameText, chevron('m6 9 6 6 6-6'));
   name.addEventListener('click', (e) => onName?.(e));
-  const label = el('span', 'atlas-label', 'Quick links');
-  const chips = el('div', 'atlas-chips');
-  scroller.append(wordmark, label, chips);
+  const row = el('div', 'atlas-items');
+  row.setAttribute('role', 'menubar');
+  scroller.append(wordmark, row);
   wrap.append(left, scroller, right);
-  // the name stays put beside the logo (the chips scroll); it is the way to the map list
-  mount.append(logoBtn, name, wrap);
+  // the popup hangs from the bar (outside the scroller, which would clip it)
+  const pop = el('div', 'atlas-pop');
+  pop.hidden = true;
+  pop.setAttribute('role', 'menu');
+  const colGroups = el('div', 'atlas-col is-groups');
+  const colEntries = el('div', 'atlas-col is-entries');
+  pop.append(colGroups, colEntries);
+  // the name stays put beside the logo (the items scroll); it is the way to the map list
+  mount.append(logoBtn, name, wrap, pop);
 
   let items = [];
-  let buttons = [];
+  let tops = [];      // [[button, top]]: what the row shows
   let state = {};
-  let shown = null;   // the current item when last marked
+  let shown = null;   // the current top when last marked
   let theme = null;
+  let open = null;    // the top whose popup is open
+  let picked = null;  // the group shown in the second column
+  let closer = 0;
+  let pointer = 'mouse';
 
   // the fades and arrows: only on an edge with more beyond it
   function edges() {
@@ -109,7 +124,7 @@ export function contentsBar(mount, { onName, onPick, logo = true }) {
     left.hidden = !(more > 1 && !atStart);
     right.hidden = !(more > 1 && !atEnd);
   }
-  scroller.addEventListener('scroll', edges, { passive: true });
+  scroller.addEventListener('scroll', () => { edges(); if (open) place(); }, { passive: true });
   new ResizeObserver(edges).observe(scroller);
   // a mouse wheel scrolls the row sideways
   scroller.addEventListener('wheel', (e) => {
@@ -117,79 +132,206 @@ export function contentsBar(mount, { onName, onPick, logo = true }) {
     scroller.scrollLeft += e.deltaY;
     e.preventDefault();
   }, { passive: false });
-  // keyboard focus on a chip brings it into view
+  // keyboard focus on an item brings it into view
   scroller.addEventListener('focusin', (e) => e.target.scrollIntoView({ block: 'nearest', inline: 'nearest' }));
 
-  function render() {
-    chips.replaceChildren();
-    buttons = [];
-    // one diagram and nothing else: no chips and no label; the word mark stays
-    const many = items.length > 1;
-    const diagrams = items.filter((x) => x.kind === 'diagram' || x.kind === 'sequence');
-    const nameOf = (x) => (x.first ? FIRST : x.label);
-    const ownerName = (x) => (x.part == null ? FIRST : x.diagram);
-    // a diagram's chip opens it at its default view, so with the diagram chips shown its
-    // default view needs no chip of its own
-    const dup = (x) => diagrams.length > 1 && x.kind === 'view' && x.state.view == null;
-    // views and deployments of more than one diagram say which diagram they belong to
-    const owned = (x) => ['view', 'join', 'deployment'].includes(x.kind);
-    const owners = new Set(items.filter(owned).map((x) => x.part));
-    const groups = GROUPS.map(([name, kinds]) => [name, items.filter((x) => kinds.includes(x.kind) && !dup(x))])
-      .filter(([name, list]) => list.length && (name !== 'Diagrams' || list.length > 1));
-    for (const [name, list] of many ? groups : []) {
-      if (chips.childElementCount) chips.appendChild(el('span', 'atlas-sep')).setAttribute('aria-hidden', 'true');
-      const g = el('div', 'atlas-group');
-      g.setAttribute('role', 'group');
-      g.setAttribute('aria-label', name);
-      for (const x of list) {
-        const b = el('button', `atlas-chip${x.unlinked ? ' is-unlinked' : ''}`, owners.size > 1 && owned(x) ? `${ownerName(x)} · ${x.label}` : nameOf(x));
-        b.type = 'button';
-        if (x.unlinked) b.title = 'Not linked from the first diagram';
-        b.addEventListener('click', () => onPick(x.state));
-        spark(b, x);
-        g.appendChild(b);
-        buttons.push([b, x]);
-      }
-      chips.appendChild(g);
+  // what the row shows: Walks, then each diagram with its groups
+  function build() {
+    const out = [];
+    const walks = items.filter((x) => x.kind === 'walkthrough');
+    if (walks.length) {
+      out.push({ label: 'Walks', walks: true, groups: walks.map((w) => ({
+        label: w.label, note: `${w.stops} stop${w.stops === 1 ? '' : 's'}`, walk: w.label,
+        entries: (w.stopList || []).map((st, i) => ({ label: `${i + 1}. ${st.label}`, state: { walkthrough: w.label, stop: i + 1 }, walk: w.label, stop: i + 1 })),
+      })) });
     }
-    label.hidden = !buttons.length;
-    // a new list starts at its start (the word mark); only a change of the current chip
-    // after that brings it into view
-    shown = currentItem();
-    scroller.scrollLeft = 0;
+    for (const d of items.filter((x) => x.kind === 'diagram' || x.kind === 'sequence')) {
+      const own = items.filter((x) => x !== d && (x.part ?? null) === (d.part ?? null) && x.kind !== 'diagram' && x.kind !== 'sequence' && x.kind !== 'walkthrough');
+      const groups = GROUPS.map(([label, kinds]) => ({ label, entries: own.filter((x) => kinds.includes(x.kind)).map((x) => ({ label: x.label, state: x.state, item: x })) }))
+        .filter((g) => g.entries.length);
+      // the diagram itself, as its default perspective: a tap opens the popup, so the popup
+      // must hold the way into the diagram too
+      if (groups.length && groups[0].label !== 'Perspectives') {
+        groups.unshift({ label: 'Perspectives', entries: [{ label: 'Overview', state: d.state, item: { kind: 'view', part: d.part, state: { ...d.state, view: null }, changed: false } }] });
+      }
+      for (const g of groups) g.note = String(g.entries.length);
+      out.push({ label: d.first ? FIRST : d.label, item: d, state: d.state, groups });
+    }
+    return out;
+  }
+
+  function render() {
+    const keep = scroller.scrollLeft;
+    const same = tops.length && JSON.stringify(build().map((t) => t.label)) === JSON.stringify(tops.map(([, t]) => t.label));
+    closePop();
+    row.replaceChildren();
+    tops = [];
+    const list = build();
+    // one diagram and nothing under it: no items; the word mark stays
+    const many = list.length > 1 || list.some((t) => t.groups.length);
+    for (const t of many ? list : []) {
+      const b = el('button', 'atlas-item', t.label);
+      b.type = 'button';
+      b.setAttribute('role', 'menuitem');
+      if (t.groups.length) { b.setAttribute('aria-haspopup', 'menu'); b.setAttribute('aria-expanded', 'false'); }
+      b.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'mouse') return; if (t.groups.length) openPop(t, b); else closeSoon(); });
+      b.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') closeSoon(); });
+      b.addEventListener('pointerdown', (e) => { pointer = e.pointerType; });
+      b.addEventListener('click', (e) => {
+        const keyboard = e.detail === 0;
+        // a tap or a key opens the popup of an item with more under it; a mouse click
+        // opens the diagram (its popup is the hover's)
+        // a phone may report a tap as a mouse: no hover there means the tap opens the popup
+        const tapped = pointer !== 'mouse' || matchMedia('(hover: none)').matches;
+        if (t.groups.length && (keyboard || tapped || !t.state)) {
+          if (open === t) closePop(); else openPop(t, b, keyboard);
+          return;
+        }
+        if (t.state) { closePop(); onPick(t.state); }
+      });
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' && t.groups.length) { e.preventDefault(); openPop(t, b, true); }
+      });
+      spark(b, t);
+      row.appendChild(b);
+      tops.push([b, t]);
+    }
+    shown = currentTop();
+    scroller.scrollLeft = same ? keep : 0;
     mark();
     edges();
   }
 
-  // the chip for what is shown: a play by its sequence; else in the diagram shown, its
-  // deployment, its view, or the diagram itself
-  function currentItem() {
-    if (state.seq) return items.find((x) => (x.kind === 'sequence' || x.kind === 'walk') && x.state.seq === state.seq) || null;
-    const here = items.filter((x) => (x.part ?? null) === (state.part ?? null) && x.kind !== 'sequence' && x.kind !== 'walk');
-    if (state.env) return here.find((x) => x.kind === 'deployment' && x.state.env === state.env) || null;
-    const views = here.filter((x) => x.kind === 'view' || x.kind === 'join');
-    const view = views.find((x) => (x.state.view ?? null) === (state.view ?? null));
-    // the default view without a chip of its own: its diagram's chip
-    if (view && buttons.some(([, x]) => x === view)) return view;
-    if (view?.state.view != null) return null;
-    return here.find((x) => x.kind === 'diagram') || null;
+  // ---- the popup ----
+  function closeSoon() {
+    clearTimeout(closer);
+    closer = setTimeout(closePop, 220);
+  }
+  function closePop() {
+    clearTimeout(closer);
+    if (!open) return;
+    for (const [b] of tops) b.setAttribute('aria-expanded', 'false');
+    open = null;
+    picked = null;
+    pop.hidden = true;
+  }
+  function openPop(t, b, focus = false) {
+    clearTimeout(closer);
+    if (open !== t) {
+      for (const [x] of tops) if (x.hasAttribute('aria-haspopup')) x.setAttribute('aria-expanded', String(x === b));
+      open = t;
+      // the group holding what is shown, else the first
+      picked = t.groups.find((g) => g.entries.some(isCurrent)) || t.groups[0];
+      fill();
+      pop.hidden = false;
+      place();
+    }
+    if (focus) (colGroups.querySelector('[aria-current]') || colGroups.querySelector('button'))?.focus();
+  }
+  // under its item, kept inside the bar's width
+  function place() {
+    const at = tops.find(([, t]) => t === open)?.[0];
+    if (!at) return;
+    const m = mount.getBoundingClientRect();
+    const r = at.getBoundingClientRect();
+    const w = pop.offsetWidth;
+    pop.style.left = `${Math.max(8, Math.min(r.left - m.left, m.width - w - 8))}px`;
+  }
+  function fill() {
+    colGroups.replaceChildren(el('div', 'atlas-head', open.walks ? 'Walks' : open.label));
+    for (const g of open.groups) {
+      const b = el('button', 'atlas-grp');
+      b.type = 'button';
+      b.setAttribute('role', 'menuitem');
+      b.append(el('span', 'atlas-grp-label', g.label), el('span', 'atlas-grp-note', g.note));
+      b.group = g;
+      // picking a group fills the second column only, so the keyboard stays where it is
+      const pick = () => { if (picked === g) return; picked = g; markGroups(); fillEntries(); };
+      b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') pick(); });
+      b.addEventListener('focus', pick);
+      b.addEventListener('click', pick);
+      colGroups.appendChild(b);
+    }
+    markGroups();
+    fillEntries();
+  }
+  function markGroups() {
+    for (const b of colGroups.querySelectorAll('.atlas-grp')) {
+      if (b.group === picked) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+      b.classList.toggle('is-on', !!b.group.walk && state.walkthrough === b.group.walk);
+    }
+  }
+  function fillEntries() {
+    colEntries.replaceChildren(el('div', 'atlas-head', open.walks ? 'Stops' : picked.label));
+    for (const e of picked.entries) {
+      const b = el('button', 'atlas-entry', e.label);
+      b.type = 'button';
+      b.setAttribute('role', 'menuitem');
+      b.entry = e;
+      if (e.item) spark(b, e.item);
+      b.addEventListener('click', () => { closePop(); onPick(e.state); });
+      colEntries.appendChild(b);
+    }
+    markEntries();
+  }
+  // the marks only: a state change while the popup is open keeps its buttons (a click
+  // in progress is not lost)
+  function markEntries() {
+    for (const b of colEntries.querySelectorAll('.atlas-entry')) {
+      if (isCurrent(b.entry)) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    }
+  }
+  pop.addEventListener('pointerenter', () => clearTimeout(closer));
+  pop.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') closeSoon(); });
+  // a tap or click elsewhere closes it
+  document.addEventListener('pointerdown', (e) => { if (open && !pop.contains(e.target) && !row.contains(e.target)) closePop(); });
+  mount.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !open) return;
+    const at = tops.find(([, t]) => t === open)?.[0];
+    closePop();
+    at?.focus();
+  });
+
+  // ---- what is shown ----
+  // an entry: the walkthrough stop open; the scenario playing; else, in the diagram shown,
+  // the deployment or the perspective (null: the default) shown
+  function isCurrent(e) {
+    if (e.walk) return state.walkthrough === e.walk && state.stop === e.stop;
+    const x = e.item;
+    if (x.kind === 'scenario') return !!state.seq && state.seq === x.state.seq;
+    if (state.seq || (x.part ?? null) !== (state.part ?? null)) return false;
+    if (x.kind === 'deployment') return state.env === x.state.env;
+    return !state.env && (x.state.view ?? null) === (state.view ?? null);
+  }
+  // the top for the diagram shown (a scenario's: its diagram); Walks is marked apart
+  function currentTop() {
+    let part = state.part ?? null;
+    if (state.seq) {
+      const p = items.find((x) => (x.kind === 'sequence' || x.kind === 'scenario') && x.state.seq === state.seq);
+      if (p) part = p.part ?? null;
+    }
+    return tops.find(([, t]) => t.item && (t.item.part ?? null) === part)?.[1] || null;
   }
   function mark() {
-    const now = currentItem();
-    for (const [b, x] of buttons) {
-      if (x === now) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    const now = currentTop();
+    for (const [b, t] of tops) {
+      if (t === now) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+      b.classList.toggle('is-on', !!t.walks && !!state.walkthrough);
     }
+    if (open) { markGroups(); markEntries(); }
     if (now === shown) return;
     shown = now;
-    const on = buttons.find(([, x]) => x === now)?.[0];
+    const on = tops.find(([, t]) => t === now)?.[0];
     if (on && !mount.contains(document.activeElement)) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
-  // something in it new or changed (the viewer's marks): the viewer's small sparkle
+  // something in it new or changed (the viewer's marks): the viewer's small sparkle; a
+  // top has it when its diagram or anything under it has
   function spark(b, x) {
+    const changed = x.groups ? !!x.item?.changed || x.groups.some((g) => g.entries.some((e) => e.item?.changed)) : !!x.changed;
     b.querySelector(':scope > .mmv-spark')?.remove();
-    b.classList.toggle('has-spark', !!x.changed);
-    if (x.changed) b.insertAdjacentHTML('beforeend', changeMarkSvg(9));
+    b.classList.toggle('has-spark', changed);
+    if (changed) b.insertAdjacentHTML('beforeend', changeMarkSvg(9));
   }
 
   function setLogo(on) { logoBtn.hidden = !on; }
@@ -198,18 +340,8 @@ export function contentsBar(mount, { onName, onPick, logo = true }) {
   return {
     setTitle(text) { nameText.textContent = text || ''; name.title = text ? `Maps: ${text}` : 'Maps'; name.hidden = !text; },
     setContents(list) {
-      const next = Array.isArray(list) ? list : [];
-      // only the marks changed: the chips stay where they are (no scroll back)
-      const bare = (l) => JSON.stringify(l.map(({ changed, ...x }) => x));
-      const same = bare(next) === bare(items);
-      items = next;
-      if (!same) { render(); return; }
-      buttons = buttons.map(([b, x]) => {
-        const y = items.find((z) => z.kind === x.kind && JSON.stringify(z.state) === JSON.stringify(x.state)) || x;
-        spark(b, y);
-        return [b, y];
-      });
-      shown = currentItem();
+      items = Array.isArray(list) ? list : [];
+      render();
     },
     setState(s) { state = s || {}; mark(); },
     // the frame colours of the viewer's theme and appearance (theme.js frame)

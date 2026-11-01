@@ -242,8 +242,8 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "before": None})[0], 200)
         self.assertEqual(self.s.json("GET", "/api/before?p=garden.md")[0], 404)
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "before": 12})[0], 400)
-        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "perspective": "sideways"})[0], 400)
-        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "perspective": "before"})[0], 200)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "edition": "sideways"})[0], 400)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "edition": "before"})[0], 200)
 
     def test_show_theme(self):
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "theme": "brand"}), (200, {"delivered": 0}))

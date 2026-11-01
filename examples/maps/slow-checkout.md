@@ -33,7 +33,7 @@ flowchart LR
   class db database
 ```
 
-## Relations: Retries
+## Perspective: Retries
 
 - payh r1@-.-> psp : retry on timeout
 

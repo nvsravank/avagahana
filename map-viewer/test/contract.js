@@ -278,7 +278,7 @@ try {
     JSON.stringify(m.root.children.map((c) => [c.id, c.shape])));
 
   // ---- relation views (any diagram type) ----
-  m = parseMap('# V\n```mermaid\nmindmap\n  n1(("C"))\n    n2("A")\n    n3("B")\n```\n## Relations\n- n2 --> n3 : one\n## Relations: Data\n- n3 -.-> n2 : back\n- n2 ==> n3\n## Relations: Data\n- n2 --o n3\n', 'v.md');
+  m = parseMap('# V\n```mermaid\nmindmap\n  n1(("C"))\n    n2("A")\n    n3("B")\n```\n## Relations\n- n2 --> n3 : one\n## Perspective: Data\n- n3 -.-> n2 : back\n- n2 ==> n3\n## Perspective: Data\n- n2 --o n3\n', 'v.md');
   check('views: the default and the named, in file order', JSON.stringify(m.views.map((x) => [x.name, x.relations.length])) === '[["Relations",1],["Data",3]]', JSON.stringify(m.views.map((x) => [x.name, x.relations.length])));
   check('views: map.relations starts as the default view', m.relations === m.views[0].relations);
   check('views: a repeated name is one view, with a warning', m.warnings.some((w) => /appear twice/.test(w)), m.warnings.join('; '));
@@ -291,7 +291,7 @@ try {
     '  user(["User"])', '  subgraph sys [System]', '    direction TB', '    subgraph web [Web]', '      ui["Page"]', '    end', '    db[("Store")]:::store', '  end',
     '  user -->|visits| ui', '  ui -- saves --> db', '  user --> ui --> db', '  ui & user -.-> db',
     '  classDef store fill:#eee', '  class user person', '  style ui fill:#f00', '  click db "https://example.com/db"', '  click ui callback',
-    '```', '## Relations: Ops', '- db --> ui : alerts',
+    '```', '## Perspective: Ops', '- db --> ui : alerts',
   ].join('\n'), 'f.md');
   check('flowchart: a box diagram', m.type === 'flowchart' && m.direction === 'LR', `${m.type} ${m.direction}`);
   check('flowchart: subgraphs nest as boxes', m.byId.sys?.container && m.byId.web?.parent === m.byId.sys && m.byId.ui?.parent === m.byId.web && m.byId.db?.parent === m.byId.sys,
@@ -470,7 +470,7 @@ try {
     check('classDef stroke-width and opacity are used; anything not a plain number is dropped', sw.byId.a.stroke?.width === 5 && sw.byId.a.stroke?.opacity === 0.4 && !sw.byId.b.stroke,
       JSON.stringify([sw.byId.a.stroke, sw.byId.b.stroke]));
     check('a class only a classDef names is a style: no meaning, no colour', !fm.byId.old.kind && !fm.byId.p.kind && fm.byId.u.kind === 'person', JSON.stringify([fm.byId.old.kind, fm.byId.p.kind]));
-    const lc = parseMap('# L\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  c["C"]\n  a e1@-->|pays| b\n  b e2@-.-> c\n  b --> c\n  e1@{ animate: true }\n  class e1 money\n  class e2 dashy\n  classDef dashy stroke-dasharray: 2 3\n```\n## Relations: Other\n- a --> c : refund :::money\n## Classes\n- money : - : Money moves\n', 'l.md');
+    const lc = parseMap('# L\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  c["C"]\n  a e1@-->|pays| b\n  b e2@-.-> c\n  b --> c\n  e1@{ animate: true }\n  class e1 money\n  class e2 dashy\n  classDef dashy stroke-dasharray: 2 3\n```\n## Perspective: Other\n- a --> c : refund :::money\n## Classes\n- money : - : Money moves\n', 'l.md');
     const [r1, r2, r3] = lc.views[0].relations;
     check('Mermaid arrow ids and classes: a class with a meaning colours the line, a classDef-only one shapes it', r1.cls === 'money' && r1.kindSlot != null && r1.label === 'pays'
       && r2.cls === 'dashy' && r2.kindSlot == null && r2.stroke?.dash === '2 3' && !r3.cls && !lc.warnings.length, JSON.stringify([r1, r2, r3, lc.warnings]));
@@ -483,7 +483,7 @@ try {
     const src = ['# Shop', '```mermaid', 'flowchart LR', '  c(["Customer"]) --> shop["Shop system"]', '  click shop "#shop-system-containers"', '  click c "#nowhere"', '```',
       '## Classes', '- queue : ph tray : Message queue',
       '## Shop system containers', '', '```mermaid', 'flowchart LR', '  web["Web"] --> q[["Queue"]]', '  class q queue', '  click web "#ideas"', '```',
-      '## Relations: Data', '- web --> q : events',
+      '## Perspective: Data', '- web --> q : events',
       '### Ideas', '', '```mermaid', 'mindmap', '  r(("Ideas"))', '    a("One")', '```',
       '```mermaid', 'mindmap', '  x(("No heading"))', '```'].join('\n');
     const f = parseMap(src, 'shop.md');
@@ -572,7 +572,7 @@ try {
     `${clash.byId.a.kindSlot} ${clash.byId.b.kindSlot}`);
 
   // ---- relation notes: keyed by an arrow id, in the block or on a view's line ----
-  const rn = parseMap('# R\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  c["C"]\n  a e1@--> b\n```\n## Relations: Other\n- b e2@-.-> c : later\n- a --> c\n## Details\n### <a id="e1"></a>A to B\nWhy A calls B.\n### <a id="e2"></a>B to C\nLater.\n### <a id="e9"></a>Nothing\nx\n', 'r.md');
+  const rn = parseMap('# R\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  c["C"]\n  a e1@--> b\n```\n## Perspective: Other\n- b e2@-.-> c : later\n- a --> c\n## Details\n### <a id="e1"></a>A to B\nWhy A calls B.\n### <a id="e2"></a>B to C\nLater.\n### <a id="e9"></a>Nothing\nx\n', 'r.md');
   const rOther = rn.views.find((x) => x.name === 'Other').relations;
   check('an arrow id on a view line is read, and notes go on relations by id', rn.relations[0].note?.body === 'Why A calls B.' && rOther[0].eid === 'e2' && rOther[0].note?.body === 'Later.'
     && rOther[0].line === 'dotted' && rOther[0].label === 'later' && !rOther[1].eid && !rOther[1].note, JSON.stringify(rOther));
@@ -585,8 +585,12 @@ try {
   const modeButtons = [...document.querySelectorAll('#a [data-mmv=modes] button')].map((b) => b.dataset.mode).join();
   check('a box diagram offers boxes, layers and list', modeButtons === 'boxes,layers,list' && fv.state.mode === 'boxes', modeButtons);
   check('a box diagram always shows its arrows (no related-links button)', document.querySelector('#a [data-mmv=relBtn]').hidden);
-  check('the view picker lists the views', [...document.querySelectorAll('#a [data-mmv=viewMenu] button')].map((b) => b.textContent).join() === 'Overview,Data flow,Events,Production,Staging,Test'
-    && document.querySelector('#a [data-mmv=viewMenu] .mmv-menu-head')?.textContent === 'Where it runs');
+  {
+    const menu = document.querySelector('#a [data-mmv=viewMenu]');
+    const first = menu.querySelector('.mmv-vm-row[data-key="d:"]');
+    const kids = [...(first?.querySelectorAll('.mmv-vm-kids .mmv-menu-item') || [])].map((b) => `${b.querySelector('.mmv-vm-label').textContent}/${b.querySelector('.mmv-vm-note')?.textContent}`);
+    check('the picker opens the diagram shown: its perspectives, then its deployments, each named so', kids.join() === 'Overview/perspective,Data flow/perspective,Events/perspective,Production/deployment,Staging/deployment,Test/deployment' && !/Where it runs/.test(menu.textContent), kids.join());
+  }
   // ---- the info panel closes on a click outside it ----
   {
     const ib = document.querySelector('#a [data-mmv=infoBtn]');
@@ -929,8 +933,8 @@ try {
     const pv = mount(document.getElementById('a'), { storageKey: null });
     await pv.load(lost.title ? '# M\n\n```mermaid\nflowchart LR\n  a --> b\n```\n\n## Lost\n\n```mermaid\nmindmap\n  r((R))\n```\n' : '', 'm.md');
     const menu = document.querySelector('#a [data-mmv=viewMenu]');
-    check('the viewer still shows an unlinked diagram, under Not linked in the view picker', !document.querySelector('#a [data-mmv=viewWrap]').hidden
-      && /Not linked/.test(menu.textContent) && /Lost/.test(menu.textContent), menu.textContent);
+    check('the viewer still shows an unlinked diagram, in the picker with the others (no heading of its own)', !document.querySelector('#a [data-mmv=viewWrap]').hidden
+      && !/Not linked/.test(menu.textContent) && /Lost/.test(menu.textContent), menu.textContent);
     pv.destroy();
 
     const d3 = mount(document.getElementById('a'), { storageKey: null });
@@ -1076,21 +1080,21 @@ try {
     const bv = mount(document.getElementById('a'), { storageKey: null });
     const q = (sel) => document.querySelector(`#a ${sel}`);
     await bv.load(now, 'release.md');
-    check('no earlier version: no toggle, no changes button', q('[data-mmv=perspBtn]').hidden && q('[data-mmv=changesBtn]').hidden && !('perspective' in bv.state));
+    check('no earlier version: no toggle, no changes button', q('[data-mmv=perspBtn]').hidden && q('[data-mmv=changesBtn]').hidden && !('edition' in bv.state));
     await bv.setBefore(was);
     const pressed = () => ['perspBefore', 'perspAfter'].filter((x) => q(`[data-mmv=${x}]`).getAttribute('aria-pressed') === 'true' && q(`[data-mmv=${x}]`).classList.contains('is-on'));
-    check('with an earlier version: the switch shows, After pressed, the changes button shows', !q('[data-mmv=perspBtn]').hidden && pressed().join() === 'perspAfter' && !q('[data-mmv=changesBtn]').hidden && bv.state.perspective === 'after', pressed().join());
+    check('with an earlier version: the switch shows, After pressed, the changes button shows', !q('[data-mmv=perspBtn]').hidden && pressed().join() === 'perspAfter' && !q('[data-mmv=changesBtn]').hidden && bv.state.edition === 'after', pressed().join());
     check('the switch: a group of two named buttons (WO-42)', q('[data-mmv=perspBtn]').getAttribute('role') === 'group' && q('[data-mmv=perspBtn]').getAttribute('aria-label') === 'Version'
       && q('[data-mmv=perspBefore]').getAttribute('aria-label') === 'Before: the earlier version' && q('[data-mmv=perspAfter]').getAttribute('aria-label') === 'After: this version' && !q('[data-mmv=perspBtn]').textContent.trim());
     q('[data-mmv=perspAfter]').click();
     await wait(30);
-    check('the switch: pressing the version on screen does nothing', bv.state.perspective === 'after');
+    check('the switch: pressing the version on screen does nothing', bv.state.edition === 'after');
     const sign = (id) => q(`[data-mmv=viewport] [data-id="${id}"] > .mmv-plan`)?.classList[1] || null;
     check('After marks what came and what changed, nothing removed is drawn', !q('[data-id="waf"]') && sign('pay') === 'is-changed', sign('pay'));
     bv.setState({ node: 'orders' });
-    await bv.setState({ perspective: 'before', env: 'Production' });
+    await bv.setState({ edition: 'before', env: 'Production' });
     await wait(50);
-    check('Before draws the earlier file: the firewall, marked removed', bv.state.perspective === 'before' && sign('waf') === 'is-removed' && bv.title === 'Checkout platform, release 1.4', `${sign('waf')} ${bv.title}`);
+    check('Before draws the earlier file: the firewall, marked removed', bv.state.edition === 'before' && sign('waf') === 'is-removed' && bv.title === 'Checkout platform, release 1.4', `${sign('waf')} ${bv.title}`);
     check('the switch: Before pressed while it is shown', pressed().join() === 'perspBefore', pressed().join());
     check('switching keeps the view and the selection', bv.state.env === 'Production' && bv.state.node === 'orders', JSON.stringify(bv.state));
     check('a moved node is marked changed in the deployment', sign('orders') === 'is-changed', sign('orders'));
@@ -1101,16 +1105,16 @@ try {
     check('the changes list: the view\'s changes in four groups', /Removed \(3\).*Added \(3\).*Moved \(1\).*Changed \(2\)/s.test(listed) && /EKS on Fargate → Orders hosts, EC2/.test(listed), listed.slice(0, 200));
     q('[data-mmv=perspAfter]').click();
     // the switch is a load, then the glide: what went fades out
-    for (let i = 0; i < 60 && (bv.state.perspective !== 'after' || q('[data-id="waf"]')); i++) await wait(50);
-    check('the After button switches back, the list stays open', bv.state.perspective === 'after' && !q('[data-mmv=changesPanel]').hidden && !q('[data-id="waf"]'),
-      JSON.stringify([bv.state.perspective, q('[data-mmv=changesPanel]').hidden, !!q('[data-id="waf"]'), q('[data-id="waf"]')?.getAttribute('class')]));
+    for (let i = 0; i < 60 && (bv.state.edition !== 'after' || q('[data-id="waf"]')); i++) await wait(50);
+    check('the After button switches back, the list stays open', bv.state.edition === 'after' && !q('[data-mmv=changesPanel]').hidden && !q('[data-id="waf"]'),
+      JSON.stringify([bv.state.edition, q('[data-mmv=changesPanel]').hidden, !!q('[data-id="waf"]'), q('[data-id="waf"]')?.getAttribute('class')]));
     const rep = (await bv.export({ format: 'svg', report: true })).report;
-    check('the layout report lists the changes, per view', rep.changes?.perspective === 'after' && rep.changes.views.length === 2
+    check('the layout report lists the changes, per view', rep.changes?.edition === 'after' && rep.changes.views.length === 2
       && rep.changes.views.find((x) => x.view === 'Production').groups.some((g) => g.state === 'moved'), JSON.stringify(rep.changes?.views?.map((x) => x.view)));
     const plain = (await (async () => { const pv = mount(document.getElementById('b'), { storageKey: null }); await pv.load(now, 'x.md'); const r = (await pv.export({ format: 'svg', report: true })).report; pv.destroy(); return r; })());
     check('no earlier version: no changes in the report', !('changes' in plain));
     await bv.setBefore(null);
-    check('setBefore(null) stops comparing', q('[data-mmv=perspBtn]').hidden && !('perspective' in bv.state) && !sign('orders'));
+    check('setBefore(null) stops comparing', q('[data-mmv=perspBtn]').hidden && !('edition' in bv.state) && !sign('orders'));
     await bv.load(now, 'other.md', { before: was });
     check('load with before: compared at once', !q('[data-mmv=perspBtn]').hidden);
     await bv.load(now, 'third.md');

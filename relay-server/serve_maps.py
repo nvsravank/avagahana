@@ -102,7 +102,7 @@ MODE = re.compile(r"^[a-z][a-z-]{0,23}$")
 COLOUR_BY = ("category", "level", "class", "changes")
 # what a show may ask for (a render's state may ask for more: expand, close, highlight, crop)
 BEFORE_MAX = 2 * 1024 * 1024   # an earlier version's text, in POST /api/show
-SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "step", "view", "env", "perspective")
+SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "step", "view", "env", "edition")
 NODE_ID = re.compile(r"^[A-Za-z][\w-]{0,99}$")
 PART_ID = re.compile(r"^[\w-]{1,100}$")   # a diagram heading's anchor
 THEME_ID = re.compile(r"^[A-Za-z0-9][\w-]{0,63}$")
@@ -248,12 +248,12 @@ def picture_fields(body: dict, out: dict):
         if not isinstance(value, str) or not value or len(value) > 100 or any(c in value for c in "\r\n\x00"):
             return f"{key} must be a short name"
         out[key] = value
-    perspective = body.get("perspective")
-    if perspective is not None:
+    edition = body.get("edition")
+    if edition is not None:
         # with an earlier version: which of the two to show (WO-34)
-        if perspective not in ("before", "after"):
-            return "perspective must be before or after"
-        out["perspective"] = perspective
+        if edition not in ("before", "after"):
+            return "edition must be before or after"
+        out["edition"] = edition
     expand = body.get("expand")
     if expand is not None:
         if expand != "all" and (not isinstance(expand, int) or isinstance(expand, bool) or expand < 0):

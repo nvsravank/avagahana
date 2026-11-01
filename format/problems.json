@@ -489,35 +489,35 @@
    "side": "both",
    "what": "A direction inside an ER group (subgraph): not used"
   },
-  "walks-not-here": {
+  "scenarios-not-here": {
    "level": "warning",
    "side": "both",
-   "what": "A ## Walks: section after a diagram that is no state or ER diagram: not read"
+   "what": "A ## Scenarios: section after a diagram that is no state or ER diagram: not read"
   },
-  "walk-empty": {
+  "scenario-empty": {
    "level": "error",
    "side": "both",
-   "what": "A walk with no steps"
+   "what": "A scenario with no steps"
   },
-  "walk-syntax": {
+  "scenario-syntax": {
    "level": "error",
    "side": "both",
-   "what": "A walk step that cannot be read (want \"- A --> B : what happens\")"
+   "what": "A scenario step that cannot be read (want \"- A --> B : what happens\")"
   },
-  "walk-not-step": {
+  "scenario-not-step": {
    "level": "error",
    "side": "both",
-   "what": "A walk step that is no transition (state) or relationship (ER) of the diagram"
+   "what": "A scenario step that is no transition (state) or relationship (ER) of the diagram"
   },
-  "walk-gap": {
+  "scenario-gap": {
    "level": "warning",
    "side": "both",
-   "what": "A walk step that does not start where the step before ended"
+   "what": "A scenario step that does not start where the step before ended"
   },
-  "walk-twice": {
+  "scenario-twice": {
    "level": "error",
    "side": "both",
-   "what": "Two walks of one diagram with the same name"
+   "what": "Two scenarios of one diagram with the same name"
   },
   "look-not-flowchart": {
    "level": "error",
@@ -568,6 +568,26 @@
    "level": "error",
    "side": "both",
    "what": "An icon marked main on a node that has a cloud icon, its own or its class's (the cloud icon is main)"
+  },
+  "walkthrough-empty": {
+   "level": "error",
+   "side": "both",
+   "what": "A walkthrough with no stops"
+  },
+  "walkthrough-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "Two walkthroughs with the same name: only the first is used"
+  },
+  "walkthrough-stop-kind": {
+   "level": "error",
+   "side": "both",
+   "what": "A walkthrough stop whose heading does not start with Diagram, Perspective, Deployment, Scenario, Join or Sequence"
+  },
+  "walkthrough-stop-unknown": {
+   "level": "error",
+   "side": "checker",
+   "what": "A walkthrough stop naming an item the map does not have (checked by kind and name)"
   }
  }
 }

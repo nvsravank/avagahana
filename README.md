@@ -92,7 +92,7 @@ After lays two versions on the same picture.
 
 ## Follow a thing through its life
 
-Walk an order through its states, one step at a time. Walk a query through its tables,
+Step an order through its states, one step at a time. Step a query through its tables,
 with a warning where a join multiplies rows.
 
 <picture>

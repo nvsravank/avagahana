@@ -6,6 +6,47 @@ marked **Contract**.
 
 ## Unreleased
 
+- Atlas and viewer (WO-40): the atlas shows no viewer picker (`viewPicker: false`): its bar
+  is the navigation; an exported snapshot keeps the picker. A minimised walkthrough is a
+  small route icon, with no name or place; the walkthrough panel sits on the left (a
+  sequence's panel keeps the right), with no Previous on the first stop and no Next on the
+  last.
+
+- Viewer and atlas (WO-40): every diagram is reachable from both. The viewer's picker
+  lists the whole map: Walks (walkthroughs and their stops) first, then every diagram,
+  linked from the first or not, with its perspectives, joins, deployments and scenarios
+  nested under it; rows open and close (Open all, Close all), the diagram shown starts
+  open, what is shown is marked. "Where it runs" and "Not linked" are gone. The atlas
+  bar has no pills: plain items (Walks, then each diagram, the first called Overview),
+  the one shown underlined; an item with more under it opens a popup of two columns
+  (its groups; the picked group's entries) on hover, a tap or Enter, and every diagram's
+  popup starts with its Overview. On a phone the viewer shows no picker in the atlas
+  (`viewPicker: 'wide'`); the atlas is the way round. `contents()` walkthrough entries
+  gain `stopList`.
+- Viewer (WO-40): a walkthrough follows the reader. Exploring inside a stop stays on it;
+  opening another stop's place moves to that stop; any other place is off the path, with
+  Return to the stop (Previous and Next go on from it). Skill: `references/walkthroughs.md`
+  (when to write one, choosing stops, writing notes); trace-architecture ends a large map
+  with one.
+
+- **Contract** (map format, addition): `## Walkthrough: <name>` tells a story over the map's
+  own items: each `### <Kind>: <name>` stop (Diagram, Perspective, Deployment, Scenario,
+  Join or Sequence) names an item and carries its Markdown note, in the order written. The
+  viewer opens it as a panel on the right with Previous and Next, minimised to a tab; the
+  atlas lists a map's walkthroughs first, under Walks, with their stop counts. Checker
+  problems `walkthrough-empty`, `walkthrough-twice`, `walkthrough-stop-kind` and
+  `walkthrough-stop-unknown` (WO-40). Viewer: `contents()` gains kind `walkthrough`, and
+  state gains `walkthrough` and `stop`.
+
+- **Contract** (map format, viewer API, server HTTP API, renamed before any release, not
+  shared yet, so no old names are kept): `## Relations: <name>` is `## Perspective: <name>`
+  and `## Walks: <name>` is `## Scenario: <name>`; the bare `## Relations` stays the default
+  perspective. Before/After is `edition` everywhere (`state.edition`, `setState`, the
+  options, `changes.edition`, `render.py --edition`, the `/api/show` body, the atlas link's
+  `edition=`). A scenario's contents entry is kind `scenario`. Problem codes are
+  `scenarios-not-here` and `scenario-*`; the old names are reported as unknown sections
+  (`section-unknown`), not read (WO-40).
+
 - Atlas (WO-43): pick another map of the same folder as Before. Each row of the map list has
   a stone, "Pick as Before", while nothing is being compared; picking a map by its name
   opens it with no Before (the open map's own name clears it). The link keeps the pick
@@ -191,14 +232,14 @@ marked **Contract**.
   "Planned changes". Theme tokens `plan-added`, `plan-changed`, `plan-removed`. The
   "since you looked" sparkle is off on a diagram with a plan.
 - **Contract** Before and After: viewer option `before` (an earlier version's text),
-  `load` context `before`, `viewer.setBefore(text)`, `perspective` in `state` and
+  `load` context `before`, `viewer.setBefore(text)`, `edition` in `state` and
   `setState`. A toggle beside the view picker switches versions with a glide; a changes
   button lists what changed in the view shown (Removed, Added, Moved, Changed); the node
   page says the same. Matching is by id (WO-34).
 - **Contract** Relay: `POST /api/show` takes `before` (kept in memory per map, `null`
-  forgets it) and `perspective`; `GET /api/before?p=`; capability `before`;
+  forgets it) and `edition`; `GET /api/before?p=`; capability `before`;
   `POST /api/render` takes `before`; the layout report then has `changes` (per view). `show.py --before FILE|none`, `render.py --before FILE
-  --perspective before|after`. The atlas carries `perspective=before` in its URL.
+  --edition before|after`. The atlas carries `edition=before` in its URL.
 - Example pair `examples/maps/checkout-release-before.md` and `checkout-release-after.md`
   (a release review); skill reference `compare.md`.
 - Checker: `plan-arrow-contradicts` (error), `plan-arrow-to-removed`, `plan-removed-keeps`,
@@ -245,7 +286,7 @@ marked **Contract**.
 - **Contract** The layout report (`export({report: true})`): labels cut short, boxes
   overlapping, lines crossing, lines closer than 2 px, the smallest text at the output
   width, each box's colour and why.
-- **Contract** `viewer.contents()` sequence and walk entries gain `steps`.
+- **Contract** `viewer.contents()` sequence and scenario entries gain `steps`.
 - **Contract** `defaultTheme: false` with no usable host theme uses the built-in theme
   with a `theme-built-in-used` warning (before: a plain grey theme); an unknown theme id
   gives a `theme-unknown` warning.
@@ -283,7 +324,7 @@ marked **Contract**.
   every reader, nothing kept), `sinceLabel` ("Since <label>", default "the earlier
   version") and `marks: false` (no marks).
 - **Contract** `viewer.contents()` lists every diagram, relation view, join view,
-  deployment, sequence and walk of the map with the state that opens it, from the
+  deployment, sequence and scenario of the map with the state that opens it, from the
   viewer's model; the `contents` event fires when the list changes. A `theme` event
   (`{id, appearance}`) lets a host style its own frame to match.
 - **Contract** Themes gain an optional `frame` colour group (`--mmv-frame-*`) for a
@@ -375,7 +416,7 @@ marked **Contract**.
 
 - **Contract** ER column relationships use stable IDs under `## Relations`; named
   `## Joins` views reuse connections or define column equalities, including composite
-  pairs. Walks select connection IDs and named views; ambiguous selections fail checking.
+  pairs. Scenarios select connection IDs and named views; ambiguous selections fail checking.
 - Fix ER column labels staying as bars after zooming back in.
 - ER tables show all columns through 15, retain PK/grain/FK/connected columns above
   that threshold, and route connections horizontally into their exact column rows.
@@ -423,21 +464,21 @@ marked **Contract**.
   Role (fact, dimension, bridge: built-in classes, else inferred) or Class. Selecting a
   fact table states its grain. The node page lists the columns. Example
   `examples/maps/sales-warehouse.md`.
-- **Contract** Walks (WO-14): `## Walks: <name>` after a state or ER diagram, steps
+- **Contract** Scenarios (WO-14, then called walks): `## Scenario: <name>` after a state or ER diagram, steps
   `- A --> B : text`, played over the diagram by the sequence player; ER steps to a
-  many side say "rows multiply here". New problem codes `walks-not-here`, `walk-empty`,
-  `walk-syntax`, `walk-not-step`, `walk-gap`, `walk-twice`.
+  many side say "rows multiply here". New problem codes `scenarios-not-here`, `scenario-empty`,
+  `scenario-syntax`, `scenario-not-step`, `scenario-gap`, `scenario-twice`.
 - **Contract** Problem codes for state and ER blocks (`state-*`, `er-*`), all in
   `format/problems.json` with a sample each.
 - **Contract** Atlas links keep any well-formed `mode` (the viewer checks it against the
   map's type), so new diagram types need no atlas change.
 - The checker is split into modules beside `format/check_map.py`: `check_common.py`,
-  `check_state.py`, `check_er.py`, `check_walks.py`.
+  `check_state.py`, `check_er.py`, `check_scenarios.py`.
 - Diagram types may bring their own node geometry, node painting, page sections,
   colour categories and icons (hooks in `map-viewer/diagrams/index.js`); `boxes: true`
   replaces the viewer's checks for the flowchart type by name.
-- Shop platform example: an order lifecycle (state, with a walk) and the orders data
-  (ER, with a join walk), linked from the Orders service and the Orders database.
+- Shop platform example: an order lifecycle (state, with a scenario) and the orders data
+  (ER, with a join scenario), linked from the Orders service and the Orders database.
 
 - Sequence player over a view: a message to itself loops round a top corner of its box
   (the one with less in the way), its number and label on a card like other messages.
@@ -640,7 +681,7 @@ marked **Contract**.
   A layered layout per open box, inside out (ranks along the arrows, crossings cut by
   neighbour averages, loose boxes stacked), direction from the block or a box's own
   `direction`. `examples/maps/c4-shop.md`: a C4 container diagram with three views.
-- **Relation views** in any map: `## Relations` is the default view, `## Relations:
+- **Relation views** in any map: `## Relations` is the default perspective, `## Perspective:
   <name>` adds one (a box diagram's own arrows are its default). A view picker shows
   when a map has more than one. In a box diagram each view is its own picture: only the
   boxes its arrows use and the boxes round them, laid out for it, animated between
@@ -757,7 +798,7 @@ marked **Contract**.
 - Node page: thumbnails draw every label, like an export, fitted to the card; cards three across and two rows to the page's height; no "Opens" heading.
 - Expand button: cycles one level, two levels, default, all (the map opens in default); a one-level state in every diagram type, with the same icons (a mind map's main branches, a box diagram's top-level boxes, closed); boxes or branches opened or closed by hand bring the button back, offering to open everything.
 - Box diagrams, drilled in: the neighbours are the real ends of the arrows (Stock database, not Data), each inside faded frames of its outer boxes that hold only the linked ends; arrows between two neighbours are not drawn. Replaces lifting to the outermost box.
-- Animation: drilling in or out, opening or closing a box or branch and the expand button and switching between drawn modes (mind map and org, boxes and layers) glide every box from where it was on screen to its new place (what leaves shrinks into the view's bottom left corner, what arrives grows out of it); then the lines, their ends and labels fade in together. Mind maps too. Double-clicking a drilled-in neighbour walks to it.
+- Animation: drilling in or out, opening or closing a box or branch and the expand button and switching between drawn modes (mind map and org, boxes and layers) glide every box from where it was on screen to its new place (what leaves shrinks into the view's bottom left corner, what arrives grows out of it); then the lines, their ends and labels fade in together. Mind maps too. Double-clicking a drilled-in neighbour scenarios to it.
 - Fix: a glide that changed the zoom level (labels to lines, or back) was cut short by a redraw; the drawing is now made at the zoom it will be seen at (fit first), so the first view of a map also has the right level of detail.
 - Notes: a link to `#<heading anchor>` opens that diagram of the file (from the node's page with the thumbnail's motion); one to no diagram is plain text. Mind map related links with a note show a note mark.
 - **Contract** Viewer state `page` (the node whose page is open), in the atlas URL (`&page=`) and the relay's `/api/show` and `show.py --page`. The node's page is a step of the crumbs: back from a diagram it opened stops at the page; the step into another diagram of the file is marked `#`.

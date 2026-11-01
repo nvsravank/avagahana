@@ -58,7 +58,7 @@ def check_connections(m, part, secs, legacy):
     pending = []
     seen_sections = set()
     for title, body, hl in secs:
-        rm = re.fullmatch(r'relations\s*(?::\s*(.+))?', title, re.I)
+        rm = re.fullmatch(r'relations|perspective\s*:\s*(.+)', title, re.I)
         jm = re.fullmatch(r'joins\s*:\s*(.+)', title, re.I)
         if not rm and not jm:
             continue

@@ -46,8 +46,8 @@ export async function testErConnections(check) {
   check('join views reuse relationship objects without adding joins to the model', view.relations[0] === map.relations[0] && !map.relations.some((r) => r.join));
   const composite = view.relations[1];
   check('composite joins pair columns by position and carry no cardinalities', composite.fromColumns.join() === 'tenant_id,other_id' && composite.toColumns.join() === 'tenant_id,id' && !composite.head && !composite.tail);
-  const walk = [...map.parts.values()].find((p) => p.walk);
-  check('walks preserve selected connection ID through sequence compilation', walk.sequence.messages[0].connectionId === 'composite' && walk.sequence.steps[0].msgs[0].connectionId === 'composite' && walk.playsOver[0].view === 'Composite');
+  const scenario = [...map.parts.values()].find((p) => p.scenario);
+  check('scenarios preserve selected connection ID through sequence compilation', scenario.sequence.messages[0].connectionId === 'composite' && scenario.sequence.steps[0].msgs[0].connectionId === 'composite' && scenario.playsOver[0].view === 'Composite');
   const measure = (t) => t.length * 7;
   const geometry = (n) => tableGeometry(n, 1, 'test', measure);
   const make = (count, fk = false) => ({ plain: 'Wide', attrs: Array.from({ length: count }, (_, i) => ({ name: `c${i}`, type: 'int', keys: new Set(i === 0 ? ['PK'] : fk ? ['FK'] : []), grain: i === 1, connected: i === count - 1 })) });
@@ -110,7 +110,7 @@ export async function testErConnections(check) {
   } finally { console.warn = originalWarn; }
   live.destroy();
   const shop = parseMap(await fetch('../../examples/maps/shop-layers.md').then((r) => r.text()), 'shop-layers.md');
-  check('Shop platform joins, relationships and walks are valid', !shop.problems.length, JSON.stringify(shop.problems));
+  check('Shop platform joins, relationships and scenarios are valid', !shop.problems.length, JSON.stringify(shop.problems));
   const data = shop.parts.get('orders-data');
   const over = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   for (const view of data.views) {

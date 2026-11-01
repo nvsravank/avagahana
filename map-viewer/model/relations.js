@@ -63,7 +63,7 @@ export function parseRelations(text, byId, warnings) {
 }
 
 // The map's views: `## Relations` (the default, unless the diagram brings its own
-// arrows) and `## Relations: <name>` sections, in file order. `own` is the diagram's
+// arrows) and `## Perspective: <name>` sections, in file order. `own` is the diagram's
 // own arrows (a flowchart's), which are the default view. The default keeps the name
 // "Relations" (the heading, and the state's view) and is shown as DEFAULT_VIEW_LABEL.
 export const DEFAULT_VIEW_LABEL = 'Overview';

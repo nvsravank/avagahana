@@ -1,4 +1,4 @@
-<!-- expect: walks-not-here -->
+<!-- expect: scenarios-not-here -->
 # Sample
 
 ```mermaid
@@ -6,5 +6,5 @@ flowchart LR
   a --> b
 ```
 
-## Walks: Not here
+## Scenario: Not here
 - a --> b

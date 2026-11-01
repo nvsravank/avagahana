@@ -4,14 +4,14 @@
 //   modes [{id, label, icon}] (list mode is shared), colourBy [{id, label}],
 //   branchOrder(children), defaultCollapsed(top), layout(mode, root, kids, size, input),
 //   buildScene(input), and optionally renderList(v, on) (a list mode of its own) and
-//   boxes: true (a box diagram: boxes holding boxes, arrows, sequences and walks play over it),
+//   boxes: true (a box diagram: boxes holding boxes, arrows, sequences and scenarios play over it),
 //   and hooks for a type that draws its nodes its own way: nodeGeometry(n, rel, font,
 //   measure) (a node's size), paintNode(g, s, {svgEl, href}) (a scene node with custom
 //   set), builtInClasses (classes of its own, as person and database are: an ER
 //   diagram's table classes), autoColourBy(map) (the map decides its colouring),
 //   icons: ['ph …'] (icons it draws itself, loaded before the first draw), drawsSelection
 //   (the drawing changes with the selection: selecting draws again), fansOut(r, from) (a
-//   walk's step along r reaches the many side), pageSections(n) -> [{title, el}] (sections
+//   scenario's step along r reaches the many side), pageSections(n) -> [{title, el}] (sections
 //   of the node's page), noteLinks (a link in a node's note to another diagram links
 //   the node, as a flowchart's click does: a state diagram, which has no click)
 //   looks ([[preference value, reader-facing label, data-look when not the value]]) for

@@ -14,7 +14,7 @@ flowchart LR
   classDef money stroke-dasharray: 4 2
 ```
 
-## Relations: Reads
+## Perspective: Reads
 
 - b r1@--> a : rows
 

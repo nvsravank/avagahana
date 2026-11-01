@@ -196,39 +196,39 @@ export function compareFiles(was, now) {
   return { parts, added, removed, warnings: [...parts.values()].flatMap((p) => p.warnings) };
 }
 
-// The mark a thing takes in one perspective: the later file shows what it adds and
+// The mark a thing takes in one edition: the later file shows what it adds and
 // changes, the earlier one what goes and what changes; a move reads as changed.
-function markOf(state, perspective) {
+function markOf(state, edition) {
   if (state === 'moved' || state === 'changed') return 'changed';
-  if (state === 'added') return perspective === 'after' ? 'added' : null;
-  if (state === 'removed') return perspective === 'before' ? 'removed' : null;
+  if (state === 'added') return edition === 'after' ? 'added' : null;
+  if (state === 'removed') return edition === 'before' ? 'removed' : null;
   return null;
 }
 
 // Marks one version (file: the parsed text of that version) with the comparison, as
 // planned changes (n.plan, r.plan) so the drawing, the list and the filter show them.
 // Each diagram gets `compared: true` and hasPlan when it has a mark.
-export function markFile(file, cmp, perspective) {
+export function markFile(file, cmp, edition) {
   for (const [k, m] of partsOf(file)) {
     const pd = cmp.parts.get(k);
     m.compared = true;
     if (!pd) { m.hasPlan = false; continue; }
     let any = false;
     for (const n of nodesOf(m)) {
-      n.plan = markOf(pd.nodes.get(n.id)?.state, perspective);
+      n.plan = markOf(pd.nodes.get(n.id)?.state, edition);
       any ||= !!n.plan;
       // a table's columns, by their name in the version shown
       const cols = pd.columns.get(n.id);
       for (const a of n.attrs || []) {
-        const c = cols && [...cols.values()].find((x) => (perspective === 'after' ? x.state !== 'removed' && x.name === a.name : x.state !== 'added' && (x.was ?? x.name) === a.name));
-        a.plan = markOf(c?.state, perspective);
+        const c = cols && [...cols.values()].find((x) => (edition === 'after' ? x.state !== 'removed' && x.name === a.name : x.state !== 'added' && (x.was ?? x.name) === a.name));
+        a.plan = markOf(c?.state, edition);
         a.planWhat = a.plan ? c.what : null;
       }
     }
     for (const v of m.views) {
       const marks = pd.arrows.get(v.name);
       for (const [r, key] of arrowKeys(v)) {
-        r.plan = marks ? markOf(marks.get(key)?.state, perspective) : null;
+        r.plan = marks ? markOf(marks.get(key)?.state, edition) : null;
         any ||= !!r.plan;
       }
       if (!v.deploy) continue;
@@ -236,7 +236,7 @@ export function markFile(file, cmp, perspective) {
       for (const n of Object.values(v.deploy.byId)) {
         if (n === v.deploy.root) continue;
         const place = places?.get(n.id);
-        n.plan = place ? markOf(place.state, perspective) : m.byId[n.id]?.plan || null;
+        n.plan = place ? markOf(place.state, edition) : m.byId[n.id]?.plan || null;
         any ||= !!n.plan;
       }
     }

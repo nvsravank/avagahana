@@ -140,12 +140,12 @@ product or customer.
 Drilling across the two facts: an order line meets the stock count for the same day
 and product, through the shared date and product dimensions.
 
-## Walks: Revenue by region
+## Scenario: Revenue by region
 
 - ORDER_LINE --> CUSTOMER : Each order line joins its customer on customer_key.
 - CUSTOMER --> REGION : The customer's region on region_key; sum net_amount per region.
 
-## Walks: Sales with tags
+## Scenario: Sales with tags
 
 - ORDER_LINE --> PRODUCT : Each order line joins its product on product_key.
 - PRODUCT --> PRODUCT_TAG : A product has several tags, so a sum over this join counts each line once per tag.

@@ -1,4 +1,4 @@
-<!-- expect: walk-empty -->
+<!-- expect: scenario-empty -->
 # Sample
 
 ```mermaid
@@ -8,4 +8,4 @@ stateDiagram-v2
   b --> [*]
 ```
 
-## Walks: Nothing
+## Scenario: Nothing

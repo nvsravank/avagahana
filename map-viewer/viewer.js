@@ -21,6 +21,7 @@ import { createSeen } from './seen.js';
 import { summarize } from './model/changes.js';
 import { compareFiles, markFile, changesIn, changesOf } from './model/compare.js';
 import { renderNoteBody } from './notes.js';
+import { STOP_KINDS } from './model/walkthroughs.js';
 import { problemList, mapProblems } from './problems.js';
 import { checkTheme, acquire, release, loadFont } from './themes/theme.js';
 import { clearMeasureCache } from './measure.js';
@@ -142,7 +143,8 @@ export function mount(element, options = {}) {
     // first, as {anchor, focus, node} (node: the node that opened the next level)
     file: null, part: null, trail: [],
     thumb: !!options.thumbnail,   // drawn small inside another viewer's node page
-    hits: [], hitIdx: -1, iconFilter: new Set(), perspective: 'after', compare: null,
+    hits: [], hitIdx: -1, iconFilter: new Set(), edition: 'after', compare: null,
+    walkthrough: null, stop: null, stopMin: false, offPath: false,   // the walkthrough open, its stop (1-based), the reader elsewhere
     view: { k: 1, x: 0, y: 0 }, layout: null, lodKey: null, exporting: false,
     expand: 'default', expandStates: [], userMoved: false, lastFit: null,
     play: null,   // a sequence playing: {seq, step, playing} (player.js)
@@ -1461,22 +1463,22 @@ export function mount(element, options = {}) {
   $.sparklesBtn.addEventListener('click', () => { togglePanel('sparklesPanel'); renderSparkles(); });
   $.changesBtn.addEventListener('click', () => { togglePanel('changesPanel'); renderChanges(); });
   // the Before / After switch (WO-42): the version on screen is pressed; the other switches
-  $.perspBefore.addEventListener('click', () => switchPerspective('before'));
-  $.perspAfter.addEventListener('click', () => switchPerspective('after'));
+  $.perspBefore.addEventListener('click', () => switchEdition('before'));
+  $.perspAfter.addEventListener('click', () => switchEdition('after'));
 
   // ---------- Before and After (WO-34) ----------
   // The other version: loaded in place of this one (a live reload, so what stayed glides,
   // what goes fades and what comes appears), keeping the diagram, view and selection.
-  async function switchPerspective(p) {
-    if (!S.compare || !['before', 'after'].includes(p) || p === S.perspective) return;
-    S.perspective = p;
+  async function switchEdition(p) {
+    if (!S.compare || !['before', 'after'].includes(p) || p === S.edition) return;
+    S.edition = p;
     await load(S.text, S.path, { sourceId });
   }
-  function markPerspective() {
+  function markEdition() {
     $.perspBtn.hidden = !S.compare;
     $.changesBtn.hidden = !S.compare;
     if (!S.compare) { $.changesPanel.hidden = true; return; }
-    const before = S.perspective === 'before';
+    const before = S.edition === 'before';
     for (const [b, on] of [[$.perspBefore, before], [$.perspAfter, !before]]) {
       b.classList.toggle('is-on', on);
       b.setAttribute('aria-pressed', String(on));
@@ -1557,14 +1559,14 @@ export function mount(element, options = {}) {
     }
   }
   // For the layout report (export.js): what changed, in the view drawn and in each view
-  // and deployment of its diagram. -> {perspective, diagram, view, whole, groups, views} or null
+  // and deployment of its diagram. -> {edition, diagram, view, whole, groups, views} or null
   v.changesReport = () => {
     if (!S.compare || !S.map) return null;
     const one = (x) => changesIn(S.compare, partKey(), x?.name || null, !!x?.deploy);
     const view = shownView();
     const here = one(view);
     return {
-      perspective: S.perspective, diagram: S.map.title, view: view ? labelOf(view) : null, whole: here.whole, groups: here.groups,
+      edition: S.edition, diagram: S.map.title, view: view ? labelOf(view) : null, whole: here.whole, groups: here.groups,
       views: S.map.views.map((x) => ({ view: labelOf(x), deployment: !!x.deploy, ...one(x) })),
       diagramsAdded: S.compare.added.map((x) => x.title), diagramsRemoved: S.compare.removed.map((x) => x.title),
     };
@@ -1629,28 +1631,111 @@ export function mount(element, options = {}) {
     if (S.map.root !== before) painter.clearSizes();
     buildViews();
   }
+  // The picker: the whole map, as the atlas lists it. Walks (the walkthroughs and their
+  // stops) first, then every diagram, linked from the first or not, each with its
+  // perspectives, joins, deployments and scenarios nested under it. Rows open and close;
+  // the diagram shown starts open. viewPicker 'wide': none on a narrow toolbar (a phone,
+  // where the host's own list is the way round).
+  // A row is open when the reader opened it, or it is the diagram shown and the reader has
+  // not closed it; the diagram shown changes, its row opens again
+  const pickerOpen = new Set();     // keys of the rows the reader opened
+  const pickerClosed = new Set();   // keys of the rows the reader closed
+  let pickerFor;                    // the diagram shown when the picker was last built
+  const KIND_WORD = { view: 'perspective', join: 'join', deployment: 'deployment', scenario: 'scenario' };
+  const KIND_ORDER = ['view', 'join', 'deployment', 'scenario'];
+  // what is shown: a stop of the walkthrough open; the scenario or sequence playing; else in
+  // the diagram shown, its deployment or perspective (null: the default), or the diagram
+  function isShown(x) {
+    if (x.kind === 'stop') return S.walkthrough === x.walk && S.stop === x.stop;
+    if (x.kind === 'walk') return S.walkthrough === x.walk;
+    const st = currentState();
+    if (x.kind === 'scenario' || x.kind === 'sequence') return !!st.seq && st.seq === x.state.seq;
+    if (st.seq || (x.part ?? null) !== (st.part ?? null)) return false;
+    if (x.kind === 'diagram') return true;
+    if (x.kind === 'deployment') return st.env === x.state.env;
+    return !st.env && (x.state.view ?? null) === (st.view ?? null);
+  }
+  function markViews() {
+    for (const b of $.viewMenu.querySelectorAll('.mmv-menu-item')) if (b.entry) b.classList.toggle('is-on', isShown(b.entry));
+  }
   function buildViews() {
     buildPlay();
-    const views = S.map?.views || [];
-    // diagrams no link leads to (a map problem): still shown, from the first diagram's picker
-    const lost = !S.part && !S.thumb ? (S.file?.unlinked || []).map((a) => S.file.parts.get(a)).filter(Boolean) : [];
-    $.viewWrap.hidden = !showViewPicker || (views.length < 2 && !lost.length);
+    const list = items();
+    const walks = walkthroughs();
+    const diagrams = list.filter((x) => x.kind === 'diagram' || x.kind === 'sequence');
+    $.viewWrap.hidden = !showViewPicker || S.thumb || (list.length < 2 && !walks.length);
     if ($.viewWrap.hidden) return;
+    const views = S.map?.views || [];
     const current = viewNamed(S.relView) || views[0];
-    $.viewName.textContent = labelOf(current) || 'Views';
+    $.viewName.textContent = labelOf(current) || 'Overview';
     fitTopSoon();
-    const item = (text, on, fn) => {
-      const b = Object.assign(document.createElement('button'), { className: `mmv-menu-item${on ? ' is-on' : ''}`, textContent: text });
+    const here = `d:${S.part ?? ''}`;
+    if (pickerFor !== here) { pickerClosed.delete(here); pickerFor = here; }
+    const isOpen = (key) => pickerOpen.has(key) || (key === here && !pickerClosed.has(key));
+    const el = (tag, cls, text) => Object.assign(document.createElement(tag), { className: cls, ...(text != null ? { textContent: text } : {}) });
+    const entry = (x, label, note, fn) => {
+      const b = el('button', 'mmv-menu-item');
+      b.type = 'button';
+      b.append(el('span', 'mmv-vm-label', label));
+      if (note) b.append(el('span', 'mmv-vm-note', note));
+      b.entry = x;
       b.addEventListener('click', () => { b.blur(); fn(); });
       return b;
     };
-    const heading = (text) => [Object.assign(document.createElement('hr'), { className: 'mmv-menu-sep' }), Object.assign(document.createElement('div'), { className: 'mmv-menu-head', textContent: text })];
-    $.viewMenu.replaceChildren(...(views.length < 2 ? [] : views).flatMap((x, k) => {
-      const b = item(labelOf(x), x === current, () => setView(x.name));
-      // the deployments after the relation views, under their own heading
-      if (!x.deploy || views[k - 1]?.deploy) return [b];
-      return [...heading('Where it runs'), b];
-    }), ...(lost.length ? [...(views.length < 2 ? heading('Not linked').slice(1) : heading('Not linked')), ...lost.map((p) => item(p.title, false, () => enterPart(p.anchor, null)))] : []));
+    // a row with what is under it: a twist that opens and closes it, and the row itself
+    const row = (key, head, kids) => {
+      const wrap = el('div', 'mmv-vm-row');
+      const open = isOpen(key);
+      const twist = el('button', 'mmv-vm-twist');
+      twist.type = 'button';
+      twist.setAttribute('aria-expanded', String(open));
+      twist.setAttribute('aria-label', open ? 'Close' : 'Open');
+      // nothing under the row: the twist keeps its room (the rows line up) but is no control
+      if (!kids.length) { twist.classList.add('is-empty'); twist.tabIndex = -1; twist.setAttribute('aria-hidden', 'true'); }
+      twist.addEventListener('click', () => { if (isOpen(key)) { pickerOpen.delete(key); pickerClosed.add(key); } else { pickerClosed.delete(key); pickerOpen.add(key); } buildViews(); $.viewMenu.querySelector(`[data-key="${CSS.escape(key)}"] .mmv-vm-twist`)?.focus(); });
+      wrap.dataset.key = key;
+      const line = el('div', 'mmv-vm-line');
+      line.append(twist, head);
+      wrap.append(line);
+      if (open && kids.length) {
+        const under = el('div', 'mmv-vm-kids');
+        under.append(...kids);
+        wrap.append(under);
+      }
+      return wrap;
+    };
+    const keys = [];
+    const out = [];
+    const tools = el('div', 'mmv-vm-tools');
+    out.push(tools);
+    if (walks.length) {
+      out.push(el('div', 'mmv-menu-head', 'Walks'));
+      for (const w of walks) {
+        const key = `w:${w.name}`;
+        keys.push(key);
+        const kids = w.stops.map((st, i) => entry({ kind: 'stop', walk: w.name, stop: i + 1 }, `${i + 1}. ${st.name}`, null, () => openWalkthrough(w.name, i + 1)));
+        out.push(row(key, entry({ kind: 'walk', walk: w.name }, w.name, `${w.stops.length} stop${w.stops.length === 1 ? '' : 's'}`, () => openWalkthrough(w.name, 1)), kids));
+      }
+    }
+    if (diagrams.length > 1 || walks.length) out.push(el('div', 'mmv-menu-head', 'Diagrams'));
+    for (const d of diagrams) {
+      const key = `d:${d.part ?? ''}`;
+      const own = list.filter((x) => (x.part ?? null) === (d.part ?? null) && KIND_WORD[x.kind])
+        .sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind));
+      const kids = own.map((x) => entry(x, x.label, KIND_WORD[x.kind], () => setState(x.state)));
+      if (kids.length) keys.push(key);
+      out.push(row(key, entry(d, d.first ? 'Overview' : d.label, null, () => setState(d.state)), kids));
+    }
+    if (keys.length > 1) {
+      const all = el('button', 'mmv-vm-tool', 'Open all');
+      const none = el('button', 'mmv-vm-tool', 'Close all');
+      all.type = none.type = 'button';
+      all.addEventListener('click', () => { keys.forEach((k) => { pickerOpen.add(k); pickerClosed.delete(k); }); buildViews(); });
+      none.addEventListener('click', () => { keys.forEach((k) => { pickerOpen.delete(k); pickerClosed.add(k); }); buildViews(); });
+      tools.append(all, none);
+    } else tools.hidden = true;
+    $.viewMenu.replaceChildren(...out);
+    markViews();
   }
   // The play button: the sequences linked to the view shown (a box diagram), or the
   // sequence shown (as lifelines). One plays at a click; several are a short list.
@@ -1786,7 +1871,7 @@ export function mount(element, options = {}) {
     }
     // planned changes (WO-34): what the ringed signs mean, in any colouring
     if (planShown()) {
-      section('plan', S.map.compared ? `Since the earlier version (${S.perspective === 'before' ? 'Before' : 'After'})` : 'Planned changes');
+      section('plan', S.map.compared ? `Since the earlier version (${S.edition === 'before' ? 'Before' : 'After'})` : 'Planned changes');
       for (const p of ['added', 'changed', 'removed']) row(planSignSvg(p, 18), PLAN_WORD[p], p);
     }
     // colour by Changes: what the plan adds, changes and removes
@@ -1925,10 +2010,13 @@ export function mount(element, options = {}) {
   function currentState() {
     // a deployment is reported as env, a relation view as view
     const env = viewNamed(S.relView)?.deploy ? S.relView : null;
-    return { mode: S.mode, part: S.part, focus: S.focus, node: S.selected, page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state(), ...(S.compare ? { perspective: S.perspective } : {}) };
+    return { mode: S.mode, part: S.part, focus: S.focus, node: S.selected, page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state(), ...(S.compare ? { edition: S.edition } : {}), ...(S.walkthrough ? { walkthrough: S.walkthrough, stop: S.stop } : {}) };
   }
   function emitState() {
     renderChanges();   // the view shown may be another
+    followStop();
+    renderWalkthrough();
+    markViews();
     renderSparkles();
     const s = currentState();
     const key = JSON.stringify(s);
@@ -1961,13 +2049,13 @@ export function mount(element, options = {}) {
     // an earlier version: the version shown, marked with what differs (model/compare.js).
     // A file with planned changes of its own shows those only.
     let compare = null;
-    if (firstLoad && options.state?.perspective === 'before') S.perspective = 'before';
+    if (firstLoad && options.state?.edition === 'before') S.edition = 'before';
     if (beforeText != null && file.root && ![file, ...file.parts.values()].some((m) => m.hasPlan)) {
       const earlier = parseMap(beforeText, String(path || 'map.md').split('/').pop());
       if (earlier.root) {
         compare = compareFiles(earlier, file);
-        if (S.perspective === 'before') file = earlier;
-        markFile(file, compare, S.perspective);
+        if (S.edition === 'before') file = earlier;
+        markFile(file, compare, S.edition);
       }
     }
     if (!file.root) {
@@ -2023,11 +2111,12 @@ export function mount(element, options = {}) {
     S.path = path;
     S.text = String(text ?? '');
     S.file = file;
+    if (!keep) { S.walkthrough = null; S.stop = null; S.stopMin = false; }
     S.compare = compare;
-    if (!compare) S.perspective = 'after';
+    if (!compare) S.edition = 'after';
     // what changed since this reader last looked: the marks, and what this load brought
     // (it glows) or took away (it leaves in red)
-    const got = seen && S.perspective === 'after' ? seen.load(sourceId == null ? (path || 'map.md') : JSON.stringify([sourceId, path || 'map.md']), file) : null;
+    const got = seen && S.edition === 'after' ? seen.load(sourceId == null ? (path || 'map.md') : JSON.stringify([sourceId, path || 'map.md']), file) : null;
     S.fresh = got?.fresh || new Set();
     S.gone = got?.gone || new Set();
     clearTimeout(freshTimer);
@@ -2060,7 +2149,7 @@ export function mount(element, options = {}) {
       render(keep ? false : 'levels');
     }
     markSparkles();
-    markPerspective();
+    markEdition();
     emit('load', { path, title: file.title, warnings: file.warnings.slice() });
     fitTopSoon();   // the host may have changed its button in the slot
     emitContents();
@@ -2119,12 +2208,99 @@ export function mount(element, options = {}) {
     renderInfo();
   }
 
+  // ---------- walkthrough: a side panel of stops, moved by the reader ----------
+  function openWalkthrough(name, k) {
+    const w = walkthroughs().find((x) => x.name === name);
+    if (!w || !w.stops.length) return;
+    const i = Math.min(Math.max(Math.trunc(k) || 1, 1), w.stops.length);
+    const st = w.stops[i - 1];
+    S.walkthrough = name;
+    S.stop = i;
+    S.offPath = false;
+    // the stop's place is set in steps; the reader is not following until it is there
+    openingStop = true;
+    try { if (st.state) setState(st.state); } finally { openingStop = false; }
+    renderWalkthrough();
+    emitState();
+  }
+  // Where the reader is against the walkthrough: exploring inside the stop (a box opened,
+  // a node's page, another mode, a step of its scenario) stays on it; opening another
+  // stop's place moves to that stop; opening any other diagram, perspective, deployment,
+  // scenario or sequence is off the path (Return to the stop; Previous and Next go on
+  // from it). Places compare by diagram, perspective, deployment and play.
+  let openingStop = false;
+  const atPlace = (want, here) => (want.seq
+    ? here.seq === want.seq
+    : !here.seq && (here.part ?? null) === (want.part ?? null) && (here.env ?? null) === (want.env ?? null) && (here.view ?? null) === (want.view ?? null));
+  function followStop() {
+    if (!S.walkthrough || openingStop || stateDepth) return;
+    const w = walkthroughs().find((x) => x.name === S.walkthrough);
+    if (!w) return;
+    const here = currentState();
+    if (w.stops[S.stop - 1]?.state && atPlace(w.stops[S.stop - 1].state, here)) { S.offPath = false; return; }
+    const k = w.stops.findIndex((st) => st.state && atPlace(st.state, here));
+    if (k >= 0) { S.stop = k + 1; S.offPath = false; } else S.offPath = true;
+  }
+  function closeWalkthrough() {
+    S.walkthrough = null;
+    S.stop = null;
+    S.offPath = false;
+    renderWalkthrough();
+    emitState();
+  }
+  function renderWalkthrough() {
+    const w = S.walkthrough && walkthroughs().find((x) => x.name === S.walkthrough);
+    $.stopPanel.hidden = !w || S.stopMin;
+    $.stopTab.hidden = !w || !S.stopMin;
+    if (!w) return;
+    const st = w.stops[S.stop - 1];
+    const kind = st.kind.charAt(0).toUpperCase() + st.kind.slice(1);
+    $.stopWalk.textContent = w.name;
+    $.stopCount.textContent = `Stop ${S.stop} of ${w.stops.length}`;
+    $.stopKind.textContent = kind;
+    $.stopTitle.textContent = st.state ? st.name : `${st.name} (not in this map)`;
+    $.stopNote.replaceChildren();
+    if (st.text) renderNoteBody(st.text, $.stopNote, wireLink);
+    // no Previous on the first stop, no Next on the last
+    $.stopPrev.hidden = S.stop <= 1;
+    $.stopNext.hidden = S.stop >= w.stops.length;
+    $.stopOff.hidden = !S.offPath;
+    $.stopBack.textContent = `Return to stop ${S.stop}`;
+    $.stopPanel.classList.toggle('is-off', !!S.offPath);
+  }
+  $.stopBack.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop));
+  $.stopPrev.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop - 1));
+  $.stopNext.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop + 1));
+  $.stopMin.addEventListener('click', () => { S.stopMin = true; renderWalkthrough(); });
+  $.stopTab.addEventListener('click', () => { S.stopMin = false; renderWalkthrough(); });
+
+  // A call sets its keys one by one (the diagram, then its perspective, ...); a
+  // walkthrough follows the reader only where the whole call lands, never in between
+  let stateDepth = 0;
   function setState(partial = {}) {
+    const before = `${S.stop}|${S.offPath}`;
+    stateDepth++;
+    let out;
+    try { out = applyState(partial); } finally { stateDepth--; }
+    if (!stateDepth && S.walkthrough) {
+      followStop();
+      if (`${S.stop}|${S.offPath}` !== before) emitState();
+    }
+    return out;
+  }
+  function applyState(partial = {}) {
     if (!S.map?.root) return;
     // the other version first (a load), then the rest on it
-    if ('perspective' in partial && S.compare && partial.perspective !== S.perspective) {
-      const { perspective, ...rest } = partial;
-      return switchPerspective(perspective).then(() => { if (Object.keys(rest).length) setState(rest); });
+    if ('edition' in partial && S.compare && partial.edition !== S.edition) {
+      const { edition, ...rest } = partial;
+      return switchEdition(edition).then(() => { if (Object.keys(rest).length) setState(rest); });
+    }
+    // a walkthrough opens at a stop (its item is opened, then the rest of the call applies)
+    if ('walkthrough' in partial) {
+      const { walkthrough, stop, ...rest } = partial;
+      if (walkthrough) openWalkthrough(walkthrough, stop); else closeWalkthrough();
+      if (Object.keys(rest).length) setState(rest);
+      return;
     }
     // a stop (seq null) comes first and the rest of the call still applies; a sequence to
     // play chooses its own diagram and view, so the call ends there
@@ -2194,7 +2370,7 @@ export function mount(element, options = {}) {
       ...(env ? { env } : S.relView ? { view: S.relView } : {}),
       ...(S.rels === '1' ? { rels: true } : {}),
       ...(play.seq ? { seq: play.seq, step: 1 } : {}),
-      ...(S.compare && S.perspective === 'before' ? { perspective: 'before' } : {}),
+      ...(S.compare && S.edition === 'before' ? { edition: 'before' } : {}),
     };
     const marks = sinceText != null && options.marks !== false;
     const opts = {
@@ -2212,18 +2388,18 @@ export function mount(element, options = {}) {
   // Everything a reader can open in the file, in file order: each diagram (a sequence
   // as kind sequence), then its relation views when it has more than one (the default
   // first, under its label "Overview"; an ER join view as kind join), its deployments
-  // and its walks. type: the diagram's type (mindmap, flowchart, sequence, ...).
-  // steps: a sequence's or walk's number of steps.
-  // state: what setState takes to open it (a sequence or walk opens
+  // and its scenarios. type: the diagram's type (mindmap, flowchart, sequence, ...).
+  // steps: a sequence's or scenario's number of steps.
+  // state: what setState takes to open it (a sequence or scenario opens
   // playing at step 1; anything else stops a sequence that plays). changed: something
   // in it is new or changed (seen.js; a view: its own arrows or places). Built from
   // this viewer's model, never from the file's headings.
-  function contents() {
+  function items() {
     const f = S.file;
     if (!f?.root || options.thumbnail) return [];
     const out = [];
     const unlinked = new Set(f.unlinked || []);
-    for (const m of [f, ...[...f.parts.values()].filter((p) => !p.walk)]) {
+    for (const m of [f, ...[...f.parts.values()].filter((p) => !p.scenario)]) {
       if (!m.root) continue;
       const part = m === f ? null : m.anchor;
       const mark = { ...(m === f ? { first: true } : {}), ...(part && unlinked.has(part) ? { unlinked: true } : {}) };
@@ -2235,9 +2411,25 @@ export function mount(element, options = {}) {
       const views = (m.views || []).filter((x) => !x.deploy);
       if (views.length > 1) for (const x of views) out.push({ kind: x.join ? 'join' : 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name }, changed: viewChanged(x) });
       for (const x of m.views || []) if (x.deploy) out.push({ kind: 'deployment', label: x.name, ...own, state: { seq: null, part, env: x.name }, changed: viewChanged(x) });
-      for (const w of f.parts.values()) if (w.walk && w.walkOf === part) out.push({ kind: 'walk', label: w.walkName, ...own, state: { seq: w.anchor, step: 1 }, steps: w.sequence?.steps.length || 0, changed: !!marked()?.partMarked(w.anchor) });
+      for (const w of f.parts.values()) if (w.scenario && w.scenarioOf === part) out.push({ kind: 'scenario', label: w.scenarioName, ...own, state: { seq: w.anchor, step: 1 }, steps: w.sequence?.steps.length || 0, changed: !!marked()?.partMarked(w.anchor) });
     }
     return out;
+  }
+  // the walkthroughs of the file (model/walkthroughs.js): each stop with the state that opens
+  // its item (the contents entry of its kind and name); null when the map has no such item
+  function walkthroughs() {
+    const list = S.file?.walkthroughs || [];
+    if (!list.length || !S.file?.root || options.thumbnail) return [];
+    const entries = items();
+    return list.map((w) => ({ name: w.name, stops: w.stops.map((st) => {
+      const hit = st.known && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name);
+      return { kind: st.kind, name: st.name, text: st.text, state: hit ? hit.state : null };
+    }) }));
+  }
+  // the walkthroughs come first (the menu's Walks), then the items
+  function contents() {
+    const walks = walkthroughs().map((w) => ({ kind: 'walkthrough', label: w.name, part: null, stops: w.stops.length, stopList: w.stops.map((st) => ({ kind: st.kind, label: st.name })), state: { walkthrough: w.name, stop: 1 }, changed: false }));
+    return [...walks, ...items()];
   }
   let lastContents = null;
   function emitContents() {
@@ -2312,7 +2504,7 @@ export function mount(element, options = {}) {
     // the map's earlier version (WO-34): text, or null to stop comparing; draws again
     async setBefore(text) {
       beforeText = text == null || options.thumbnail ? null : String(text);
-      if (beforeText == null) S.perspective = 'after';
+      if (beforeText == null) S.edition = 'after';
       if (S.path != null || S.text) await load(S.text, S.path, { sourceId });
     },
     setPrefs(p = {}) {

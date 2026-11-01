@@ -7,5 +7,5 @@ mindmap
     n2("Branch")
 ```
 
-## Relations: Empty
+## Perspective: Empty
 

@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-11-01 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37), the Poster look: a main icon per node, details on hover, a look per diagram type (WO-38), and a node page that follows a switch of light and dark, the earlier version asked for without an error, and render.py's warning for a --seq the map does not have, and expand 0 in a box diagram showing its top-level boxes (WO-39), and labels that break lines: a box's title at <br> and when long, and the labels of arrows, ER relationships and sequence messages with bold, italic and two lines, cut with … past two and shown whole on hover, the checker warning past two (WO-41), and ER Before and After at column level: columns compared by name with renames in a Renames section, connection pairs and cardinality in ER words, row signs and sparkles per column, nullable types, and emphasis in table titles and comments (WO-22 follow-up), and ER tables coloured by the classes the agent writes: six table classes built in (fact, dimension, bridge, master, transaction, lookup), the Role colouring and its guessing removed, a table with no class in one plain colour, and Mermaid's ER subgraph read as groups of tables that close like boxes, their tables' lines lifted to a closed group (WO-44), and a map picked as Before from the atlas's map list, kept in the link (WO-43). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-11-01 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37), the Poster look: a main icon per node, details on hover, a look per diagram type (WO-38), and a node page that follows a switch of light and dark, the earlier version asked for without an error, and render.py's warning for a --seq the map does not have, and expand 0 in a box diagram showing its top-level boxes (WO-39), and labels that break lines: a box's title at <br> and when long, and the labels of arrows, ER relationships and sequence messages with bold, italic and two lines, cut with … past two and shown whole on hover, the checker warning past two (WO-41), and ER Before and After at column level: columns compared by name with renames in a Renames section, connection pairs and cardinality in ER words, row signs and sparkles per column, nullable types, and emphasis in table titles and comments (WO-22 follow-up), and ER tables coloured by the classes the agent writes: six table classes built in (fact, dimension, bridge, master, transaction, lookup), the Role colouring and its guessing removed, a table with no class in one plain colour, and Mermaid's ER subgraph read as groups of tables that close like boxes, their tables' lines lifted to a closed group (WO-44), the rename to perspectives, scenarios and edition (no old names), walkthroughs over the map's own items with a panel on the left that follows the reader, and every diagram reachable from the atlas's plain items with their popups and from the viewer's whole-map picker (WO-40), and a map picked as Before from the atlas's map list, kept in the link (WO-43). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER scenarios. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -75,22 +75,22 @@ Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the
 
 ### <a id="checker"></a>Standalone format checker
 
-Python 3.9+ standard library checker. Validates syntax, extension sections, identifiers, cross-map targets, diagram reachability, sequence overlays and walks. Shares problem codes with the JavaScript viewer. Evidence: format/check_map.py and format/problems.json.
+Python 3.9+ standard library checker. Validates syntax, extension sections, identifiers, cross-map targets, diagram reachability, sequence overlays and scenarios. Shares problem codes with the JavaScript viewer. Evidence: format/check_map.py and format/problems.json.
 
 
 ### <a id="relay"></a>Optional relay
 
-Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), or the report for a draft's text drawn in the map's place (--draft, or draft_report() in-process for a trial script), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages (an empty 204 when there is none and the page asks with empty=1). render.py warns when --seq names no sequence or walk of the map, by the checker's names (check_map.seq_names), and still draws. Beside it, pack.py needs no running server: it fills map-viewer/snapshot.html (the page the viewer's own pack.js fills by the same rules) with one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. /api/info carries build, the code's commit, for an export's generator tag. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
+Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), or the report for a draft's text drawn in the map's place (--draft, or draft_report() in-process for a trial script), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages (an empty 204 when there is none and the page asks with empty=1). render.py warns when --seq names no sequence or scenario of the map, by the checker's names (check_map.seq_names), and still draws. Beside it, pack.py needs no running server: it fills map-viewer/snapshot.html (the page the viewer's own pack.js fills by the same rules) with one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. /api/info carries build, the code's commit, for an export's generator tag. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
 
 
 ### <a id="atlas"></a>Atlas owns the outside world
 
-Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its quick-links bar above the viewer lists what the map holds, from viewer.contents(). Mounts the viewer with the maps folder's themes and the relay's build, passes a map's earlier version and saved time (asOf, for an export's footer) from the relay, and answers the agent's renders in a hidden second viewer. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
+Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its bar above the viewer is the navigation (Walks, then every diagram, from viewer.contents()); it mounts the viewer with no picker of its own. Mounts the viewer with the maps folder's themes and the relay's build, passes a map's earlier version and saved time (asOf, for an export's footer) from the relay, and answers the agent's renders in a hidden second viewer. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
 
 
 ### <a id="viewer"></a>Embeddable viewer
 
-mount(element, options) returns load, setState, on, ready, contents, export, snapshot, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url when used, or come from the host's assets option (a snapshot); crossMapNote marks links to maps a page cannot open. CSS is scoped to .mmv. Evidence: map-viewer/index.js, viewer.js, base.css; docs/map-viewer-api.md.
+mount(element, options) returns load, setState, on, ready, contents, export, snapshot, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url when used, or come from the host's assets option (a snapshot); crossMapNote marks links to maps a page cannot open. CSS is scoped to .mmv. Its picker lists the whole map (walkthroughs, then every diagram with what is under it). A walkthrough (model/walkthroughs.js: ## Walkthrough sections, ### Kind: name stops) opens in a panel on the left with Previous and Next; exploring inside a stop stays on it, another stop's place moves to it, anything else is off the path. Evidence: map-viewer/index.js, viewer.js, model/walkthroughs.js, base.css; docs/map-viewer-api.md.
 
 
 ### <a id="reader"></a>Reader interaction
@@ -108,14 +108,14 @@ Drill, select, search, filter icons, open notes and node pages, change view/depl
 - viewer : verified
 - files : verified
 
-## Relations: Runtime
+## Perspective: Runtime
 
 - files --> relay : reads
 - relay --> atlas : HTTP and SSE
 - atlas --> viewer : mount and load
 - viewer --> reader : read-only view
 
-## Relations: Authoring
+## Perspective: Authoring
 
 - agent --> skill : invokes
 - skill --> files : writes Markdown
@@ -171,7 +171,7 @@ mindmap
       n7("Markdown plus Mermaid")
       n8("Details, icons and classes")
       n9("Views, deployments and diagram links")
-      n10("Sequences and walks")
+      n10("Sequences and scenarios")
     n11("**Diagram families**")
       n12("mindmap: mindmap, org, list")
       n13("flowchart: boxes, layers, list")
@@ -212,7 +212,7 @@ mindmap
       pg("Node pages and connections")
       nt("Notes and icons")
     playbackGroup("**Playback**")
-      pl("Play sequences and walks")
+      pl("Play sequences and scenarios")
     preferencesGroup("**Preferences and history**")
       th("Themes and typography")
       sn("Changes since last look")
@@ -235,7 +235,7 @@ Per-instance closure coordinates model, state, DOM, redraw and event subscriptio
 
 ### <a id="m"></a>model/map.js
 
-Shared parseMap orchestrates type parsing, notes, classes, relations, deployments, further diagrams, walks and sequence linkage. Each node gets its main icon (model/main-icon.js: the first cloud icon, its class's, else one marked main), and a flowchart its ## Look: line. Evidence: model/map.js; model/main-icon.js.
+Shared parseMap orchestrates type parsing, notes, classes, relations, deployments, further diagrams, scenarios and sequence linkage. Each node gets its main icon (model/main-icon.js: the first cloud icon, its class's, else one marked main), and a flowchart its ## Look: line. Evidence: model/map.js; model/main-icon.js.
 
 
 ### <a id="p"></a>paint.js
@@ -308,7 +308,7 @@ flowchart LR
   split["Split diagrams and sections"]
   parse["Type-specific parser"]
   model["Shared model enrichment"]
-  links["Resolve diagram links and walks"]
+  links["Resolve diagram links and scenarios"]
   measure["Measure text and shapes"]
   layout["Type layout"]
   scene["Build scene"]
@@ -344,9 +344,9 @@ diagramForHeader selects one of five plugins. parseBody returns a common rooted 
 Labels and depth; icons and notes; semantic class slots; planned-change class on each node (never inherited); named relation views; infrastructure deployment placements; warnings. IDs index nodes through byId.
 
 
-### <a id="links"></a>Resolve diagram links and walks
+### <a id="links"></a>Resolve diagram links and scenarios
 
-click and supported note links become inners. State and ER walks compile to synthetic sequence parts. Plays over validates participant visibility and edges. Reachability checks flag orphan diagrams.
+click and supported note links become inners. State and ER scenarios compile to synthetic sequence parts. Plays over validates participant visibility and edges. Reachability checks flag orphan diagrams.
 
 
 ### <a id="measure"></a>Measure text and shapes
@@ -496,7 +496,7 @@ Remembers picked directory handle. Permission is checked/requested on revisit; a
 
 ### <a id="bar"></a>bar.js
 
-The quick-links bar, 44 px above the viewer. The logo (outside the scroller) is a picture only. When the viewer's toolbar is narrow (is-narrow), the map's name beside the logo opens the map list and the word mark and label go; the scroller holds the word mark, the "Quick links" label and a chip per diagram, view, deployment and play, built from viewer.contents() and refreshed on its contents event. The current chip is marked; a chip whose contents changed takes the viewer's small sparkle (changeMarkSvg). Fades and arrows show more, no scroll bar. Colours from the theme's frame group. Evidence: atlas/bar.js; atlas/atlas.css.
+The contents bar, 44 px above the viewer. The logo (outside the scroller) is a picture only. When the viewer's toolbar is narrow (is-narrow), the map's name beside the logo opens the map list and the word mark goes; the scroller holds the word mark and plain items: Walks (the walkthroughs), then each diagram, the first called Overview, built from viewer.contents() and refreshed on its contents event. An item with more under it opens a popup of two columns (its Perspectives, Joins, Deployments and Scenarios, or the walkthroughs; then the picked group's entries or stops) on hover, a tap or Enter. The diagram shown is underlined, Walks too while a walkthrough is open; something changed takes the viewer's small sparkle (changeMarkSvg). Fades and arrows show more, no scroll bar. Colours from the theme's frame group. Evidence: atlas/bar.js; atlas/atlas.css.
 
 
 ### <a id="themesJs"></a>themes.js
@@ -733,7 +733,7 @@ These are explanatory states derived from mount/load/destroy behavior, not liter
 Fatal parse errors leave the previous map displayed and report map problems. Theme/host issues are also events and console messages; default showProblems displays map issues. Corrected input can be loaded again.
 
 
-## Walks: Edit and recover
+## Scenario: Edit and recover
 
 - [*] --> Mounted : Host calls mount.
 - Mounted --> Ready : Initial assets become ready.
@@ -784,7 +784,7 @@ root and byId refer to node objects; views contains view objects; a view contain
 
 ### <a id="sequence"></a>Sequence payload and linked indexes
 
-A sequence diagram part holds sequence.participants, sequence.messages, sequence.steps and sequence.groups. Steps refer to message objects through msgs. A box diagram's separate sequences index holds anchor/view/title descriptors for sequences that play over it. State and ER walks compile into synthetic sequence parts. Evidence: diagrams/sequence/parse.js and model/map.js addWalks/linkSequences.
+A sequence diagram part holds sequence.participants, sequence.messages, sequence.steps and sequence.groups. Steps refer to message objects through msgs. A box diagram's separate sequences index holds anchor/view/title descriptors for sequences that play over it. State and ER scenarios compile into synthetic sequence parts. Evidence: diagrams/sequence/parse.js and model/map.js addWalks/linkSequences.
 
 ### <a id="deployment"></a>A deployment is attached to a view
 
@@ -845,9 +845,9 @@ erDiagram
 - message-target
 - MESSAGE.(from,to) message-endpoints@--- RELATION.(from,to) : same directed endpoints
 
-## Walks: Resolve a message | Message routing
+## Scenario: Resolve a message | Message routing
 
-- MESSAGE message-connection@--> RELATION : A generated walk message carries connectionId, selecting a declared connection by eid in its selected view. Ordinary messages can omit it.
+- MESSAGE message-connection@--> RELATION : A generated scenario message carries connectionId, selecting a declared connection by eid in its selected view. Ordinary messages can omit it.
 - RELATION relation-source@--> NODE : Follow that connection's source ID within its diagram.
 
 ## Details
@@ -862,15 +862,15 @@ from is a source node ID in the owning diagram. For a local connection, to is a 
 
 ### <a id="MESSAGE"></a>Message identity is i, not its displayed number
 
-i is the message's zero-based position in sequence.messages and is unique within that sequence. num is a display number: a call and its reply can share it, so num does not identify a message. Generated state/ER walk messages may have connectionId; normal sequence messages can omit it. Evidence: diagrams/sequence/parse.js numberMessages and model/map.js addWalks.
+i is the message's zero-based position in sequence.messages and is unique within that sequence. num is a display number: a call and its reply can share it, so num does not identify a message. Generated state/ER scenario messages may have connectionId; normal sequence messages can omit it. Evidence: diagrams/sequence/parse.js numberMessages and model/map.js addWalks.
 
 ### <a id="message-connection"></a>A selected connection is optional
 
-For an ID-bearing generated walk step, MESSAGE.connectionId resolves to RELATION.eid in the walk's selected view. Some source connections have no eid, and ordinary sequence messages carry no connectionId. The relationship is therefore optional at the connection end, not a claim that every message references exactly one identified relationship. The owning diagram and selected view provide the lookup scope; the model does not store invented diagram_id or view_id columns.
+For an ID-bearing generated scenario step, MESSAGE.connectionId resolves to RELATION.eid in the scenario's selected view. Some source connections have no eid, and ordinary sequence messages carry no connectionId. The relationship is therefore optional at the connection end, not a claim that every message references exactly one identified relationship. The owning diagram and selected view provide the lookup scope; the model does not store invented diagram_id or view_id columns.
 
 ### <a id="message-endpoints"></a>Endpoint equality does not establish relationship identity
 
-Within a specific Plays over target diagram and view, equal from/to IDs can find candidate directed relationships. Multiple relationships can have those same endpoints, so this two-column equality is an additional join, not a unique foreign-key relationship. Reverse traversal also reverses the endpoint comparison; this example compares only the directed case. Use connectionId when a walk selects one identified connection exactly.
+Within a specific Plays over target diagram and view, equal from/to IDs can find candidate directed relationships. Multiple relationships can have those same endpoints, so this two-column equality is an additional join, not a unique foreign-key relationship. Reverse traversal also reverses the endpoint comparison; this example compares only the directed case. Use connectionId when a scenario selects one identified connection exactly.
 
 ## Plugin and quality
 
@@ -960,7 +960,7 @@ flowchart LR
 
 ### <a id="pythonCheck"></a>Python checker
 
-check_map.py plus check_common.py, check_state.py, check_er.py, check_walks.py. check_map.seq_names lists a map's sequence and walk names for render.py. Strict problems fail; ignored Mermaid styling/unsupported presentation syntax can produce passing warnings. It also resolves cross-map references from map location upward.
+check_map.py plus check_common.py, check_state.py, check_er.py, check_scenarios.py. check_map.seq_names lists a map's sequence and scenario names for render.py. Strict problems fail; ignored Mermaid styling/unsupported presentation syntax can produce passing warnings. It also resolves cross-map references from map location upward.
 
 
 ### <a id="jsParse"></a>Viewer parser

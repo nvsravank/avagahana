@@ -123,28 +123,50 @@ html, body { background: var(--mmv-bg, #fff); }
 .atlas-mapname:hover { background: color-mix(in srgb, var(--mmv-frame-ink) 7%, transparent); }
 .atlas-mapname-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .atlas-mapname svg { flex: none; opacity: .7; }
-.atlas-label { flex: none; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mmv-frame-muted); white-space: nowrap; }
-.atlas-label[hidden] { display: none; }
-/* a phone upright: the chips need the room */
 /* the viewer's toolbar is narrow (is-narrow: a phone, or the top row does not fit) */
-body:has(.mmv.is-narrow) .atlas-bar:has(.atlas-mapname:not([hidden])) :is(.atlas-label, .atlas-wordmark) { display: none; }
+body:has(.mmv.is-narrow) .atlas-bar:has(.atlas-mapname:not([hidden])) .atlas-wordmark { display: none; }
 body:has(.mmv.is-narrow) .atlas-mapname:not([hidden]) { display: inline-flex; }
 /* the map list's own button leaves the viewer; its list opens from the top */
 .mmv.is-narrow .atlas-picker { position: absolute; top: 0; left: 0; }
 .mmv.is-narrow .atlas-picker > .atlas-pill { display: none; }
 .mmv.is-narrow .atlas-picker > .atlas-panel { top: 0; }
-.atlas-chips { display: flex; align-items: center; gap: 10px; }
-.atlas-chips:empty { display: none; }
-.atlas-group { display: flex; align-items: center; gap: 6px; }
-.atlas-sep { flex: none; width: 1px; height: 20px; background: var(--mmv-frame-muted); opacity: .5; }
-.atlas-chip {
-  flex: none; height: 28px; padding: 0 11px; border: 1px solid var(--mmv-frame-chip-edge); border-radius: 14px;
-  background: var(--mmv-frame-chip); color: var(--mmv-frame-chip-ink); font: inherit; font-size: 13px; font-weight: 600;
-  white-space: nowrap; cursor: pointer;
+/* the items: plain words in a row; the one shown is underlined in the accent */
+.atlas-items { display: flex; align-items: stretch; gap: 2px; height: 100%; }
+.atlas-items:empty { display: none; }
+.atlas-item {
+  position: relative; flex: none; height: 100%; padding: 0 10px; border: 0; background: none;
+  color: var(--mmv-frame-muted); font: inherit; font-size: 14px; white-space: nowrap; cursor: pointer;
 }
-.atlas-chip:hover { color: var(--mmv-frame-ink); background: color-mix(in srgb, var(--mmv-frame-ink) 6%, var(--mmv-frame-chip)); }
-.atlas-chip[aria-current="true"] { background: var(--mmv-frame-chip-active); border-color: var(--mmv-frame-accent); color: var(--mmv-frame-chip-active-ink); }
-.atlas-chip.is-unlinked { border-style: dashed; }
+.atlas-item:hover, .atlas-item[aria-expanded="true"] { color: var(--mmv-frame-ink); }
+.atlas-item[aria-current="page"] { color: var(--mmv-frame-ink); font-weight: 600; }
+.atlas-item[aria-current="page"]::after, .atlas-item.is-on::after {
+  content: ""; position: absolute; left: 10px; right: 10px; bottom: 0; height: 2px; border-radius: 1px; background: var(--mmv-frame-accent);
+}
+.atlas-item.is-on { color: var(--mmv-frame-ink); }
 /* something in it new or changed since the reader looked: the viewer's small sparkle */
-.atlas-chip.has-spark { position: relative; }
-.atlas-chip > .mmv-spark { position: absolute; top: -4px; right: -3px; color: var(--mmv-highlight, var(--mmv-frame-accent)); }
+.atlas-item > .mmv-spark, .atlas-entry > .mmv-spark { position: absolute; top: 9px; right: 1px; color: var(--mmv-highlight, var(--mmv-frame-accent)); }
+.atlas-entry.has-spark { position: relative; }
+/* the popup: two columns under its item (groups; the picked group's entries) */
+.atlas-bar { position: relative; z-index: 20; }
+.atlas-pop {
+  position: absolute; top: 100%; z-index: 30; display: grid; grid-template-columns: minmax(150px, 190px) minmax(180px, 1fr);
+  width: min(520px, calc(100vw - 16px)); max-height: min(70vh, 520px); margin-top: 4px; padding: 6px; box-sizing: border-box;
+  background: var(--mmv-frame-bg); color: var(--mmv-frame-ink); border: 1px solid color-mix(in srgb, var(--mmv-frame-ink) 14%, var(--mmv-frame-bg));
+  border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .22); overflow: hidden;
+}
+.atlas-pop[hidden] { display: none; }
+.atlas-col { min-width: 0; overflow-y: auto; padding: 2px 0; }
+.atlas-col.is-entries { border-left: 1px solid color-mix(in srgb, var(--mmv-frame-ink) 12%, var(--mmv-frame-bg)); padding-left: 6px; margin-left: 6px; }
+.atlas-head { padding: 6px 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mmv-frame-muted); }
+.atlas-grp, .atlas-entry {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; border: 0; border-radius: 8px; background: none;
+  color: var(--mmv-frame-ink); font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+}
+.atlas-grp:hover, .atlas-grp[aria-current="true"], .atlas-entry:hover { background: color-mix(in srgb, var(--mmv-frame-ink) 8%, transparent); }
+.atlas-grp-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-grp-note { margin-left: auto; flex: none; font-size: 12px; color: var(--mmv-frame-muted); }
+.atlas-grp.is-on .atlas-grp-label, .atlas-entry[aria-current="true"] { color: var(--mmv-frame-accent); font-weight: 600; }
+/* a phone: the popup spans the bar */
+@media (max-width: 560px) {
+  .atlas-pop { left: 8px !important; right: 8px; width: auto; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); }
+}

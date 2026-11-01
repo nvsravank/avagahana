@@ -47,7 +47,7 @@ flowchart LR
   class orders,pay business-service
 ```
 
-## Relations: Data flow
+## Perspective: Data flow
 
 - customer --> cart : basket
 - cart --> gw : order
@@ -57,7 +57,7 @@ flowchart LR
 - payh --> psp : card token
 - psp --> payh : payment result
 
-## Relations: Events
+## Perspective: Events
 
 - ord -.-> queue : order placed
 - queue -.-> payh : charge requested

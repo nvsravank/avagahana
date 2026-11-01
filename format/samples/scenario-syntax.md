@@ -1,4 +1,4 @@
-<!-- expect: walk-syntax -->
+<!-- expect: scenario-syntax -->
 # Sample
 
 ```mermaid
@@ -8,5 +8,5 @@ stateDiagram-v2
   b --> [*]
 ```
 
-## Walks: Bad
+## Scenario: Bad
 - a -> b

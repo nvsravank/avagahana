@@ -32,8 +32,11 @@ const viewer = mount(element, {
   showProblems: 'map',  // 'map' | 'all' | 'none': which problems show on screen
   sequenceStepSeconds: 3,   // a sequence's step while playing: 2 to 5 s, by halves
   title: true,          // false: no map title in the toolbar (a host that names the map itself)
-  viewPicker: true,     // false: no view picker (a host that lists the views itself);
-                        // 'wide': not while the toolbar is narrow
+  viewPicker: true,     // the picker of the whole map (walkthroughs, then each diagram with its
+                        // perspectives, joins, deployments and scenarios, rows that open and
+                        // close); false: none (a host that lists them itself); 'wide': not
+                        // while the toolbar is narrow. The atlas passes false: its bar is the
+                        // navigation; a snapshot (no bar) keeps the picker
   assets: null,         // (path) => Promise<text>: the viewer's own files from the host (below)
   crossMapNote: null,   // without host.openMap: said beside a link to another map
   asOf: null,           // when the first map was saved (Date, ISO text or ms): the export's footer
@@ -85,8 +88,12 @@ promise; a failure is reported as a `host` problem and the viewer carries on.
 ## State
 
 ```js
-{ mode, part, focus, node, page, view, env, rels, seq, step }
+{ mode, part, focus, node, page, view, env, rels, seq, step, walkthrough, stop }
 ```
+
+`walkthrough` (the name) and `stop` (1-based) are present while a walkthrough is open. Setting
+`walkthrough` opens that stop: the stop's item is opened, then the rest of the call applies;
+`walkthrough: null` closes it. Moving with Previous and Next is the viewer's own panel.
 
 | Field | Meaning |
 |---|---|
@@ -250,8 +257,8 @@ viewer compares the two by id, in each diagram, view and deployment:
   sign; List mode names the table's changed columns. A stale rename is a warning
   (`map-rename-stale`) and reads as a removal and an addition.
 - A map with planned-change classes of its own shows those only.
-- `state` carries `perspective` (`'before'` or `'after'`) while comparing, and
-  `setState({perspective})` and `options.state.perspective` switch it.
+- `state` carries `edition` (`'before'` or `'after'`) while comparing, and
+  `setState({edition})` and `options.state.edition` switch it.
 
 ## Events
 
@@ -277,14 +284,15 @@ Each viewer has its own list. Entries, in file order:
 | `view` | relation view of a diagram with more than one, the default first (label "Overview") | `{seq: null, part, view: name or null}` |
 | `join` | ER join view (`## Joins: <name>`) | as `view` |
 | `deployment` | environment | `{seq: null, part, env}` |
-| `walk` | walk of a state or ER diagram | `{seq: anchor, step: 1}` |
+| `scenario` | scenario of a state or ER diagram | `{seq: anchor, step: 1}` |
+| `walkthrough` | a walkthrough of the file (`## Walkthrough: <name>`), listed first; `stops` is its number of stops, `stopList` each stop's `{kind, label}` in order | `{walkthrough: name, stop: 1}` (opens its first stop) |
 
 Every entry has `kind`, `label`, `part` (the diagram's anchor, `null` for the first) and
-`type` (the diagram's type); views, deployments and walks also `diagram` (its title).
-A sequence or walk has `steps`, its number of steps (added in WO-32).
+`type` (the diagram's type); views, deployments and scenarios also `diagram` (its title).
+A sequence or scenario has `steps`, its number of steps (added in WO-32).
 The first diagram has `first: true`; a diagram no link reaches ("Not linked") has
 `unlinked: true`, and its `state` still opens it. Every entry has `changed`: something
-in it is new or changed since the reader looked (a diagram, sequence or walk: anything in
+in it is new or changed since the reader looked (a diagram, sequence or scenario: anything in
 it; a view or deployment: its own arrows or places). A host draws it with
 `changeMarkSvg(size)` from `map-viewer/index.js` (an `<svg>` string, `currentColor`).
 Entries may gain fields later; a host ignores those it does not know. The `contents`
@@ -331,7 +339,7 @@ mounts with `marks: false` and selects nothing).
 | `touching` | `[{a, b, gap, at}]`: two lines closer than `minGap` px at the output's scale. Lines that share an end meet there by design: the first 24 drawing units from that end do not count, and two lines running together into one end (two keys to one column) are one line until they part. |
 | `minGap` | 2 (px). |
 | `smallestText` | `{px, id}`: the smallest text at the output width. |
-| `changes` | Only with an earlier version (WO-34): `{perspective, diagram, view, whole, groups, views, diagramsAdded, diagramsRemoved}`. `groups`: `[{state, lines}]` in the order removed, added, moved, changed, as the changes list says them, for the view drawn; `views`: `[{view, deployment, whole, groups}]` for each view and deployment of that diagram; `whole`: `added` or `removed` for a view or diagram only one file has. |
+| `changes` | Only with an earlier version (WO-34): `{edition, diagram, view, whole, groups, views, diagramsAdded, diagramsRemoved}`. `groups`: `[{state, lines}]` in the order removed, added, moved, changed, as the changes list says them, for the view drawn; `views`: `[{view, deployment, whole, groups}]` for each view and deployment of that diagram; `whole`: `added` or `removed` for a view or diagram only one file has. |
 | `colours` | Per box `{id, label, fill, stroke, why}`: its fill and its outline as `#rrggbb` (a class or theme may colour either, so read both) and why, from the colour-by: `category 3`, `level 2`, `class database`, `change added`, `centre`. |
 
 ## Problems

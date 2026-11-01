@@ -1,6 +1,6 @@
 # State diagrams and ER diagrams
 
-Full rules: `../../../docs/map-format.md`, "State diagrams", "ER diagrams", "Walks".
+Full rules: `../../../docs/map-format.md`, "State diagrams", "ER diagrams", "Scenarios".
 
 ## State diagrams (`stateDiagram-v2`)
 
@@ -98,13 +98,13 @@ erDiagram
   (`boxes.md`, "Crossing arrows": when, and the draft script), with the mode `tables`
   and each `## Joins:` view.
 
-## Walks: `## Walks: <name>`
+## Scenario: `## Scenario: <name>`
 
 A path told as a story over a state or ER diagram: how an order gets stuck, how a query
 joins its tables. After the diagram's block, a step per line:
 
 ```
-## Walks: Payment fails twice
+## Scenario: Payment fails twice
 
 - [*] --> Pending : The order is placed and waits for payment.
 - Pending --> Charging : The shopper submits the card.
@@ -114,12 +114,12 @@ joins its tables. After the diagram's block, a step per line:
 
 - A step is a transition of the state diagram, its way round, or a relationship of the
   ER diagram, either way. Each step should start where the last ended.
-- In an ER walk, a step onto the many side of a relationship is marked "Rows multiply
-  here": use walks to show where a join fans out.
-- Play it like a sequence: its `seq` is `<diagram anchor>-walk-<walk name anchor>`,
-  where the first diagram's anchor is its `# Title`'s (`# Order states` with the walk
-  above: `order-states-walk-payment-fails-twice`):
-  `show.py "<map>" --seq order-states-walk-payment-fails-twice --step 1`.
+- In an ER scenario, a step onto the many side of a relationship is marked "Rows multiply
+  here": use scenarios to show where a join fans out.
+- Play it like a sequence: its `seq` is `<diagram anchor>-scenario-<scenario name anchor>`,
+  where the first diagram's anchor is its `# Title`'s (`# Order states` with the scenario
+  above: `order-states-scenario-payment-fails-twice`):
+  `show.py "<map>" --seq order-states-scenario-payment-fails-twice --step 1`.
 
 ## Column relationships and named join views
 
@@ -137,7 +137,7 @@ Keep Mermaid valid. Put column connections outside its block:
 ## Joins: Attempts and shipments
 - PAYMENT.order_id payment-shipment@--- SHIPMENT.order_id : same order
 
-## Walks: Follow payment | Payment by customer
+## Scenario: Follow payment | Payment by customer
 - PAYMENT payment-order@--> ORDER : Follow the declared relationship.
 - ORDER order-customer@--> CUSTOMER : Find the customer.
 ```
@@ -150,5 +150,5 @@ No SQL or LEFT/RIGHT direction is required for these equality diagrams.
 
 Up to 15 columns all show with no expand control. Above 15, PK, grain, FK and connected
 columns always show. Every mapped endpoint aligns with its column, including separate
-relationships between the same tables. Give walk steps explicit IDs when table pairs
+relationships between the same tables. Give scenario steps explicit IDs when table pairs
 are ambiguous: the checker rejects ambiguous, missing or out-of-view selections.

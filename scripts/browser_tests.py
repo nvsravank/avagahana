@@ -297,8 +297,8 @@ def viewer_pack_tests(browser, base, tmp, check):
             args += ["--theme", "brand"]
         line, out = pack(md, tmp / "theirs.html", *args, maps_dir=maps if req.get("theme") else EXAMPLES)
         theirs = payload(out.read_text(encoding="utf-8")) if line.startswith("STATUS=packed") else {}
-        # rels and perspective are the viewer's only (pack.py takes no flag for them)
-        state = {k: v for k, v in mine["options"].get("state", {}).items() if k not in ("rels", "perspective")}
+        # rels and edition are the viewer's only (pack.py takes no flag for them)
+        state = {k: v for k, v in mine["options"].get("state", {}).items() if k not in ("rels", "edition")}
         mine_cmp = dict(mine, options=dict(mine["options"], state=state))
         if not state:
             mine_cmp["options"].pop("state")

@@ -56,6 +56,7 @@ things connect.
 | A data model, tables and joins | `erDiagram` | `references/state-and-er.md` |
 | A plan: what will be added, changed, removed | classes `added` `changed` `removed` | `references/changes.md` |
 | Two versions of a map compared (a release review: what is new, removed, moved, changed) | the same map, plus its earlier file | `references/compare.md` |
+| A path through the map for one audience (a security review, a new joiner) | `## Walkthrough: <name>` with `### <Kind>: <name>` stops | `references/walkthroughs.md` |
 
 Read the reference before writing that kind; the full format is
 `../../docs/map-format.md` (read it for anything the references do not cover). Use
@@ -132,6 +133,17 @@ Card charge with an idempotency key, so a retry never charges twice.
 - No item limits: a big system is fine, but split it into views and diagrams so each
   picture stays readable.
 
+## Walkthroughs: a story for one audience
+
+When a reader needs a path through the map (a security review, a new joiner), add a
+`## Walkthrough: <name>` section to the file (the end of the file is fine). Each stop is a
+`### <Kind>: <name>` heading, in the order written: `Diagram`, `Perspective`, `Deployment`,
+`Scenario`, `Join` or `Sequence`, then the item's name as its heading gives it. The Markdown
+under the stop says what to notice there. The reader moves through the stops with Previous and
+Next; nothing plays by itself. Only items of this map can be stops, and the checker names any
+it cannot find. When to write one, how to pick and order stops and how to write the notes:
+`references/walkthroughs.md`.
+
 ## Point the reader
 
 `python3 "<plugin root>/relay-server/show.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" [options]`
@@ -142,7 +154,7 @@ moves every open page to that place while you explain it:
 - `--part <heading anchor>` one of the file's further diagrams (`## Orders service` is
   `orders-service`); `--view <name>` a relation view; `--env <name>` a deployment;
   `--mode mindmap|org|list|boxes|layers|lifelines`.
-- `--seq <anchor> --step N` play a sequence or a walk at step N (see the references);
+- `--seq <anchor> --step N` play a sequence or a scenario at step N (see the references);
   `--colour-by changes` open a plan in its Changes colouring.
 - `--before <file>` compare with an earlier version of the map (`references/compare.md`).
 

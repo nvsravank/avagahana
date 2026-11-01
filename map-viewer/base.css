@@ -353,6 +353,25 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-menu-item:hover { background: var(--mmv-chrome-hover); }
 .mmv-menu-item .mmv-mi-label { display: inline-flex; align-items: center; gap: 6px; font-size: inherit; font-weight: 600; color: inherit; }
 .mmv-menu-sep { border: 0; border-top: 1px solid var(--mmv-chrome-border); margin: 4px 2px; }
+/* the picker (viewer.js buildViews): the whole map, rows that open and close */
+[data-mmv="viewMenu"] { max-height: calc(100cqh - 80px); overflow-y: auto; min-width: 240px; }
+.mmv-vm-tools { display: flex; justify-content: flex-end; gap: 4px; padding: 2px 4px 4px; }
+.mmv-vm-tools[hidden] { display: none; }
+.mmv-vm-tool { border: 0; background: none; padding: 2px 6px; border-radius: 6px; font: inherit; font-size: 12px; color: var(--mmv-muted); cursor: pointer; }
+.mmv-vm-tool:hover { background: var(--mmv-chrome-hover); color: var(--mmv-ink); }
+.mmv-vm-line { display: flex; align-items: center; }
+.mmv-vm-twist { flex: none; display: grid; place-items: center; width: 22px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--mmv-muted); cursor: pointer; }
+.mmv-vm-twist::before { content: ""; width: 0; height: 0; border-left: 5px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .12s; }
+.mmv-vm-twist[aria-expanded="true"]::before { transform: rotate(90deg); }
+.mmv-vm-twist.is-empty { visibility: hidden; pointer-events: none; }
+.mmv-vm-twist:hover { background: var(--mmv-chrome-hover); color: var(--mmv-ink); }
+.mmv-vm-line > .mmv-menu-item { flex: 1; min-width: 0; }
+.mmv-vm-kids { padding-left: 22px; }
+.mmv-vm-kids .mmv-menu-item { font-weight: 400; }
+.mmv-vm-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: inherit !important; color: inherit !important; font-weight: inherit !important; }
+.mmv-vm-note { flex: none; }
+[data-mmv="viewMenu"] .mmv-menu-item.is-on { color: var(--mmv-accent, var(--mmv-link)); background: var(--mmv-chrome-hover); }
+@media (prefers-reduced-motion: reduce) { .mmv-vm-twist::before { transition: none; } }
 .mmv-menu-head { padding: 4px 8px 2px; font-size: 11px; color: var(--mmv-muted); text-transform: uppercase; letter-spacing: .04em; }
 
 /* ---- note: a popover (a peek at a note, an arrow's relations, related links) ---- */
@@ -562,6 +581,23 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-tl-bracket:is(.is-loop, .is-par).is-tight .mmv-tl-word { display: none; }
 
 /* the side panel: the step in words */
+/* a walkthrough: a panel on the left (a sequence's panel is on the right), moved by the
+   reader (Previous, Next); minimised to a small route icon */
+.mmv-stop-panel { top: 62px; left: 14px; bottom: 64px; width: min(320px, calc(100cqw - 28px)); overflow: auto; font-size: 13px; line-height: 1.45; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.mmv-stop-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mmv-stop-walk { font-size: 12px; color: var(--mmv-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mmv-stop-count { font-size: 12px; color: var(--mmv-muted); }
+.mmv-stop-kind { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--mmv-muted); margin-top: 4px; }
+.mmv-stop-title { font-size: 16px; font-weight: 600; margin: 0; }
+.mmv-stop-note { flex: 1; min-height: 0; overflow: auto; }
+.mmv-stop-note .mmv-note-body { padding: 4px 0; }
+.mmv-stop-off { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--mmv-highlight) 14%, var(--mmv-bg)); }
+.mmv-stop-off[hidden] { display: none; }
+.mmv-stop-panel.is-off :is(.mmv-stop-kind, .mmv-stop-title, .mmv-stop-note) { opacity: .6; }
+.mmv-stop-foot [data-mmv="stopNext"] { margin-left: auto; }
+.mmv-stop-foot :is([data-mmv="stopPrev"], [data-mmv="stopNext"])[hidden] { display: none; }
+.mmv-stop-foot { display: flex; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid var(--mmv-chrome-border); }
+.mmv-stop-tab { position: absolute; left: 14px; top: 62px; }
 .mmv-seq-panel { top: 62px; right: 14px; width: min(300px, calc(100cqw - 28px)); max-height: calc(100cqh - 200px); overflow: auto; font-size: 13px; line-height: 1.45; padding: 12px 14px; }
 .mmv-seq-head { font-size: 12px; color: var(--mmv-muted); margin-bottom: 6px; }
 .mmv-seq-cap { font-size: 12px; color: var(--mmv-call); margin: 2px 0; }
@@ -577,6 +613,9 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-seq-arrow-head svg { width: 16px; height: 16px; }
 .mmv-seq-notes { margin-top: 10px; padding: 6px 8px; border-radius: 6px; background: color-mix(in srgb, var(--mmv-highlight) 14%, var(--mmv-bg)); }
 /* narrow: the panel under the drawing, above the step bar */
+@container (max-width: 719px) {
+  .mmv-stop-panel { right: 14px; bottom: auto; width: auto; max-height: 42cqh; }
+}
 @container (max-width: 719px) {
   /* the step bar beside the zoom column (bottom right), the info button gives way */
   .mmv-stepbar { left: 14px; transform: none; width: calc(100cqw - 78px); }
@@ -628,7 +667,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 marker.is-kind .mmv-er-end { stroke: var(--n); stroke-opacity: 1; }
 .mmv-flow.mmv-er-line.is-lit { stroke-width: 3; stroke-opacity: 1; }
 .mmv-arrow-words { margin: 0 0 8px; }
-/* an ER table a walk has not reached (player.js): grey, as other nodes are */
+/* an ER table a scenario has not reached (player.js): grey, as other nodes are */
 .mmv .mmv-table.is-idle > .mmv-table-body { fill: color-mix(in srgb, var(--mmv-idle) 85%, transparent); stroke: var(--mmv-idleLine); }
 .mmv .mmv-table.is-idle > .mmv-table-head { fill: var(--mmv-idleLine); }
 .mmv .mmv-table.is-idle :is(.mmv-table-title, .mmv-table-col, .mmv-table-fk, .mmv-table-type) { fill: var(--mmv-muted); }

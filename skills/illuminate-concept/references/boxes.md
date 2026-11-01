@@ -69,7 +69,7 @@ sys.path.insert(0, "<plugin root>/relay-server")
 from render import draft_report, RenderError
 
 MAP, MAPS = "<Topic>/<Name>.md", "<maps folder>"
-VIEWS = [None, "Events"]          # None: the default view; then each `## Relations: <name>`
+VIEWS = [None, "Events"]          # None: the default view; then each `## Perspective: <name>`
 
 def score(text):
     """(crossings, problems) for each mode and view of the first diagram."""
@@ -85,7 +85,7 @@ Score every mode and view, not only the one the person reads (an ER diagram's vi
 are its `## Joins:` sections). The reader can switch
 between Boxes and Layers, and a view lays out the first block's nodes in the first
 block's order, so a reorder that helps the default view can tangle a view. `view=`
-takes the name after `## Relations: `; `part=` a further diagram's heading anchor. Keep
+takes the name after `## Perspective: `; `part=` a further diagram's heading anchor. Keep
 an attempt only when nothing gets worse anywhere; when the modes want opposite orders
 and neither can gain without the other losing, the picture is at its best: leave it.
 There is no need to look at pictures.
@@ -115,10 +115,10 @@ agent may be using.)
 ## Views: what each picture shows
 
 - The arrows inside the block are the default view ("Relations"); it is not "all".
-  Each `## Relations: <name>` section is another view, and shows only the boxes its
+  Each `## Perspective: <name>` section is another view, and shows only the boxes its
   arrows use (and the boxes round them), laid out again.
 - Use views to keep pictures small and to hide whole layers: synchronous calls in the
-  block, events only in `## Relations: Events` (the messaging boxes then appear only
+  block, events only in `## Perspective: Events` (the messaging boxes then appear only
   there). There is no "All" view, by design.
 - View lines: `- from --> to : label`, with Mermaid's arrow operators.
 

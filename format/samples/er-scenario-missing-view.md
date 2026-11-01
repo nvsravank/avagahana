@@ -1,4 +1,4 @@
-<!-- expect: walk-not-step -->
+<!-- expect: scenario-not-step -->
 # Column connections
 
 ```mermaid
@@ -22,8 +22,8 @@ erDiagram
 - tenant
 - A.(tenant_id,other_id) composite@--- B.(tenant_id,id) : equal pairs
 
-## Walks: Composite walk | Composite
+## Scenario: Composite scenario | Composite
 - A composite@--> B : Match both columns.
 
-## Walks: Missing view | Absent
+## Scenario: Missing view | Absent
 - A tenant@--> B : Unknown view.

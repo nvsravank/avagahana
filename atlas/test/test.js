@@ -268,7 +268,7 @@ try {
   panel.destroy();
   // ---- contents bar ----
   const barEl = document.createElement('header');
-  barEl.style.width = '420px';
+  barEl.style.width = '320px';
   document.body.appendChild(barEl);
   const picks = [];
   let names = 0;
@@ -280,35 +280,56 @@ try {
     { kind: 'deployment', label: 'Production', part: null, diagram: 'Shop', state: { seq: null, part: null, env: 'Production' } },
     { kind: 'diagram', label: 'Orders', part: 'orders', state: { seq: null, part: 'orders', view: null } },
     { kind: 'join', label: 'Lines', part: 'orders', diagram: 'Orders', state: { seq: null, part: 'orders', view: 'Lines' } },
-    { kind: 'walk', label: 'Pay then ship', part: 'orders', diagram: 'Orders', state: { seq: 'orders-walk-pay-then-ship', step: 1 } },
+    { kind: 'scenario', label: 'Pay then ship', part: 'orders', diagram: 'Orders', state: { seq: 'orders-scenario-pay-then-ship', step: 1 } },
     { kind: 'sequence', label: 'Checkout', part: 'checkout', unlinked: true, state: { seq: 'checkout', step: 1 } },
+    { kind: 'walkthrough', label: 'Security', part: null, stops: 2, stopList: [{ kind: 'diagram', label: 'Shop' }, { kind: 'view', label: 'Data flow' }], state: { walkthrough: 'Security', stop: 1 } },
   ];
   bar.setContents(items);
-  const chipText = () => [...barEl.querySelectorAll('.atlas-chip')].map((b) => b.textContent);
-  check('bar: chips in groups Diagrams | Views | Deployments | Plays', show([...barEl.querySelectorAll('.atlas-group')].map((g) => g.getAttribute('aria-label'))) === show(['Diagrams', 'Views', 'Deployments', 'Plays']) && barEl.querySelectorAll('.atlas-sep').length === 3);
-  check('bar: "Quick links" in place of the title', barEl.querySelector('.atlas-label')?.textContent === 'Quick links' && !barEl.querySelector('.atlas-label').hidden && !barEl.querySelector('.atlas-title') && !barEl.textContent.includes('Shop'));
-  check('bar: views of several diagrams name their diagram; plays do not', show(chipText()) === show(['Overview', 'Orders', 'Overview · Data flow', 'Orders · Lines', 'Overview · Production', 'Pay then ship', 'Checkout']), show(chipText()));
-  const current = () => barEl.querySelector('.atlas-chip[aria-current=true]')?.textContent;
+  const tops = () => [...barEl.querySelectorAll('.atlas-item')];
+  const topText = () => tops().map((b) => b.textContent);
+  const item = (text) => tops().find((b) => b.textContent === text);
+  const pop = barEl.querySelector('.atlas-pop');
+  const col = (cls) => [...pop.querySelectorAll(`.${cls}`)].map((b) => b.textContent);
+  const press = (b) => b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+  const mouse = (b) => { b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse' })); b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); };
+  const tap = (b) => { b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' })); b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); };
+  check('bar: plain items, no pills: Walks, then each diagram, the first called Overview', show(topText()) === show(['Walks', 'Overview', 'Orders', 'Checkout']) && !barEl.querySelector('.atlas-chip, .atlas-label'), show(topText()));
+  check('bar: items are buttons the keyboard reaches; those with more say so', tops().every((b) => b.tagName === 'BUTTON' && b.tabIndex === 0) && item('Overview').getAttribute('aria-haspopup') === 'menu' && !item('Checkout').hasAttribute('aria-haspopup'));
+  const current = () => barEl.querySelector('.atlas-item[aria-current=page]')?.textContent;
   bar.setState({ part: null, view: null });
-  check('bar: the default view is marked on its diagram\'s chip, which opens it', current() === 'Overview', current());
-  bar.setState({ part: null, view: 'Data flow' });
-  check('bar: the current view is marked, not its diagram', current() === 'Overview · Data flow', current());
-  bar.setState({ part: null, env: 'Production' });
-  check('bar: a deployment is marked', current() === 'Overview · Production', current());
+  check('bar: the diagram shown is marked', current() === 'Overview', current());
   bar.setState({ part: 'orders', view: 'Lines' });
-  check('bar: a join view is marked', current() === 'Orders · Lines', current());
-  bar.setState({ part: null, seq: 'orders-walk-pay-then-ship', step: 3 });
-  check('bar: a play is marked while it plays', current() === 'Pay then ship', current());
-  [...barEl.querySelectorAll('.atlas-chip')].find((b) => b.textContent === 'Overview · Data flow').click();
-  check('bar: a chip hands over its state', show(picks.at(-1)) === show({ seq: null, part: null, view: 'Data flow' }), show(picks));
-  check('bar: an unlinked diagram is marked so', barEl.querySelector('.atlas-chip.is-unlinked')?.textContent === 'Checkout');
-  check('bar: chips are buttons the keyboard reaches', [...barEl.querySelectorAll('.atlas-chip')].every((b) => b.tagName === 'BUTTON' && b.tabIndex === 0));
+  check('bar: a join of a further diagram marks that diagram', current() === 'Orders', current());
+  bar.setState({ part: null, seq: 'orders-scenario-pay-then-ship', step: 3 });
+  check('bar: a scenario playing marks its diagram', current() === 'Orders', current());
+  bar.setState({ part: null, view: 'Data flow', walkthrough: 'Security', stop: 2 });
+  check('bar: a walkthrough open marks Walks, and the diagram it shows', current() === 'Overview' && item('Walks').classList.contains('is-on') && !item('Orders').classList.contains('is-on'), current());
+  press(item('Overview'));
+  check('bar: Enter or Space opens the popup: the groups, then the picked group\'s entries', !pop.hidden && item('Overview').getAttribute('aria-expanded') === 'true' && show(col('atlas-grp-label')) === show(['Perspectives', 'Deployments']) && show(col('atlas-entry')) === show(['Overview', 'Data flow']), show([col('atlas-grp-label'), col('atlas-entry')]));
+  check('bar: the entry shown is marked in the popup', pop.querySelector('.atlas-entry[aria-current=true]')?.textContent === 'Data flow');
+  [...pop.querySelectorAll('.atlas-grp')].find((b) => b.textContent.startsWith('Deployments')).click();
+  check('bar: picking a group fills the second column', show(col('atlas-entry')) === show(['Production']), show(col('atlas-entry')));
+  [...pop.querySelectorAll('.atlas-entry')].find((b) => b.textContent === 'Production').click();
+  check('bar: an entry hands over its state and closes the popup', show(picks.at(-1)) === show({ seq: null, part: null, env: 'Production' }) && pop.hidden, show(picks.at(-1)));
+  press(item('Walks'));
+  check('bar: Walks lists the walkthroughs with their stop counts, and the stops in order', show(col('atlas-grp')) === show(['Security2 stops']) && show(col('atlas-entry')) === show(['1. Shop', '2. Data flow']) && pop.querySelector('.atlas-entry[aria-current=true]')?.textContent === '2. Data flow', show([col('atlas-grp'), col('atlas-entry')]));
+  [...pop.querySelectorAll('.atlas-entry')][0].click();
+  check('bar: a stop opens the walkthrough there', show(picks.at(-1)) === show({ walkthrough: 'Security', stop: 1 }), show(picks.at(-1)));
+  const n = picks.length;
+  tap(item('Orders'));
+  check('bar: a tap opens the popup and goes nowhere; the diagram itself is its first perspective', !pop.hidden && picks.length === n && show(col('atlas-grp-label')) === show(['Perspectives', 'Joins', 'Scenarios']) && show(col('atlas-entry')) === show(['Overview']), show([col('atlas-grp-label'), col('atlas-entry')]));
+  barEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  check('bar: Escape closes it', pop.hidden);
+  mouse(item('Orders'));
+  check('bar: a mouse click opens the diagram (its popup is the hover\'s)', show(picks.at(-1)) === show({ seq: null, part: 'orders', view: null }) && pop.hidden, show(picks.at(-1)));
+  mouse(item('Checkout'));
+  check('bar: an item with nothing under it opens at once', show(picks.at(-1)) === show({ seq: 'checkout', step: 1 }));
   check('bar: no scroll bar; more beyond the edge shows an arrow', getComputedStyle(barEl.querySelector('.atlas-scroll')).overflowX === 'auto' && !barEl.querySelector('.atlas-arrow.is-right').hidden && barEl.querySelector('.atlas-arrow.is-left').hidden);
   bar.setContents([items[0]]);
-  check('bar: one diagram and nothing else: no chips, no label', !barEl.querySelector('.atlas-chip') && barEl.querySelector('.atlas-label').hidden);
+  check('bar: one diagram and nothing else: no items', !barEl.querySelector('.atlas-item'));
   check('bar: nothing more, no arrows', barEl.querySelector('.atlas-arrow.is-right').hidden && barEl.querySelector('.atlas-arrow.is-left').hidden);
   bar.setContents(items.slice(0, 4));
-  check('bar: one diagram with views: its Overview view keeps its chip', show(chipText()) === show(['Overview', 'Data flow', 'Production']), show(chipText()));
+  check('bar: one diagram with perspectives: its item, with a popup', show(topText()) === show(['Overview']) && item('Overview').getAttribute('aria-haspopup') === 'menu', show(topText()));
   bar.setState({ part: null, view: null });
   check('bar: and it is marked', current() === 'Overview', current());
   bar.setTitle('Shop platform');

@@ -10,7 +10,7 @@ python3 format/check_map.py <map.md> [<map.md> ...]
 
 `check_map.py` is the command; the readers it uses sit beside it: `check_common.py`
 (problems and labels), `check_state.py` (state diagrams, their paths), `check_er.py`
-(ER diagrams) and `check_walks.py` (`## Walks:` sections).
+(ER diagrams) and `check_scenarios.py` (`## Scenarios:` sections).
 
 Prints `OK`, or one line per problem (`file:line: problem`), and exits 1 on any. Strict:
 every Mermaid block must be valid Mermaid for its type, every extension section valid,

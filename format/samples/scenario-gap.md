@@ -1,4 +1,4 @@
-<!-- expect: walk-gap -->
+<!-- expect: scenario-gap -->
 # Sample
 
 ```mermaid
@@ -8,6 +8,6 @@ stateDiagram-v2
   b --> [*]
 ```
 
-## Walks: Jumps
+## Scenario: Jumps
 - [*] --> a : start
 - b --> [*] : not where it was
