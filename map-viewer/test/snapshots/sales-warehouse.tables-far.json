@@ -5,14 +5,14 @@
   {
    "kind": "node",
    "id": "ORDER_LINE",
-   "x": 808.94,
-   "y": 299.2,
+   "x": 930.3,
+   "y": 440.5,
    "w": 240,
    "h": 265,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k1 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Order line, level 1, has a note, fact table, 12 columns",
+   "cls": "mmv-node mmv-table mmv-k1 mmv-l1 mmv-d1 mmv-c1 mmv-p0",
+   "name": "Order line, level 1, has a note, Fact table, 12 columns",
    "marks": {
     "hit": false,
     "sel": true
@@ -62,7 +62,7 @@
      "h": 19,
      "size": 12,
      "weight": 400,
-     "name": "date_key",
+     "name": "customer_key",
      "type": "int",
      "mark": null,
      "fk": true,
@@ -73,8 +73,8 @@
      "h": 19,
      "size": 12,
      "weight": 400,
-     "name": "product_key",
-     "type": "int",
+     "name": "currency_code",
+     "type": "string",
      "mark": null,
      "fk": true,
      "bar": true
@@ -84,7 +84,7 @@
      "h": 19,
      "size": 12,
      "weight": 400,
-     "name": "customer_key",
+     "name": "product_key",
      "type": "int",
      "mark": null,
      "fk": true,
@@ -95,7 +95,174 @@
      "h": 19,
      "size": 12,
      "weight": 400,
+     "name": "date_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 166,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
      "name": "store_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 185,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "quantity",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 204,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "net_amount",
+     "type": "decimal",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 223,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "discount",
+     "type": "decimal",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 242,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "tax",
+     "type": "decimal",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null,
+   "note": {
+    "x": 218,
+    "y": 7,
+    "size": 16
+   },
+   "caption": {
+    "text": "One row per order and line no",
+    "x": 120,
+    "y": 283
+   }
+  },
+  {
+   "kind": "node",
+   "id": "RETURN_LINE",
+   "x": 1786.41,
+   "y": 308,
+   "w": 240,
+   "h": 227,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k2 mmv-l1 mmv-d1 mmv-c1 mmv-p0",
+   "name": "Return line, level 1, has a note, Fact table, 10 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Return line",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "return_line_key",
+     "type": "bigint",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "return_id",
+     "type": "int",
+     "mark": "grain",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "line_no",
+     "type": "int",
+     "mark": "grain",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 90,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "currency_code",
+     "type": "string",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 109,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "customer_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 128,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "product_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 147,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "date_key",
      "type": "int",
      "mark": null,
      "fk": true,
@@ -117,7 +284,7 @@
      "h": 19,
      "size": 12,
      "weight": 400,
-     "name": "net_amount",
+     "name": "refund_amount",
      "type": "decimal",
      "mark": null,
      "fk": false,
@@ -128,29 +295,7 @@
      "h": 19,
      "size": 12,
      "weight": 400,
-     "name": "discount",
-     "type": "decimal",
-     "mark": null,
-     "fk": false,
-     "bar": true
-    },
-    {
-     "y": 223,
-     "h": 19,
-     "size": 12,
-     "weight": 400,
-     "name": "tax",
-     "type": "decimal",
-     "mark": null,
-     "fk": false,
-     "bar": true
-    },
-    {
-     "y": 242,
-     "h": 19,
-     "size": 12,
-     "weight": 400,
-     "name": "currency",
+     "name": "reason",
      "type": "string",
      "mark": null,
      "fk": false,
@@ -162,24 +307,19 @@
     "x": 218,
     "y": 7,
     "size": 16
-   },
-   "caption": {
-    "text": "One row per order and line no",
-    "x": 120,
-    "y": 283
    }
   },
   {
    "kind": "node",
    "id": "STOCK_LEVEL",
-   "x": 1632.94,
-   "y": 267.5,
+   "x": 2566.02,
+   "y": 440.5,
    "w": 240,
    "h": 151,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Stock level, level 1, fact table, 6 columns",
+   "cls": "mmv-node mmv-table mmv-k3 mmv-l1 mmv-d1 mmv-c1 mmv-p0",
+   "name": "Stock level, level 1, Fact table, 6 columns",
    "marks": {
     "hit": false,
     "sel": false
@@ -207,7 +347,7 @@
      "h": 19,
      "size": 12,
      "weight": 400,
-     "name": "date_key",
+     "name": "warehouse_key",
      "type": "int",
      "mark": "grain",
      "fk": true,
@@ -229,7 +369,7 @@
      "h": 19,
      "size": 12,
      "weight": 400,
-     "name": "warehouse_key",
+     "name": "date_key",
      "type": "int",
      "mark": "grain",
      "fk": true,
@@ -262,84 +402,15 @@
   },
   {
    "kind": "node",
-   "id": "CUSTOMER",
-   "x": 193.06,
-   "y": 916.79,
-   "w": 240,
-   "h": 113,
-   "custom": "table",
-   "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Customer, level 1, dimension table, 4 columns",
-   "marks": {
-    "hit": false,
-    "sel": false
-   },
-   "title": {
-    "text": "Customer",
-    "size": 16,
-    "weight": 600,
-    "bar": true
-   },
-   "rows": [
-    {
-     "y": 30,
-     "h": 22,
-     "size": 14,
-     "weight": 600,
-     "name": "customer_key",
-     "type": "int",
-     "mark": "pk",
-     "fk": false,
-     "bar": true
-    },
-    {
-     "y": 52,
-     "h": 19,
-     "size": 12,
-     "weight": 400,
-     "name": "region_key",
-     "type": "int",
-     "mark": null,
-     "fk": true,
-     "bar": true
-    },
-    {
-     "y": 71,
-     "h": 19,
-     "size": 12,
-     "weight": 400,
-     "name": "email",
-     "type": "string",
-     "mark": null,
-     "fk": false,
-     "bar": true
-    },
-    {
-     "y": 90,
-     "h": 19,
-     "size": 12,
-     "weight": 400,
-     "name": "segment",
-     "type": "string",
-     "mark": null,
-     "fk": false,
-     "bar": true
-    }
-   ],
-   "more": null
-  },
-  {
-   "kind": "node",
    "id": "STORE",
-   "x": 808.94,
-   "y": 47,
+   "x": 930.3,
+   "y": 680,
    "w": 240,
    "h": 94,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Store, level 1, dimension table, 3 columns",
+   "cls": "mmv-node mmv-table mmv-k7 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
+   "name": "Store, level 1, Dimension table, 3 columns",
    "marks": {
     "hit": false,
     "sel": false
@@ -390,14 +461,14 @@
   {
    "kind": "node",
    "id": "WAREHOUSE",
-   "x": 2084.18,
-   "y": 239,
+   "x": 2566.02,
+   "y": 241.5,
    "w": 240,
    "h": 94,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k7 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Warehouse, level 1, dimension table, 3 columns",
+   "cls": "mmv-node mmv-table mmv-k8 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
+   "name": "Warehouse, level 1, Dimension table, 3 columns",
    "marks": {
     "hit": false,
     "sel": false
@@ -448,14 +519,14 @@
   {
    "kind": "node",
    "id": "PRODUCT",
-   "x": 1632.94,
-   "y": 66,
+   "x": 1786.41,
+   "y": 547.5,
    "w": 240,
    "h": 132,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Product, level 1, dimension table, 5 columns",
+   "cls": "mmv-node mmv-table mmv-k5 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
+   "name": "Product, level 1, Dimension table, 5 columns",
    "marks": {
     "hit": false,
     "sel": false
@@ -528,14 +599,14 @@
   {
    "kind": "node",
    "id": "DATE",
-   "x": 808.94,
-   "y": 602.1,
+   "x": 1714.37,
+   "y": 836,
    "w": 240,
    "h": 151,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Date, level 1, dimension table, 6 columns",
+   "cls": "mmv-node mmv-table mmv-k4 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
+   "name": "Date, level 1, Dimension table, 6 columns",
    "marks": {
     "hit": true,
     "sel": false
@@ -618,15 +689,142 @@
   },
   {
    "kind": "node",
-   "id": "REGION",
-   "x": 120,
-   "y": 435.6,
+   "id": "CUSTOMER",
+   "x": 930.3,
+   "y": 191.5,
+   "w": 240,
+   "h": 113,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k6 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
+   "name": "Customer, level 1, Dimension table, 4 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Customer",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "customer_key",
+     "type": "int",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "region_key",
+     "type": "int",
+     "mark": null,
+     "fk": true,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "email",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 90,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "segment",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "CURRENCY",
+   "x": 1786.41,
+   "y": 47,
    "w": 240,
    "h": 94,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k8 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Region, level 1, dimension table, 3 columns",
+   "cls": "mmv-node mmv-table mmv-k12 mmv-l1 mmv-d1 mmv-cm mmv-p0",
+   "name": "Currency, level 1, Lookup table, 3 columns",
+   "marks": {
+    "hit": false,
+    "sel": false
+   },
+   "title": {
+    "text": "Currency",
+    "size": 16,
+    "weight": 600,
+    "bar": true
+   },
+   "rows": [
+    {
+     "y": 30,
+     "h": 22,
+     "size": 14,
+     "weight": 600,
+     "name": "currency_code",
+     "type": "string",
+     "mark": "pk",
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 52,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "name",
+     "type": "string",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    },
+    {
+     "y": 71,
+     "h": 19,
+     "size": 12,
+     "weight": 400,
+     "name": "minor_units",
+     "type": "int",
+     "mark": null,
+     "fk": false,
+     "bar": true
+    }
+   ],
+   "more": null
+  },
+  {
+   "kind": "node",
+   "id": "REGION",
+   "x": 120,
+   "y": 412,
+   "w": 240,
+   "h": 94,
+   "custom": "table",
+   "grow": 1,
+   "cls": "mmv-node mmv-table mmv-k9 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
+   "name": "Region, level 1, Dimension table, 3 columns",
    "marks": {
     "hit": false,
     "sel": false
@@ -677,14 +875,14 @@
   {
    "kind": "node",
    "id": "PRODUCT_TAG",
-   "x": 1632.94,
-   "y": 427.6,
+   "x": 2609.83,
+   "y": 39,
    "w": 240,
    "h": 78,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k9 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Product tag, level 1, bridge table, 2 columns",
+   "cls": "mmv-node mmv-table mmv-k10 mmv-l1 mmv-d1 mmv-c3 mmv-p0",
+   "name": "Product tag, level 1, Bridge table, 2 columns",
    "marks": {
     "hit": false,
     "sel": false
@@ -724,14 +922,14 @@
   {
    "kind": "node",
    "id": "TAG",
-   "x": 1251.74,
-   "y": 564.1,
+   "x": 2228.63,
+   "y": 37.5,
    "w": 240,
    "h": 75,
    "custom": "table",
    "grow": 1,
-   "cls": "mmv-node mmv-table mmv-k10 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
-   "name": "Tag, level 1, dimension table, 2 columns",
+   "cls": "mmv-node mmv-table mmv-k11 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
+   "name": "Tag, level 1, Dimension table, 2 columns",
    "marks": {
     "hit": false,
     "sel": false
@@ -773,14 +971,14 @@
   {
    "kind": "rel",
    "id": "line-date",
-   "d": "M928.94,266.2 L988.94,266.2 L988.94,567.6 L928.94,567.6",
+   "d": "M1050.3,464.5 L1126.3,464.5 L1566.37,801.5 L1594.37,801.5",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line ordered on exactly one Date. Each Date goes with zero or more Order line.",
    "label": {
-    "x": 988.94,
-    "y": 373.33,
+    "x": 1218.61,
+    "y": 539.19,
     "text": "ordered on"
    },
    "items": [
@@ -796,14 +994,14 @@
   {
    "kind": "rel",
    "id": "line-product",
-   "d": "M928.94,285.2 L956.94,285.2 L1484.94,41 L1512.94,41",
+   "d": "M1050.3,445.5 L1142.3,445.5 L1638.41,522.5 L1666.41,522.5",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line sells exactly one Product. Each Product goes with zero or more Order line.",
    "label": {
-    "x": 1059.06,
-    "y": 241.97,
+    "x": 1088.3,
+    "y": 449.5,
     "text": "sells"
    },
    "items": [
@@ -819,14 +1017,14 @@
   {
    "kind": "rel",
    "id": "line-customer",
-   "d": "M688.94,304.2 L660.94,304.2 L341.06,901.29 L313.06,901.29",
+   "d": "M1050.3,407.5 L1078.3,407.5 L1094.3,176 L1050.3,176",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line bought by exactly one Customer. Each Customer goes with zero or more Order line.",
    "label": {
-    "x": 550.56,
-    "y": 514.24,
+    "x": 1086.3,
+    "y": 295.75,
     "text": "bought by"
    },
    "items": [
@@ -842,14 +1040,14 @@
   {
    "kind": "rel",
    "id": "line-store",
-   "d": "M928.94,323.2 L972.94,323.2 L972.94,41 L928.94,41",
+   "d": "M1050.3,483.5 L1110.3,483.5 L1110.3,674 L1050.3,674",
    "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Order line sold at exactly one Store. Each Store goes with zero or more Order line.",
    "label": {
-    "x": 972.94,
-    "y": 230.47,
+    "x": 1110.3,
+    "y": 495.5,
     "text": "sold at"
    },
    "items": [
@@ -864,15 +1062,130 @@
   },
   {
    "kind": "rel",
+   "id": "line-currency",
+   "d": "M1050.3,426.5 L1094.3,426.5 L1638.41,41 L1666.41,41",
+   "cls": "mmv-flow mmv-er-line is-lit mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Order line priced in exactly one Currency. Each Currency goes with zero or more Order line.",
+   "label": {
+    "x": 1203.3,
+    "y": 353.27,
+    "text": "priced in"
+   },
+   "items": [
+    {
+     "from": "ORDER_LINE",
+     "to": "CURRENCY",
+     "eid": "line-currency",
+     "label": "priced in",
+     "words": "Each Order line priced in exactly one Currency. Each Currency goes with zero or more Order line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "return-date",
+   "d": "M1906.41,351 L1950.41,351 L1950.41,801.5 L1834.37,801.5",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Return line returned on exactly one Date. Each Date goes with zero or more Return line.",
+   "label": {
+    "x": 1950.41,
+    "y": 580.25,
+    "text": "returned on"
+   },
+   "items": [
+    {
+     "from": "RETURN_LINE",
+     "to": "DATE",
+     "eid": "return-date",
+     "label": "returned on",
+     "words": "Each Return line returned on exactly one Date. Each Date goes with zero or more Return line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "return-product",
+   "d": "M1906.41,332 L1966.41,332 L1950.41,522.5 L1906.41,522.5",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Return line returns exactly one Product. Each Product goes with zero or more Return line.",
+   "label": {
+    "x": 1963.16,
+    "y": 374.65,
+    "text": "returns"
+   },
+   "items": [
+    {
+     "from": "RETURN_LINE",
+     "to": "PRODUCT",
+     "eid": "return-product",
+     "label": "returns",
+     "words": "Each Return line returns exactly one Product. Each Product goes with zero or more Return line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "return-customer",
+   "d": "M1666.41,313 L1638.41,313 L1078.3,176 L1050.3,176",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Return line returned by exactly one Customer. Each Customer goes with zero or more Return line.",
+   "label": {
+    "x": 1596.55,
+    "y": 306.76,
+    "text": "returned by"
+   },
+   "items": [
+    {
+     "from": "RETURN_LINE",
+     "to": "CUSTOMER",
+     "eid": "return-customer",
+     "label": "returned by",
+     "words": "Each Return line returned by exactly one Customer. Each Customer goes with zero or more Return line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
+   "id": "return-currency",
+   "d": "M1906.41,294 L1934.41,294 L1934.41,41 L1906.41,41",
+   "cls": "mmv-flow mmv-er-line mmv-p0",
+   "head": "er-one",
+   "tail": "er-zero-many",
+   "hint": "Each Return line refunded in exactly one Currency. Each Currency goes with zero or more Return line.",
+   "label": {
+    "x": 1934.41,
+    "y": 171.5,
+    "text": "refunded in"
+   },
+   "items": [
+    {
+     "from": "RETURN_LINE",
+     "to": "CURRENCY",
+     "eid": "return-currency",
+     "label": "refunded in",
+     "words": "Each Return line refunded in exactly one Currency. Each Currency goes with zero or more Return line."
+    }
+   ]
+  },
+  {
+   "kind": "rel",
    "id": "stock-date",
-   "d": "M1512.94,253.5 L1484.94,253.5 L956.94,567.6 L928.94,567.6",
+   "d": "M2446.02,464.5 L2418.02,464.5 L1878.37,801.5 L1834.37,801.5",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Stock level counted on exactly one Date. Each Date goes with zero or more Stock level.",
    "label": {
-    "x": 1375.39,
-    "y": 322.67,
+    "x": 2306.98,
+    "y": 537.84,
     "text": "counted on"
    },
    "items": [
@@ -888,14 +1201,14 @@
   {
    "kind": "rel",
    "id": "stock-product",
-   "d": "M1752.94,272.5 L1780.94,272.5 L1780.94,41 L1752.94,41",
+   "d": "M2446.02,445.5 L2402.02,445.5 L1966.41,522.5 L1906.41,522.5",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Stock level counts exactly one Product. Each Product goes with zero or more Stock level.",
    "label": {
-    "x": 1780.94,
-    "y": 196.67,
+    "x": 2376.02,
+    "y": 454.1,
     "text": "counts"
    },
    "items": [
@@ -911,14 +1224,14 @@
   {
    "kind": "rel",
    "id": "stock-warehouse",
-   "d": "M1752.94,291.5 L1796.94,291.5 L1936.18,233 L1964.18,233",
+   "d": "M2686.02,426.5 L2714.02,426.5 L2714.02,235.5 L2686.02,235.5",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Stock level held in exactly one Warehouse. Each Warehouse goes with zero or more Stock level.",
    "label": {
-    "x": 1838.37,
-    "y": 278.09,
+    "x": 2714.02,
+    "y": 335,
     "text": "held in"
    },
    "items": [
@@ -934,14 +1247,14 @@
   {
    "kind": "rel",
    "id": "customer-region",
-   "d": "M313.06,921.79 L357.06,921.79 L357.06,429.6 L240,429.6",
+   "d": "M810.3,196.5 L782.3,196.5 L268,406 L240,406",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Customer lives in exactly one Region. Each Region goes with zero or more Customer.",
    "label": {
-    "x": 357.06,
-    "y": 917.79,
+    "x": 751.89,
+    "y": 212.89,
     "text": "lives in"
    },
    "items": [
@@ -957,14 +1270,14 @@
   {
    "kind": "rel",
    "id": "store-region",
-   "d": "M688.94,61.5 L660.94,61.5 L268,429.6 L240,429.6",
+   "d": "M810.3,694.5 L782.3,694.5 L284,406 L240,406",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Store stands in exactly one Region. Each Region goes with zero or more Store.",
    "label": {
-    "x": 637.99,
-    "y": 87,
+    "x": 752.17,
+    "y": 681.05,
     "text": "stands in"
    },
    "items": [
@@ -980,14 +1293,14 @@
   {
    "kind": "rel",
    "id": "tag-product",
-   "d": "M1752.94,429.6 L1796.94,429.6 L1796.94,41 L1752.94,41",
+   "d": "M2489.83,41 L2445.83,41 L1934.41,522.5 L1906.41,522.5",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Product tag tagged by exactly one Product. Each Product goes with zero or more Product tag.",
    "label": {
-    "x": 1796.94,
-    "y": 425.6,
+    "x": 2345.35,
+    "y": 139.6,
     "text": "tagged by"
    },
    "items": [
@@ -1003,14 +1316,14 @@
   {
    "kind": "rel",
    "id": "tag-tag",
-   "d": "M1512.94,451.6 L1484.94,451.6 L1399.74,567.6 L1371.74,567.6",
+   "d": "M2489.83,63 L2461.83,63 L2376.63,41 L2348.63,41",
    "cls": "mmv-flow mmv-er-line mmv-p0",
    "head": "er-one",
    "tail": "er-zero-many",
    "hint": "Each Product tag tags exactly one Tag. Each Tag goes with zero or more Product tag.",
    "label": {
-    "x": 1474.61,
-    "y": 469.67,
+    "x": 2442.45,
+    "y": 62,
     "text": "tags"
    },
    "items": [

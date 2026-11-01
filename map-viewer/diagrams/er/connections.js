@@ -3,7 +3,6 @@
 import { problem } from '../../model/problem.js';
 import { arrowLabel } from '../../model/labels.js';
 import { parseRelations, DEFAULT_VIEW_LABEL } from '../../model/relations.js';
-import { inferRoles } from './roles.js';
 
 const ID = '[A-Za-z_][\\w-]*';
 const COL = '[A-Za-z_*][\\w-]*';
@@ -105,6 +104,5 @@ export function parseErViews(sections, byId, warnings, own = []) {
       for (const col of cols || []) byId[id].attrs.find((a) => a.name === col).connected = true;
     }
   }
-  inferRoles(Object.values(byId).filter((n) => n.attrs && !n.synthetic), views.filter((v) => !v.join).flatMap((v) => v.relations));
   return views;
 }

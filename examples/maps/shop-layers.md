@@ -330,6 +330,8 @@ erDiagram
     uuid order_line_id FK
     timestamp expires_at
   }
+  class CUSTOMER,ADDRESS,PRODUCT master
+  class ORDER,ORDER_LINE,PAYMENT,SHIPMENT,RESERVATION transaction
 ```
 
 ## Relations

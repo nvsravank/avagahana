@@ -3,7 +3,7 @@
   "kind": "row",
   "id": "ORDER_LINE",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-selected",
+  "cls": "mmv-lrow mmv-k1 mmv-l1 mmv-d1 mmv-c1 mmv-p0 is-selected",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -45,6 +45,63 @@
     "name": "Store",
     "label": "sold at",
     "glyph": "⇄"
+   },
+   {
+    "dir": "out",
+    "other": "CURRENCY",
+    "name": "Currency",
+    "label": "priced in",
+    "glyph": "⇄"
+   }
+  ],
+  "note": true
+ },
+ {
+  "kind": "row",
+  "id": "RETURN_LINE",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c1 mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Return line",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "out",
+    "other": "DATE",
+    "name": "Date",
+    "label": "returned on",
+    "glyph": "⇄"
+   },
+   {
+    "dir": "out",
+    "other": "PRODUCT",
+    "name": "Product",
+    "label": "returns",
+    "glyph": "⇄"
+   },
+   {
+    "dir": "out",
+    "other": "CUSTOMER",
+    "name": "Customer",
+    "label": "returned by",
+    "glyph": "⇄"
+   },
+   {
+    "dir": "out",
+    "other": "CURRENCY",
+    "name": "Currency",
+    "label": "refunded in",
+    "glyph": "⇄"
    }
   ],
   "note": true
@@ -53,7 +110,7 @@
   "kind": "row",
   "id": "STOCK_LEVEL",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-c1 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -96,7 +153,7 @@
   "kind": "row",
   "id": "DATE",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k3 mmv-l1 mmv-d1 mmv-c0 mmv-p0 is-hit",
+  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-c2 mmv-p0 is-hit",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -120,6 +177,13 @@
    },
    {
     "dir": "in",
+    "other": "RETURN_LINE",
+    "name": "Return line",
+    "label": "returned on",
+    "glyph": "⇄"
+   },
+   {
+    "dir": "in",
     "other": "STOCK_LEVEL",
     "name": "Stock level",
     "label": "counted on",
@@ -132,7 +196,7 @@
   "kind": "row",
   "id": "PRODUCT",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k4 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k5 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -156,6 +220,13 @@
    },
    {
     "dir": "in",
+    "other": "RETURN_LINE",
+    "name": "Return line",
+    "label": "returns",
+    "glyph": "⇄"
+   },
+   {
+    "dir": "in",
     "other": "STOCK_LEVEL",
     "name": "Stock level",
     "label": "counts",
@@ -175,7 +246,7 @@
   "kind": "row",
   "id": "CUSTOMER",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k5 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k6 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -198,6 +269,13 @@
     "glyph": "⇄"
    },
    {
+    "dir": "in",
+    "other": "RETURN_LINE",
+    "name": "Return line",
+    "label": "returned by",
+    "glyph": "⇄"
+   },
+   {
     "dir": "out",
     "other": "REGION",
     "name": "Region",
@@ -211,7 +289,7 @@
   "kind": "row",
   "id": "STORE",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k6 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k7 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -247,7 +325,7 @@
   "kind": "row",
   "id": "WAREHOUSE",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k7 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k8 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -276,7 +354,7 @@
   "kind": "row",
   "id": "REGION",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k8 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k9 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -312,7 +390,7 @@
   "kind": "row",
   "id": "PRODUCT_TAG",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k9 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k10 mmv-l1 mmv-d1 mmv-c3 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -348,7 +426,7 @@
   "kind": "row",
   "id": "TAG",
   "depth": 0,
-  "cls": "mmv-lrow mmv-k10 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
+  "cls": "mmv-lrow mmv-k11 mmv-l1 mmv-d1 mmv-c2 mmv-p0",
   "toggle": null,
   "closed": false,
   "icons": [],
@@ -368,6 +446,42 @@
     "other": "PRODUCT_TAG",
     "name": "Product tag",
     "label": "tags",
+    "glyph": "⇄"
+   }
+  ],
+  "note": false
+ },
+ {
+  "kind": "row",
+  "id": "CURRENCY",
+  "depth": 0,
+  "cls": "mmv-lrow mmv-k12 mmv-l1 mmv-d1 mmv-cm mmv-p0",
+  "toggle": null,
+  "closed": false,
+  "icons": [],
+  "runs": [
+   [
+    {
+     "text": "Currency",
+     "bold": false,
+     "italic": false
+    }
+   ]
+  ],
+  "count": null,
+  "rels": [
+   {
+    "dir": "in",
+    "other": "ORDER_LINE",
+    "name": "Order line",
+    "label": "priced in",
+    "glyph": "⇄"
+   },
+   {
+    "dir": "in",
+    "other": "RETURN_LINE",
+    "name": "Return line",
+    "label": "refunded in",
     "glyph": "⇄"
    }
   ],

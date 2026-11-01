@@ -104,26 +104,31 @@ erDiagram
     int id PK
     string email UK
   }
-  ORDER["Order"] {
-    int id PK
-    int customer_id FK
-    int total "in cents"
-    int legacy_basket_id
-    timestamp placed_at
-  }
-  ORDER_LINE["Order line"] {
-    int order_id FK "grain"
-    int line_no "grain"
-    int product_id
-    int quantity
-  }
-  PAYMENT["Payment"] {
-    int id PK
-    int order_id FK
-    string card_token "kept **30 days**"
-    string status
-  }
-  ORDER_LINE:::fact
+  subgraph orders [Orders]
+    ORDER["Order"] {
+      int id PK
+      int customer_id FK
+      int total "in cents"
+      int legacy_basket_id
+      timestamp placed_at
+    }
+    ORDER_LINE["Order line"] {
+      int order_id FK "grain"
+      int line_no "grain"
+      int product_id
+      int quantity
+    }
+  end
+  subgraph payments [Payments]
+    PAYMENT["Payment"] {
+      int id PK
+      int order_id FK
+      string card_token "kept **30 days**"
+      string status
+    }
+  end
+  CUSTOMER:::master
+  class ORDER,ORDER_LINE,PAYMENT transaction
 ```
 
 ## Relations

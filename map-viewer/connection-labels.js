@@ -62,6 +62,23 @@ export function placeLabels(routes, arrows, pos, titleZone = () => 0, titleHeigh
     const lw = labelWidth(w);
     const inside = new Set();
     for (const end of [w.a, w.z]) for (let n = end.parent; n; n = n.parent) inside.add(n);
+    // what a label box would cover: another line a little, a label, a box or a box's title much
+    const costOf = (box) => {
+      let cost = 0;
+      for (const o of near(box)) {
+        if (o.r <= box.l || o.l >= box.r || o.b <= box.t || o.t >= box.b) continue;
+        if (o.seg) { if (o.seg !== w.key) cost += 25; continue; }
+        if (o.label) { cost += 1000; continue; }
+        if (o.n && inside.has(o.n)) {
+          // a box the arrow runs inside: the label stays off its title and its border
+          const within = box.l >= o.l && box.r <= o.r && box.t >= o.t && box.b <= o.b;
+          if (!within || (box.t < o.t + titleHeight && box.l < o.l + titleZone(o.n))) cost += 1000;
+          continue;
+        }
+        cost += 1000;
+      }
+      return cost;
+    };
     const lens = pts.slice(1).map((q, i) => Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1]));
     const total = lens.reduce((x, y) => x + y, 0);
     let best = null;
@@ -80,26 +97,31 @@ export function placeLabels(routes, arrows, pos, titleZone = () => 0, titleHeigh
         const x = p[0] + (q[0] - p[0]) * f;
         const y = p[1] + (q[1] - p[1]) * f;
         const box = { l: x - lw / 2, t: y - lh / 2, r: x + lw / 2, b: y + lh / 2 };
-        let cost = d * 0.05 + (flat ? 0 : 20);   // early along the arrow: two arrows running
-        // opposite ways in one gap put their labels at opposite ends
-        for (const o of near(box)) {
-          if (o.r <= box.l || o.l >= box.r || o.b <= box.t || o.t >= box.b) continue;
-          if (o.seg) { if (o.seg !== w.key) cost += 25; continue; }
-          if (o.label) { cost += 1000; continue; }
-          if (o.n && inside.has(o.n)) {
-            // a box the arrow runs inside: the label stays off its title and its border
-            const within = box.l >= o.l && box.r <= o.r && box.t >= o.t && box.b <= o.b;
-            if (!within || (box.t < o.t + titleHeight && box.l < o.l + titleZone(o.n))) cost += 1000;
-            continue;
-          }
-          cost += 1000;
-        }
-        if (!best || cost < best.cost) best = { cost, x, y, box };
+        const cost = d * 0.05 + (flat ? 0 : 20) + costOf(box);   // early along the arrow: two
+        // arrows running opposite ways in one gap put their labels at opposite ends
+        if (!best || cost < best.cost) best = { cost, x, y, box, p, q };
         if (to === from) break;
       }
       at += lens[i];
     }
     if (!best) continue;
+    // Every place on the line hits another label (two lines meeting one row of a table,
+    // say): the label moves just off its line, beside where it was, rather than overlap
+    if (best.cost >= 1000) {
+      const { x, y, p, q } = best;
+      const lh = labelH(w);
+      const len = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1;
+      const nx = -(q[1] - p[1]) / len;
+      const ny = (q[0] - p[0]) / len;
+      const off = (Math.abs(nx) * lw + Math.abs(ny) * lh) / 2 + 2;
+      for (const s of [1, -1]) {
+        const cx = x + s * nx * off;
+        const cy = y + s * ny * off;
+        const box = { l: cx - lw / 2, t: cy - lh / 2, r: cx + lw / 2, b: cy + lh / 2 };
+        const cost = costOf(box) + 30;
+        if (cost < best.cost) best = { ...best, cost, x: cx, y: cy, box };
+      }
+    }
     out.set(w.key, [Math.round(best.x * 100) / 100, Math.round(best.y * 100) / 100]);
     add({ ...best.box, label: w.key });
   }

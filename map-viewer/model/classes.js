@@ -85,19 +85,28 @@ export function parseClasses(text, warnings) {
   return out;
 }
 
-// the map's classes: the built-in ones with the map's own on top
-export function mergeClasses(own) {
+// the map's classes: the built-in ones (and the diagram type's own, an ER diagram's
+// table classes) with the map's own on top
+export function mergeClasses(own, typeOwn = {}) {
   const out = {};
-  for (const [name, def] of Object.entries(BUILT_IN)) out[name] = { ...def };
+  for (const [name, def] of Object.entries({ ...BUILT_IN, ...typeOwn })) out[name] = { ...def };
   for (const [name, def] of Object.entries(own)) out[name] = { ...out[name], ...def, label: def.label || out[name]?.label || null };
   return out;
 }
 
-// A node's class: the first with a meaning, else the first at all; null for none.
+// A node's class: a reserved one (an ER table class: `wins`, the later of two), else the
+// first with a meaning, else the first at all; null for none.
 // skip: classes that only style (a classDef with no meaning: no colour, no key row).
 export function classOf(n, classes, skip = new Set()) {
   const names = (n.cls || '').split(/\s+/).filter((c) => c && !PINS.has(c) && !CHANGE_CLASSES.has(c) && !skip.has(c));
-  return names.find((c) => classes[c]) || names[0] || null;
+  return names.filter((c) => classes[c]?.wins).at(-1) || names.find((c) => classes[c]) || names[0] || null;
+}
+
+// The reserved classes a node names itself, when more than one (one wins: classOf).
+// -> [name] (empty when fewer than two)
+export function reservedTwice(n, classes) {
+  const named = [...new Set((n.cls || '').split(/\s+/).filter((c) => classes[c]?.wins))];
+  return named.length > 1 ? named : [];
 }
 
 const slotFromName = (name) => {
@@ -111,9 +120,10 @@ const slotFromName = (name) => {
 // -> Map(name -> slot)
 export function assignSlots(names, classes) {
   const out = new Map();
-  // the built-in slots stay free for their classes, on every map, so another class
-  // never borrows the colour of a person or a database
-  const taken = new Set(Object.values(BUILT_IN).map((d) => d.slot).filter((s) => typeof s === 'number'));
+  // the built-in slots (and the diagram type's own, an ER diagram's table classes) stay
+  // free for their classes, on every map, so another class never borrows the colour of
+  // a person or a database
+  const taken = new Set(Object.values(classes).map((d) => d.slot).filter((s) => typeof s === 'number'));
   for (const name of names) {
     const own = classes[name]?.slot;
     if (own != null) { out.set(name, own); taken.add(own); }

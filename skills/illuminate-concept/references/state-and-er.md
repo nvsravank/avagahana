@@ -62,9 +62,41 @@ erDiagram
   marks a type that may be empty. Names are plain words: no quotes, no spaces (Mermaid
   and GitHub reject them). The table's label (`ORDER["**Order**<br>_line_"]`) and
   comments may use `**bold**`, `_italic_` and `<br>`.
-- Classes `fact`, `dimension`, `bridge` set a table's role; otherwise the viewer infers
-  it. Other classes (subject areas) colour the Class scheme.
-- Layout is the viewer's; nothing in the map sets it.
+- **Say what each table is with a class.** The viewer guesses nothing: a table with no
+  class is drawn in one plain colour. Six table classes are built in, each with its own
+  colour and key label, so no `## Classes` line is needed:
+  - warehouse (OLAP): `fact` (a measured event, one row per grain), `dimension` (what
+    facts are described by), `bridge` (links two tables many-to-many);
+  - application (OLTP): `master` (core things that last: customer, product),
+    `transaction` (business records: order, order line, payment), `lookup` (code lists:
+    country, currency, status; drawn muted).
+
+  One per table (two is a checker error); it wins over the table's other classes. Class
+  every table when the kinds matter; `class A,B,C transaction` does several at once.
+- **Group tables by subject area with `subgraph`.** ER diagrams take Mermaid's
+  `subgraph id [Title]` ... `end` (Mermaid 11.17+), as flowcharts do; groups nest. The
+  reader sees a frame that closes like a box, its tables' lines then meeting the closed
+  group. A table belongs to the group it is first named in, so declare it inside. Draw
+  no relationship to a group and write no `direction` inside one (checker warnings).
+
+  ```
+  subgraph orders [Orders]
+    ORDER["Order"] {
+      int id PK
+    }
+    ORDER_LINE["Order line"] {
+      int order_id FK "grain"
+    }
+  end
+  ```
+- **Crossing lines: only table order works.** Reordering columns does not untangle
+  lines: the viewer draws each table's foreign keys in the order their lines leave it,
+  in each view (the whole diagram, a join view, a table opened on its own), so write
+  columns in the order that reads best and leave them. The order of the tables does
+  move the picture (tables with as many relationships as each other are placed in the
+  order they are written). When the lines tangle, try table orders as for box diagrams
+  (`boxes.md`, "Crossing arrows": when, and the draft script), with the mode `tables`
+  and each `## Joins:` view.
 
 ## Walks: `## Walks: <name>`
 

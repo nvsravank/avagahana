@@ -17,6 +17,7 @@
 //   input: {relations, collapsed}; a closed table (in collapsed) shows its key columns,
 //   an open one all of them (diagrams/er/table.js)
 import { connectionPaths, connectionLabels, connectionSpace, channelSpace } from './lines.js';
+import { tablesIn } from './table.js';
 
 const GAP = 44;          // between tables after pushing apart
 const WIDTH_STEP = 40;   // table widths round up to this
@@ -26,46 +27,176 @@ const PUSH_ROUNDS = 80;
 const REFINE_SWEEPS = 3;
 const REFINE_MAX = 150;  // more tables than this: no refining (it compares every pair of lines)
 const ANGLES = 16;       // places tried round each neighbour
+const GROUP_PAD = 28;    // a group's frame round its tables (and their line channels)
+const GROUP_TITLE = 40;  // the frame's title strip
 
 export function layoutTables(root, size, input) {
   // A table drilled into (the viewer's focus) has nothing inside it: it shows itself and
   // the tables its relationships in this view reach, laid out as the diagram is.
-  const table = !root.children.length && root.parent ? root : null;
+  const table = root.attrs && !root.synthetic ? root : null;
   const near = table && new Set([table.id, ...input.relations.filter((r) => !r.cross && (r.from === table.id || r.to === table.id)).flatMap((r) => [r.from, r.to])]);
   const rels = input.relations.filter((r) => !r.cross && (!near || (near.has(r.from) && near.has(r.to))));
-  if (table) root = table.parent;
+  if (table) while (root.parent) root = root.parent;
   // a view shows the tables its relationships use; a view with none shows all
   const used = new Set(rels.flatMap((r) => [r.from, r.to]));
-  const tables = root.children.filter((n) => (near ? near.has(n.id) : !rels.length || used.has(n.id)));
-  const index = new Map(tables.map((n, i) => [n.id, i]));
-  const dims = new Map(tables.map((n) => {
+  const visible = new Set(tablesIn(root).filter((n) => (near ? near.has(n.id) : !rels.length || used.has(n.id))));
+  // a closed group (subgraph, WO-44) stands for the tables inside it: a box of its own,
+  // their lines lifted to it (one line to each table or group they reach)
+  const closed = (n) => !!input.collapsed?.has(n.id);
+  const standFor = new Map();
+  for (const n of visible) {
+    let s = n;
+    for (let x = n.parent; x && x !== root; x = x.parent) if (x.group && closed(x)) s = x;
+    standFor.set(n, s);
+  }
+  const byId = input.byId;
+  const lifted = new Map();
+  const lines = [];
+  for (const r of rels) {
+    const a = standFor.get(byId[r.from]);
+    const b = standFor.get(byId[r.to]);
+    if (!a || !b) continue;
+    if (a.attrs && b.attrs) { lines.push(r); continue; }
+    if (a === b) continue;
+    const key = [a.id, b.id].sort().join('|');
+    if (!lifted.has(key)) lifted.set(key, { from: a.id, to: b.id, eid: `lift:${key}`, label: '', line: 'solid', cross: false, lifted: [] });
+    lifted.get(key).lifted.push(r);
+  }
+  lines.push(...lifted.values());
+  const boxes = [...new Set(standFor.values())];
+  const dims = new Map(boxes.map((n) => {
     const g = size(n);
-    return [n, { w: g.w, h: input.collapsed?.has(n.id) ? g.h : g.hOpen }];
+    return [n, { w: g.w, h: n.attrs && closed(n) ? g.h : g.hOpen }];
   }));
   // One width for the whole visible view, including room for its widest table.
   const width = Math.ceil(Math.max(0, ...[...dims.values()].map((d) => d.w)) / WIDTH_STEP) * WIDTH_STEP;
-  const corridors = channelSpace(rels);
+  const corridors = channelSpace(lines);
   for (const [n, d] of dims) { d.w = width; d.channel = corridors.get(n.id) || 0; }
-  const adj = new Map(tables.map((n) => [n, new Set()]));
-  for (const r of rels) {
-    const a = tables[index.get(r.from)];
-    const b = tables[index.get(r.to)];
-    if (a && b) { adj.get(a).add(b); adj.get(b).add(a); }
-  }
   // Reserve the same label, note/icon and endpoint clearance as flowcharts,
   // including separate tracks for parallel relationships and composite pairs.
-  const labelRoom = connectionSpace(rels, input.byId, input.playLabel);
+  const labelRoom = connectionSpace(lines, byId, input.playLabel);
   for (const [key, room] of labelRoom) {
     const [a, b] = key.split('|');
     room.gap = Math.max(room.gap, (corridors.get(a) || 0) + (corridors.get(b) || 0) + room.width + 32);
   }
-  const deg = (n) => adj.get(n).size;
-  const byBusy = (a, b) => deg(b) - deg(a) || index.get(a.id) - index.get(b.id);
+  // An open group's tables (and groups) are laid out on their own, then the group stands
+  // as one table, its frame's size, among the rest.
+  const shown = new Set(boxes);
+  const parentOf = new Map();   // a box or an open group -> the open group holding it
+  const build = (n) => {
+    const out = [];
+    for (const c of n.children) {
+      if (shown.has(c)) out.push(c);
+      else if (c.group && !closed(c) && tablesIn(c).some((t) => visible.has(t))) {
+        const it = { id: c.id, node: c, kids: build(c) };
+        for (const k of it.kids) parentOf.set(k, it);
+        out.push(it);
+      }
+    }
+    return out;
+  };
+  const lay = (level) => {
+    for (const it of level) {
+      if (!it.kids) continue;
+      it.inner = lay(it.kids);
+      it.box = bounds(it.inner, dims);
+      // the frame holds its tables' line channels too
+      const channel = Math.max(0, ...it.kids.map((k) => dims.get(k).channel || 0));
+      it.box.l -= channel; it.box.r += channel;
+      dims.set(it, { w: it.box.r - it.box.l + 2 * GROUP_PAD, h: it.box.b - it.box.t + GROUP_PAD + GROUP_TITLE, channel: 0 });
+    }
+    // the lines, lifted to what stands at this level
+    const here = new Set(level);
+    const rep = (x) => { while (x && !here.has(x)) x = parentOf.get(x); return x; };
+    const adj = new Map(level.map((x) => [x, new Set()]));
+    const room = new Map();
+    for (const r of lines) {
+      const a = rep(byId[r.from]);
+      const b = rep(byId[r.to]);
+      if (!a || !b || a === b) continue;
+      adj.get(a).add(b); adj.get(b).add(a);
+      const was = labelRoom.get([r.from, r.to].sort().join('|'));
+      const key = [a.id, b.id].sort().join('|');
+      if (was) room.set(key, room.has(key) ? { width: Math.max(room.get(key).width, was.width), height: Math.max(room.get(key).height, was.height), gap: Math.max(room.get(key).gap, was.gap) } : { ...was });
+    }
+    return arrange(level, adj, dims, room);
+  };
+  const pos = new Map();
+  const frames = [];
+  const place = (at, ox, oy, depth) => {
+    for (const [it, p] of at) {
+      const d = dims.get(it);
+      if (!it.kids) { pos.set(it, { x: ox + p.x, y: oy + p.y, ...d }); continue; }
+      frames.push({ node: it.node, depth, x: ox + p.x, y: oy + p.y, w: d.w, h: d.h });
+      place(it.inner, ox + p.x - d.w / 2 + GROUP_PAD - it.box.l, oy + p.y - d.h / 2 + GROUP_TITLE - it.box.t, depth + 1);
+    }
+  };
+  place(lay(build(root)), 0, 0, 0);
+  // Each table's foreign-key rows in the order their lines leave it, top to bottom, in
+  // this view (WO-44): a line leaves its column's row, so this keeps them from
+  // crossing at the table, whatever the file's order. The grain's foreign keys move
+  // only among themselves, so key and grain rows stay first; the node page and the grain
+  // sentence keep the file's order.
+  const rowOrder = foreignKeyOrder(lines, pos, byId, size);
+  const geom = (n) => (rowOrder.has(n) ? { ...size(n), rows: rowOrder.get(n) } : size(n));
+  const connections = connectionPaths(lines, pos, byId, geom);
+  return { pos, edges: [], connections, labels: connectionLabels(connections, pos, byId, input.playLabel), groups: frames, rowOrder };
+}
 
-  // groups of connected tables, each laid out on its own, then side by side
+// -> Map(table -> its rows reordered), only for tables whose order changes
+function foreignKeyOrder(lines, pos, byId, size) {
+  // table -> Map(column -> [the way each of its lines leaves: an angle, swept from up to
+  // down on the side the line leaves by (lines.js: towards a table it faces, else right)])
+  const far = new Map();
+  for (const r of lines) {
+    const ends = [byId[r.from], byId[r.to]];
+    if (ends[0] === ends[1]) continue;
+    // a line lifted to a closed group stands for its tables' relationships
+    for (const u of r.lifted || [r]) {
+      for (const [id, cols] of [[u.from, u.fromColumns], [u.to, u.toColumns]]) {
+        const t = byId[id];
+        if (!cols?.length || !ends.includes(t)) continue;
+        const p = pos.get(t);
+        const q = pos.get(ends[0] === t ? ends[1] : ends[0]);
+        if (!p || !q) continue;
+        const dx = q.x - p.x;
+        const side = Math.abs(dx) > (p.w + q.w) / 2 + 24 ? Math.sign(dx) : 1;
+        const angle = Math.atan2(q.y - p.y, side * dx);
+        if (!far.has(t)) far.set(t, new Map());
+        for (const c of cols) far.get(t).set(c, [...(far.get(t).get(c) || []), angle]);
+      }
+    }
+  }
+  const out = new Map();
+  for (const [t, cols] of far) {
+    const geo = size(t);
+    const rows = geo.rows.slice();
+    const mean = (row) => { const ys = cols.get(row.a.name); return ys ? ys.reduce((a, b) => a + b, 0) / ys.length : Infinity; };
+    let changed = false;
+    // the grain's foreign keys among themselves, then the other foreign keys (a primary
+    // key stays where it is)
+    for (const grain of [true, false]) {
+      const at = rows.slice(0, geo.shownCount).map((row, i) => (row.a.keys.has('FK') && !row.a.keys.has('PK') && !!row.a.grain === grain ? i : -1)).filter((i) => i >= 0);
+      const sorted = at.map((i, k) => ({ row: rows[i], k, y: mean(rows[i]) })).sort((a, b) => a.y - b.y || a.k - b.k).map((x) => x.row);
+      if (sorted.every((row, k) => row === rows[at[k]])) continue;
+      at.forEach((i, k) => { rows[i] = sorted[k]; });
+      changed = true;
+    }
+    if (changed) out.set(t, rows);
+  }
+  return out;
+}
+
+// Tables (or groups, standing as tables) laid out hub and spoke: each set of connected
+// ones on its own, side by side, then those with no relationship in a row after them.
+// -> Map(item -> {x, y}), the top-left of the whole at 0, 0 or more
+function arrange(level, adj, dims, labelRoom) {
+  const index = new Map(level.map((n, i) => [n, i]));
+  const deg = (n) => adj.get(n).size;
+  const byBusy = (a, b) => deg(b) - deg(a) || index.get(a) - index.get(b);
   const seen = new Set();
   const groups = [];
-  for (const n of [...tables].sort(byBusy)) {
+  for (const n of [...level].sort(byBusy)) {
     if (seen.has(n)) continue;
     const g = [];
     const todo = [n];
@@ -77,10 +208,9 @@ export function layoutTables(root, size, input) {
     }
     groups.push(g.sort(byBusy));
   }
-  const pos = new Map();
+  const at = new Map();
   const radius = (n) => Math.hypot(dims.get(n).w + 2 * dims.get(n).channel, dims.get(n).h) / 2;
   let x0 = 0;
-  // tables with no relationship at all go in a row after the groups
   const loose = groups.filter((g) => g.length === 1 && !deg(g[0])).map((g) => g[0]);
   for (const g of groups.filter((x) => !(x.length === 1 && !deg(x[0])))) {
     const placed = placeGroup(g, adj, dims, radius);
@@ -91,16 +221,14 @@ export function layoutTables(root, size, input) {
     }
     pushApart(placed, dims, new Set(placed.hubs));
     const box = bounds(placed.at, dims);
-    for (const [n, p] of placed.at) pos.set(n, { x: p.x - box.l + x0, y: p.y - box.t, ...dims.get(n) });
+    for (const [n, p] of placed.at) at.set(n, { x: p.x - box.l + x0, y: p.y - box.t });
     x0 += box.r - box.l + GAP * 3;
   }
-  let lx = x0;
   for (const n of loose) {
-    pos.set(n, { x: lx + dims.get(n).w / 2, y: dims.get(n).h / 2, ...dims.get(n) });
-    lx += dims.get(n).w + GAP;
+    at.set(n, { x: x0 + dims.get(n).w / 2, y: dims.get(n).h / 2 });
+    x0 += dims.get(n).w + GAP;
   }
-  const connections = connectionPaths(rels, pos, input.byId, size);
-  return { pos, edges: [], connections, labels: connectionLabels(connections, pos, input.byId, input.playLabel) };
+  return at;
 }
 
 function placeGroup(g, adj, dims, radius) {

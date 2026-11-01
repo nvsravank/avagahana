@@ -61,7 +61,8 @@ writes `<file>.report.json` beside the picture:
   view) and render again.
 - `crossings.count`: weigh it against `lines`. Many crossings mean the picture needs
   splitting into views or a `--crop`; a few avoidable ones can often be untangled by
-  the order of lines (`boxes.md`, "Crossing arrows").
+  the order of lines (`boxes.md`, "Crossing arrows"; ER diagrams: `state-and-er.md`,
+  "Crossing lines").
 - `touching`: lines closer than 2 px at the output size; a larger `--width` or a
   smaller picture (`--crop`, `--expand`) helps.
 - `smallestText.px`: under about 9 px the text will not read in the document; give a

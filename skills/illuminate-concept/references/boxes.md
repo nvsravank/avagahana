@@ -18,6 +18,9 @@ in one file", "Deployments".
 
 ## Crossing arrows: the order of lines
 
+(ER diagrams: only the order of tables works there, not the order of columns:
+`state-and-er.md`, "Crossing lines". The when and the how below hold for them too.)
+
 The layout cuts crossings itself wherever it can see the arrows: children of one
 subgraph with arrows among them are reordered by those arrows, whatever the file says.
 In two places it cannot see, and there it keeps the order the lines are written in:
@@ -71,14 +74,15 @@ VIEWS = [None, "Events"]          # None: the default view; then each `## Relati
 def score(text):
     """(crossings, problems) for each mode and view of the first diagram."""
     out = {}
-    for mode in ("boxes", "layers"):
+    for mode in ("boxes", "layers"):   # an ER diagram: ("tables",)
         for view in VIEWS:
             r = draft_report(MAP, text, maps_dir=MAPS, mode=mode, view=view)
             out[mode, view] = (r["crossings"]["count"], len(r["overlaps"]) + len(r["cutLabels"]))
     return out
 ```
 
-Score every mode and view, not only the one the person reads. The reader can switch
+Score every mode and view, not only the one the person reads (an ER diagram's views
+are its `## Joins:` sections). The reader can switch
 between Boxes and Layers, and a view lays out the first block's nodes in the first
 block's order, so a reorder that helps the default view can tangle a view. `view=`
 takes the name after `## Relations: `; `part=` a further diagram's heading anchor. Keep

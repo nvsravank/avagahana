@@ -104,31 +104,36 @@ erDiagram
     int id PK
     string email UK
   }
-  ORDER["Order"] {
-    int id PK
-    int customer_id FK
-    decimal(10,2) total "in euros"
-    timestamp placed_at
-  }
-  ORDER_LINE["Order line"] {
-    int order_id FK "grain"
-    int line_no "grain"
-    int product_id
-    int quantity
-  }
-  PAYMENT["Payment"] {
-    int id PK
-    int order_id FK
-    string psp_token "kept **90 days**,<br>for refunds"
-    date? token_expires_on
-    string status
-  }
-  REFUND["Refund"] {
-    int id PK
-    int payment_id FK
-    decimal(10,2) amount
-  }
-  ORDER_LINE:::fact
+  subgraph orders [Orders]
+    ORDER["Order"] {
+      int id PK
+      int customer_id FK
+      decimal(10,2) total "in euros"
+      timestamp placed_at
+    }
+    ORDER_LINE["Order line"] {
+      int order_id FK "grain"
+      int line_no "grain"
+      int product_id
+      int quantity
+    }
+  end
+  subgraph payments [Payments]
+    PAYMENT["Payment"] {
+      int id PK
+      int order_id FK
+      string psp_token "kept **90 days**,<br>for refunds"
+      date? token_expires_on
+      string status
+    }
+    REFUND["Refund"] {
+      int id PK
+      int payment_id FK
+      decimal(10,2) amount
+    }
+  end
+  CUSTOMER:::master
+  class ORDER,ORDER_LINE,PAYMENT,REFUND transaction
 ```
 
 ## Relations

@@ -1,9 +1,9 @@
-// page.js — what an ER table's node page says about it: its role and what one row is
-// (the grain sentence), then every column (keys marked, type, comment). A comment reads
+// page.js — what an ER table's node page says about it: what one row is (the grain
+// sentence; its class is in the page's head, page.js), then every column (keys marked, type, comment). A comment reads
 // **bold**, _italic_ and <br> as Mermaid draws it, built as elements (never as HTML).
 // Compared with an earlier version, a changed column's ringed sign says what changed.
 // -> [{title, el}] for page.js
-import { grainSentence, ROLE_LABELS } from './roles.js';
+import { grainSentence } from './words.js';
 import { inlineRuns } from '../../model/labels.js';
 import { planSignSvg, PLAN_WORD } from '../../chrome.js';
 
@@ -17,10 +17,8 @@ function commentInto(cell, text) {
 
 export function tablePage(n) {
   if (!n.attrs) return [];
-  const about = document.createElement('p');
-  about.className = 'mmv-table-about';
-  const role = ROLE_LABELS[n.role] || 'Table';
-  about.textContent = [`${role}${n.roleSource === 'inferred' && n.role !== 'table' ? ' (from its relationships)' : ''}.`, grainSentence(n) ? `${grainSentence(n)}.` : ''].filter(Boolean).join(' ');
+  const grain = grainSentence(n);
+  const about = grain ? Object.assign(document.createElement('p'), { className: 'mmv-table-about', textContent: `${grain}.` }) : null;
   const table = document.createElement('table');
   table.className = 'mmv-columns';
   const head = table.createTHead().insertRow();
@@ -41,6 +39,6 @@ export function tablePage(n) {
     commentInto(r.insertCell(), a.grain ? '' : a.comment || '');
   }
   const wrap = document.createElement('div');
-  wrap.append(about, table);
+  wrap.append(...(about ? [about] : []), table);
   return [{ title: `Columns (${n.attrs.length})`, el: wrap }];
 }

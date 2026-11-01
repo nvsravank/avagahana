@@ -11,6 +11,9 @@ REL = re.compile(rf"^({ID})\s*(\|o|\|\||\}}o|\}}\|)(--|\.\.)(o\||\|\||o\{{|\|\{{
 ENTITY = re.compile(rf'^({ID})(?:\s*\[\s*"?([^"\]]*)"?\s*\])?(?:\s*:::\s*([\w-]+))?\s*(\{{)?\s*(\}})?$')
 ATTR = re.compile(r'^([\w(),.\[\]-]+\??)\s+([A-Za-z_*][\w-]*)\s*((?:PK|FK|UK)(?:\s*,\s*(?:PK|FK|UK))*)?\s*(?:"([^"]*)")?$')
 SKIP = re.compile(r"^(direction\b|accTitle\b|accDescr\b)")
+GROUP = re.compile(rf'^subgraph\s+(?:"([^"]+)"|({ID})(?:\s*\[\s*"?([^"\]]*)"?\s*\])?)$')
+# the table classes (map-viewer/diagrams/er/words.js): one per table
+TABLE_CLASSES = {"fact", "dimension", "bridge", "master", "transaction", "lookup"}
 
 
 def read_er(m, lines, first, start_line):
@@ -19,13 +22,19 @@ def read_er(m, lines, first, start_line):
     ids = {}
     arrows = []
     class_defs = {}
+    classes = {}   # entity id -> the classes it names
+    inside = []    # the groups (subgraph ... end) open at this line, innermost last
+
+    def holder():
+        return next((g for g in reversed(inside) if g), root)
 
     def entity(nid, ln):
         n = ids.get(nid)
         if not n:
-            n = {"id": nid, "children": [], "parent": root, "line": ln, "container": False, "named": True, "attrs": []}
+            parent = holder()
+            n = {"id": nid, "children": [], "parent": parent, "line": ln, "container": False, "named": True, "attrs": []}
             ids[nid] = n
-            root["children"].append(n)
+            parent["children"].append(n)
         return n
 
     open_ = None
@@ -46,6 +55,30 @@ def read_er(m, lines, first, start_line):
                 continue
             m.report(ln, "er-attr-syntax", f'entity {open_["id"]}: column not understood: "{t}" (want: type name [PK, FK, UK] ["comment"])')
             continue
+        mm = GROUP.match(t)
+        if mm:
+            gid = mm.group(1) or mm.group(2)
+            was = ids.get(gid)
+            if was and not was.get("group") and not was["attrs"]:
+                was["parent"]["children"].remove(was)
+                del ids[gid]
+                was = None
+            if was:
+                m.report(ln, "er-line-syntax", f"group {gid}: {'a second group' if was.get('group') else 'a table'} has this id")
+                inside.append(None)
+                continue
+            parent = holder()
+            g = {"id": gid, "children": [], "parent": parent, "line": ln, "container": True, "named": True, "group": True}
+            ids[gid] = g
+            parent["children"].append(g)
+            inside.append(g)
+            continue
+        if t == "end" and inside:
+            inside.pop()
+            continue
+        if re.match(r"^direction\b", t) and inside:
+            m.report(ln, "er-group-direction", f"group {holder()['id']}: a direction inside a group is not used (ER tables are laid out hub and spoke)")
+            continue
         if SKIP.match(t):
             continue
         if re.match(r"^style\b", t):
@@ -61,6 +94,8 @@ def read_er(m, lines, first, start_line):
             for nid in (x.strip() for x in mm.group(1).split(",")):
                 if nid not in ids:
                     m.report(ln, "class-unknown-id", f"class {mm.group(2)} on {nid}, which is no entity")
+                else:
+                    classes.setdefault(nid, []).append((mm.group(2), ln))
             continue
         mm = REL.match(t)
         if mm:
@@ -77,13 +112,25 @@ def read_er(m, lines, first, start_line):
             n = entity(mm.group(1), ln)
             if mm.group(2):
                 check_label(m, ln, mm.group(1), mm.group(2))
+            if mm.group(3):
+                classes.setdefault(n["id"], []).append((mm.group(3), ln))
             if mm.group(4) and not mm.group(5):
                 open_ = n
             continue
         m.report(ln, "er-line-syntax", f'ER diagram line not understood: "{t}"')
     if open_:
         m.report(open_["line"], "er-not-closed", f'entity {open_["id"]}: its columns are not closed with "}}"')
-    for n in ids.values():
+    for g in (x for x in inside if x):
+        m.report(g["line"], "er-group-not-closed", f'group {g["id"]}: not closed with "end"')
+    # a relationship to or from a group is not drawn
+    for a in [x for x in arrows if ids[x["from"]].get("group") or ids[x["to"]].get("group")]:
+        m.report(a["line"], "er-group-relationship", f"{a['from']} to {a['to']}: a relationship to or from a group is not drawn (link its tables)")
+        arrows.remove(a)
+    for nid, named in classes.items():
+        kinds = sorted({c for c, _ in named if c in TABLE_CLASSES})
+        if len(kinds) > 1:
+            m.report(named[-1][1], "er-table-class-twice", f"table {nid} is {' and '.join(kinds)}: one table class per table")
+    for n in (x for x in ids.values() if not x.get("group")):
         seen = set()
         for name in n["attrs"]:
             if name in seen:

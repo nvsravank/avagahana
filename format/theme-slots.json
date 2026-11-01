@@ -12,10 +12,10 @@
   "appearance": [
     {"slot": "bg", "kind": "colour", "required": true, "use": "the drawing's background; every contrast is checked against it"},
     {"slot": "ink", "kind": "colour", "required": true, "use": "text: labels, titles, the list", "contrast": {"with": "bg", "min": 4.5, "code": "contrast-text"}},
-    {"slot": "category", "kind": "palette", "required": true, "use": "colours told apart: a mind map's branches, a box diagram's classes, ER tables; lines take their node's colour. Repeats after the last", "contrast": {"with": "bg", "min": 3, "code": "contrast-palette"}},
+    {"slot": "category", "kind": "palette", "required": true, "use": "colours told apart: a mind map's branches, a box diagram's and an ER diagram's classes (the table classes take slots 1 to 5); lines take their node's colour. Repeats after the last", "contrast": {"with": "bg", "min": 3, "code": "contrast-palette"}},
     {"slot": "level", "kind": "palette", "use": "a ramp by depth, the centre first (colour by level)", "contrast": {"with": "bg", "min": 3, "code": "contrast-palette"}},
     {"slot": "muted", "kind": "colour", "use": "secondary text: arrow labels, region outlines, what is not lit"},
-    {"slot": "accent", "kind": "colour", "use": "focus rings, the colour of nodes with no class (colour by class)"},
+    {"slot": "accent", "kind": "colour", "use": "focus rings, the colour of nodes with no class (colour by class; every table of an ER diagram with no classes)"},
     {"slot": "center", "kind": "colour", "use": "a mind map's centre fill"},
     {"slot": "centerInk", "kind": "colour", "use": "text on the centre"},
     {"slot": "tint", "kind": "percent", "quiet": true, "use": "how much of a node's colour fills its box in the outline look (0 to 100)"},

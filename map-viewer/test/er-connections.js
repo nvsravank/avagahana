@@ -18,7 +18,7 @@ export async function testErConnections(check) {
     await fv.load(await fetch('../../examples/maps/sales-warehouse.md').then((r) => r.text()), 'sales-warehouse.md');
     await new Promise((r) => setTimeout(r, 60));
     const drawn = [...host.querySelectorAll('[data-mmv=nodes] > g')].map((g) => g.dataset.id).sort().join();
-    check('ER focus in Tables mode: the table and its neighbours', drawn === 'CUSTOMER,DATE,ORDER_LINE,PRODUCT,STORE', drawn);
+    check('ER focus in Tables mode: the table and its neighbours', drawn === 'CURRENCY,CUSTOMER,DATE,ORDER_LINE,PRODUCT,STORE', drawn);
     check('ER focus in Tables mode: nothing placed at NaN', !host.querySelector('[transform*="NaN"]'));
     fv.destroy();
     host.remove();

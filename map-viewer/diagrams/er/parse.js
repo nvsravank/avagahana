@@ -11,20 +11,27 @@
 //       string? note                      (a type ending in ? may be empty, Mermaid 11.16+)
 //       int customer_id FK "grain"        and a comment; the comment "grain" marks the
 //     }                                   columns that together say what one row is
-//     ORDER:::fact                        classes, as in a flowchart; fact, dimension and
-//     classDef big stroke-width:3px       bridge are built in (the Role colouring)
+//     ORDER:::fact                        classes, as in a flowchart; the table classes
+//     classDef big stroke-width:3px       (fact, dimension, master, ...: words.js) are built in
+//     subgraph orders [Orders]            a group of tables (Mermaid 11.17+): an id and a
+//       ORDER                             title, a quoted title, or one word for both; a
+//     end                                 box holding its tables, as a flowchart's subgraph
+//                                         (it opens and closes); a table belongs to the
+//                                         group it is first named in; groups nest. A
+//                                         relationship to a group, or a direction inside
+//                                         one, is not drawn (a warning)
 //
 // Ends: |o zero or one, || exactly one, }o zero or more, }| one or more (written
 // mirrored on the right: o|, ||, o{, |{).
 import { shortenLabel, labelToRuns, arrowLabel } from '../../model/labels.js';
 import { problem } from '../../model/problem.js';
-import { inferRoles } from './roles.js';
 
 const ID = '[A-Za-z_][\\w-]*';
 const LEFT = { '|o': 'zero-one', '||': 'one', '}o': 'zero-many', '}|': 'one-many' };
 const RIGHT = { 'o|': 'zero-one', '||': 'one', 'o{': 'zero-many', '|{': 'one-many' };
 const REL = new RegExp(`^(${ID})\\s*(\\|o|\\|\\||\\}o|\\}\\|)(--|\\.\\.)(o\\||\\|\\||o\\{|\\|\\{)\\s*(${ID})\\s*:\\s*(.*)$`);
 const ENTITY = new RegExp(`^(${ID})(?:\\s*\\[\\s*"?([^"\\]]*)"?\\s*\\])?(?:\\s*:::\\s*([\\w-]+))?\\s*(\\{)?\\s*(\\})?$`);
+const GROUP = new RegExp(`^subgraph\\s+(?:"([^"]+)"|(${ID})(?:\\s*\\[\\s*"?([^"\\]]*)"?\\s*\\])?)$`);
 const ATTR = /^([\w(),.[\]-]+\??)\s+([A-Za-z_*][\w-]*)\s*((?:PK|FK|UK)(?:\s*,\s*(?:PK|FK|UK))*)?\s*(?:"([^"]*)")?$/;
 
 export function parseEr(lines, start, title, warnings) {
@@ -50,12 +57,15 @@ export function parseEr(lines, start, title, warnings) {
     labelToRuns(n, warnings);
   }
   const addClass = (n, cls) => { n.cls = n.cls ? `${n.cls} ${cls}` : cls; };
+  // the groups (subgraph ... end): boxes in the tree, without columns (n.group)
+  const inside = [];   // the groups open at this line, innermost last
+  const holder = () => inside.findLast((g) => g) || root;
   function entity(id) {
     let n = byId[id];
     if (!n) {
       n = node(id, id);
-      n.parent = root;
-      root.children.push(n);
+      n.parent = holder();
+      n.parent.children.push(n);
       byId[id] = n;
     }
     return n;
@@ -75,6 +85,32 @@ export function parseEr(lines, start, title, warnings) {
         continue;
       }
       warnings.push(problem('er-attr-syntax', `Entity ${open.id}: column not understood (line ${i + 1}): "${t}".`));
+      continue;
+    }
+    if ((m = t.match(GROUP))) {
+      const id = m[1] ?? m[2];
+      let was = byId[id];
+      // named before as a relationship's end (no columns): the group takes its place
+      if (was && !was.group && !was.attrs.length) { was.parent.children.splice(was.parent.children.indexOf(was), 1); delete byId[id]; was = null; }
+      if (was) {
+        warnings.push(problem('er-line-syntax', `Group ${id} (line ${i + 1}): ${was.group ? 'a second group' : 'a table'} has this id.`));
+        inside.push(null);
+        continue;
+      }
+      const g = node(id, m[1] ?? (m[3]?.trim() || m[2]));
+      g.group = true;
+      g.container = true;
+      delete g.attrs;
+      g.shape = 'er-group';
+      g.parent = holder();
+      g.parent.children.push(g);
+      byId[id] = g;
+      inside.push(g);
+      continue;
+    }
+    if (t === 'end' && inside.length) { inside.pop(); continue; }
+    if (/^direction\b/.test(t) && inside.length) {
+      warnings.push(problem('er-group-direction', `Group ${holder().id}: a direction inside a group is not used (ER tables are laid out hub and spoke).`));
       continue;
     }
     if (/^(direction\b|style\b|accTitle\b|accDescr\b)/.test(t)) continue;
@@ -107,8 +143,14 @@ export function parseEr(lines, start, title, warnings) {
     warnings.push(problem('er-line-syntax', `ER diagram line not understood (line ${i + 1}): "${t}".`));
   }
   if (open) warnings.push(problem('er-not-closed', `Entity ${open.id}: its columns are not closed with "}".`));
+  for (const g of inside.filter(Boolean)) warnings.push(problem('er-group-not-closed', `Group ${g.id}: not closed with "end".`));
+  // a relationship to or from a group is not drawn
+  for (const r of relations.filter((x) => byId[x.from].group || byId[x.to].group)) {
+    warnings.push(problem('er-group-relationship', `${r.from} to ${r.to}: a relationship to or from a group is not drawn (link its tables).`));
+    relations.splice(relations.indexOf(r), 1);
+  }
 
-  for (const n of root.children) {
+  for (const n of Object.values(byId).filter((x) => x.attrs)) {
     const names = n.attrs.map((a) => a.name);
     for (const name of new Set(names.filter((x, k) => names.indexOf(x) !== k))) warnings.push(problem('er-attr-twice', `Entity ${n.id}: column ${name} appears twice.`));
     // keys first: primary key, then the grain, then foreign keys, then the rest (file order within)
@@ -116,6 +158,5 @@ export function parseEr(lines, start, title, warnings) {
     n.attrs = n.attrs.map((a, k) => ({ a, k })).sort((x, y) => rank(x.a) - rank(y.a) || x.k - y.k).map((x) => x.a);
     n.plain = n.plain || n.id;
   }
-  inferRoles(root.children, relations);
   return { root, byId, relations, shortened, extra: { direction: 'LR', classDefs } };
 }

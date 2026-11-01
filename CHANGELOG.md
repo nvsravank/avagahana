@@ -6,6 +6,34 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format, viewer API): ER diagrams lose the Role colouring and its
+  inference from relationship counts, which read an application's schema as a
+  warehouse (Order and Payment as dimensions). An ER diagram is coloured by class, as a
+  box diagram is; a link's `colourBy=category` opens Class. A table with no class takes
+  one plain colour (the theme's `accent`), with no colour key (WO-44).
+- **Contract** (map format, addition): six table classes are built in for ER diagrams,
+  each with a fixed colour and key label, no `## Classes` line needed: `fact`,
+  `dimension`, `bridge`, `master`, `transaction`, `lookup` (muted). One wins over a
+  table's other classes; two on one table is a checker error, `er-table-class-twice`
+  (WO-44).
+- **Contract** (map format, addition): ER diagrams read Mermaid's `subgraph` ... `end`
+  (Mermaid 11.17+) as groups of tables: boxes in the tree that frame their tables, close
+  with their dot to one box (the tables' lines lifted to it) and can be drilled into.
+  Checker problems `er-group-not-closed` (error), `er-group-relationship` and
+  `er-group-direction` (warnings) (WO-44).
+- Examples: the release review's Orders data groups Order and Order line, and Payment
+  and Refund, with Customer outside, classed `master` and `transaction`; shop-layers'
+  Orders data is classed; sales-warehouse is classed and gains a Return line fact
+  (sharing Date, Product and Customer) and a Currency lookup (WO-44).
+- ER layout: in each view (the whole diagram, a join view, a table opened on its own) a
+  table draws its foreign-key rows in the order their lines leave it, top to bottom, so
+  lines no longer cross at the table whatever the file's column order (one order could
+  not suit every view). The node page and the grain sentence keep the file's order
+  (WO-44).
+- Skill: the ER reference says to class every table (the six table classes), to group
+  tables with `subgraph`, and how to untangle ER lines (table order, the same draft
+  script as box diagrams; column order no longer moves them) (WO-44).
+
 - Fix: opening a table in Tables mode (the viewer's `focus` on an ER table, as a drill or
   a link does) left the canvas empty and logged `translate(NaN,NaN)`: the table has no
   children to lay out. It now shows the table and the tables its relationships in the

@@ -8,6 +8,7 @@ import { typeFor, MAX_LINE } from '../../geometry.js';
 import { wrapRuns } from '../../measure.js';
 
 export const HEAD = 30;     // the title strip, for a title of one line
+export const GROUP_H = 46;  // a closed group's box
 const PAD_X = 10;
 const MARK_W = 24;          // the key mark column (key, grain diamond)
 const FK_W = 22;            // the FK label after the mark
@@ -16,15 +17,24 @@ const MORE_H = 20;          // the open / close row
 const SIGN_W = 20;          // a compared column's sign, after its type (WO-22 follow-up)
 const ROW = { key: { size: 14, weight: 600, h: 22 }, col: { size: 12, weight: 400, h: 19 } };
 
+// every table at or under n (inside its groups; the map's root holds no columns)
+export const tablesIn = (n) => (n.attrs && !n.synthetic ? [n] : (n.children || []).flatMap(tablesIn));
+
 // The title reads bold, italic and <br> as a box title does (WO-41): a line per <br>,
 // wrapped past MAX_LINE; the strip grows by a line height for each further line.
 // -> {type, w, h, hOpen, head, titleLines, signW, rows: [{a, kind, size, weight, h}], hidden, lines: []}
 //    rows: the always-shown columns first, then the hidden ones (shown while open)
 export function tableGeometry(n, rel, font, measure) {
-  const type = typeFor(Math.max(1, rel));
+  // a table reads the same inside a group (WO-44): its title is always level 1's
+  const type = typeFor(1);
   const titleLines = wrapRuns(n.runs || [[{ text: n.plain || n.id, bold: false, italic: false }]], type, font, MAX_LINE, measure);
   const title = Math.max(...titleLines.map((l) => l.w), 0);
   const lh = Math.round(type.size * 1.25);
+  // a group (subgraph): closed, a box with its name; lines meet it at its middle
+  if (!n.attrs) {
+    const w = Math.ceil(Math.max(title + 2 * PAD_X + 30, 120));
+    return { type, lh, head: GROUP_H, titleLines, signW: 0, iconSize: 16, iconsW: 0, textW: title, lines: [], ox: PAD_X, oy: 0, w, h: GROUP_H, hOpen: GROUP_H, rows: [], shownCount: 0, hidden: 0 };
+  }
   const head = HEAD + Math.max(0, titleLines.length - 1) * lh;
   // room for a sign after the type when the table's columns are compared
   const signW = n.attrs.some((a) => a.plan) ? SIGN_W : 0;

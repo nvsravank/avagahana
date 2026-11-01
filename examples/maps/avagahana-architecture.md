@@ -55,7 +55,7 @@ flowchart LR
 
 ### <a id="av"></a>Authoring layer and reading guide
 
-Code review of the local repository on 2026-10-27, updated 2026-11-01 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37), the Poster look: a main icon per node, details on hover, a look per diagram type (WO-38), and a node page that follows a switch of light and dark, the earlier version asked for without an error, and render.py's warning for a --seq the map does not have, and expand 0 in a box diagram showing its top-level boxes (WO-39), and labels that break lines: a box's title at <br> and when long, and the labels of arrows, ER relationships and sequence messages with bold, italic and two lines, cut with … past two and shown whole on hover, the checker warning past two (WO-41), and ER Before and After at column level: columns compared by name with renames in a Renames section, connection pairs and cardinality in ER words, row signs and sparkles per column, nullable types, and emphasis in table titles and comments (WO-22 follow-up). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
+Code review of the local repository on 2026-10-27, updated 2026-11-01 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37), the Poster look: a main icon per node, details on hover, a look per diagram type (WO-38), and a node page that follows a switch of light and dark, the earlier version asked for without an error, and render.py's warning for a --seq the map does not have, and expand 0 in a box diagram showing its top-level boxes (WO-39), and labels that break lines: a box's title at <br> and when long, and the labels of arrows, ER relationships and sequence messages with bold, italic and two lines, cut with … past two and shown whole on hover, the checker warning past two (WO-41), and ER Before and After at column level: columns compared by name with renames in a Renames section, connection pairs and cardinality in ER words, row signs and sparkles per column, nullable types, and emphasis in table titles and comments (WO-22 follow-up), and ER tables coloured by the classes the agent writes: six table classes built in (fact, dimension, bridge, master, transaction, lookup), the Role colouring and its guessing removed, a table with no class in one plain colour, and Mermaid's ER subgraph read as groups of tables that close like boxes, their tables' lines lifted to a closed group (WO-44). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER walks. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
 
 ### <a id="agent"></a>AI agent
@@ -70,7 +70,7 @@ External maps folder. Relative slash-separated paths identify .md and .mmd files
 
 ### <a id="skill"></a>Shared map skills
 
-Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and three more are read only when needed: render.md (pictures for documents, render.py, the layout report), themes.md (a brand or house style, themes.py) and compare.md (two versions of a map: show.py and render.py --before, the changes as data); render.md also says when to send a snapshot (pack.py) instead of a picture; boxes.md says where the order of lines sets the picture and how to untangle crossings by trying orders on drafts (draft_report). trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
+Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and three more are read only when needed: render.md (pictures for documents, render.py, the layout report), themes.md (a brand or house style, themes.py) and compare.md (two versions of a map: show.py and render.py --before, the changes as data); render.md also says when to send a snapshot (pack.py) instead of a picture; boxes.md says where the order of lines sets the picture and how to untangle crossings by trying orders on drafts (draft_report); state-and-er.md says the same for ER tables, tells the agent to class every table and to group tables with subgraph. trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
 
 
 ### <a id="checker"></a>Standalone format checker
@@ -402,17 +402,17 @@ Every type supplies type, label, header recognition and parseBody. Separate pars
 
 ### <a id="modesHook"></a>modes and colourBy
 
-Types declare modes, colour encodings, branch ordering and initial collapse behavior. Shared list rendering (list.js) is a keyboard and screen-reader tree: rows read in full, notes open in place, arrows as rows. It is replaceable; sequences provide sequence/list.js.
+Types declare modes, colour encodings (or autoColourBy: the map decides, as for box and ER diagrams), classes of their own (builtInClasses: ER's table classes, with fixed colour slots that win over a table's other classes), branch ordering and initial collapse behavior. Shared list rendering (list.js) is a keyboard and screen-reader tree: rows read in full, notes open in place, arrows as rows. It is replaceable; sequences provide sequence/list.js.
 
 
 ### <a id="layoutHook"></a>layout and buildScene
 
-mindmap/layout.js, flowchart/layout.js, sequence/layout.js and er/layout.js define placement. flowchart/layout.js orders by arrows where it can and keeps the file's order where it cannot (unlinked children, arrows leaving a box); a box's own direction holds for its unlinked children. State uses graph layout with state scene/check support.
+mindmap/layout.js, flowchart/layout.js, sequence/layout.js and er/layout.js define placement. flowchart/layout.js orders by arrows where it can and keeps the file's order where it cannot (unlinked children, arrows leaving a box); a box's own direction holds for its unlinked children. er/layout.js lays an open group's tables out on their own and places the group as one table; a closed group is one box and the lines of its tables are lifted to it; in each view a table's foreign-key rows are drawn in the order their lines leave it, so they do not cross at the table. State uses graph layout with state scene/check support.
 
 
 ### <a id="custom"></a>Optional rendering hooks
 
-nodeGeometry, paintNode, categoryOf/categoryKey, icons, drawsSelection, fansOut, pageSections and noteLinks are optional. ER uses custom table geometry/paint, role inference and fan-out detection; state enables note links.
+nodeGeometry, paintNode, builtInClasses, autoColourBy, icons, drawsSelection, fansOut, pageSections and noteLinks are optional. ER uses custom table geometry/paint (a group's closed box too), its table classes and fan-out detection, and guesses nothing about what a table is; state enables note links.
 
 
 ### <a id="types"></a>Five built-in plugins
@@ -824,6 +824,8 @@ erDiagram
     boolean back
     boolean self
   }
+  NODE:::master
+  class RELATION,MESSAGE transaction
 ```
 
 ## Relations
@@ -852,7 +854,7 @@ erDiagram
 
 ### <a id="NODE"></a>IDs are scoped, not global database keys
 
-This picture shows actual ID-bearing fields in the in-memory model, not a SQL schema or a serialization contract. byId indexes nodes by id within one diagram. A sequence's from/to IDs identify its participant nodes. A Plays over link validates corresponding participant IDs in a selected target diagram and view. Matching IDs from unrelated diagrams is not a valid join. The PK and UK marks describe uniqueness within those owning scopes; no new scope-key fields are implied.
+This picture shows actual ID-bearing fields in the in-memory model, not a SQL schema or a serialization contract. An ER group (subgraph) is a node too, with no columns and its tables as children. byId indexes nodes by id within one diagram. A sequence's from/to IDs identify its participant nodes. A Plays over link validates corresponding participant IDs in a selected target diagram and view. Matching IDs from unrelated diagrams is not a valid join. The PK and UK marks describe uniqueness within those owning scopes; no new scope-key fields are implied.
 
 ### <a id="RELATION"></a>Optional identity and local versus cross-map targets
 

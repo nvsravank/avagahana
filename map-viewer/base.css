@@ -601,6 +601,11 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 
 /* ER diagrams (diagrams/er): tables over their lines, semi-transparent so the lines show
    through. Flat tints the whole table with row dividers; Zebra alternates row fills */
+/* an ER group (subgraph, WO-44): a quiet frame behind its tables; closed, a box */
+.mmv-er-group { --n: var(--mmv-muted); }
+.mmv[data-diagram="er"][data-look] .mmv-frame.mmv-er-group > .mmv-shape { fill: color-mix(in srgb, var(--n) 6%, var(--mmv-bg)); stroke: color-mix(in srgb, var(--n) 75%, var(--mmv-bg)); stroke-width: 1.4; }
+.mmv[data-diagram="er"][data-look] .mmv-node.mmv-er-group > .mmv-shape { fill: color-mix(in srgb, var(--n) 14%, var(--mmv-bg)); stroke: var(--n); stroke-width: 1.6; }
+.mmv-er-group :is(.mmv-frame-title, .mmv-label) { fill: var(--mmv-ink); }
 .mmv[data-diagram="er"] .mmv-table > .mmv-table-body { fill: color-mix(in srgb, var(--n) 10%, transparent); stroke: var(--n); stroke-width: 1.6; }
 .mmv[data-diagram="er"][data-look="outline"] .mmv-table > .mmv-table-body { fill: color-mix(in srgb, color-mix(in srgb, var(--n) 22%, var(--mmv-bg)) 82%, transparent); }
 .mmv[data-diagram="er"][data-look="fade"] .mmv-table > .mmv-table-body { fill: color-mix(in srgb, var(--mmv-bg) 80%, transparent); }

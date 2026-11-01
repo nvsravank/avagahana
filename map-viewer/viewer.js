@@ -218,7 +218,7 @@ export function mount(element, options = {}) {
   const inView = (n) => { for (let c = n; c; c = c.parent) if (c === viewRoot()) return true; return false; };
   // branch colours: see layout.js categoryOf
   const colourRoot = () => (diagram().stableColours ? S.map.root : viewRoot());
-  const categoryOf = (n) => diagram().categoryOf?.(n) ?? branchCategory(n, colourRoot(), diagram().branchOrder);
+  const categoryOf = (n) => branchCategory(n, colourRoot(), diagram().branchOrder);
   const levelOf = (n) => n.depth - colourRoot().depth;
 
   // ---------- internals shared with the modules ----------
@@ -244,15 +244,13 @@ export function mount(element, options = {}) {
   };
   v.sinceWords = sinceWords;
   // what colour alone may say about a node, in words (List mode reads them): its class,
-  // its planned change, an ER table's role
+  // its planned change
   v.wordsOf = (n) => {
     if (!n) return [];
     const out = [];
     const cls = n.kind && S.map?.classes?.[n.kind];
     if (n.kind) out.push(cls?.label || n.kind);
     if (n.plan) out.push(S.map?.compared ? `${n.plan} since the earlier version` : `planned: ${n.plan}`);
-    const role = diagram().categoryKey && S.map ? diagram().categoryKey(S.map).find((x) => x.k === categoryOf(n)) : null;
-    if (role && n.parent === S.map.root) out.push(role.label);
     return out;
   };
   v.renderNote = (note, el) => { if (note?.body != null) renderNoteBody(note.body, el, wireLink); };
@@ -1761,15 +1759,13 @@ export function mount(element, options = {}) {
     };
     const swatchOf = (cls) => `<svg viewBox="0 0 18 18" width="18" height="18" class="${cls}" aria-hidden="true"><rect x="2" y="3" width="14" height="12" rx="3" style="fill:color-mix(in srgb, var(--n) 25%, var(--mmv-bg));stroke:var(--n);stroke-width:2"/></svg>`;
     // colour key for a box diagram coloured by its top-level boxes
-    if (S.colourBy === 'category' && diagram().categoryKey && S.map?.root) {
-      section('colours', 'Colours');
-      for (const { k, label } of diagram().categoryKey(S.map)) row(swatchOf(`mmv-k${k}`), label, null);
-    } else if (S.colourBy === 'category' && diagram().stableColours && S.map?.root?.children.length) {
+    if (S.colourBy === 'category' && diagram().stableColours && S.map?.root?.children.length) {
       section('colours', 'Colours');
       for (const n of S.map.root.children.filter((x) => !x.mark)) row(swatchOf(`mmv-k${categoryOf(n)}`), n.plain, null);
     }
     // colour key: what each class's colour means, when colouring by class, with the
-    // class's icon; "No class" only for plain boxes without one (not the boxes that hold them)
+    // class's icon; "No class" only for plain boxes without one (not the boxes that hold
+    // them), and no key at all when nothing has a class (one plain colour: an ER diagram)
     const classIcons = new Set();
     if (S.colourBy === 'class' && S.map?.root) {
       const shown = new Map();
@@ -1777,7 +1773,7 @@ export function mount(element, options = {}) {
         if (n.kindSlot != null && (n.kind || !n.children.length)) shown.set(n.kind || '', n.kindSlot);
         n.children.forEach(walk);
       })(S.map.root);
-      if (shown.size) {
+      if ([...shown.keys()].some(Boolean)) {
         section('colours', 'Colours');
         const keys = [...shown.keys()].sort((a, b) => (a === '' ? 1 : b === '' ? -1 : a.localeCompare(b)));
         for (const name of keys) {

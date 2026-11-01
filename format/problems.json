@@ -469,6 +469,26 @@
    "side": "both",
    "what": "A column named twice in one entity"
   },
+  "er-table-class-twice": {
+   "level": "error",
+   "side": "both",
+   "what": "A table names two table classes (fact, dimension, bridge, master, transaction, lookup): the viewer uses the later"
+  },
+  "er-group-not-closed": {
+   "level": "error",
+   "side": "both",
+   "what": "An ER group (subgraph) not closed with end"
+  },
+  "er-group-relationship": {
+   "level": "warning",
+   "side": "both",
+   "what": "A relationship to or from an ER group (subgraph): not drawn; link its tables"
+  },
+  "er-group-direction": {
+   "level": "warning",
+   "side": "both",
+   "what": "A direction inside an ER group (subgraph): not used"
+  },
   "walks-not-here": {
    "level": "warning",
    "side": "both",

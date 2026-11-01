@@ -758,19 +758,39 @@ erDiagram
   out, rows too small to read are bars. The node's page lists every column.
 - **Looks**: Flat uses a uniform fill with subtle row dividers; Zebra alternates
   row fills. These are the ER names for the shared look preferences.
-- **Role**: each table is a fact, a dimension, a bridge or another table, for the Role
-  colouring. A class `fact`, `dimension` or `bridge` says so; otherwise the viewer infers
-  it from the relationships (the many side of more than half, with a grain or three or
-  more relationships: a fact; no grain, two relationships, the many side of both: a
-  bridge; the one side of at least half: a dimension). The Class colouring uses the
-  map's classes (subject areas, say), as in a box diagram.
+- **Table classes** (WO-44): a table's class says what it is; the viewer guesses
+  nothing. Six are built in, as `person` and `database` are, each with a fixed colour and
+  key label in ER diagrams, so no `## Classes` line is needed: `fact` (Fact), `dimension`
+  (Dimension), `bridge` (Bridge) for a warehouse; `master` (Master data), `transaction`
+  (Transaction), `lookup` (Lookup, drawn in the muted colour) for an application's data.
+  A table with one wins over its other classes; two on one table is an error
+  (`er-table-class-twice`; the viewer uses the later). A map may change their label or
+  icon in `## Classes`; their colour stays. Outside ER diagrams they are ordinary class
+  names. An ER diagram is coloured by class (the map decides, as in a box diagram); a
+  table with no class takes the one plain colour (the theme's `accent`), and with no
+  classes at all there is no colour key.
+- **Groups**: Mermaid's ER `subgraph` (Mermaid 11.17 and later): `subgraph id [Title]`,
+  `subgraph "Title"` (its id too) or `subgraph word`, closed by `end`; groups nest. A group
+  is a box holding its tables, as a flowchart's subgraph: framed, closed by its dot (a
+  closed group is one box; the lines of its tables meet it, one per table or group they
+  reach), drilled into, given a note by its id. A table belongs to the group it is first
+  named in. A relationship to or from a group is not drawn (`er-group-relationship`); a
+  `direction` inside a group is not used (`er-group-direction`); a group not closed is an
+  error (`er-group-not-closed`).
 - **Layout**: the tables with most relationships are hubs; a table joined to one hub
   rings it, one joined to several sits between them, and places are then refined so
   lines cross as little as possible, pass behind no table and have room for their
   labels. All tables in the current view use the width needed by its widest table.
   Endpoint channels are allocated across all connections on each table side, and
-  layout reserves their space. Tables line up where they can. Not set in the map.
-- Problems: `er-line-syntax`, `er-attr-syntax`, `er-not-closed`, `er-attr-twice`; for
+  layout reserves their space. Tables line up where they can. A group is laid out on its
+  own and then placed as one table. A line meets a table at its column's row; in each
+  view the viewer draws a table's foreign keys (among themselves, and the grain's among
+  themselves) in the order their lines leave it, top to bottom, so they do not cross at
+  the table; the node page and the grain sentence keep the file's order. Not set in the
+  map, but tables with as many relationships as each other are placed in file order.
+- Problems: `er-line-syntax`, `er-attr-syntax`, `er-not-closed`, `er-attr-twice`,
+  `er-table-class-twice`, `er-group-not-closed`, `er-group-relationship`,
+  `er-group-direction`; for
   `## Renames`, `rename-syntax`, `rename-unknown-column`, `rename-stale` (viewer only).
 
 ## ER column relationships and join views
@@ -800,8 +820,7 @@ attached at the header rather than suggesting a particular column.
   Mermaid relationships. Named relationship sections define other model views.
 - `## Joins: <name>` defines a named equality view. Use `- <connection-id>` to reuse
   an existing connection, or define a new column connection with `id@---`. References
-  may precede definitions. A new join does not add a model relationship, cardinality,
-  or role inference. No SQL block, join execution order, LEFT or RIGHT is implied.
+  may precede definitions. A new join does not add a model relationship or cardinality. No SQL block, join execution order, LEFT or RIGHT is implied.
   Fan-out is known only when reusing a relationship with declared cardinality.
 - Definition IDs are unique within their diagram, independent of labels and file order.
 

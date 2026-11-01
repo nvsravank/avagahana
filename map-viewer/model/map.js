@@ -9,7 +9,7 @@ import { splitSections, attachNotes, parseIconLegend, attachNodeIcons, attachArr
 import { parseViews } from './relations.js';
 import { assignDepth } from './tree.js';
 import { resolveMain } from './main-icon.js';
-import { parseClasses, mergeClasses, classOf, assignSlots, strokeOf, withClassIcon, CHANGE_CLASSES, planOf } from './classes.js';
+import { parseClasses, mergeClasses, classOf, reservedTwice, assignSlots, strokeOf, withClassIcon, CHANGE_CLASSES, planOf } from './classes.js';
 import { readDeployment, infraOf, buildDeployment, syncWarnings } from './deployments.js';
 import { WALK_TYPES, readWalk, walkText } from './walks.js';
 
@@ -154,7 +154,8 @@ function parsePart(text, fileName, shared) {
   // that name the class themselves. Every node of a box diagram has a slot (0 = no
   // class), so colour by class can colour it.
   const classText = [shared, sections.classes].filter(Boolean).join('\n');
-  const classes = mergeClasses(classText ? parseClasses(classText, warnings) : {});
+  // a diagram type may bring classes of its own (an ER diagram's table classes, WO-44)
+  const classes = mergeClasses(classText ? parseClasses(classText, warnings) : {}, diagram.builtInClasses);
   // a class only a classDef names (not built in, not in ## Classes) shapes outlines only
   const styleOnly = new Set(Object.keys(read.extra?.classDefs || {}).filter((c) => !classes[c]));
   // a planned-change class (model/classes.js) is built in: a classDef of that name does nothing
@@ -163,6 +164,10 @@ function parsePart(text, fileName, shared) {
     delete read.extra.classDefs[name];
   }
   const own = new Map(Object.values(byId).map((n) => [n, classOf(n, classes, styleOnly)]));
+  for (const n of Object.values(byId)) {
+    const two = reservedTwice(n, classes);
+    if (two.length) warnings.push(problem('er-table-class-twice', `Table ${n.id} is ${two.join(' and ')}: one table class per table; ${own.get(n)}, the later, is used.`));
+  }
   // deployments: read now, so their new boxes take colour slots and notes with the rest
   if (sections.deployments.length && diagram.type !== 'flowchart') warnings.push(problem('deployment-not-flowchart', 'Deployments are for box diagrams (flowcharts): not read.'));
   const raw = diagram.type === 'flowchart' ? sections.deployments.map((d) => readDeployment(d, warnings)).filter(Boolean) : [];
@@ -204,6 +209,7 @@ function parsePart(text, fileName, shared) {
     if (c) {
       n.kind = c;
       n.kindSlot = slots.get(c);
+      n.kindLabel = classes[c]?.label || c;
       if (own.get(n)) n.icons = withClassIcon(n.icons, classes[c]).slice();
       // a figure (person, external) only where the node names the class itself
       if (own.get(n) && classes[c]?.figure) n.figure = true;

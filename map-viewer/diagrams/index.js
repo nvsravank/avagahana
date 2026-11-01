@@ -7,7 +7,8 @@
 //   boxes: true (a box diagram: boxes holding boxes, arrows, sequences and walks play over it),
 //   and hooks for a type that draws its nodes its own way: nodeGeometry(n, rel, font,
 //   measure) (a node's size), paintNode(g, s, {svgEl, href}) (a scene node with custom
-//   set), categoryOf(n) and categoryKey(map) (its own "category" colouring and key),
+//   set), builtInClasses (classes of its own, as person and database are: an ER
+//   diagram's table classes), autoColourBy(map) (the map decides its colouring),
 //   icons: ['ph …'] (icons it draws itself, loaded before the first draw), drawsSelection
 //   (the drawing changes with the selection: selecting draws again), fansOut(r, from) (a
 //   walk's step along r reaches the many side), pageSections(n) -> [{title, el}] (sections
