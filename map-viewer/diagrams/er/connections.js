@@ -1,6 +1,7 @@
 // Column connections live outside Mermaid. Relationships describe the model;
 // named join views describe equality pairs and may reuse relationship IDs.
 import { problem } from '../../model/problem.js';
+import { arrowLabel } from '../../model/labels.js';
 import { parseRelations, DEFAULT_VIEW_LABEL } from '../../model/relations.js';
 import { inferRoles } from './roles.js';
 
@@ -31,7 +32,7 @@ export function parseConnection(line, byId, warnings, join = false) {
     for (const col of e.columns) if (!byId[e.id].attrs.some((x) => x.name === col)) return bad(`Connection ${eid}: unknown column ${e.id}.${col}.`);
   }
   if (!a.columns.length || a.columns.length !== b.columns.length) return bad(`Connection ${eid}: both ends need the same number of columns.`);
-  return { from: a.id, to: b.id, fromColumns: a.columns, toColumns: b.columns, eid, label: label.trim(), cross: false,
+  return { from: a.id, to: b.id, fromColumns: a.columns, toColumns: b.columns, eid, ...arrowLabel(label), cross: false,
     line: body === '..' ? 'dotted' : 'solid', tail: tail ? `er-${LEFT[tail]}` : null, head: head ? `er-${RIGHT[head]}` : null,
     ...(join ? { join: true } : { fromCard: LEFT[tail], toCard: RIGHT[head] }) };
 }

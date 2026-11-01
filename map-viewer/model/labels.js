@@ -45,6 +45,51 @@ export function labelToRuns(node, warnings) {
   node.plain = node.runs.map((r) => r.map((s) => s.text).join('')).join(' ').trim();
 }
 
+// An arrow's label (WO-41): `<br>` breaks a line, emphasis as in a node's label.
+// -> { label: its words as one line of plain text (what every list, pop-up and report
+// says), labelRuns: [[runs], ...] every line, only when it has emphasis or several lines }
+export function arrowLabel(raw) {
+  const text = (raw || '').trim();
+  const lines = text.replace(/\\n/g, '\n').replace(/<br\s*\/?>/gi, '\n').split('\n').map((l) => inlineRuns(l.trim())).filter((r) => r.length);
+  const plain = (runs) => runs.map((r) => r.text).join('');
+  const label = lines.map(plain).join(' ');
+  const styled = lines.length > 1 || lines.some((runs) => runs.some((r) => r.bold || r.italic) || plain(runs).length > ARROW_WRAP);
+  return styled ? { label, labelRuns: lines } : { label };
+}
+
+// What an arrow draws of it: a line longer than ARROW_WRAP characters wraps at a space;
+// at most two lines; past that the second ends in "…" and hovering the label shows it
+// whole (viewer.js). -> { lines, cut }
+export const ARROW_LINES = 2;
+export const ARROW_WRAP = 40;
+export function arrowLines(runs) {
+  const wrapped = runs.flatMap(wrapLine);
+  if (wrapped.length <= ARROW_LINES) return { lines: wrapped, cut: false };
+  const lines = wrapped.slice(0, ARROW_LINES);
+  lines[ARROW_LINES - 1] = [...lines[ARROW_LINES - 1], { text: ' …', bold: false, italic: false }];
+  return { lines, cut: true };
+}
+// one written line as lines of at most ARROW_WRAP characters, broken between words (a
+// longer word keeps a line of its own), each run keeping its emphasis
+function wrapLine(runs) {
+  const out = [[]];
+  let n = 0;
+  for (const r of runs) {
+    for (const word of r.text.split(/(\s+)/)) {
+      if (!word) continue;
+      const space = !word.trim();
+      if (!space && n > 0 && n + word.length > ARROW_WRAP) { out.push([]); n = 0; }
+      if (space && n === 0) continue;
+      const line = out[out.length - 1];
+      const last = line[line.length - 1];
+      if (last && last.bold === r.bold && last.italic === r.italic) last.text += word;
+      else line.push({ text: word, bold: r.bold, italic: r.italic });
+      n += word.length;
+    }
+  }
+  return out.map((line) => { const l = line[line.length - 1]; if (l) l.text = l.text.replace(/\s+$/, ''); return line.filter((x) => x.text); }).filter((l) => l.length);
+}
+
 // Emphasis as in Markdown: **bold**, __bold__, *italic*, _italic_. An underscore inside a
 // word is just an underscore (ORDER_SUPERVISION_TRIGGER, RLSE_NOV06_GOLIVE). A backslash
 // keeps the next \\ ` * or _ as itself; text in `backticks` is taken as written.

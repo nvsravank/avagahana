@@ -14,7 +14,7 @@
 // first appear. The block's arrows are the map's default relation view. `style` and
 // `linkStyle` lines are skipped: a map names meanings, the theme picks colours.
 import { shapeOf } from '../../model/shapes.js';
-import { shortenLabel, labelToRuns } from '../../model/labels.js';
+import { shortenLabel, labelToRuns, arrowLabel } from '../../model/labels.js';
 import { edgeKind } from '../../model/relations.js';
 import { problem } from '../../model/problem.js';
 import { CHANGE_CLASSES } from '../../model/classes.js';
@@ -155,7 +155,7 @@ export function parseFlowchart(lines, start, title, warnings) {
     const groups = parts.groups.map((g) => g.split(/\s+&\s+/).map(node).filter(Boolean));
     parts.arrows.forEach((a, k) => {
       for (const from of groups[k]) {
-        for (const to of groups[k + 1]) relations.push({ from: from.id, to: to.id, label: a.label, cross: false, ...a.kind, ...(a.id ? { eid: a.id } : {}) });
+        for (const to of groups[k + 1]) relations.push({ from: from.id, to: to.id, ...arrowLabel(a.label), cross: false, ...a.kind, ...(a.id ? { eid: a.id } : {}) });
       }
     });
   }

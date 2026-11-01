@@ -670,14 +670,31 @@ export function mount(element, options = {}) {
     if (S.noteSticky || page.isOpen() || !S.map?.byId[id]) return;
     showDetails(S.map.byId[id], anchor);
   }
+  // an arrow label cut to two lines (WO-41): hovering it shows the whole label
+  function hoverLabel(id, anchor) {
+    clearTimeout(hideTimer);
+    const cut = painter.cutLabel(id);
+    if (S.noteSticky || page.isOpen() || !cut) return;
+    $.noteTitle.textContent = cut.title;
+    $.noteBody.replaceChildren(...cut.runs.map((runs) => {
+      const p = Object.assign(document.createElement('p'), { className: 'mmv-label-line' });
+      for (const run of runs) p.appendChild(Object.assign(document.createElement(run.bold ? 'strong' : run.italic ? 'em' : 'span'), { textContent: run.text }));
+      return p;
+    }));
+    $.note.hidden = false;
+    S.noteOpen = true;
+    placeNote(anchor);
+  }
   $.canvas.addEventListener('mouseover', (e) => {
     if (stage.dragging()) return;
     const ni = e.target.closest('[data-note]');
     if (ni) { hoverNote(ni.dataset.note, ni); return; }
+    const lb = e.target.closest('[data-label]');
+    if (lb) { hoverLabel(lb.dataset.label, lb); return; }
     const hv = posterNow() && e.target.closest('[data-hover]');
     if (hv) hoverDetails(hv.dataset.hover, hv);
   });
-  $.canvas.addEventListener('mouseout', (e) => { if (e.target.closest('[data-note], [data-hover]')) scheduleHide(); });
+  $.canvas.addEventListener('mouseout', (e) => { if (e.target.closest('[data-note], [data-hover], [data-label]')) scheduleHide(); });
   $.note.addEventListener('mouseenter', () => clearTimeout(hideTimer));
   $.note.addEventListener('mouseleave', () => { if (!S.noteSticky) scheduleHide(); });
   const listHandlers = {

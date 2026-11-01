@@ -1,4 +1,4 @@
-import { labelWidth, labelH, LABEL_END, placeLabels } from '../../connection-labels.js';
+import { labelWidth, labelH, LABEL_END, placeLabels, writtenLabel } from '../../connection-labels.js';
 
 // layout.js — boxes inside boxes, laid out by the current view's arrows, and the
 // arrows' routes. Pure: no DOM.
@@ -43,6 +43,7 @@ import { labelWidth, labelH, LABEL_END, placeLabels } from '../../connection-lab
 
 const PAD = 14;        // inside a box, round its content
 const TITLE = 26;      // a box's title strip
+const TITLE_LINE = 18; // each further line of a title (a <br>, or a long one wrapped)
 const RANK_GAP = 44;   // between ranks at least (arrows run here; tracks and labels widen it)
 const GAP = 22;        // between neighbours in a rank, and between packed rows
 const SWEEPS = 4;
@@ -115,7 +116,10 @@ export function layoutBoxes(root, kids, size, input) {
     : n.dir || (!n.parent ? input.direction || 'TB' : !n.parent.parent ? 'LR' : TURN[dirOf(n.parent)]));
   // the room a box's title takes along its top (open, its main icon sits at the right,
   // or in Poster at the left)
-  const titleZone = (b) => size(b).w + (b.main ? 26 + 4 : 0);
+  // A title is drawn semibold (scene.js); a box below the first level is measured as a
+  // regular label, so its widest line gets the difference (about 8%).
+  const titleZone = (b) => size(b).w + (size(b).type?.weight < 600 ? Math.ceil((size(b).textW || 0) * 0.08) : 0) + (b.main ? 26 + 4 : 0);
+  const titleH = (b) => TITLE + (b.synthetic || !b.runs ? 0 : Math.max(0, (size(b).lines?.length || 1) - 1) * TITLE_LINE);
 
   // ---- what is drawn, and the arrows between drawn things (one per pair of ends) ----
   const placed = new Set(isMap ? [] : [root, ...neighbours]);
@@ -148,13 +152,15 @@ export function layoutBoxes(root, kids, size, input) {
     w.note = !input.poster && w.items.length === 1 && !!w.items[0].note;
     w.icons = input.poster ? 0 : w.items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), w.items[0].icons || []).length;
     w.text = w.items.length > 1 ? `${w.items.length} links` : w.items[0].label || (w.note || w.icons ? ' ' : null);
+    // a label of two lines (WO-41): its gap makes room for both; measured by its widest
+    if (w.items.length === 1) writtenLabel(w, w.items[0]);
     // playing: the arrow says only what the sequence sends along it, the longest
     // message each way (so the picture keeps its place through the play)
     if (input.playLabel) {
       const ways = w.items.map((r) => input.playLabel(r)).filter(Boolean);
       const longest = (k) => ways.map((x) => x[k]).filter(Boolean).sort((p, q) => q.length - p.length)[0] || null;
       const [fwd, back] = [longest('fwd'), longest('back')];
-      Object.assign(w, { note: false, icons: 0, lines: (fwd ? 1 : 0) + (back ? 1 : 0) });
+      Object.assign(w, { note: false, icons: 0, rows: 1, lines: (fwd ? 1 : 0) + (back ? 1 : 0) });
       w.text = [fwd, back].filter(Boolean).sort((p, q) => q.length - p.length)[0] || null;
     }
   }
@@ -309,12 +315,13 @@ export function layoutBoxes(root, kids, size, input) {
           if (!end.c || info.has(end.c)) continue;   // an open box's ports come from its inside
           const k = portsOn.get(end.c) || {};
           k[end.side] = (k[end.side] || 0) + 1;
-          if (leg.w.text) k[`${end.side}text`] = true;
+          // labelled arrows on a side lie a label's height apart (two lines: two, WO-41)
+          if (leg.w.text) k[`${end.side}text`] = Math.max(k[`${end.side}text`] || 0, LABEL_SPREAD, labelH(leg.w) + 4);
           portsOn.set(end.c, k);
         }
       }
     }
-    const need = (n, text) => (n ? 2 * PORT_MARGIN + (n - 1) * (text ? LABEL_SPREAD : SPREAD) : 0);
+    const need = (n, spread) => (n ? 2 * PORT_MARGIN + (n - 1) * (spread || SPREAD) : 0);
     const needOn = (p, a, b) => Math.max(need(p[a] || 0, p[`${a}text`]), need(p[b] || 0, p[`${b}text`]));
     // (Poster, WO-38: every node keeps its own size, as figures do)
     const plain = (c) => !input.poster && !c.figure && !OWN_SHAPE.has(c.shape);
@@ -504,7 +511,7 @@ export function layoutBoxes(root, kids, size, input) {
 
     // the box's border across the flow, in content coordinates
     const titleNeed = framed ? titleZone(b) : 0;
-    const crossBorder = { low: across ? -(PAD + TITLE) : -PAD, high: crossMax + PAD };
+    const crossBorder = { low: across ? -(PAD + titleH(b)) : -PAD, high: crossMax + PAD };
 
     // ---- each leg's crossings of the gaps: [gap, from, to] across the flow ----
     const gaps = Array.from({ length: nR + 1 }, () => []);
@@ -600,11 +607,11 @@ export function layoutBoxes(root, kids, size, input) {
     const cw = across ? mainTotal : crossMax;
     const ch = across ? crossMax : mainTotal;
     let ox = framed ? PAD : 0;
-    let oy = framed ? PAD + TITLE : 0;
+    let oy = framed ? PAD + titleH(b) : 0;
     let W = framed ? Math.max(cw + 2 * PAD, titleNeed) : cw;
     for (const leg of I.legs) if (leg.xs && !across) for (const x of leg.xs) W = Math.max(W, x + ox + 12);
     if (minW > W) { ox += (minW - W) / 2; W = minW; }
-    let H = framed ? ch + 2 * PAD + TITLE : ch;
+    let H = framed ? ch + 2 * PAD + titleH(b) : ch;
     if (minH > H) { oy += (minH - H) / 2; H = minH; }
     const at = (mn, cr) => {
       const mm = I.dir === 'RL' || I.dir === 'BT' ? mainTotal - mn : mn;

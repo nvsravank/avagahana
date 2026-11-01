@@ -19,7 +19,7 @@
 //
 // `style`, `hide empty description`, `scale`, `accTitle` and `accDescr` lines are skipped.
 // The transitions are the diagram's own arrows: its default relation view.
-import { shortenLabel, labelToRuns } from '../../model/labels.js';
+import { shortenLabel, labelToRuns, arrowLabel } from '../../model/labels.js';
 import { problem } from '../../model/problem.js';
 import { checkPaths } from './checks.js';
 
@@ -158,7 +158,7 @@ export function parseState(lines, start, title, warnings) {
       const b = m[2].startsWith('[*]') ? { n: mark(true), cls: null } : end(m[2]);
       if (a.cls) addClass(a.n, a.cls);
       if (b.cls) addClass(b.n, b.cls);
-      relations.push({ from: a.n.id, to: b.n.id, label: (m[3] || '').trim(), cross: false, line: 'solid', head: 'arrow', tail: null });
+      relations.push({ from: a.n.id, to: b.n.id, ...arrowLabel(m[3]), cross: false, line: 'solid', head: 'arrow', tail: null });
       continue;
     }
     // X : description   (one line of the state's compartment)

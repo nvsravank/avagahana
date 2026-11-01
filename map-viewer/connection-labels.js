@@ -1,5 +1,6 @@
 // Shared label measurements and collision placement, independent of line routing.
 // Flowcharts and ER use the same end clearance, icon room and longest-first rules.
+import { arrowLines } from './model/labels.js';
 export const LABEL_H = 16;    // an arrow label's height (12px text)
 // an arrow's label: a little over the real width, and room for its icons and a note
 // mark after it
@@ -9,7 +10,25 @@ export const labelWidth = (w) => w.text.trim().length * 6.8 + 10 + (w.icons + (w
 // line, the returns on a second under it (player.js); each line starts with a number
 const PLAY_BADGE = 30;
 const PLAY_LINE_GAP = 4;
-export const labelH = (w) => (w.lines > 1 ? 2 * LABEL_H + PLAY_LINE_GAP : LABEL_H);
+// a label written on two lines (w.rows, WO-41) takes the same room
+export const labelH = (w) => (w.lines > 1 || w.rows > 1 ? 2 * LABEL_H + PLAY_LINE_GAP : LABEL_H);
+export const LABEL_LINE = LABEL_H + PLAY_LINE_GAP;   // between the baselines of a two-line label
+// A relation's label as drawn (WO-41), for a layout's label w: two lines count as two
+// rows; it is measured by its widest line
+export function writtenLabel(w, r) {
+  if (!r?.labelRuns) return w;
+  const { lines } = arrowLines(r.labelRuns);
+  w.rows = lines.length;
+  w.text = lines.map((runs) => runs.map((x) => x.text).join('')).sort((p, q) => q.length - p.length)[0];
+  return w;
+}
+// ... and for a scene's label: the lines it draws; cut: it had more, and hovering it shows
+// them all, under the arrow's ends (viewer.js)
+export function labelLines(r, title) {
+  if (!r?.labelRuns) return {};
+  const { lines, cut } = arrowLines(r.labelRuns);
+  return { lines, ...(cut ? { cut: { title, runs: r.labelRuns } } : {}) };
+}
 // Arrow labels: on the arrow's own straight runs, as near its start as there is room,
 // clear of every box (of a box the arrow runs inside: its title and border), of the arrow's
 // ends (where its heads are) and of each other; crossing another arrow costs a little. Longest labels first; a label with no

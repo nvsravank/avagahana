@@ -122,7 +122,8 @@ agent may be using.)
 
 - Operators carry meaning: `-->` a call, `-.->` asynchronous or an event, `==>` the main
   path, `--o` / `--x` other ends, `<-->` both ways. Labels: `-->|label|` in the block,
-  `: label` in a view line. Keep labels short; they take room in the gaps.
+  `: label` in a view line. Keep labels short; they take room in the gaps. `<br>` gives
+  a second line (a protocol under the verb: `reads<br>JDBC`); only two are drawn.
 - A note on an arrow: give it an id (`orders e1@-->|charges| payments`, or on a view
   line `- retry e3@-.-> notify : resend`) and key a `## Details` entry by it. One id per
   arrow, never the same as a node's.

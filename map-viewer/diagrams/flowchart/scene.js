@@ -10,10 +10,15 @@
 // (layout.labels), else on the longest run.
 import { nodeShaper, nodeName, typeFor, planClass, passesFilter } from '../../geometry.js';
 import { strokeStyle } from '../../model/classes.js';
+import { labelLines } from '../../connection-labels.js';
 
 const TITLE_X = 12;
 const TITLE_Y = 18;
 const POSTER_CORNER = 26;   // a Poster box's main icon, in its top-left corner
+// a title's lines when it takes more than one: its label's lines (a <br>), each wrapped
+// as the node's label is (geometry.js), so it fits the width the layout gave the box;
+// layout.js makes the strip taller
+const titleLines = (lines) => (lines.length > 1 ? { lines: lines.map((l) => l.runs.map((r) => r.text).join('').trim()) } : {});
 
 // input: as the mind map's (diagrams/mindmap/scene.js), layout.pos holding frame: true
 // for open boxes
@@ -41,7 +46,7 @@ export function buildScene(input) {
           ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
           ...(main?.src && input.tintOf?.(main.src) ? { tint: input.tintOf(main.src) } : {}),
           name: `${nodeName(n, rel, false)}, a box`,
-          title: { text: n.plain, x: main ? POSTER_CORNER + 8 : TITLE_X, y: 17, size: Math.min(type.size, 15) - 1, weight: 600 },
+          title: { text: n.plain, ...titleLines(input.geom(n).lines), x: main ? POSTER_CORNER + 8 : TITLE_X, y: 17, size: Math.min(type.size, 15) - 1, weight: 600 },
           icons: [], ...(main ? { main } : {}), hover: true,
           marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
           ...(n.plan ? { plan: n.plan } : {}),
@@ -62,7 +67,7 @@ export function buildScene(input) {
         cls: `mmv-frame ${shaper.tone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
         ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
         name: `${nodeName(n, rel, false)}, a box`,
-        title: { text: n.plain, x: titleX, y: TITLE_Y, size: Math.min(type.size, 15), weight: 600 },
+        title: { text: n.plain, ...titleLines(input.geom(n).lines), x: titleX, y: TITLE_Y, size: Math.min(type.size, 15), weight: 600 },
         icons,
         ...(main ? { main } : {}),
         marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
@@ -131,7 +136,7 @@ export function relationShapes(input) {
       ...(slot != null ? { slot } : {}), ...(plan ? { plan } : {}), ...(lineCls?.stroke ? { style: strokeStyle(lineCls.stroke) } : {}),
       head: kind.head || null, tail: kind.tail || null,
       label: items.length > 1 ? { x: mid[0], y: mid[1], text: `${items.length} links`, ...(icons.length ? { icons } : {}) }
-        : first.label || noteMark || icons.length ? { x: mid[0], y: mid[1], text: first.label, ...(noteMark ? { note: true } : {}), ...(icons.length ? { icons } : {}) } : null,
+        : first.label || noteMark || icons.length ? { x: mid[0], y: mid[1], text: first.label, ...labelLines(first, `${input.byId[first.from]?.plain || first.from} → ${input.byId[first.to]?.plain || first.to}`), ...(noteMark ? { note: true } : {}), ...(icons.length ? { icons } : {}) } : null,
       ...(dim ? { dim } : {}),
       items: items.map((r) => ({ from: r.from, to: r.to, label: r.label, ...(r.note ? { note: r.note } : {}), ...(r.icons?.length ? { icons: r.icons.slice() } : {}) })),
     });

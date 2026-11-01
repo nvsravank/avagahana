@@ -12,6 +12,7 @@ import { picture } from './icons.js';
 import { diagramOf } from './diagrams/index.js';
 import { measure } from './measure.js';
 import { nodeGeometry, MIN_LABEL_PX, PAD, MAX_LINE, toneClass, typeFor, planClass } from './geometry.js';
+import { LABEL_LINE } from './connection-labels.js';
 
 export { MIN_LABEL_PX, PAD, MAX_LINE, toneClass, typeFor };
 
@@ -356,13 +357,16 @@ export function createPainter(v) {
     // the hover pop-up
     if (s.tint) g.style.setProperty('--n', s.tint);
     svgEl('rect', { class: 'mmv-shape', width: s.w, height: s.h, rx: s.hover ? 2 : 8, style: s.stroke }, g);
-    if (s.hover) svgEl('rect', { class: 'mmv-hit', 'data-hover': s.id, width: s.w, height: 26 }, g);
+    const extra = Math.max(0, (s.title.lines?.length || 1) - 1) * 18;   // a title of several lines (layout.js TITLE_LINE)
+    if (s.hover) svgEl('rect', { class: 'mmv-hit', 'data-hover': s.id, width: s.w, height: 26 + extra }, g);
     if (s.marks.hit || s.marks.sel) drawMarks(g, null, s.marks, s.w, s.h, 'frame');
     for (const ic of s.icons || []) drawIcon(g, ic);
     if (s.main) drawIcon(g, s.main);
     // Poster: the pop-up names it, so no browser tooltip on the screen (exports keep it)
     if (s.hover && !S.exporting) g.querySelectorAll('title').forEach((t) => t.remove());
-    svgEl('text', { class: 'mmv-frame-title', x: s.title.x, y: s.title.y, 'font-size': s.title.size, 'font-weight': s.title.weight }, g).textContent = s.title.text;
+    const title = svgEl('text', { class: 'mmv-frame-title', x: s.title.x, y: s.title.y, 'font-size': s.title.size, 'font-weight': s.title.weight }, g);
+    if (!s.title.lines) title.textContent = s.title.text;
+    else s.title.lines.forEach((line, i) => { svgEl('tspan', { x: s.title.x, dy: i ? 18 : 0 }, title).textContent = line; });
     if (s.note) {
       const ng = svgEl('g', { class: 'mmv-note-ic', 'data-note': s.id, transform: `translate(${s.note.x},${s.note.y})` }, g);
       svgEl('rect', { class: 'mmv-hit', x: -5, y: -5, width: s.note.size + 10, height: s.note.size + 10 }, ng);
@@ -425,8 +429,25 @@ export function createPainter(v) {
     }
     return `url(#${id})`;
   };
+  // an arrow label's text: one line as it is; lines of runs (WO-41) centred on its place,
+  // bold and italic as written. A cut one (past two lines) shows them all on hover.
+  const cutLabels = new Map();   // arrow id -> {title, runs}: labels cut to two lines
+  const labelTop = (L) => L.y - ((L.lines?.length || 1) - 1) * LABEL_LINE / 2;
+  const labelW = (L) => (L.lines ? Math.max(...L.lines.map((runs) => runs.reduce((w, r) => w + measure(r.text, 12, r.bold ? 700 : 400, r.italic, v.font()), 0)))
+    : measure(L.text, 12, 400, false, v.font()));
+  function labelText(parent, attrs, s) {
+    const L = s.label;
+    if (L.cut) cutLabels.set(s.id, L.cut);
+    const t = svgEl('text', { ...attrs, ...(L.cut ? { 'data-label': s.id } : {}) }, parent);
+    if (!L.lines) { t.textContent = L.text; return t; }
+    L.lines.forEach((runs, i) => runs.forEach((r, k) => {
+      svgEl('tspan', { ...(k ? {} : { x: attrs.x, y: labelTop(L) + i * LABEL_LINE }), 'font-weight': r.bold ? 700 : null, 'font-style': r.italic ? 'italic' : null }, t).textContent = r.text;
+    }));
+    return t;
+  }
   function paintRelLayer(rels) {
     const frag = document.createDocumentFragment();
+    cutLabels.clear();
     for (const s of rels) {
       // a box diagram's arrows carry their own class and ends; related links in a mind map do not
       if (s.cls) {
@@ -447,13 +468,14 @@ export function createPainter(v) {
       if (s.label && (s.label.note || s.label.icons)) {
         // the label, its icons, then a note mark; the note mark clicks like the arrow
         const icons = (s.label.icons || []).map((c) => v.iconDef(c, v.legend()));
-        const tw = s.label.text ? measure(s.label.text, 12, 400, false, v.font()) + 4 : 0;
+        const tw = s.label.text ? labelW(s.label) + 4 : 0;
         const iw = icons.length * 16;
         const x0 = s.label.x - (tw + iw + (s.label.note ? 14 : 0)) / 2;
         const lg = s.dim ? svgEl('g', { class: 'is-dim' }, frag) : frag;
-        if (s.label.text) svgEl('text', { class: s.cls ? 'mmv-flow-label' : 'mmv-rel-label', x: x0, y: s.label.y, 'text-anchor': 'start', 'font-size': 12, 'data-for': s.id }, lg).textContent = s.label.text;
+        if (s.label.text) labelText(lg, { class: s.cls ? 'mmv-flow-label' : 'mmv-rel-label', x: x0, y: s.label.y, 'text-anchor': 'start', 'font-size': 12, 'data-for': s.id }, s);
+        const iy = labelTop(s.label) - 11;   // the icons and note mark sit on the first line
         icons.forEach((def, k) => {
-          const ig = svgEl('g', { class: 'mmv-icon mmv-flow-icon', transform: `translate(${x0 + tw + k * 16},${s.label.y - 11})`, style: def.color ? `color:${def.color}` : null }, lg);
+          const ig = svgEl('g', { class: 'mmv-icon mmv-flow-icon', transform: `translate(${x0 + tw + k * 16},${iy})`, style: def.color ? `color:${def.color}` : null }, lg);
           svgEl('rect', { class: 'mmv-flow-note-bg', x: -1, y: -1, width: 16, height: 16, rx: 3 }, ig);
           if (def.vendor) {
             const dark = def.dark && picture(def.dark);
@@ -464,13 +486,13 @@ export function createPainter(v) {
           svgEl('title', {}, ig).textContent = def.label;
         });
         if (s.label.note) {
-          const ng = svgEl('g', { class: 'mmv-note-ic mmv-flow-note', 'data-arrow': s.id, transform: `translate(${x0 + tw + iw},${s.label.y - 11})` }, lg);
+          const ng = svgEl('g', { class: 'mmv-note-ic mmv-flow-note', 'data-arrow': s.id, transform: `translate(${x0 + tw + iw},${iy})` }, lg);
           svgEl('rect', { class: 'mmv-flow-note-bg', x: -1, y: -1, width: 16, height: 16, rx: 3 }, ng);
           svgEl('g', { transform: 'scale(0.5833)' }, ng).innerHTML = UI.note;
           svgEl('title', {}, ng).textContent = 'Note: click to read';
         }
       }
-      else if (s.label) svgEl('text', { class: `${s.cls ? 'mmv-flow-label' : 'mmv-rel-label'}${s.dim ? ' is-dim' : ''}${s.badge?.cls ? ` ${s.badge.cls}` : ''}`, x: s.label.x, y: s.label.y, 'text-anchor': 'middle', 'font-size': 12, 'data-for': s.id }, frag).textContent = s.label.text;
+      else if (s.label) labelText(frag, { class: `${s.cls ? 'mmv-flow-label' : 'mmv-rel-label'}${s.dim ? ' is-dim' : ''}${s.badge?.cls ? ` ${s.badge.cls}` : ''}`, x: s.label.x, y: s.label.y, 'text-anchor': 'middle', 'font-size': 12, 'data-for': s.id }, s);
       // a sequence message's number: a call's filled, a reply's outlined
       if (s.badge) badge(s.badge, s.tint, frag);
     }
@@ -592,5 +614,5 @@ export function createPainter(v) {
     return true;
   }
 
-  return { draw, paintMarks, paintRels, paintChanges, nodeGeom, sceneInput, badge, marker: (kind, tint) => end(kind, null, tint), animateNext: () => { animate = true; }, lod: () => { if (gliding) lodLater = true; else if (S.layout) draw(S.layout); }, forget: () => { lastPos = new Map(); }, arrow: (id) => arrows.get(id) || null, clearSizes: () => sizeCache.clear() };
+  return { draw, paintMarks, paintRels, paintChanges, nodeGeom, sceneInput, badge, marker: (kind, tint) => end(kind, null, tint), animateNext: () => { animate = true; }, lod: () => { if (gliding) lodLater = true; else if (S.layout) draw(S.layout); }, forget: () => { lastPos = new Map(); }, arrow: (id) => arrows.get(id) || null, cutLabel: (id) => cutLabels.get(id) || null, clearSizes: () => sizeCache.clear() };
 }

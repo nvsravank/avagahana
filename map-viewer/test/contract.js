@@ -1234,6 +1234,67 @@ try {
     box.style.cssText = '';
   }
 
+  // ---- a box title of several lines: a <br> breaks it, a long line wraps, the box makes room ----
+  {
+    const box = document.getElementById('a');
+    box.style.cssText = 'position:fixed;left:0;top:0;width:1000px;height:600px';
+    const tv = mount(box, { storageKey: null });
+    const long = 'Google Chrome, Mozilla Firefox, Apple Safari or Microsoft Edge and one more';
+    await tv.load(`# Titles\n\n\`\`\`mermaid\nflowchart LR\n  subgraph one ["Data center"]\n    x["X"]\n  end\n  subgraph two ["Data center<br>Ubuntu 16.04"]\n    y["Y"]\n  end\n  subgraph three ["${long}"]\n    z["Z"]\n  end\n\`\`\`\n`, 'titles.md');
+    await wait(100);
+    const frame = (id) => document.querySelector(`#a [data-mmv=frames] [data-id="${id}"]`);
+    const lines = (id) => [...frame(id).querySelectorAll('.mmv-frame-title tspan')].map((t) => t.textContent);
+    const h = (id) => Number(frame(id).querySelector('.mmv-shape').getAttribute('height'));
+    check('a <br> in a box title draws two lines', JSON.stringify(lines('two')) === JSON.stringify(['Data center', 'Ubuntu 16.04']), JSON.stringify(lines('two')));
+    check('a one-line box title stays one text', !lines('one').length && frame('one').querySelector('.mmv-frame-title').textContent === 'Data center');
+    check('the box with a two-line title is a line taller', Math.abs(h('two') - h('one') - 18) < 1, `${h('one')} ${h('two')}`);
+    check('a long box title wraps', lines('three').length > 1 && lines('three').join(' ') === long, JSON.stringify(lines('three')));
+    const inside = (id) => { const f = frame(id).querySelector('.mmv-shape').getBoundingClientRect(), t = frame(id).querySelector('.mmv-frame-title').getBoundingClientRect(); return t.right <= f.right && t.bottom <= f.bottom; };
+    check('every title line is inside its box', ['one', 'two', 'three'].every(inside), ['one', 'two', 'three'].filter((id) => !inside(id)).join());
+
+    // arrow labels: emphasis and <br> as in a node's label, two lines drawn at most
+    await tv.load('# Arrows\n\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  c["C"]\n  d["D"]\n  e["E"]\n  a -->|plain| b\n  a -->|"**charge** *async*"| c\n  a -->|"reads<br>sync JDBC"| d\n  a -->|"one<br>two<br>three<br>four"| e\n```\n', 'arrows.md');
+    await wait(100);
+    const label = (k) => document.querySelector(`#a .mmv-rels text[data-for="${k}"]`);
+    const spans = (k) => [...label(k).querySelectorAll('tspan')].map((t) => [t.textContent, t.getAttribute('font-weight'), t.getAttribute('font-style')]);
+    check('a plain arrow label is one text', label('a>b').textContent === 'plain' && !label('a>b').querySelector('tspan'));
+    check('an arrow label draws bold and italic', JSON.stringify(spans('a>c')) === JSON.stringify([['charge', '700', null], [' ', null, null], ['async', null, 'italic']]), JSON.stringify(spans('a>c')));
+    const ys = [...label('a>d').querySelectorAll('tspan[y]')].map((t) => Number(t.getAttribute('y')));
+    check('a <br> in an arrow label draws two lines', ys.length === 2 && ys[1] - ys[0] === 20 && label('a>d').textContent === 'readssync JDBC', JSON.stringify(ys));
+    check('past two lines an arrow label ends in … and hovers whole', label('a>e').textContent === 'onetwo …' && label('a>e').dataset.label === 'a>e' && !label('a>d').dataset.label, label('a>e').textContent);
+    label('a>e').dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    await wait(50);
+    const note = document.querySelector('#a [data-mmv=note]');
+    check('hovering a cut label shows every line', !note.hidden && [...note.querySelectorAll('.mmv-label-line')].map((p) => p.textContent).join('|') === 'one|two|three|four', note.textContent);
+    label('a>e').dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+    await wait(400);
+    check('leaving a cut label hides it again', note.hidden);
+    const lineCount = (el) => el ? el.querySelectorAll('tspan[y]').length : 0;
+    // a long one-line label wraps to two; an ER relationship and a sequence message read lines too
+    await tv.load('# Wrap\n\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  a -->|reads the whole order history for this customer every time| b\n```\n', 'wrap.md');
+    await wait(100);
+    const wrapped = document.querySelector('#a .mmv-rels text[data-for="a>b"]');
+    check('a long arrow label wraps to two lines at a space', lineCount(wrapped) === 2 && !wrapped.dataset.label, wrapped?.outerHTML.slice(0, 200));
+    await tv.load('# ER\n\n```mermaid\nerDiagram\n  CUSTOMER ||--o{ ORDER : "places<br>online"\n  CUSTOMER {\n    int id PK\n  }\n  ORDER {\n    int id PK\n    int customer_id FK\n  }\n```\n', 'er.md');
+    await wait(100);
+    check('an ER relationship label reads <br>', lineCount(document.querySelector('#a .mmv-rels text.mmv-flow-label')) === 2, document.querySelector('#a .mmv-rels text')?.outerHTML.slice(0, 200));
+    await tv.load('# Seq\n\n```mermaid\nsequenceDiagram\n  A->>B: **charge**<br>card\n  B-->>A: ok\n```\n', 'seq.md');
+    await wait(100);
+    const msg = document.querySelector('#a .mmv-rels text.mmv-flow-label');
+    check('a sequence message draws bold and two lines', lineCount(msg) === 2 && msg.querySelector('tspan').getAttribute('font-weight') === '700', msg?.outerHTML.slice(0, 200));
+    tv.destroy();
+    box.style.cssText = '';
+  }
+
+  // ---- arrow labels in the model: plain words everywhere text is shown ----
+  {
+    const m = parseMap('# L\n\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  a -->|"**charge**<br>*async*"| b\n```\n', 'l.md');
+    const r = m.relations[0];
+    check('an arrow label\'s words are plain text, its lines kept apart', r.label === 'charge async' && r.labelRuns.length === 2 && r.labelRuns[0][0].bold && r.labelRuns[1][0].italic, JSON.stringify(r));
+    const p = parseMap('# L\n\n```mermaid\nflowchart LR\n  a["A"]\n  b["B"]\n  a -->|just words| b\n```\n', 'l.md').relations[0];
+    check('a plain arrow label has no lines kept', p.label === 'just words' && !p.labelRuns, JSON.stringify(p));
+  }
+
   // ---- accessibility ----
   const acc = mount(document.getElementById('a'), { storageKey: null });
   await acc.load(SAMPLE, 'garden.md');

@@ -20,7 +20,7 @@
 //   steps: [{msgs, captions[], notes[], repeat?}]  played in order; a `par` plays the
 //     k-th step of each branch together; a loop ends in a "repeat" step
 //   groups: [{kind, label, from, to}]  a block over steps from..to (the timeline's brackets)
-import { shortenLabel, labelToRuns } from '../../model/labels.js';
+import { shortenLabel, labelToRuns, arrowLabel } from '../../model/labels.js';
 import { problem } from '../../model/problem.js';
 
 const ID = '[A-Za-z_]\\w*(?:-(?![->x)])\\w+)*';
@@ -94,7 +94,7 @@ export function parseSequence(lines, start, title, warnings) {
       participant(from);
       participant(to);
       const m = {
-        i: messages.length, from, to, label: (text || '').trim().replace(/<br\s*\/?>/gi, ' '),
+        i: messages.length, from, to, ...arrowLabel(text),
         line: op.includes('--') ? 'dotted' : 'solid',
         head: op.endsWith('x') ? 'cross' : op.endsWith(')') ? 'async' : op.endsWith('>>') ? 'arrow' : 'open',
         both: op.startsWith('<<'), self: from === to,

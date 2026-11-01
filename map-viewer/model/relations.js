@@ -12,6 +12,7 @@
 // Arrows use Mermaid's own operators: --> solid, -.-> dotted, ==> thick, --- no head,
 // <--> both ends, --o circle, --x cross (longer ones, ---->, mean the same).
 import { problem } from './problem.js';
+import { arrowLabel } from './labels.js';
 
 // one operator: an optional tail end, a body (--, -.-, ==), an optional head end
 export const EDGE_OP = /(<|o|x)?(-{2,}|-\.+-|={2,})(>|o|x)?/;
@@ -56,7 +57,7 @@ export function parseRelations(text, byId, warnings) {
       warnings.push(problem('relation-unknown-node', `Relation to unknown node "${to}".`));
       continue;
     }
-    rels.push({ from, to, label: (label || '').trim(), cross, ...kind, ...(c ? { cls: c[1] } : {}), ...(m[2] ? { eid: m[2] } : {}) });
+    rels.push({ from, to, ...arrowLabel(label), cross, ...kind, ...(c ? { cls: c[1] } : {}), ...(m[2] ? { eid: m[2] } : {}) });
   }
   return rels;
 }

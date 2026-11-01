@@ -9,6 +9,7 @@ import { HEAD } from './table.js';
 import { cardinalityWords, grainSentence } from './roles.js';
 
 import { connectionPaths, connectionLabels } from './lines.js';
+import { labelLines } from '../../connection-labels.js';
 
 export function buildScene(input) {
   const { layout: L } = input;
@@ -66,7 +67,7 @@ export function relationShapes(input) {
       ...(r.plan ? { plan: r.plan } : {}), ...(r.stroke ? { style: strokeStyle(r.stroke) } : {}),
       head: r.head, tail: r.tail,
       hint: cardinalityWords(r, input.byId),
-      label: !pair && (r.label || r.note || r.icons?.length) ? { x: r2(mid[0]), y: r2(mid[1] + 4), text: r.label, ...(r.note ? { note: true } : {}), ...(r.icons?.length ? { icons: r.icons } : {}) } : null,
+      label: !pair && (r.label || r.note || r.icons?.length) ? { x: r2(mid[0]), y: r2(mid[1] + 4), text: r.label, ...labelLines(r, `${input.byId[r.from]?.plain || r.from} → ${input.byId[r.to]?.plain || r.to}`), ...(r.note ? { note: true } : {}), ...(r.icons?.length ? { icons: r.icons } : {}) } : null,
       ...(dim ? { dim } : {}),
       items: [{ from: r.from, to: r.to, eid: r.eid, label: r.label, words: cardinalityWords(r, input.byId), ...(r.note ? { note: r.note } : {}), ...(r.icons?.length ? { icons: r.icons.slice() } : {}) }],
     });

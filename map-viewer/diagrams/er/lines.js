@@ -1,6 +1,6 @@
 // Column ports and two horizontal stubs; the middle is always one straight line.
 import { HEAD } from './table.js';
-import { placeLabels, labelWidth, labelH, LABEL_END } from '../../connection-labels.js';
+import { placeLabels, labelWidth, labelH, LABEL_END, writtenLabel } from '../../connection-labels.js';
 const PARALLEL = 16;
 const CHANNEL_START = 28;
 
@@ -148,11 +148,11 @@ function rowY(geo, box, col) {
 }
 
 export function connectionLabel(r, key, byId, playLabel) {
-  const w = { key, a: byId[r.from], z: byId[r.to], text: r.label || (r.note || r.icons?.length ? ' ' : null), icons: r.icons?.length || 0, note: !!r.note };
+  const w = writtenLabel({ key, a: byId[r.from], z: byId[r.to], text: r.label || (r.note || r.icons?.length ? ' ' : null), icons: r.icons?.length || 0, note: !!r.note }, r);
   const playing = playLabel?.(r);
   if (playing) {
     const texts = [playing.fwd, playing.back].filter(Boolean);
-    Object.assign(w, { text: texts.sort((a, b) => b.length - a.length)[0] || null, icons: 0, note: false, lines: texts.length });
+    Object.assign(w, { text: texts.sort((a, b) => b.length - a.length)[0] || null, icons: 0, note: false, rows: 1, lines: texts.length });
   }
   return w;
 }

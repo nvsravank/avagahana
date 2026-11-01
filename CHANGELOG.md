@@ -6,6 +6,18 @@ marked **Contract**.
 
 ## Unreleased
 
+- Fix: a box's title broke no lines: a `<br>` drew as a space and a long title ran past
+  the box. It now breaks at `<br>` and wraps as a node's label does; the title strip and
+  the box grow to fit, and a box below the first level is sized for its semibold title
+  (WO-41).
+- **Contract** (map format, addition): an arrow label reads `**bold**`, `*italic*` and
+  `<br>` as a node's label does (flowcharts, state diagrams, ER relationships, sequence
+  messages, view lines), and a line over 40 characters wraps at a space. Two lines are
+  drawn and the gap, the box's side or the message's row make room for them; past two
+  the second ends in `…`, hovering the label shows it whole, and the checker warns
+  (`arrow-label-lines`, new warning). A relation's or message's `label` is now its plain
+  words on one line (lists, pop-ups, reports); a node label's `*italic*` is documented
+  (WO-41).
 - README: the hero opens the launch video on YouTube; links to the video and the article
   (WO-39 follow-up).
 - README: See the whole shows one shop at three levels (the system, its parts, everything

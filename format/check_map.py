@@ -208,6 +208,13 @@ ARROW = re.compile(r"^\s*((?:<|o|x)?(?:-{2,}|-\.+-|={2,})(?:>|o|x)?)\s*(?:\|([^|
 LABELLED = re.compile(r"^\s*(--|-\.|==)\s+(.+?)\s+((?:-{2,}|\.+-|={2,})(?:>|o|x)?)\s*")
 
 
+def label_lines(m, ln, label, what):
+    """An arrow's or message's label past two lines: two are drawn, the rest on hover (WO-41)."""
+    n = len([x for x in re.split(r"<br\s*/?>", label or "", flags=re.I) if x.strip()])
+    if n > 2:
+        m.report(ln, "arrow-label-lines", f"{what} label has {n} lines: two are drawn, the rest shows on hover; shorten it or put it in a note")
+
+
 def split_arrows(t):
     """A statement split at its arrows, outside brackets and quotes -> (groups, arrows) or None."""
     groups, arrows, cur, depth, quote, i = [], [], "", 0, False, 0
@@ -382,6 +389,7 @@ def read_flowchart(m, lines, first, start_line, what="flowchart"):
         groups, arws = parts
         nodes = [[x for x in (node(s, ln) for s in re.split(r"\s+&\s+", g)) if x] for g in groups]
         for j, a in enumerate(arws):
+            label_lines(m, ln, a["label"], "arrow")
             if a["id"]:
                 if a["id"] in eids:
                     m.report(ln, "arrow-id-twice", f"arrow id {a['id']} used twice (first on line {eids[a['id']]})")
@@ -632,6 +640,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
                 continue
             count += 1
             frm, eid, to = mm.group(1), mm.group(2), mm.group(4)
+            label_lines(m, ln, mm.group(5), "relation")
             walk_views.setdefault(name.lower(), (name, []))[1].append({"from": frm, "to": to, "eid": eid})
             if cm and cm.group(1) in CHANGE_CLASSES:
                 view_plans.append((frm, to, cm.group(1), ln))
@@ -663,6 +672,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
                 m.report(ln, 'relation-syntax', f'relation not understood: {line.strip()}')
                 return None
             a, eid, b = mm.group(1), mm.group(2), mm.group(4)
+            label_lines(m, ln, mm.group(5), "relation")
             if a not in ids:
                 m.report(ln, 'relation-unknown-node', f'unknown endpoint {a}')
             if '#' in b and b not in ids:
@@ -948,6 +958,7 @@ def read_sequence(m, lines, first, start_line):
             no_message()
         if mm:
             frm, op, to = mm.group(1), mm.group(2), mm.group(4)
+            label_lines(m, ln, mm.group(5), "message")
             participant(frm, ln)
             participant(to, ln)
             if mm.group(5) and EMOJI.search(mm.group(5)):

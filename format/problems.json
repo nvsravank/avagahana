@@ -132,6 +132,11 @@
    "side": "checker",
    "what": "An arrow's id@{ ... } settings: valid Mermaid, ignored"
   },
+  "arrow-label-lines": {
+   "level": "warning",
+   "side": "checker",
+   "what": "An arrow's or message's label past two lines: two are drawn, the rest shows on hover"
+  },
   "style-ignored": {
    "level": "warning",
    "side": "checker",

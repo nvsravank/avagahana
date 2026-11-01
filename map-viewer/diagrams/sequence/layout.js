@@ -8,6 +8,9 @@
 //     x, y, w, h}], stepY: [y of each step's first row]}
 // The groups and notes are also in pos (as plain objects), so fitting sees them.
 
+import { arrowLines } from '../../model/labels.js';
+import { LABEL_LINE } from '../../connection-labels.js';
+
 const HEAD_GAP = 48;    // between two heads, at least
 const ROW = 40;          // a message's row
 const SELF_H = 18;       // a message to itself drops this far
@@ -19,6 +22,13 @@ const GROUP_PAD = 64;    // a block reaches this far past its outermost lines
 const CHAR_W = 6.6;      // a label character at 12px (near enough to keep labels apart)
 
 export const labelWidth = (text) => (text ? text.length * CHAR_W + 16 : 0);
+// a message's label as drawn (WO-41): its widest line, and its lines (two at most); a
+// second line takes a line more of the row, above the arrow
+export function drawnLabel(m) {
+  if (!m.labelRuns) return { text: m.label, rows: 1 };
+  const { lines } = arrowLines(m.labelRuns);
+  return { text: lines.map((runs) => runs.map((r) => r.text).join('')).sort((p, q) => q.length - p.length)[0], rows: lines.length };
+}
 
 export function layoutLifelines(root, size, seq) {
   const pos = new Map();
@@ -37,7 +47,7 @@ export function layoutLifelines(root, size, seq) {
   const spans = seq.messages.map((m) => {
     const a = col.get(m.from);
     const b = col.get(m.to);
-    return { a: Math.min(a, b), b: m.self ? a + 1 : Math.max(a, b), need: labelWidth(m.label) + (m.self ? SELF_W : 24) + 22 };
+    return { a: Math.min(a, b), b: m.self ? a + 1 : Math.max(a, b), need: labelWidth(drawnLabel(m).text) + (m.self ? SELF_W : 24) + 22 };
   }).filter((s) => s.b < heads.length).sort((p, q) => (p.b - p.a) - (q.b - q.a));
   for (const s of spans) {
     const lack = s.need - (x[s.b] - x[s.a]);
@@ -62,6 +72,7 @@ export function layoutLifelines(root, size, seq) {
       for (const m of step.msgs) {
         const k1 = col.get(m.from);
         const k2 = col.get(m.to);
+        y += (drawnLabel(m).rows - 1) * LABEL_LINE;
         rows.set(m, { y, x1: x[k1], x2: x[k2] });
         y += ROW + (m.self ? SELF_H : 0);
       }
@@ -89,7 +100,7 @@ export function layoutLifelines(root, size, seq) {
     const ids = seq.steps.slice(a.g.from, a.g.to + 1).flatMap((st) => [...st.msgs.flatMap((m) => [m.from, m.to]), ...st.notes.flatMap((n) => n.over)]);
     const ks = cols(ids);
     // a message to itself on the last line reaches out to the right, with its label
-    const self = Math.max(0, ...seq.steps.slice(a.g.from, a.g.to + 1).flatMap((st) => st.msgs.filter((m) => m.self && col.get(m.from) === Math.max(...ks)).map((m) => SELF_W + 12 + labelWidth(m.label))));
+    const self = Math.max(0, ...seq.steps.slice(a.g.from, a.g.to + 1).flatMap((st) => st.msgs.filter((m) => m.self && col.get(m.from) === Math.max(...ks)).map((m) => SELF_W + 12 + labelWidth(drawnLabel(m).text))));
     const pad = Math.max(16, GROUP_PAD - a.depth * 12);
     const x0 = x[Math.min(...ks)] - pad;
     const x1 = x[Math.max(...ks)] + Math.max(pad, self + 12);

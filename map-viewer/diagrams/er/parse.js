@@ -15,7 +15,7 @@
 //
 // Ends: |o zero or one, || exactly one, }o zero or more, }| one or more (written
 // mirrored on the right: o|, ||, o{, |{).
-import { shortenLabel, labelToRuns } from '../../model/labels.js';
+import { shortenLabel, labelToRuns, arrowLabel } from '../../model/labels.js';
 import { problem } from '../../model/problem.js';
 import { inferRoles } from './roles.js';
 
@@ -90,7 +90,7 @@ export function parseEr(lines, start, title, warnings) {
       const b = entity(m[5]);
       const label = m[6].trim().replace(/^"(.*)"$/, '$1');
       relations.push({
-        from: a.id, to: b.id, label, cross: false, line: m[3] === '--' ? 'solid' : 'dotted',
+        from: a.id, to: b.id, ...arrowLabel(label), cross: false, line: m[3] === '--' ? 'solid' : 'dotted',
         // each end's cardinality: the marks drawn there (diagrams/er/scene.js)
         tail: `er-${LEFT[m[2]]}`, head: `er-${RIGHT[m[4]]}`, fromCard: LEFT[m[2]], toCard: RIGHT[m[4]],
       });

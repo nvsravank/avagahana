@@ -77,8 +77,8 @@ mindmap
   Mermaid's own mindmap does not have them, but the viewer and the checker accept them
   (see `map-viewer/test/fixtures/node-shapes.txt`). Brackets that are no Mermaid shape draw a plain
   node; the checker rejects them.
-- **Label**: plain text. `**bold**` is allowed (main branches are bold by convention),
-  `<br>` breaks a line. No other markup, no emoji, no links: a URL in a label is plain text.
+- **Label**: plain text. `**bold**` and `*italic*` are allowed (main branches are bold
+  by convention), `<br>` breaks a line. No other markup, no emoji, no links: a URL in a label is plain text.
   An underscore inside a word is just an underscore (`ORDER_SUPERVISION_TRIGGER`), so code
   names, constants and release ids need no escaping; `\_` and `\*` also keep the mark.
 - **Length**: at most 150 characters a line (between `<br>`s) and 1,000 in all. A longer
@@ -323,7 +323,13 @@ flowchart LR
   named in.
 - **Arrows**: Mermaid's (see `## Relations`), with a label as `-->|label|` or
   `-- label -->`; chains (`a --> b --> c`) and `&` (`a & b --> c`). They are the
-  map's default relation view.
+  map's default relation view. A label (here, in a state diagram, an ER relationship, a
+  sequence message and a view line) reads `**bold**` and `*italic*` as a node's label
+  does, and `<br>` breaks it; a line over 40 characters wraps at a space. Two lines are
+  drawn, and the gap (a message's row) makes room for them; past two, the second line
+  ends in `…`, hovering the label shows it whole, and the checker warns
+  (`arrow-label-lines`). Lists, pop-ups and reports give the label as one line of plain
+  words.
 - **Coloured lines**: give an arrow an id with Mermaid's `<from> <id>@--> <to>` and a
   class with `class <id> <name>` (Mermaid 11). A line class with a meaning (built in, or
   a line in `## Classes`) colours the line and its ends from the theme and is listed
@@ -613,7 +619,7 @@ The basket id and the delivery slot, with an idempotency key.
   the theme).
 - **Messages**: `->>` (a call), `-->>` (a reply), `->` and `-->` (no arrow head), `-x`
   and `--x` (a cross), `-)` and `--)` (async), `<<->>` and `<<-->>` (both ways); a label
-  after `:`. A dotted message is a reply. `+` / `-` activations, `activate`,
+  after `:` (bold, italic and two lines, as an arrow's label). A dotted message is a reply. `+` / `-` activations, `activate`,
   `deactivate`, `autonumber`, `title` and `destroy` are read and ignored.
 - **Numbers**: calls are numbered in order; a reply takes the number of the call it
   answers (the nearest earlier call the other way between the same two that no reply

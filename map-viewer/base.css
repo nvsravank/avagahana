@@ -145,6 +145,9 @@ marker.is-kind .mmv-flow-x { stroke: var(--n); stroke-opacity: 1; }
 .mmv[data-colour-by="changes"] marker:not(.is-plan) .mmv-flow-x { stroke: var(--mmv-muted); stroke-opacity: 0.55; }
 .mmv-flow-hit { fill: none; stroke: transparent; stroke-width: 14; pointer-events: stroke; cursor: pointer; }
 .mmv-flow-label { fill: var(--mmv-muted); stroke: var(--mmv-bg); stroke-width: 4; paint-order: stroke; }
+/* a label cut to two lines: hover shows it whole (WO-41) */
+.mmv-rels [data-label] { pointer-events: auto; cursor: default; }
+.mmv-label-line { margin: 0 0 4px; }
 
 /* edges: one solid path each, in the colour of the node they lead to, by branch or by level alike */
 .mmv-edge { fill: none; stroke: var(--n); }
