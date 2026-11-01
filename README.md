@@ -1,8 +1,10 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://sravannerella.com/avagahana/readme/see-the-whole-dark.png">
-    <img alt="A cloud architecture drawn by Avagahana: an operator calls an API gateway and a function, which hand jobs to a server inside a private network; a queue feeds three workers, and results go to analytics and an audit log." src="https://sravannerella.com/avagahana/readme/see-the-whole-light.png">
-  </picture>
+  <a href="https://www.youtube.com/watch?v=bNGapwE9Y4M">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://sravannerella.com/avagahana/readme/hero-video-dark.png">
+      <img alt="Watch the Avagahana launch video on YouTube. The still shows a cloud architecture drawn by Avagahana: an operator calls an API gateway and a function, which hand jobs to a server inside a private network; a queue feeds three workers, and results go to analytics and an audit log." src="https://sravannerella.com/avagahana/readme/hero-video-light.png">
+    </picture>
+  </a>
 </p>
 
 # Avagahana
@@ -12,6 +14,8 @@
 Your agent writes a map in plain Markdown. You read it as a diagram you can explore,
 at your own pace. Avagahana (Telugu: అవగాహన) means understanding.
 
+[Watch the video](https://www.youtube.com/watch?v=bNGapwE9Y4M) ·
+[Read the article](https://medium.com/@nvsravank/your-agent-knows-the-code-now-you-can-see-the-picture-28357fd11261) ·
 [Gallery](https://sravannerella.com/avagahana/gallery/) ·
 [Install](#install) ·
 [Map format](docs/map-format.md) ·
@@ -32,19 +36,19 @@ whole repository. A strict checker finds the mistakes in a map before you open i
 
 ## See the whole
 
-Begin with everything at once: a mind map for ideas, boxes for a system. Or read the
-same map as an outline, by keyboard or screen reader.
+Begin with the whole system, then open it one level at a time: its parts, then
+everything inside. Or read the same map as an outline, by keyboard or screen reader.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://sravannerella.com/avagahana/readme/see-the-whole-mind-map-dark.png">
-  <img alt="A mind map of a community garden, with branches for crops, budget, site, beds and people." src="https://sravannerella.com/avagahana/readme/see-the-whole-mind-map-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://sravannerella.com/avagahana/readme/see-the-whole-levels-dark.png">
+  <img alt="The same shop at three levels. First the system as one closed box between a customer and a card provider; then its parts: web app, API, orders service, payments and the orders database; then everything inside each of them." src="https://sravannerella.com/avagahana/readme/see-the-whole-levels-light.png">
 </picture>
 
 ## Go one level deeper
 
-Open a box to see what is inside, with the world around it still in view. Every part
-has a page of its own: what it connects to, the views it appears in, where it runs in
-each environment.
+Step into one box and the world around it stays in view, faded. Every part has a page
+of its own: what it connects to, the views it appears in, where it runs in each
+environment.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://sravannerella.com/avagahana/readme/go-one-level-deeper-dark.png">

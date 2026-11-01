@@ -106,7 +106,7 @@ them, `state` does not report them; another diagram clears `highlight` and `crop
 
 | Field | Meaning |
 |---|---|
-| `expand` | A whole number of levels shown below the top of the view (`0`: the top only; boxes deeper are closed), or `'all'`. |
+| `expand` | A whole number of levels shown below the top of the view (`0`: the top only; boxes deeper are closed), or `'all'`. A box diagram's top is not drawn, so there `0` is the same as `1`: the top-level boxes, closed (WO-39 follow-up; `0` drew nothing). |
 | `close` | Node ids (an array, or a comma-separated string) of boxes shown closed, after `expand`. |
 | `highlight` | Node ids kept in their colours, with what is inside them and the boxes round them; every other box, line and label takes the player's idle colours (`roles.idle`, `idleLine`, `muted`). `null` or `[]` ends it. Not while a sequence plays. |
 | `crop` | A node id: an export shows that box and what it is connected to (its arrows' other ends; in a mind map its parent and children) instead of the whole diagram. `null` ends it. The screen is not cropped. |

@@ -100,6 +100,19 @@ export async function testRender(check) {
     v.setState({ expand: 2 });
     const two = drawn().size;
     check('state expand: 1 < 2 < all levels', one > 1 && one < two && two < all, `${one} ${two} ${all}`);
+    {
+      // a box diagram: 0 never closes the top it is drawn in (that drew nothing), it is the same as 1
+      const el = document.body.appendChild(Object.assign(document.createElement('div'), { style: 'width:900px;height:600px;position:relative' }));
+      const b = mount(el, { storageKey: null, marks: false });
+      await b.load(await fetch('../../examples/maps/c4-shop.md').then((r) => r.text()), 'c4-shop.md');
+      const ids = () => [...el.querySelectorAll('[data-mmv=nodes] > [data-id]')].map((g) => g.dataset.id).sort().join();
+      b.setState({ expand: 1 });
+      const level1 = ids();
+      b.setState({ expand: 0 });
+      check('state expand 0 in a box diagram: the top-level boxes, closed, as 1', level1 !== '' && ids() === level1, `${ids()} vs ${level1}`);
+      b.destroy();
+      el.remove();
+    }
     v.setState({ expand: 'all', close: ['n2'] });
     check('state close: the box shows closed, the rest open', !drawn().has('n3') && drawn().has('n2') && drawn().size < all);
     v.setState({ expand: 'all', highlight: 'n2' });

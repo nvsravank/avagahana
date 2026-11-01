@@ -6,6 +6,13 @@ marked **Contract**.
 
 ## Unreleased
 
+- README: the hero opens the launch video on YouTube; links to the video and the article
+  (WO-39 follow-up).
+- README: See the whole shows one shop at three levels (the system, its parts, everything
+  inside) (WO-39 follow-up).
+- Fix: `expand: 0` (`render.py --expand 0`) drew nothing in a box diagram; its top is
+  never closed now, so 0 shows the top-level boxes closed, as 1 does (WO-39 follow-up).
+
 - README shows what Avagahana does: one section and one picture each, light and dark,
   the pictures on the website (made by its own script), install after (WO-39).
 - Example `cache-miss.md`: two sequences over one small view, a stampede and a single

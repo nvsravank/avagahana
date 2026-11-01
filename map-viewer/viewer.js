@@ -376,7 +376,10 @@ export function mount(element, options = {}) {
       if (depth != null) {
         const top = viewRoot();
         (function open(n) { S.collapsed.delete(n.id); n.children.forEach(open); })(top);
-        if (depth !== 'all') (function walk(n, d) { if (d >= depth && n.children.length) S.collapsed.add(n.id); n.children.forEach((c) => walk(c, d + 1)); })(top, 0);
+        // a box diagram's top is not drawn (the diagram, or the box drilled into): closed, nothing would
+        // show, so 0 keeps it open and shows the top-level boxes closed, as 1 does
+        const keep = diagram().boxes ? top : null;
+        if (depth !== 'all') (function walk(n, d) { if (d >= depth && n.children.length && n !== keep) S.collapsed.add(n.id); n.children.forEach((c) => walk(c, d + 1)); })(top, 0);
         relayout = true;
       }
     }
