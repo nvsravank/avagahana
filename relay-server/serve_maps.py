@@ -36,6 +36,9 @@ Serves, on 127.0.0.1 only:
   POST /api/shutdown    stop the server                               (not with --no-shutdown)
 The server depends on nothing inside atlas/ or map-viewer/: without them the API works.
 """
+from runtime import require_python
+require_python()
+
 import argparse
 import base64
 import hashlib
@@ -53,6 +56,8 @@ import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+import safe_files
+from theme_style import normalize_theme
 from urllib.parse import parse_qs, quote, unquote, urlencode, urlsplit
 
 VERSION = "0.1.0"
@@ -176,7 +181,7 @@ def _title(path: Path) -> str:
 
 def scan(maps_dir: Path) -> dict:
     maps, digest = [], hashlib.sha1()
-    for path in sorted(maps_dir.rglob("*")):
+    for path in sorted(maps_dir.rglob("*"), key=lambda p: p.relative_to(maps_dir).as_posix()):
         if not path.is_file() or path.suffix.lower() not in MAP_EXTENSIONS:
             continue
         if any(part.startswith(".") for part in path.relative_to(maps_dir).parts):
@@ -337,66 +342,80 @@ def render_fields(body: dict):
 def read_themes(maps_dir: Path) -> dict:
     """{themes, settings, problems}: each <id>.json as the viewer's theme object (its
     font files as /api/theme-file URLs), settings.json with its defaults filled in.
-    The viewer checks the themes; this only reads them and reports what it cannot read."""
-    folder = maps_dir / THEMES_DIR
+    Fields and styling are normalized here; the viewer also fills defaults and checks contrast."""
     problems, themes = [], []
     settings = {"builtIn": True, "default": None, "logo": True}
-    if not folder.is_dir():
-        return {"themes": [], "settings": settings, "problems": []}
-    raw = folder / "settings.json"
-    if raw.is_file():
-        try:
-            got = json.loads(raw.read_text(encoding="utf-8"))
-            if not isinstance(got, dict):
-                raise ValueError("not an object")
-            for key in ("builtIn", "logo"):
-                if isinstance(got.get(key), bool):
-                    settings[key] = got[key]
-            if isinstance(got.get("default"), str) and THEME_ID.match(got["default"]):
-                settings["default"] = got["default"]
-        except (OSError, ValueError) as exc:
-            problems.append({"level": "warning", "code": "themes-settings", "message": f".themes/settings.json could not be read ({exc}); defaults used."})
-    for path in sorted(folder.glob("*.json")):
-        if path.name == "settings.json":
-            continue
-        if not THEME_ID.match(path.stem):
-            problems.append({"level": "warning", "code": "theme-file-name", "message": f".themes/{path.name}: a theme file is named by its id (letters, digits, - and _)."})
-            continue
-        try:
-            obj = json.loads(path.read_text(encoding="utf-8"))
-            if not isinstance(obj, dict):
-                raise ValueError("not an object")
-        except (OSError, ValueError) as exc:
-            problems.append({"level": "error", "code": "theme-file", "message": f".themes/{path.name} could not be read ({exc})."})
-            continue
-        obj["id"] = path.stem
-        if "label" not in obj and isinstance(obj.get("name"), str):
-            obj["label"] = obj["name"]
-        font = obj.get("font")
-        if isinstance(font, dict):
-            faces = font.get("faces") if isinstance(font.get("faces"), list) else [{"file": font.get("file"), "weight": 400, "style": "normal"}]
-            ok = []
-            for face in faces:
-                name = face.get("file") if isinstance(face, dict) else None
-                if not isinstance(name, str) or "/" in name or "\\" in name or name.startswith(".") or Path(name).suffix.lower() not in FONT_TYPES or not (folder / name).is_file():
-                    problems.append({"level": "warning", "code": "theme-font-file", "message": f".themes/{path.name}: font file {name!r} is not a .woff2, .woff, .ttf or .otf file in .themes/."})
+    try:
+        with safe_files.directory(maps_dir, (THEMES_DIR,)) as directory:
+            names = sorted(safe_files.listdir(directory))
+            if "settings.json" in names:
+                try:
+                    got = json.loads(safe_files.read_at(directory, "settings.json"))
+                    if not isinstance(got, dict):
+                        raise ValueError("not an object")
+                    for key in ("builtIn", "logo"):
+                        if isinstance(got.get(key), bool):
+                            settings[key] = got[key]
+                    if isinstance(got.get("default"), str) and THEME_ID.fullmatch(got["default"]):
+                        settings["default"] = got["default"]
+                except (OSError, ValueError) as exc:
+                    problems.append({"level": "warning", "code": "themes-settings", "message": f"Theme settings could not be read ({exc}); defaults used."})
+            for name in names:
+                if not name.endswith(".json") or name == "settings.json":
                     continue
-                ok.append({"weight": face.get("weight", 400), "style": face.get("style", "normal"), "url": "api/theme-file?f=" + quote(name)})
-            obj["font"] = {"family": font.get("family") or path.stem, "faces": ok} if ok else None
-        themes.append(obj)
+                tid = name[:-5]
+                if not THEME_ID.fullmatch(tid):
+                    problems.append({"level": "warning", "code": "theme-file-name", "message": "A theme file is named by its id."})
+                    continue
+                try:
+                    obj = json.loads(safe_files.read_at(directory, name))
+                    if not isinstance(obj, dict):
+                        raise ValueError("not an object")
+                    obj["id"] = tid
+                    if isinstance(obj.get("font"), dict) and not isinstance(obj["font"].get("family"), str):
+                        obj["font"] = dict(obj["font"], family=tid)
+                    def warn(code, message):
+                        problems.append({"level": "warning", "code": code, "message": message, "where": tid})
+                    obj = normalize_theme(obj, warn)
+                    if "label" not in obj and isinstance(obj.get("name"), str):
+                        obj["label"] = obj["name"]
+                    font = obj.get("font")
+                    if isinstance(font, dict):
+                        faces = []
+                        for face in font.get("faces", []):
+                            filename = face.get("file")
+                            try:
+                                if not valid_font_name(filename):
+                                    raise OSError("invalid font filename")
+                                safe_files.read_at(directory, filename)
+                            except OSError:
+                                warn("theme-font-file", "A theme font must be a regular, unlinked font file in .themes/.")
+                                continue
+                            faces.append({"weight": face["weight"], "style": face["style"], "url": "api/theme-file?f=" + quote(filename)})
+                        obj["font"] = {"family": font["family"], "faces": faces} if faces else None
+                    themes.append(obj)
+                except (OSError, ValueError) as exc:
+                    problems.append({"level": "error", "code": "theme-file", "message": f"Theme {tid} could not be read ({exc})."})
+    except FileNotFoundError:
+        pass
+    except OSError as exc:
+        problems.append({"level": "error", "code": "theme-file", "message": f"Theme directory is unavailable or unsafe ({exc})."})
     return {"themes": themes, "settings": settings, "problems": problems}
 
 
+def valid_font_name(name):
+    return (isinstance(name, str) and bool(name) and not any(c in name for c in ("/", "\\", "\x00"))
+            and not name.startswith(".") and Path(name).suffix.lower() in FONT_TYPES)
+
+
 def theme_file(maps_dir: Path, name: str):
-    """A font file in .themes/, or None."""
-    if not name or "/" in name or "\\" in name or "\x00" in name or name.startswith(".") or Path(name).suffix.lower() not in FONT_TYPES:
+    """Read an unlinked theme font using the same policy as snapshot packing."""
+    if not valid_font_name(name):
         return None
-    full = (maps_dir / THEMES_DIR / name).resolve()
     try:
-        full.relative_to((maps_dir / THEMES_DIR).resolve())
-    except ValueError:
+        return safe_files.read(maps_dir, THEMES_DIR + "/" + name)
+    except OSError:
         return None
-    return full if full.is_file() else None
 
 
 # ---------- renders: a request from the agent, answered by one open page ----------
@@ -620,10 +639,11 @@ def make_handler(relay: Relay):
             if path == "/api/themes":
                 return self.send_json(200, read_themes(relay.maps_dir))
             if path == "/api/theme-file":
-                full = theme_file(relay.maps_dir, (parse_qs(query).get("f") or [""])[0])
-                if not full:
+                name = (parse_qs(query).get("f") or [""])[0]
+                data = theme_file(relay.maps_dir, name)
+                if data is None:
                     return self.not_found()
-                return self.send_payload(200, full.read_bytes(), FONT_TYPES[full.suffix.lower()])
+                return self.send_payload(200, data, FONT_TYPES[Path(name).suffix.lower()])
             if path.startswith("/api/"):
                 return self.not_found()
             if path.startswith("/map-viewer/"):
@@ -775,14 +795,19 @@ def make_handler(relay: Relay):
             return self.send_json(200 if opened else 500, {"opened": bool(opened)})
 
         def _static(self, base, rel: str):
+            rel = rel.rstrip('/') or 'index.html'
             if base is None or not base.is_dir():
                 return self.not_found()
-            full = safe_join(base, rel)
-            if full and full.is_dir():
-                full = full / "index.html"
-            if not full or not full.is_file() or full.suffix.lower() not in STATIC_TYPES:
+            # Keep hidden-file/path guards, then open the final file/index via no-follow fds.
+            if not safe_join(base, rel):
                 return self.not_found()
-            self.send_payload(200, full.read_bytes(), STATIC_TYPES[full.suffix.lower()])
+            try:
+                data, suffix = safe_files.asset(base, rel)
+                if suffix not in STATIC_TYPES:
+                    return self.not_found()
+            except OSError:
+                return self.not_found()
+            self.send_payload(200, data, STATIC_TYPES[suffix])
 
     return Handler
 
@@ -796,6 +821,8 @@ class Server(ThreadingHTTPServer):
 
 def build_server(relay: Relay) -> Server:
     """A bound, not yet serving server for this relay (tests use it directly)."""
+    if not safe_files.supported():
+        raise OSError("Safe relay file access is unavailable on this operating system.")
     return Server(("127.0.0.1", relay.port), make_handler(relay))
 
 

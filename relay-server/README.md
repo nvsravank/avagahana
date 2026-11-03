@@ -6,6 +6,11 @@ The optional, read-only local server: the bridge from an agent to the viewer. Py
 at a node, and lets the agent ask the open page for a picture of a map (SVG or PNG, for
 a document). The maps folder's own themes live in its `.themes/`. Contract: [`docs/relay-server-api.md`](../docs/relay-server-api.md).
 
+Python 3.9 and 3.15 are tested. No venv or package installation. The relay retains
+its `127.0.0.1` binding for local single-user traffic. File operations use no-follow directory descriptors on macOS/Linux and native
+relative file handles on Windows, including junction/reparse-point checks. See [local operation](../docs/security.md) and
+[targeted theme styling](../docs/theme-styling.md).
+
 ```bash
 python3 relay-server/serve_maps.py --maps-dir <folder>         # start, or reuse a running one
 python3 relay-server/show.py "Topic/Map.md" --node n12          # look here

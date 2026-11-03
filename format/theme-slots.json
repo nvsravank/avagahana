@@ -7,7 +7,7 @@
     {"slot": "description", "kind": "text", "use": ".themes/ only: what the theme is for, so an agent can choose (themes.py list)"},
     {"slot": "font", "kind": "font", "use": "{family, faces: [{weight, style, data}]}; in .themes/ each face's data is a file beside the theme ({family, faces: [{weight, style, file}]} or {family, file}). Needed: 400, 600, 700, each plain and italic; a missing weight borrows the nearest"},
     {"slot": "appearances", "kind": "appearances", "required": true, "use": "light and/or dark: at least one"},
-    {"slot": "css", "kind": "css", "use": "extra CSS for the theme's classes (map-viewer-api.md lists them)"}
+    {"slot": "css", "kind": "css", "use": "targeted CSS through defined class hooks; selectors/properties in docs/theme-styling.md"}
   ],
   "appearance": [
     {"slot": "bg", "kind": "colour", "required": true, "use": "the drawing's background; every contrast is checked against it"},
@@ -50,10 +50,22 @@
     {"slot": "icons.green", "kind": "colour", "use": "icon swatch green"},
     {"slot": "icons.blue", "kind": "colour", "use": "icon swatch blue"},
     {"slot": "icons.purple", "kind": "colour", "use": "icon swatch purple"},
-    {"slot": "icons.grey", "kind": "colour", "use": "icon swatch grey"}
+    {"slot": "icons.grey", "kind": "colour", "use": "icon swatch grey"},
+    {"slot": "style.boxRadius", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 40. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.panelRadius", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 40. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.buttonRadius", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 40. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.lineWidth", "kind": "number", "quiet": true, "use": "Optional appearance control; 0.25 to 12. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.emphasisWidth", "kind": "number", "quiet": true, "use": "Optional appearance control; 0.25 to 20. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.dashLength", "kind": "number", "quiet": true, "use": "Optional appearance control; 1 to 40. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.dashGap", "kind": "number", "quiet": true, "use": "Optional appearance control; 1 to 40. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.panelAlpha", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 1. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.tableAlpha", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 1. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.zebraAlpha", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 1. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.tableHeaderAlpha", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 1. See docs/theme-styling.md; omitted preserves the current look."},
+    {"slot": "style.stripeAlpha", "kind": "number", "quiet": true, "use": "Optional appearance control; 0 to 1. See docs/theme-styling.md; omitted preserves the current look."}
   ],
   "checks": {
-    "both": ["theme-not-object", "theme-id", "theme-appearance", "theme-category", "theme-appearances", "contrast-text", "contrast-palette", "contrast-ink", "contrast-frame", "theme-filled", "theme-lines-gone", "font-shape"],
+    "both": ["theme-not-object", "theme-id", "theme-appearance", "theme-category", "theme-appearances", "contrast-text", "contrast-palette", "contrast-ink", "contrast-frame", "theme-filled", "theme-lines-gone", "font-shape", "theme-css", "theme-shadow", "theme-control"],
     "checker": ["contrast-colour-blind", "theme-font-file", "theme-description"],
     "about": "both: the viewer (themes/theme.js checkTheme) and themes.py check report them alike, held in step by format/theme-samples/. checker: themes.py only (colour blindness, a .themes/ font file, a missing description)."
   }

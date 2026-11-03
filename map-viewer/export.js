@@ -10,13 +10,13 @@ import { collectFacts, layoutReport } from './report.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
 const STYLE_PROPS = {
-  all: ['fill', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'opacity', 'color', 'paint-order'],
-  text: ['font-family', 'font-size', 'font-weight', 'font-style'],
+  all: ['fill', 'stroke', 'stroke-width', 'stroke-opacity', 'fill-opacity', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'opacity', 'color', 'paint-order', 'rx', 'ry'],
+  text: ['font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing'],
 };
 
 // values that are the SVG default: left out to keep the file small
 const DEFAULTS = {
-  stroke: 'none', 'stroke-width': '1px', 'stroke-opacity': '1', 'stroke-dasharray': 'none', 'stroke-linecap': 'butt',
+  'fill-opacity': '1', stroke: 'none', 'stroke-width': '1px', 'stroke-opacity': '1', 'stroke-dasharray': 'none', 'stroke-linecap': 'butt',
   'stroke-linejoin': 'miter', opacity: '1', 'paint-order': 'normal', 'font-style': 'normal',
 };
 // color(srgb r g b / a), from color-mix(), as rgba() that every SVG editor reads
@@ -111,8 +111,9 @@ export function createExporter(v) {
     expandMarkers(out);
     const real = registered(S.themeId)?.font?.family;
     const internal = familyName(S.themeId);
-    const family = real ? `'${real}'` : 'sans-serif';
-    for (const s of out.querySelectorAll('style')) if (real) s.textContent = s.textContent.split(`font-family:"${internal}"`).join(`font-family:"${real}"`);
+    const cssString = (text) => '"' + [...text].map((c) => /[a-zA-Z0-9 _-]/.test(c) ? c : `\\${c.codePointAt(0).toString(16)} `).join('') + '"';
+    const family = real ? cssString(real) : 'sans-serif';
+    for (const s of out.querySelectorAll('style')) if (real) s.textContent = s.textContent.split(`font-family:"${internal}"`).join(`font-family:${family}`);
     for (const el of [out, ...out.querySelectorAll('*')]) {
       for (const a of [...el.attributes]) if (a.name === 'role' || a.name.startsWith('aria-') || (a.name.startsWith('data-') && a.name !== 'data-id')) el.removeAttribute(a.name);
       const st = el.getAttribute('style');
@@ -421,27 +422,44 @@ export function createExporter(v) {
     root.appendChild(frame);
     const doc = frame.contentDocument;
     const fontCss = await embeddedFontCss(S.themeId);
-    let body;
-    let head = `<style>@page{margin:12mm}html,body{margin:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}${fontCss}</style>`;
+    const style = (text) => {
+      const element = doc.createElement('style');
+      element.textContent = text;
+      doc.head.appendChild(element);
+    };
+    const meta = doc.createElement('meta');
+    meta.setAttribute('charset', 'utf-8');
+    doc.head.appendChild(meta);
+    style(`@page{margin:12mm}html,body{margin:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}${fontCss}`);
+    let stylesReady = Promise.resolve();
     if (S.mode !== 'list') {
-      const text = new XMLSerializer().serializeToString((await buildDrawn()).svg);
-      body = `<img src="${dataUrl(text)}" style="display:block;max-width:100%;max-height:95vh;margin:0 auto">`;
+      const img = doc.createElement('img');
+      img.src = dataUrl(new XMLSerializer().serializeToString((await buildDrawn()).svg));
+      Object.assign(img.style, { display: 'block', maxWidth: '100%', maxHeight: '95vh', margin: '0 auto' });
+      doc.body.appendChild(img);
     } else {
-      const themeCss = [...document.querySelectorAll('style[data-mmv-theme], style[data-mmv-fallback]')].map((s) => s.textContent).join('\n');
       const base = document.querySelector('style[data-mmv-base]');
-      head += `${base ? `<style>${base.textContent}</style>` : `<link rel="stylesheet" href="${new URL('base.css', import.meta.url)}">`}<style>${themeCss}</style>`;
-      const a = root.dataset;
-      body = `<div class="mmv mmv-printing" data-theme="${a.theme}" data-appearance="${a.appearance}" data-colour-by="${a.colourBy}" data-look="${a.look}"><div class="mmv-list">${$.list.innerHTML}</div></div>`;
+      if (base) style(base.textContent);
+      else {
+        const link = doc.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = new URL('base.css', import.meta.url).href;
+        stylesReady = new Promise((res) => {
+          link.addEventListener('load', res, { once: true });
+          link.addEventListener('error', res, { once: true });
+        });
+        doc.head.appendChild(link);
+      }
+      for (const theme of document.querySelectorAll('style[data-mmv-theme], style[data-mmv-fallback]')) style(theme.textContent);
+      const mount = doc.createElement('div');
+      mount.className = 'mmv mmv-printing';
+      for (const key of ['theme', 'appearance', 'colourBy', 'look', 'diagram', 'boxes']) {
+        if (root.dataset[key] != null) mount.dataset[key] = root.dataset[key];
+      }
+      mount.appendChild(doc.importNode($.list, true));
+      doc.body.appendChild(mount);
     }
-    doc.open();
-    doc.write(`<!doctype html><html><head><meta charset="utf-8">${head}</head><body>${body}</body></html>`);
-    doc.close();
-    await new Promise((res) => {
-      const link = doc.querySelector('link');
-      if (!link) { res(); return; }
-      link.addEventListener('load', res);
-      link.addEventListener('error', res);
-    });
+    await stylesReady;
     await Promise.all([...doc.images].map((im) => im.decode().catch(() => {})));
     await doc.fonts?.ready;
     const win = frame.contentWindow;

@@ -1,8 +1,9 @@
 # format
 
 The map format and its checker. Spec: [`docs/map-format.md`](../docs/map-format.md).
-Stands alone (Python 3.9+, standard library; reads `map-viewer/icons.json` and the
-bundled Phosphor names).
+Runs without a server or browser (Python 3.9+, standard library). Keep the bundled
+`map-viewer/` icon catalogs and assets alongside it: distributing `format/` alone
+is not sufficient.
 
 ```
 python3 format/check_map.py <map.md> [<map.md> ...]
@@ -39,3 +40,7 @@ share (`checks.both`) or only the tool makes (`checks.checker`). `theme-samples/
 one sample theme per shared problem (and clean ones); each names the codes it expects.
 `scripts/check_samples.py` holds `themes.py` to them and the browser tests hold the
 viewer.
+
+`style-samples.json` tests the targeted CSS, colour and shadow grammars in Python
+and JavaScript. The shared policy is `map-viewer/themes/style-policy.js`, a
+JSON-compatible module Python reads as data. Full rules: [Theme styling](../docs/theme-styling.md).

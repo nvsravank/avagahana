@@ -23,6 +23,10 @@ import { renderNoteBody } from '../notes.js';
 const results = [];
 const check = (name, ok, detail = '') => results.push({ name, ok: !!ok, detail: ok ? '' : String(detail) });
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const waitFor = async (test, limit = 5000) => {
+  const end = performance.now() + limit;
+  while (!test() && performance.now() < end) await wait(25);
+};
 const SAMPLE = await fetch('../../examples/maps/garden.md').then((r) => r.text());
 const startHref = location.href;
 const styleCount = () => document.querySelectorAll('style[data-mmv-theme]').length;
@@ -654,7 +658,11 @@ try {
     }
     fv.setState({ page: null });
     fv.setState({ page: 'ord' });
-    await wait(300);   // the thumbnails load
+    await waitFor(() => {
+      const page = [...document.querySelectorAll('#a .mmv-page')].at(-1);
+      const thumbnails = [...page.querySelectorAll('.mmv-aspect:not(.mmv-runs .mmv-aspect)')];
+      return thumbnails.length === 3 && thumbnails.every((b) => b.querySelector('.mmv.is-spot'));
+    });   // wait for the actual thumbnail state, including on slower Windows runners
     const cards = [...[...document.querySelectorAll('#a .mmv-page')].at(-1).querySelectorAll('.mmv-aspect:not(.mmv-runs .mmv-aspect)')];
     const said = cards.map((b) => `${b.querySelector('.mmv-page-cap').textContent}${b.classList.contains('is-on') ? '*' : ''}`).join();
     const marked = cards.every((b) => b.querySelector('.mmv.is-spot'));
@@ -1124,7 +1132,7 @@ try {
 
   // ---- changes since you looked (WO-13 part B) ----
   {
-    const shopText = await fetch('../../examples/maps/c4-shop.md').then((r) => r.text());
+    const shopText = (await fetch('../../examples/maps/c4-shop.md').then((r) => r.text())).replace(/\r\n?/g, '\n');
     const edited = shopText.replace('fraud["Fraud check"]', 'risk["Risk score"]').replace('payh --> fraud', 'payh --> risk')
       .replace('stock["Stock check"]', 'stock["Stock lookup"]').replace('    queue[["Event queue"]]\n', '    queue[["Event queue"]]\n    cache[("Cache")]\n').replace('  stock --> db\n', '  stock --> db\n  stock --> cache\n');
     localStorage.removeItem('avagahana-test-seen-seen');

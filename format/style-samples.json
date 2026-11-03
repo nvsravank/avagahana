@@ -1,0 +1,225 @@
+{
+  "css": [
+    {
+      "input": ".mmv-node > .mmv-shape { rx: 8px; stroke-width: 2px; fill-opacity: 0.25; }",
+      "output": ".mmv-node > .mmv-shape{rx:8px;stroke-width:2px;fill-opacity:0.25}",
+      "codes": []
+    },
+    {
+      "input": ".mmv[data-appearance=\"dark\"] .mmv-flow.is-dotted {stroke:rgba(0, 0, 0, .5);stroke-dasharray:5 4}",
+      "output": ".mmv[data-appearance=\"dark\"] .mmv-flow.is-dotted{stroke:rgba(0, 0, 0, .5);stroke-dasharray:5 4}",
+      "codes": []
+    },
+    {
+      "input": ".mmv-panel {border-radius:4px;position:fixed;color:red}",
+      "output": ".mmv-panel{border-radius:4px;color:red}",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": "body{color:red}.mmv-flow{stroke:blue}",
+      "output": ".mmv-flow{stroke:blue}",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv + .mmv-panel{color:red}",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-node:has(.mmv-label){fill:red}",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-label::before{content:\"x\"}",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-flow{stroke:url(https://example.invalid/x);stroke-width:3}",
+      "output": ".mmv-flow{stroke-width:3}",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-panel{color:var(--other);opacity:2;--other:red}",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": "@import \"https://example.invalid\";",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv{color:red}</style><script>parent.payload=1</script>",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-flow{stroke:red;stroke-width:2px!important}",
+      "output": ".mmv-flow{stroke:red}",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-flow{/* comment */stroke:red}",
+      "output": ".mmv-flow{stroke:red}",
+      "codes": []
+    },
+    {
+      "input": ".mmv-flow{stroke:red}/*",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-flow{stroke:red}.mmv-node{",
+      "output": "",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv[data-look=\"poster\"],.mmv-flow{stroke-linecap:round}",
+      "output": ".mmv[data-look=\"poster\"],.mmv-flow{stroke-linecap:round}",
+      "codes": []
+    },
+    {
+      "input": ".mmv-panel{font-size:16px;font-weight:600}",
+      "output": ".mmv-panel{font-size:16px;font-weight:600}",
+      "codes": []
+    },
+    {
+      "input": ".mmv-label{font-size:24px;fill:red}",
+      "output": ".mmv-label{fill:red}",
+      "codes": [
+        "theme-css"
+      ]
+    },
+    {
+      "input": ".mmv-shape{rx:8}",
+      "output": ".mmv-shape{rx:8px}",
+      "codes": []
+    }
+  ],
+  "colours": [
+    [
+      "#fff",
+      true
+    ],
+    [
+      "#ffffff80",
+      true
+    ],
+    [
+      "transparent",
+      true
+    ],
+    [
+      "rgba(1,2,3,.5)",
+      true
+    ],
+    [
+      "color-mix(in srgb, #fff 88%, transparent)",
+      true
+    ],
+    [
+      "color-mix(in srgb, color-mix(in srgb, #fff 10%, #000) 80%, transparent)",
+      true
+    ],
+    [
+      "red;position:fixed",
+      false
+    ],
+    [
+      "rgb(1 2 3);background:url(x)",
+      false
+    ],
+    [
+      "url(x)",
+      false
+    ],
+    [
+      "var(--x)",
+      false
+    ],
+    [
+      "rgb(1 2 3/**/)",
+      false
+    ],
+    [
+      "color-mix(in srgb,red 101%,blue)",
+      false
+    ],
+    [
+      "rgb(1 2 3 4)",
+      false
+    ],
+    [
+      "rgb(1,,2,3)",
+      false
+    ],
+    [
+      "hsl(10deg 50% 50% / .5)",
+      true
+    ],
+    [
+      "color(display-p3 1 0 0 / .5)",
+      true
+    ],
+    [
+      "rgb(1 2 3 / 9)",
+      false
+    ]
+  ],
+  "shadows": [
+    [
+      "none",
+      true
+    ],
+    [
+      "0 2px 10px rgba(16, 24, 40, 0.10)",
+      true
+    ],
+    [
+      "0 2px 12px rgba(0,0,0,.35)",
+      true
+    ],
+    [
+      "0 0 1px red; color:red",
+      false
+    ],
+    [
+      "0 0 2px url(x)",
+      false
+    ],
+    [
+      "0 0 -2px red",
+      false
+    ],
+    [
+      "0 0 1px red,0 0 2px blue",
+      false
+    ]
+  ]
+}

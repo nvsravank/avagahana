@@ -320,8 +320,19 @@ try {
   check('bar: a tap opens the popup and goes nowhere; the diagram itself is its first perspective', !pop.hidden && picks.length === n && show(col('atlas-grp-label')) === show(['Perspectives', 'Joins', 'Scenarios']) && show(col('atlas-entry')) === show(['Overview']), show([col('atlas-grp-label'), col('atlas-entry')]));
   barEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   check('bar: Escape closes it', pop.hidden);
-  mouse(item('Orders'));
-  check('bar: a mouse click opens the diagram (its popup is the hover\'s)', show(picks.at(-1)) === show({ seq: null, part: 'orders', view: null }) && pop.hidden, show(picks.at(-1)));
+  // Exercise both input capabilities explicitly. Headless Windows/Linux can
+  // report hover:none even when we dispatch a synthetic mouse PointerEvent.
+  const originalMedia = window.matchMedia;
+  try {
+    window.matchMedia = (q) => q === '(hover: none)' ? { matches: false } : originalMedia.call(window, q);
+    mouse(item('Orders'));
+    check('bar: a mouse click on a hover device opens the diagram', show(picks.at(-1)) === show({ seq: null, part: 'orders', view: null }) && pop.hidden, show(picks.at(-1)));
+    const beforeNonHover = picks.length;
+    window.matchMedia = (q) => q === '(hover: none)' ? { matches: true } : originalMedia.call(window, q);
+    mouse(item('Orders'));
+    check('bar: a mouse-reported tap on a non-hover device opens its popup', !pop.hidden && picks.length === beforeNonHover);
+    barEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  } finally { window.matchMedia = originalMedia; }
   mouse(item('Checkout'));
   check('bar: an item with nothing under it opens at once', show(picks.at(-1)) === show({ seq: 'checkout', step: 1 }));
   check('bar: no scroll bar; more beyond the edge shows an arrow', getComputedStyle(barEl.querySelector('.atlas-scroll')).overflowX === 'auto' && !barEl.querySelector('.atlas-arrow.is-right').hidden && barEl.querySelector('.atlas-arrow.is-left').hidden);

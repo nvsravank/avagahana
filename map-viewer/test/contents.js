@@ -8,7 +8,7 @@ import defaultTheme from '../themes/default/theme.js';
 const anchorOf = (h) => h.toLowerCase().trim().replace(/[^\w\- ]/g, '').replace(/ /g, '-');
 const RESERVED = /^(relations|perspective|joins|classes|details|notes|icons|node icons|scenario|deployment|plays over)\b/i;
 function galleryJumps(text) {
-  const lines = text.split('\n');
+  const lines = text.replace(/\r\n?/g, '\n').split('\n');
   const title = (lines.find((l) => /^# /.test(l)) || '# Map').slice(2).trim();
   const first = lines.findIndex((l) => l.startsWith('```mermaid'));
   const kind = (i) => (lines[i + 1] || '').trim().split(/\s/)[0];

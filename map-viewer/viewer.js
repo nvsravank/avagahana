@@ -1297,12 +1297,12 @@ export function mount(element, options = {}) {
   const onMedia = () => { if (S.appearance === 'auto') applyChrome(); };
   media.addEventListener('change', onMedia);
 
-  function addTheme(obj) {
+  function addTheme(obj, builtIn = false) {
     const r = checkTheme(obj);
     problems.add('theme', r.problems);
     if (!r.ok) return { ok: false, problems: r.problems };
     themes.set(r.theme.id, r.theme);
-    themeSources.set(r.theme.id, obj);   // as given: what a snapshot carries
+    themeSources.set(r.theme.id, builtIn ? obj : r.theme.source);   // only allowlisted source data
     if (ready.done) buildThemePanel();
     return { ok: true, problems: r.problems };
   }
@@ -2454,14 +2454,14 @@ export function mount(element, options = {}) {
       }
     };
     const builtIn = options.defaultTheme !== false ? await loadBuiltIn() : null;
-    if (builtIn) addTheme(builtIn);
+    if (builtIn) addTheme(builtIn, true);
     for (const t of options.themes || []) addTheme(t);
     // the built-in turned off, and no theme of the host's usable: the built-in after all
     if (!themes.size && options.defaultTheme === false) {
       const t = await loadBuiltIn();
       if (t) {
         problems.add('theme', [{ level: 'warning', code: 'theme-built-in-used', message: 'The built-in theme was turned off, but no other theme could be used; using the built-in theme.' }]);
-        addTheme(t);
+        addTheme(t, true);
       }
     }
     // a theme asked for by id that is not here: the first one, and say so

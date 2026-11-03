@@ -31,6 +31,9 @@ Finds the relay server serving the maps folder and sends POST /api/render. Print
   STATUS=not_running          no relay server for this folder: start serve_maps.py
   STATUS=failed ERROR=...     e.g. no such map, a bad flag, or the page could not draw it
 """
+from runtime import require_python
+require_python()
+
 import argparse
 import base64
 import json

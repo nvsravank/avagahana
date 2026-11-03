@@ -104,3 +104,9 @@ The atlas reads them from the relay (`GET /api/themes`, font files from
 with them. One theme and `builtIn: false` hides the theme picker; `builtIn: false`
 with no usable theme uses the built-in after all, with a warning (from the viewer and
 `themes.py check`). Slots: `format/theme-slots.json`; tool: `relay-server/themes.py`.
+
+Themes use [defined styling hooks](theme-styling.md); CSS is parsed and regenerated
+within the theme root. Unknown fields are not retained for snapshots. Relay theme
+files/fonts must be unlinked files within the selected maps root, and theme generation
+refuses linked destinations. The browser folder source normalizes themes through
+the same viewer checks; filesystem access remains governed by browser permissions.

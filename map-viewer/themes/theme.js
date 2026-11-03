@@ -1,3 +1,4 @@
+import { isColour, isShadow, parseCss, writeCss, controls, safeSource, finiteBetween } from './safe-style.js';
 // theme.js — themes are plain objects the host hands over (colours as values,
 // the font as bytes). This module checks them, turns them into CSS variables in
 // one <style> per theme (shared by every viewer in the document) and loads the
@@ -62,7 +63,7 @@ export function contrast(a, b) {
   if (la == null || lb == null) return null;
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
-const isColour = (c) => typeof c === 'string' && c.trim() !== '' && (typeof CSS === 'undefined' || CSS.supports('color', c));
+
 
 // ---------- checking ----------
 // Returns {ok, theme (normalised), problems}. Unusable: not ok. Flaws: warnings
@@ -85,11 +86,12 @@ export function checkTheme(input) {
   }
   if (!Object.keys(apps).length && !problems.length) err('theme-appearances', 'A theme needs a light or a dark appearance.');
   const font = checkFont(input.font, warn);
+  const css = writeCss(parseCss(input.css, warn));
   if (problems.some((p) => p.level === 'error')) return { ok: false, problems };
   return {
     ok: true,
     problems,
-    theme: { id, label: typeof input.label === 'string' ? input.label : id, appearances: apps, font, css: typeof input.css === 'string' ? input.css : '', source: input },
+    theme: { id, label: typeof input.label === 'string' ? input.label : id, appearances: apps, font, css, source: safeSource(input) },
   };
 }
 
@@ -128,7 +130,9 @@ function fillAppearance(name, src, warn) {
   const ch = src.chrome || {};
   const ro = src.roles || {};
   const icons = src.icons || {};
+  if (ch.shadow != null && !isShadow(ch.shadow)) warn('theme-shadow', 'Invalid panel shadow; using the default.');
   const app = {
+    style: controls(src.style, warn),
     bg,
     ink,
     muted: pick(src.muted, mix(ink, 65, bg), 'muted'),
@@ -142,7 +146,7 @@ function fillAppearance(name, src, warn) {
       hover: pick(ch.hover, mix(ink, 7, bg), 'chrome.hover'),
       active: pick(ch.active, ink, 'chrome.active'),
       activeInk: pick(ch.activeInk, bg, 'chrome.activeInk'),
-      shadow: typeof ch.shadow === 'string' ? ch.shadow : (dark ? '0 2px 12px rgba(0,0,0,.35)' : '0 2px 10px rgba(16,24,40,.10)'),
+      shadow: isShadow(ch.shadow) ? ch.shadow : (dark ? '0 2px 12px rgba(0,0,0,.35)' : '0 2px 10px rgba(16,24,40,.10)'),
     },
     icons: Object.fromEntries(SWATCHES.map((k) => [k, pick(icons[k], sw[k], `icons.${k}`)])),
   };
@@ -194,7 +198,7 @@ function checkFont(font, warn) {
     return null;
   }
   const faces = font.faces.filter((f) => f && f.data != null).map((f) => ({
-    weight: Number(f.weight) || 400,
+    weight: finiteBetween(f.weight, 1, 1000) ? f.weight : 400,
     style: f.style === 'italic' ? 'italic' : 'normal',
     data: f.data,
   }));
@@ -228,6 +232,26 @@ function themeCss(t) {
     app.level.forEach((c, i) => { v[`lvl-${i + 1}`] = c.fill; v[`lvl-${i + 1}-ink`] = c.ink; });
     const at = `${sel(t.id)}[data-appearance="${a}"]`;
     out.push(`${at}{color-scheme:${a};${Object.entries(v).map(([k, x]) => `--mmv-${k}:${x}`).join(';')}}`);
+    const st = app.style || {};
+    const declarations = (pairs) => pairs.filter(([, v]) => v != null).map(([k, v]) => `${k}:${v}`).join(';');
+    const rule = (target, pairs) => {
+      const d = declarations(pairs);
+      const space = target.indexOf(' ');
+      const prefix = space < 0 ? target : target.slice(0, space);
+      const descendant = space < 0 ? '' : target.slice(space).trim();
+      if (d) out.push(`${at}${prefix}${descendant ? ` :where(${descendant})` : ''}{${d}}`);
+    };
+    if (st.boxRadius != null) rule(' :is(.mmv-node:not(.mmv-er-group),.mmv-frame:not(.is-region)) > .mmv-shape:not(.is-solid):not(.is-mark)', [['rx', `${st.boxRadius}px`], ['ry', `${st.boxRadius}px`]]);
+    if (st.panelRadius != null) rule(' :is(.mmv-panel,.mmv-note,.mmv-page)', [['border-radius', `${st.panelRadius}px`]]);
+    if (st.buttonRadius != null) rule(' :is(.mmv-pill,.mmv-seg button,.mmv-icon-btn)', [['border-radius', `${st.buttonRadius}px`]]);
+    if (st.lineWidth != null) rule(' :is(.mmv-flow:not(.is-thick):not(.is-now):not(.mmv-pa):not(.mmv-pc):not(.mmv-pr),.mmv-edge,.mmv-rel)', [['stroke-width', st.lineWidth]]);
+    if (st.emphasisWidth != null) rule(' :is(.mmv-flow.is-thick,.mmv-seq-msg.is-now)', [['stroke-width', st.emphasisWidth]]);
+    if (st.dashLength != null || st.dashGap != null) rule(' :is(.mmv-flow.is-dotted,.mmv-rel)', [['stroke-dasharray', `${st.dashLength ?? 5} ${st.dashGap ?? 4}`]]);
+    if (st.panelAlpha != null) out.push(`${at}{--mmv-chrome-bg:rgb(from ${app.chrome.bg} r g b / ${st.panelAlpha})}`);
+    if (st.tableAlpha != null) rule('[data-diagram="er"][data-look="outline"] .mmv-table > .mmv-table-body', [['fill', `color-mix(in srgb,color-mix(in srgb,var(--n) 22%,var(--mmv-bg)) ${st.tableAlpha * 100}%,transparent)`]]);
+    if (st.zebraAlpha != null) rule('[data-diagram="er"][data-look="fade"] .mmv-table > .mmv-table-body', [['fill', `color-mix(in srgb,var(--mmv-bg) ${st.zebraAlpha * 100}%,transparent)`]]);
+    if (st.tableHeaderAlpha != null) rule(' .mmv-table-head', [['fill', `color-mix(in srgb,var(--n) ${st.tableHeaderAlpha * 100}%,transparent)`]]);
+    if (st.stripeAlpha != null) rule('[data-diagram="er"][data-look="fade"] .mmv-table-row', [['fill', `color-mix(in srgb,var(--n) ${st.stripeAlpha * 100}%,transparent)`]]);
     // which palette colour each element takes, for the viewer's "colour by" choice:
     // by category (class mmv-k<n>, 0 = the centre) or by level (class mmv-l<n>)
     const nc = app.category.length;
@@ -259,7 +283,7 @@ function themeCss(t) {
   const fallback = `var(--mmv-font-fallback, ${FALLBACK_FONT})`;
   const family = t.font ? `"${familyName(t.id)}", ${fallback}` : fallback;
   out.push(`${sel(t.id)}{--mmv-font:${family}}`);
-  if (t.css) out.push(t.css);
+  if (t.css) out.push(writeCss(parseCss(t.css), sel(t.id)));
   return out.join('\n');
 }
 

@@ -420,7 +420,7 @@ loads the font with the `FontFace` API.
     },
     dark: { … },
   },
-  css: '',   // optional extra rules, using the class names below
+  css: '',   // optional targeted CSS: defined selectors/properties, checked and scoped
 }
 ```
 
@@ -493,7 +493,12 @@ Gives a host's own element the same theme variables and font (`--mmv-bg`, `--mmv
 interface matches the viewer. `theme` is an object, or
 the id of a theme a viewer has registered. Returns `{ok, problems, release()}`.
 
-### Classes a theme's `css` can use
+### Classes a theme's targeted `css` can use
+
+CSS is parsed, validated and regenerated beneath the current theme root. The exact
+selector/property subset, numeric appearance controls and rejection behaviour are
+defined in [Theme styling](theme-styling.md). These class names are hooks, not
+permission to supply arbitrary CSS.
 
 Root: `.mmv` (`is-narrow` while the toolbar leaves out Export, Search and a `'wide'` view picker: under 480 px, or the top row does not fit; a host may style its own slot button by it) with `data-theme`, `data-appearance`, `data-colour-by`, `data-look` (how the look draws: `fade` or `outline` for a mind map and ER, `fade` for a flowchart's Outline and for state diagrams and sequences, `poster`), `data-diagram` (`mindmap`, `flowchart`, `sequence`, `state` or `er`), `data-boxes` (a box diagram: flowchart, state, er). Drawing: `mmv-node`, `mmv-shape` (`is-solid`, `is-mark`: a state diagram's dots, bar and choice), `mmv-divider` (a state's description rule), `mmv-warn` (a state's path warning), `mmv-table` with `mmv-table-head`, `mmv-table-row`, `mmv-table-more`, `mmv-key`, `mmv-grain` (an ER table), `mmv-er-line` (`is-lit`; `is-lifted` to a closed group), `mmv-er-end` (crow's-foot marks), `mmv-er-group` (an ER group: on its frame when open, on its box when closed), `mmv-label`, `mmv-icon`, `mmv-edge`, `mmv-frame` (an open box; `is-poster` in Poster, its `--n` set to an AWS main icon's colour), `mmv-frame-title`, `is-poster` on a Poster node (`data-hover`: the node whose details hovering shows), `mmv-icon is-tile` with `mmv-tile` (a Phosphor main icon on a tile), `mmv-inner-spot` (a Poster node's linked-diagram sparkle), `mmv-flow` (a box diagram's arrow; `is-dotted`, `is-thick`), `mmv-flow-label`,
 `mmv-rel`, `mmv-rel-label`, `mmv-dot`, `mmv-rel-dot`, `mmv-bar`,

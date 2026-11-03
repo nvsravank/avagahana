@@ -1,3 +1,4 @@
+import { checkTheme } from './themes/theme.js';
 // pack.js — the viewer's own packer (WO-35): the whole map in one HTML file, a snapshot
 // as relay-server/pack.py makes it, for the Export menu's "Interactive HTML" and
 // viewer.snapshot(). Loaded on first use; never part of a snapshot itself.
@@ -25,12 +26,36 @@ const has = (o, k) => o != null && Object.prototype.hasOwnProperty.call(o, k);
 const plain = (o) => o != null && typeof o === 'object' && !Array.isArray(o);
 // line ends as Python reads a text file, so both packers see the same text
 const lf = (t) => t.replace(/\r\n?/g, '\n');
-async function fetchOk(path) {
-  const r = await fetch(new URL(path, import.meta.url));
-  if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
-  return r;
+// Bound asset reads for local hosts, and never turn a transient read failure into
+// a missing module in an otherwise successful snapshot. Optional icon 404s remain
+// optional; required modules, styles and indexes must all be present.
+let assetReads = 0;
+const assetWaiters = [];
+async function readText(path) {
+  if (assetReads < 4) assetReads++;
+  else await new Promise((resolve) => assetWaiters.push(resolve));
+  try {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const response = await fetch(new URL(path, import.meta.url));
+        if (!response.ok) throw Object.assign(new Error(`HTTP ${response.status}`), { status: response.status });
+        return lf(await response.text());
+      } catch (error) {
+        if (attempt >= 2 || (error.status != null && error.status < 500)) {
+          throw Object.assign(new Error(`${path}: snapshot asset unavailable (${error.message})`), { status: error.status });
+        }
+        await new Promise((resolve) => setTimeout(resolve, 50 * (attempt + 1)));
+      }
+    }
+  } finally {
+    if (assetWaiters.length) assetWaiters.shift()();
+    else assetReads--;
+  }
 }
-const readText = async (path) => lf(await (await fetchOk(path)).text());
+const optionalText = (path) => readText(path).catch((error) => {
+  if (error.status === 404) return null;
+  throw error;
+});
 const escape = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
 
 function base64(bytes) {
@@ -105,7 +130,7 @@ async function viewerModules() {
   const imports = (path, text) => [...text.matchAll(IMPORT)].filter((m) => !isComment(text, m.index)).map((m) => resolve(path, m[3])).filter(Boolean);
   const asked = new Set(['index.js']);
   for (let wave = ['index.js']; wave.length;) {
-    const got = await Promise.all(wave.map((p) => readText(p).catch(() => null)));
+    const got = await Promise.all(wave.map((p) => readText(p)));
     const next = [];
     wave.forEach((p, i) => {
       if (got[i] == null) return;
@@ -148,7 +173,7 @@ async function iconFiles(texts, modules) {
   names.add('circle-dashed');   // the unknown icon (icons.js)
   const files = { 'base.css': css, 'icons.json': JSON.stringify(index) };
   const sorted = [...names].sort();
-  const icons = await Promise.all(sorted.map((n) => readText(`vendor/phosphor/duotone/${n}-duotone.svg`).catch(() => null)));
+  const icons = await Promise.all(sorted.map((n) => optionalText(`vendor/phosphor/duotone/${n}-duotone.svg`)));
   sorted.forEach((n, i) => { if (icons[i] != null) files[`vendor/phosphor/duotone/${n}-duotone.svg`] = icons[i]; });
   const sets = {};
   const pairs = new Map();
@@ -173,9 +198,15 @@ async function iconFiles(texts, modules) {
 // faces as {weight, style}; and each face's bytes as base64
 async function themeData(theme) {
   const builtIn = (await import('./themes/default/theme.js')).default;
+  const isBuiltIn = !theme || theme === builtIn;
+  if (!isBuiltIn) {
+    const checked = checkTheme(theme);
+    if (!checked.ok) throw new Error('Cannot pack an invalid theme.');
+    theme = checked.theme.source;
+  }
   const faces = theme?.font?.faces || [];
   const fonts = await Promise.all(faces.map(async (f) => base64(await (typeof f.data === 'function' ? f.data() : f.data))));
-  if (!theme || theme === builtIn) return { theme: 'default', fonts };
+  if (isBuiltIn) return { theme: 'default', fonts };
   const out = JSON.parse(JSON.stringify(theme));
   if (faces.length) out.font = { family: theme.font.family, faces: faces.map((f) => ({ weight: f.weight, style: f.style })) };
   return { theme: out, fonts };

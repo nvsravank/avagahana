@@ -62,3 +62,14 @@ a warning.
 Only when the font chosen is not a public font (one whose licence lets anyone use it,
 such as the fonts on Google Fonts), say once: the user is responsible for the licence
 of fonts they use.
+
+## Beyond the normal theme settings (only when requested)
+
+Use colours, palettes, fonts and the named appearance controls for ordinary themes.
+Only if the user asks for substantially more custom styling than those settings
+provide, read `../../../docs/theme-styling.md` for the defined class hooks, selectors,
+properties and examples. Do not read that guide automatically when making maps or
+ordinary themes. Theme CSS is a targeted subset, not an arbitrary stylesheet.
+
+`.themes/` JSON/fonts must be ordinary files, not symlinks. `derive --write` refuses
+linked destinations; report the problem rather than bypassing its checks.

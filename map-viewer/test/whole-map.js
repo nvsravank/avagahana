@@ -55,6 +55,21 @@ export async function testWholeMap(check) {
     check('snapshot: no marks of this reader\'s', p.options.marks === false && !('since' in p.options));
     check('snapshot: the viewer\'s modules, deepest first, ending at index.js', p.order.at(-1) === 'index.js' && p.order.includes('viewer.js') && !p.order.includes('pack.js'), p.order.slice(-3));
     check('snapshot: imports are tokens, a comment\'s example left as it is', p.modules['index.js'].includes(`export { mount } from ${"'"}@@avagahana-module:viewer.js@@'`) && p.modules['index.js'].includes("from './map-viewer/index.js'"));
+    const realFetch = window.fetch;
+    let moduleAttempts = 0;
+    try {
+      window.fetch = (url, ...args) => {
+        if (String(url).endsWith('/model/sections.js') && moduleAttempts++ === 0) return Promise.reject(new TypeError('synthetic transient read'));
+        return realFetch.call(window, url, ...args);
+      };
+      const recovered = payloadOf(await v.snapshot());
+      check('snapshot: transient module read is retried and retained', moduleAttempts === 2 && !!recovered.modules['model/sections.js']);
+      window.fetch = (url, ...args) => String(url).endsWith('/model/sections.js')
+        ? Promise.reject(new TypeError('synthetic unavailable asset')) : realFetch.call(window, url, ...args);
+      let refused = '';
+      try { await v.snapshot(); } catch (error) { refused = error.message; }
+      check('snapshot: a required asset failure rejects instead of producing a partial file', refused.includes('model/sections.js') && refused.includes('snapshot asset unavailable'), refused);
+    } finally { window.fetch = realFetch; }
     const html = await v.snapshot();
     check('snapshot: the version only in the generator tag', html.includes('<meta name="generator" content="Avagahana pack.js test-v">') && !/<footer>[^]*test-v/.test(html));
     check('snapshot: footer always Built with Avagahana, linking home', /<footer><a class="av-brand" href="https:\/\/sravannerella.com\/avagahana\/"[^>]*><svg class="av-mark"[^]*Built with Avagahana<\/a>/.test(html));

@@ -8,8 +8,8 @@ Python standard library only; needs Chrome, Chromium or Edge (set AVAGAHANA_CHRO
 its path if it is somewhere unusual). It serves the repo on a free localhost port,
 loads each page and reads the "N / M passed" line the page writes once it has finished
 (window.testResults). On macOS and Linux it drives Chrome over its debugging pipe and
-waits in real time; elsewhere it falls back to --dump-dom with a virtual-time budget,
-which can end a page early while it waits for a font or a file.
+waits in real time; Windows uses a private loopback DevTools connection and also
+waits for actual page and snapshot completion.
 Without a browser it says so and exits 0, so it never blocks anyone.
 
 --update loads map-viewer/test/scene.html?update=1 and writes the scenes it builds
@@ -33,7 +33,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PAGES = ["map-viewer/test/index.html", "map-viewer/test/scene.html", "atlas/test/index.html"]
+PAGES = ["map-viewer/test/theme-styling.html", "map-viewer/test/index.html", "map-viewer/test/scene.html", "atlas/test/index.html"]
 SNAPSHOTS = ROOT / "map-viewer" / "test" / "snapshots"
 BROWSERS = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -66,15 +66,7 @@ def find_browser():
 
 def dump(browser, url, profile):
     """The page's DOM once it has finished."""
-    return dump_pipe(browser, url, profile) if os.name == "posix" else dump_virtual(browser, url, profile)
-
-
-def dump_virtual(browser, url, profile):
-    """The page's DOM after 20 s of virtual time (Chrome's --dump-dom)."""
-    cmd = [browser, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
-           f"--user-data-dir={profile}", "--virtual-time-budget=20000", "--dump-dom", url]
-    out = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-    return out.stdout
+    return dump_pipe(browser, url, profile)
 
 
 def dump_pipe(browser, url, profile, limit=180):
@@ -84,6 +76,7 @@ def dump_pipe(browser, url, profile, limit=180):
         with chrome_pipe(browser, profile) as (send, _events):
             target = send("Target.createTarget", {"url": url})["targetId"]
             session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
+            send("Emulation.setEmulatedMedia", {"features": [{"name": "prefers-reduced-motion", "value": "no-preference"}]}, session)
             done = "window.testResults ? document.documentElement.outerHTML : null"
             end = time.time() + limit
             while time.time() < end:
@@ -101,6 +94,11 @@ def chrome_pipe(browser, profile):
     """(send, events) for a headless Chrome over its DevTools protocol on
     --remote-debugging-pipe: it reads commands on fd 3 and writes on fd 4, each a JSON
     message ending in a NUL byte. events collects the messages that answer no command."""
+    if os.name == 'nt' or os.environ.get('AVAGAHANA_BROWSER_TRANSPORT') == 'port':
+        from browser_connection import chrome_port
+        with chrome_port(browser, profile) as connection:
+            yield connection
+        return
     import fcntl
     to_r, to_w = os.pipe()
     from_r, from_w = os.pipe()
@@ -197,6 +195,7 @@ def drive(browser, url, act=None, wait_drawn=True, downloads=None):
             send("Browser.setDownloadBehavior", {"behavior": "allow", "downloadPath": str(downloads)})
         target = send("Target.createTarget", {"url": url, "width": 1200, "height": 900, "newWindow": True})["targetId"]
         session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
+        send("Emulation.setEmulatedMedia", {"features": [{"name": "prefers-reduced-motion", "value": "no-preference"}]}, session)
         send("Runtime.enable", session=session)
         send("Log.enable", session=session)
 
@@ -222,6 +221,8 @@ def drive(browser, url, act=None, wait_drawn=True, downloads=None):
         errors = [e["params"]["entry"]["text"] for e in events if e["method"] == "Log.entryAdded" and e["params"]["entry"]["level"] == "error"]
         errors += [e["params"]["exceptionDetails"].get("text", "exception") for e in events if e["method"] == "Runtime.exceptionThrown"]
         errors += [str(e["params"]["args"][:1]) for e in events if e["method"] == "Runtime.consoleAPICalled" and e["params"]["type"] == "error"]
+        if not drawn:
+            errors.append("page did not draw: " + str(evaluate("document.body.innerText.slice(0, 300)")))
         return drawn, answer, errors
 
 
@@ -238,7 +239,17 @@ def differences(a, b):
         if x == y:
             continue
         if isinstance(x, dict) and isinstance(y, dict):
-            out += [f"{key}.{k}" for k in sorted(set(x) | set(y)) if x.get(k) != y.get(k)][:5]
+            for k in sorted(set(x) | set(y)):
+                if x.get(k) == y.get(k):
+                    continue
+                left, right = x.get(k), y.get(k)
+                detail = "missing" if left is None or right is None else "different"
+                if isinstance(left, str) and isinstance(right, str):
+                    at = next((i for i, (a, b) in enumerate(zip(left, right)) if a != b), min(len(left), len(right)))
+                    detail = f"lengths {len(left)}/{len(right)}, at {at}: {left[at:at+35]!r}/{right[at:at+35]!r}"
+                out.append(f"{key}.{k} ({detail})")
+                if len(out) >= 5:
+                    break
         else:
             out.append(key)
     return out
@@ -262,7 +273,7 @@ def viewer_pack_tests(browser, base, tmp, check):
     (maps / "garden.md").write_text((EXAMPLES / "garden.md").read_text(encoding="utf-8"), encoding="utf-8")
     sys.path.insert(0, str(ROOT / "relay-server"))
     from serve_maps import read_themes   # noqa: E402
-    brand = next(t for t in read_themes(maps)["themes"] if t["id"] == "brand")
+    brand = next(t for t in read_themes(maps.resolve())["themes"] if t["id"] == "brand")
     for face in brand["font"]["faces"]:
         face["fontUrl"] = f"../themes/default/fonts/{font}"
     before = (EXAMPLES / "checkout-release-before.md").read_text(encoding="utf-8")
@@ -305,9 +316,9 @@ def viewer_pack_tests(browser, base, tmp, check):
         if "prefs" in mine_cmp["options"] and "prefs" not in theirs.get("options", {}):
             mine_cmp["options"].pop("prefs")
         diff = differences(mine_cmp, theirs)
-        check(f"both packers make the same data: {name}", not diff, f"{line}; differ: {diff}")
+        check(f"both packers make the same data: {name}", not diff, f"{line}; differ: {diff}; browser: {errors[:2]}")
         mine_file = tmp / "mine.html"
-        mine_file.write_text(made, encoding="utf-8")
+        mine_file.write_bytes(made.encode("utf-8"))
         drawn, _, errors = open_snapshot(browser, mine_file)
         check(f"the viewer's file opens from file:// with no errors: {name}", drawn and not errors, f"{drawn} nodes; {errors[:3]}")
 
@@ -481,16 +492,13 @@ def main():
                     if line.strip().startswith("✗") or line.strip().startswith("- ") or "->" in line:
                         print("     " + line.strip()[:300])
 
-    if os.name == "posix":
-        results = snapshot_tests(browser, base)
-        ok = sum(1 for _, good, _ in results if good)
-        print(f"{'ok  ' if ok == len(results) else 'FAIL'} snapshots (pack.py and the viewer's pack.js, file://): {ok} / {len(results)}")
-        for name, good, detail in results:
-            if not good:
-                failed += 1
-                print(f"     ✗ {name}: {detail}"[:300])
-    else:
-        print("snapshots: SKIPPED (they need the DevTools pipe, macOS or Linux)")
+    results = snapshot_tests(browser, base)
+    ok = sum(1 for _, good, _ in results if good)
+    print(f"{'ok  ' if ok == len(results) else 'FAIL'} snapshots (pack.py and the viewer's pack.js, file://): {ok} / {len(results)}")
+    for name, good, detail in results:
+        if not good:
+            failed += 1
+            print(f"     ✗ {name}: {detail}"[:300])
     server.shutdown()
     return 1 if failed else 0
 

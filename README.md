@@ -125,7 +125,10 @@ MCP server, and no comments or shared editing.*
 
 ## Install
 
-Python 3.9+ is required.
+Python 3.9+ is required; a maintained, patched Python is recommended. Tested on 3.9
+and 3.15. Standard library only: no virtual environment or package installation.
+The relay listens on `127.0.0.1` for local single-user use. See
+[local operation and data boundaries](docs/security.md) for platform and file-access details.
 
 ### Claude Code
 

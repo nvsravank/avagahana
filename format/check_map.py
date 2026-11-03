@@ -33,6 +33,10 @@ import re
 import sys
 from pathlib import Path
 
+if sys.version_info < (3, 9):
+    print("ERROR: Python 3.9 or later is required.")
+    raise SystemExit(1)
+
 # the checker's modules sit beside it (also under `python3 -I`, which leaves this folder off the path)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check_common import Map, check_label, MAX_LINE, MAX_LABEL, EMOJI, PROBLEMS  # noqa: E402

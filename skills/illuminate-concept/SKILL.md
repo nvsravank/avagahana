@@ -24,7 +24,8 @@ things connect.
   relative to the maps folder, with forward slashes. Read existing maps before editing.
 - In commands below, replace `<plugin root>` and `<maps folder>` with the resolved
   absolute paths. They are notation, not environment variables or client substitutions.
-  Quote each path as a single argument. Commands need Python 3.9 or later (`python3`).
+  Quote each path as a single argument. Commands need Python 3.9 or later (`python3`), tested on 3.9 and 3.15.
+  Use the installed interpreter directly; no virtual environment or pip packages.
 
 ## The loop, every time you write a map
 
@@ -168,3 +169,5 @@ notes or classes to say "this is new".
 A picture for a document, slide or PDF (SVG or PNG), or one file to send a person who
 should explore the map (a snapshot): read `references/render.md`.
 The user asks for a theme, brand or house style, or a new theme: read `references/themes.md`.
+Only when the user wants substantially more custom styling than the theme settings
+provide, read `../../docs/theme-styling.md` for targeted CSS hooks; do not read it automatically.

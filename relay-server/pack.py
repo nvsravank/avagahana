@@ -20,6 +20,9 @@ Needs no relay server. Prints one line:
   STATUS=packed FILE=... SIZE=...    written (SIZE in bytes)
   STATUS=failed ERROR=...            e.g. no maps folder, no such map, an unknown theme
 """
+from runtime import require_python
+require_python()
+
 import argparse
 import base64
 import datetime
@@ -27,6 +30,7 @@ import hashlib
 import html
 import json
 import posixpath
+from theme_style import normalize_theme
 import re
 import sys
 from pathlib import Path
@@ -36,7 +40,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 VIEWER = ROOT / "map-viewer"
 sys.path.insert(0, str(HERE))
-from serve_maps import COLOUR_BY, build_version, MAP_DIR_ENV, THEMES_DIR, read_themes, resolve_maps_dir, safe_join, status_line  # noqa: E402
+from serve_maps import COLOUR_BY, build_version, MAP_DIR_ENV, THEMES_DIR, read_themes, theme_file, resolve_maps_dir, safe_join, status_line  # noqa: E402
 
 # a module's relative import: from './x.js', import('./x.js'), import './x.js'
 IMPORT = re.compile(r"""(\bfrom\s*|\bimport\s*\(\s*|^\s*import\s+)(['"])(\.{1,2}/[^'"]+)\2""", re.M)
@@ -154,10 +158,15 @@ def folder_theme(maps_dir, theme_id):
     fonts, faces = [], []
     for face in (theme.get("font") or {}).get("faces", []):
         name = re.sub(r"^api/theme-file\?f=", "", face["url"])
-        fonts.append(base64.b64encode((maps_dir / THEMES_DIR / unquote(name)).read_bytes()).decode())
+        data = theme_file(maps_dir, unquote(name))
+        if data is None:
+            raise ValueError("theme font is unavailable or unsafe")
+        fonts.append(base64.b64encode(data).decode())
         faces.append({"weight": face["weight"], "style": face["style"]})
     if faces:
         theme["font"] = {"family": theme["font"]["family"], "faces": faces}
+    if theme.get("font") and not faces:
+        theme.pop("font", None)
     return theme, fonts
 
 
@@ -170,6 +179,8 @@ def pack(map_text, map_path, theme, fonts, options, saved=None, now=None):
     """The snapshot's HTML. saved: when the map file was last saved (a datetime), shown
     "as of"; without it the pack time, shown "exported". The start-up script shows it
     in the reader's own time zone and language."""
+    if isinstance(theme, dict):
+        theme = normalize_theme(theme, font_metadata=True)
     modules, order = viewer_modules()
     texts = [map_text] + [options[k] for k in ("since", "before") if options.get(k)]
     files = icon_files(texts, modules)
@@ -257,7 +268,7 @@ def main(argv=None) -> int:
         saved = datetime.datetime.fromtimestamp(full.stat().st_mtime)
         page = pack(full.read_text(encoding="utf-8"), Path(args.map).as_posix(), theme, fonts, options, saved=saved)
         out = Path(args.out).expanduser()
-        out.write_text(page, encoding="utf-8")
+        out.write_bytes(page.encode("utf-8"))
     except (OSError, ValueError) as exc:
         print(status_line("failed", error=getattr(exc, "strerror", None) or exc))
         return 1

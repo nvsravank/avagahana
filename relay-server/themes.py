@@ -20,11 +20,15 @@ derive  A full theme (light and dark) from one or two brand colours and a font. 
 
 Slots and their meaning: format/theme-slots.json. Standard library only (Python 3.9+).
 """
+from runtime import require_python
+require_python("json")
+
 import argparse
 import json
 import math
 import re
-import shutil
+import safe_files
+from theme_style import is_colour, is_shadow, parse_css, controls
 import sys
 from pathlib import Path
 
@@ -43,32 +47,8 @@ SWATCH_DEFAULTS = {
 }
 FONT_TYPES = (".woff2", ".woff", ".ttf", ".otf")
 CVD_MIN_DE = 10   # two neighbouring category colours closer than this (CIE76) look alike
-CSS_NAMES = set("""aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue
-blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan
-darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen
-darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey
-darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite
-forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink
-indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral
-lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen
-lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen magenta
-maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue
-mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin
-navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen
-paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple rebeccapurple red
-rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue
-slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white
-whitesmoke yellow yellowgreen transparent currentcolor""".split())
 
-
-# ---------- colour maths (hex for the checks, as the viewer) ----------
-def is_colour(c) -> bool:
-    if not isinstance(c, str) or not c.strip():
-        return False
-    t = c.strip().lower()
-    return bool(re.fullmatch(r"#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})", t)
-                or re.fullmatch(r"(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix)\(.*\)", t)
-                or t in CSS_NAMES)
+# Colour syntax is shared with the browser restricted-style policy.
 
 
 def hex_rgb(c):
@@ -237,6 +217,7 @@ def check(theme, where=None):
             warn("font-shape", "The theme font needs a family and faces; using the fallback font.")
         elif not [f for f in faces if isinstance(f, dict) and (f.get("data") is not None or f.get("file") is not None)]:
             warn("font-shape", "The theme font has no face with data; using the fallback font.")
+    parse_css(theme.get("css"), warn)
     ok = not any(p["level"] == "error" for p in problems)
     return ok, problems, apps
 
@@ -278,11 +259,14 @@ def fill_appearance(name, src, warn):
     lum = luminance(bg)
     dark = (lum if lum is not None else 1) < 0.2
     sw = SWATCH_DEFAULTS["dark" if dark else "light"]
-    ch = src.get("chrome") or {}
-    ro = src.get("roles") or {}
-    icons = src.get("icons") or {}
+    ch = src.get("chrome") if isinstance(src.get("chrome"), dict) else {}
+    ro = src.get("roles") if isinstance(src.get("roles"), dict) else {}
+    icons = src.get("icons") if isinstance(src.get("icons"), dict) else {}
     tint = src.get("tint")
+    if "shadow" in ch and not is_shadow(ch["shadow"]):
+        warn("theme-shadow", "Invalid panel shadow; using the default.")
     app = {
+        "style": controls(src.get("style"), warn),
         "bg": bg, "ink": ink,
         "muted": pick(src.get("muted"), mix(ink, 65, bg), "muted"),
         "accent": pick(src.get("accent"), ink, "accent"),
@@ -296,10 +280,10 @@ def fill_appearance(name, src, warn):
         "hover": pick(ch.get("hover"), mix(ink, 7, bg), "chrome.hover"),
         "active": pick(ch.get("active"), ink, "chrome.active"),
         "activeInk": pick(ch.get("activeInk"), bg, "chrome.activeInk"),
-        "shadow": ch["shadow"] if isinstance(ch.get("shadow"), str) else ("0 2px 12px rgba(0,0,0,.35)" if dark else "0 2px 10px rgba(16,24,40,.10)"),
+        "shadow": ch["shadow"] if is_shadow(ch.get("shadow")) else ("0 2px 12px rgba(0,0,0,.35)" if dark else "0 2px 10px rgba(16,24,40,.10)"),
     }
     app["icons"] = {k: pick(icons.get(k), sw[k], f"icons.{k}") for k in SWATCHES}
-    fr = src.get("frame") or {}
+    fr = src.get("frame") if isinstance(src.get("frame"), dict) else {}
 
     def quietly(v, fallback):
         return v if is_colour(v) else fallback
@@ -349,7 +333,13 @@ def check_more(theme, apps, folder=None):
         faces = font.get("faces") if isinstance(font.get("faces"), list) else [{"file": font.get("file")}]
         for f in faces:
             name = f.get("file") if isinstance(f, dict) else None
-            if not isinstance(name, str) or "/" in name or "\\" in name or name.startswith(".") or Path(name).suffix.lower() not in FONT_TYPES or not (folder / name).is_file():
+            valid = isinstance(name, str) and bool(name) and not any(c in name for c in ("/", "\\", "\x00")) and not name.startswith(".") and Path(name).suffix.lower() in FONT_TYPES
+            if valid:
+                try:
+                    safe_files.read(folder.parent.resolve(), THEMES_DIR + "/" + name)
+                except OSError:
+                    valid = False
+            if not valid:
                 problems.append({"level": "warning", "code": "theme-font-file", "message": f"Font file {name!r} is not a .woff2, .woff, .ttf or .otf file beside the theme."})
     if folder is not None and isinstance(theme, dict) and not (isinstance(theme.get("description"), str) and theme["description"].strip()):
         problems.append({"level": "warning", "code": "theme-description", "message": "No description: say what the theme is for, so an agent can choose it."})
@@ -358,7 +348,10 @@ def check_more(theme, apps, folder=None):
 
 def check_file(path: Path):
     try:
-        theme = json.loads(path.read_text(encoding="utf-8"))
+        if path.parent.name == THEMES_DIR:
+            theme = json.loads(safe_files.read(path.parent.parent.resolve(), THEMES_DIR + "/" + path.name))
+        else:
+            theme = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         return {"ok": False, "problems": [{"level": "error", "code": "theme-file", "message": f"{path.name} could not be read ({exc})."}]}
     in_themes = path.parent.name == THEMES_DIR
@@ -375,7 +368,11 @@ def list_themes(maps_dir: Path):
     raw = read_themes(maps_dir)
     out = []
     for t in raw["themes"]:
-        source = json.loads((folder / f"{t['id']}.json").read_text(encoding="utf-8"))
+        try:
+            source = json.loads(safe_files.read(maps_dir, THEMES_DIR + "/" + t['id'] + ".json"))
+        except (OSError, ValueError) as exc:
+            raw["problems"].append({"level": "error", "code": "theme-file", "message": f"Theme could not be read ({exc})."})
+            continue
         source["id"] = t["id"]
         ok, problems, apps = check(source)
         problems += check_more(source, apps, folder)
@@ -525,7 +522,7 @@ def main(argv=None) -> int:
         if c and not hex_rgb(c):
             print(json.dumps({"error": f"{c}: a colour is #rrggbb"}))
             return 1
-    if not THEME_ID.match(args.id):
+    if not THEME_ID.fullmatch(args.id):
         print(json.dumps({"error": "--id: letters, digits, - and _"}))
         return 1
     fonts = [Path(f).expanduser() for f in args.font]
@@ -548,13 +545,19 @@ def main(argv=None) -> int:
         print(json.dumps({"error": problem}))
         return 1
     folder = maps_dir / THEMES_DIR
-    folder.mkdir(exist_ok=True)
-    for f in fonts:
-        if f.resolve() != (folder / f.name).resolve():
-            shutil.copyfile(f, folder / f.name)
     out = folder / f"{args.id}.json"
     body = {k: v for k, v in theme.items() if k != "id"}
-    out.write_text(json.dumps(body, indent=2) + "\n", encoding="utf-8")
+    try:
+        for f in fonts:
+            if not (folder / f.name).is_symlink() and f.resolve() == (folder / f.name).resolve():
+                # Even an existing same-path font must pass the contained reader.
+                safe_files.read(maps_dir, THEMES_DIR + "/" + f.name)
+            else:
+                safe_files.write(maps_dir, THEMES_DIR + "/" + f.name, f.read_bytes())
+        safe_files.write(maps_dir, THEMES_DIR + "/" + args.id + ".json", (json.dumps(body, indent=2) + "\n").encode("utf-8"))
+    except OSError as exc:
+        print(json.dumps({"error": f"Cannot safely write theme: {exc}"}))
+        return 1
     result = check_file(out)
     print(json.dumps({"written": str(out), **result}, indent=2))
     return 0 if result["ok"] else 1

@@ -3,7 +3,11 @@
 The optional relay server is the bridge from an agent to the viewer: the agent writes
 map files, the server serves them and tells open pages when they change, and the agent
 can point the human at a node while it explains. It is read-only for maps.
-Python 3.9+ standard library only; macOS, Linux and Windows.
+Python 3.9+ standard library only, tested on 3.9 and 3.15. macOS/Linux use no-follow directory descriptors; Windows uses native relative
+file handles with reparse-point checks. No virtual environment or additional packages.
+
+The listener remains bound to `127.0.0.1` for local single-user operation. It is
+not a multi-user hosting service. See [local operation and file policy](security.md).
 
 **The API is stable.** Existing endpoints keep their shape; changes are additions.
 Any change is a contract change: note it in `CHANGELOG.md`.
@@ -237,3 +241,12 @@ saves `.themes/<id>.json` and copies the fonts beside it.
 capability flags, running without atlas or viewer, render (checks, a stand-in page's
 claim and answer, no page), themes, and the command line (start, reuse, show, render,
 themes, stop).
+
+## Theme and static file policy
+
+The selected maps root is resolved once. Theme directories, JSON and fonts below
+it must not be symlinks. Returned theme objects contain only supported fields and
+canonical targeted CSS. Fonts served and packed use the same reader; static
+directory indexes receive the same checks as direct files. Disallowed HTTP assets
+keep returning 404. Theme reads report problems and writes fail explicitly.
+See [theme styling](theme-styling.md) and [local operation](security.md).

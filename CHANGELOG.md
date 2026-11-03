@@ -6,6 +6,27 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (themes): targeted CSS support through defined class hooks, selectors
+  and properties, checked consistently in Python and the viewer. Numeric appearance
+  controls cover rectangular corners, strokes/dashes and background alpha; colours,
+  palettes, fonts and tint keep their existing settings. Unsupported CSS warns and
+  is omitted. The theme-authoring skill points to the hook guide only when the user
+  asks for customization beyond normal theme settings.
+- Theme file access: one contained reader for relay fonts and snapshot fonts, checked
+  theme JSON, atomic theme writes, and consistent static directory-index handling.
+  Linked theme files/directories/destinations are refused (**Contract**). Print uses
+  document nodes; snapshots retain normalized theme data.
+- Snapshot asset loading bounds concurrent reads, retries transient failures and reports
+  unavailable required files rather than packing a partial viewer.
+- Python: retain 3.9+ compatibility and expand automated testing to 3.15. No virtual
+  environment or package installation. Validation uses checkout v7 and setup-python v7
+  through their major-version tags.
+- Dependabot checks GitHub Actions monthly, grouping available updates into one PR.
+- Relay: retain local-only `127.0.0.1` operation. Document local single-user scope,
+  file authorities and runtime/platform requirements. File handling uses directory descriptors on macOS/Linux and native relative
+  handles on Windows, with junction/reparse-point checks. Validation includes Windows
+  on Python 3.9 and 3.15, including browser exports and offline snapshots.
+
 - Atlas and viewer (WO-40): the atlas shows no viewer picker (`viewPicker: false`): its bar
   is the navigation; an exported snapshot keeps the picker. A minimised walkthrough is a
   small route icon, with no name or place; the walkthrough panel sits on the left (a

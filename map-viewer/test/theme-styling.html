@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Theme styling checks</title>
+<style>body{font:14px system-ui;margin:0}#a{width:900px;height:600px}.fail{color:#b00}</style></head>
+<body><div id="a"></div><div id="out">Running…</div>
+<script type="module">
+import { testSecurity } from './security.js';
+const results = [];
+const check = (name, ok, detail = '') => results.push({ name, ok: !!ok, detail: ok ? '' : String(detail) });
+try { await testSecurity(check); } catch (e) { check('theme checks finish', false, e.stack || e); }
+window.testResults = results;
+const out = document.getElementById('out');
+const heading = out.appendChild(document.createElement('p'));
+heading.textContent = `${results.filter((r) => r.ok).length} / ${results.length} passed`;
+for (const r of results) {
+  const row = out.appendChild(document.createElement('div'));
+  row.className = r.ok ? 'pass' : 'fail';
+  row.textContent = `${r.ok ? '✓' : '✗'} ${r.name}${r.detail ? ` — ${r.detail}` : ''}`;
+}
+</script></body></html>
