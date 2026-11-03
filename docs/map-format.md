@@ -174,9 +174,21 @@ family so they read as one set:
 | `hypothesis` | A guess to test | a guess, to be checked next |
 | `unsourced` | Source not found / not reviewed | heard or assumed; no source found, or not reviewed |
 
-They are icons like any other (filter, key, export). They say how sure, not what a node
-is: a node whose class brings an icon keeps it, with the marks after it. Why something
-is verified goes in its note (`## Details`). Arrows take them by arrow id (below).
+Trust marks keep their existing icon assignments. In the drawing, they occupy the
+final position on the right, after the note icon, separate from identity icons.
+Their space is reserved even when the map opens with marks hidden, so showing or
+hiding them does not move labels or notes. The Verification button beside
+Info holds their legend and a Show / Hide control, independently of other icons.
+Click/tap a node or arrow mark to open that claim's Evidence section. Keyboard focus
+alone and hover do not open it; Enter/Space activates it. Repeating the click,
+clicking outside or Escape closes it (Escape returns focus to the mark).
+
+The evidence remains in the full note when diagram marks are hidden. A node page
+shows its trust marks and expanded, foldable evidence directly below the title,
+then the rest of its note and its diagrams. Evidence is not duplicated on that page.
+Trust marks and a nonempty Evidence section must occur together for each node or
+named arrow. The checker errors if either half is missing. The viewer warns and
+continues drawing, retaining independently authored marks and notes. No automatic source validation or freshness check is implied.
 
 ### `## Icons` legend (optional)
 
@@ -969,3 +981,82 @@ double-click still drills into a box.
   direction turns as usual). A group with `stroke-width: 0` in its `classDef` has no
   box at all (no border, no fill), e.g. a row of people across the top.
 - **List**: as for mind maps.
+
+## Sources and claim evidence
+
+**Contract** (WO-46, addition). All source metadata is standard Markdown outside
+Mermaid fences. A `## Sources` section is a file-wide registry (available to every
+diagram). Repository and revision aliases must be unique, lower-case letters,
+digits and hyphens, starting with a letter.
+
+```markdown
+## Sources
+
+### Repository: service
+
+- Name: Shop service
+- URL: https://github.com/example/shop
+
+Checkout implementation.
+
+#### Revision: service-reviewed
+
+- Branch: main
+- Commit: <full 40- or 64-character hexadecimal Git object ID>
+- Reviewed: 2026-11-03
+```
+
+One repository may have several revisions. Name defaults to its alias; Version control
+defaults to `git`. Every Git repository requires a revision with a full Commit.
+Branch is optional for detached HEAD. URL is optional for local-only repositories.
+For an unversioned folder use `- Version control: none` at repository level, with
+Reviewed there and no revisions/branch/commit. Dates are ISO dates or UTC timestamps.
+Descriptions are Markdown beneath the relevant heading. No source files are bundled.
+
+A node's or named arrow's existing Details note may contain one `#### Evidence`
+section. The Evidence section ends at the next heading of level four or above.
+
+```markdown
+### <a id="checkout"></a>Checkout
+
+Coordinates order creation and payment.
+
+#### Evidence
+
+- Source: [Shop service](#revision-service-reviewed)
+  - File: src/checkout.py
+  - Lines: 42-68
+  - Supports: Creates an order before requesting payment.
+
+- Source: [Shop service](#revision-service-reviewed)
+  - File: src/payments.py
+  - Lines: 105-128
+  - Supports: Leaves a failed payment available for retry.
+```
+
+Evidence may include ordinary Markdown explaining the trust judgment. When citing
+artifacts, each Source bullet has optional indented File, Lines, Supports, URL and
+SHA-256 fields.
+Multiple references may name the same revision and/or file; UI groups them by source
+revision. For Git, Source must resolve to `#revision-<alias>`; for non-Git use
+`#repository-<alias>`. Lines is a positive integer or ordered inclusive range and
+requires File. File is relative, with no empty or `..` path segments. Supports is
+Markdown explaining what that evidence establishes. SHA-256 is an optional full
+64-character hexadecimal file digest; it identifies bytes without preserving them.
+Repository-only references are permitted but do not imply file-level support.
+
+GitHub.com, GitLab.com and Bitbucket.org file/line links use the captured commit.
+Unknown hosts require an explicit pinned evidence URL for a clickable citation;
+without it the metadata remains readable. Git evidence's explicit URL must contain
+the recorded commit as a path segment. Source URLs must be HTTP(S), without user
+credentials or query strings; repository URLs also have no fragment. The viewer
+never fetches repository content. Malformed authored sources/evidence and unpaired marks/verification text are checker
+errors. The viewer warns without refusing to draw. Evidence may contain ordinary
+Markdown explaining a trust judgment, with or without structured references.
+A Sources registry is required only when a structured reference uses it. A valid citation does not prove
+an agent's interpretation, remote access, or present-day freshness.
+
+Trust visibility is a runtime preference, not a map section. Interactive HTML keeps
+the reader's current selection separately from the unchanged source text. SVG, PNG and print
+are static diagrams with no clickable evidence links, popups, source lists or extra
+printed URLs. Use HTML or the source Markdown to retain the complete evidence.

@@ -3,7 +3,7 @@
   {
    "kind": "frame",
    "id": "shop",
-   "x": -155.9,
+   "x": -166.4,
    "y": 0,
    "w": 209,
    "h": 216,
@@ -36,7 +36,7 @@
   {
    "kind": "frame",
    "id": "pay",
-   "x": -155.9,
+   "x": -166.4,
    "y": 13,
    "w": 181,
    "h": 162,
@@ -68,7 +68,7 @@
   {
    "kind": "node",
    "id": "payh",
-   "x": -155.9,
+   "x": -166.4,
    "y": -12,
    "w": 140,
    "h": 32,
@@ -98,7 +98,7 @@
   {
    "kind": "node",
    "id": "fraud",
-   "x": -155.9,
+   "x": -166.4,
    "y": 64,
    "w": 153,
    "h": 32,
@@ -117,7 +117,7 @@
      "color": "var(--mmv-icon-purple)",
      "label": "A guess to test",
      "size": 15,
-     "x": 12,
+     "x": 125.7,
      "y": 8.5
     }
    ],
@@ -129,13 +129,13 @@
       "text": "Fraud check",
       "bold": false,
       "italic": false,
-      "x": 33,
+      "x": 12,
       "y": 20.3
      }
     ]
    },
    "note": {
-    "x": 125.7,
+    "x": 104.7,
     "y": 8.5,
     "size": 15
    }
@@ -143,13 +143,13 @@
   {
    "kind": "node",
    "id": "psp",
-   "x": 191.9,
+   "x": 199.9,
    "y": 0,
-   "w": 137,
+   "w": 142,
    "h": 72,
    "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
    "grow": 1,
-   "name": "Card provider, level 1",
+   "name": "Card provider, level 1, has a note",
    "marks": {
     "hit": true,
     "sel": false
@@ -162,7 +162,7 @@
      "color": null,
      "label": "Globe",
      "size": 38,
-     "x": 28.5,
+     "x": 52,
      "y": 4
     },
     {
@@ -170,8 +170,8 @@
      "ph": "seal-warning",
      "color": "var(--mmv-icon-grey)",
      "label": "Source not found / not reviewed",
-     "size": 38,
-     "x": 70.5,
+     "size": 17,
+     "x": 119,
      "y": 4
     }
    ],
@@ -183,10 +183,15 @@
       "text": "Card provider",
       "bold": false,
       "italic": false,
-      "x": 6.1,
+      "x": 8.6,
       "y": 63.2
      }
     ]
+   },
+   "note": {
+    "x": 96,
+    "y": 4,
+    "size": 17
    }
   }
  ],
@@ -194,14 +199,15 @@
   {
    "kind": "rel",
    "id": "payh>psp",
-   "d": "M-85.9,-12 L123.4,-12",
+   "d": "M-96.4,-12 L128.9,-12",
    "cls": "mmv-flow is-dotted mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 18.75,
+    "x": 16.25,
     "y": -8,
     "text": "retry on timeout",
+    "note": true,
     "icons": [
      "hypothesis"
     ]
@@ -211,6 +217,10 @@
      "from": "payh",
      "to": "psp",
      "label": "retry on timeout",
+     "note": {
+      "heading": "r1",
+      "body": "#### Evidence\n\nIllustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim."
+     },
      "icons": [
       "hypothesis"
      ]

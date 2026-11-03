@@ -104,10 +104,13 @@ export function createPage(v, h) {
     // against the map's earlier version (WO-34): what the changes list says of this node
     const version = v.versionChanges?.(n.id) || [];
     if (version.length) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: `Since the earlier version: ${version.join('; ')}.` }));
+    const trust = n.icons.filter((c) => ['verified', 'inferred', 'hypothesis', 'unsourced'].includes(c));
+    if (trust.length || n.note?.evidence) v.verification.evidence(n.note, body, trust, true);
     if (n.note) {
-      const note = document.createElement('div');
-      note.className = 'mmv-page-note';
-      renderNoteBody(n.note.body, note, h.wireLink);
+      const note = document.createElement('div'); note.className = 'mmv-page-note';
+      const e = n.note.evidence;
+      if (e) { renderNoteBody(e.before, note, h.wireLink); renderNoteBody(e.after, note, h.wireLink); }
+      else renderNoteBody(n.note.body, note, h.wireLink);
       body.appendChild(note);
     }
     // what the diagram type adds about the node (an ER table's columns: diagrams/er/page.js)

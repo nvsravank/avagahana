@@ -4,6 +4,7 @@
 // columns of wider tables appear while open, and a last row that
 // opens or closes it ("+ 4 columns"). The width fits every column, open or not, so
 // opening a table only makes it taller. Pure: no DOM.
+import { TRUST } from '../../model/provenance.js';
 import { typeFor, MAX_LINE } from '../../geometry.js';
 import { wrapRuns } from '../../measure.js';
 
@@ -28,7 +29,8 @@ export function tableGeometry(n, rel, font, measure) {
   // a table reads the same inside a group (WO-44): its title is always level 1's
   const type = typeFor(1);
   const titleLines = wrapRuns(n.runs || [[{ text: n.plain || n.id, bold: false, italic: false }]], type, font, MAX_LINE, measure);
-  const title = Math.max(...titleLines.map((l) => l.w), 0);
+  const trustW = (n.icons || []).filter((c) => TRUST.has(c)).length * 22;
+  const title = Math.max(...titleLines.map((l) => l.w), 0) + trustW + (trustW && n.note ? 22 : 0);
   const lh = Math.round(type.size * 1.25);
   // a group (subgraph): closed, a box with its name; lines meet it at its middle
   if (!n.attrs) {

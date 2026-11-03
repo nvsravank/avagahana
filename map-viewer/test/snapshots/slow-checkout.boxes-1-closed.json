@@ -3,7 +3,7 @@
   {
    "kind": "frame",
    "id": "shop",
-   "x": -155.9,
+   "x": -166.4,
    "y": 0,
    "w": 155,
    "h": 86,
@@ -39,7 +39,7 @@
   {
    "kind": "node",
    "id": "pay",
-   "x": -176.4,
+   "x": -186.9,
    "y": 13,
    "w": 86,
    "h": 32,
@@ -75,13 +75,13 @@
   {
    "kind": "node",
    "id": "psp",
-   "x": 164.9,
+   "x": 172.9,
    "y": 0,
-   "w": 137,
+   "w": 142,
    "h": 72,
    "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
    "grow": 1,
-   "name": "Card provider, level 1",
+   "name": "Card provider, level 1, has a note",
    "marks": {
     "hit": true,
     "sel": false
@@ -94,7 +94,7 @@
      "color": null,
      "label": "Globe",
      "size": 38,
-     "x": 28.5,
+     "x": 52,
      "y": 4
     },
     {
@@ -102,8 +102,8 @@
      "ph": "seal-warning",
      "color": "var(--mmv-icon-grey)",
      "label": "Source not found / not reviewed",
-     "size": 38,
-     "x": 70.5,
+     "size": 17,
+     "x": 119,
      "y": 4
     }
    ],
@@ -115,10 +115,15 @@
       "text": "Card provider",
       "bold": false,
       "italic": false,
-      "x": 6.1,
+      "x": 8.6,
       "y": 63.2
      }
     ]
+   },
+   "note": {
+    "x": 96,
+    "y": 4,
+    "size": 17
    }
   }
  ],
@@ -126,14 +131,15 @@
   {
    "kind": "rel",
    "id": "pay>psp",
-   "d": "M-133.4,13 L96.4,13",
+   "d": "M-143.9,13 L101.9,13",
    "cls": "mmv-flow is-dotted mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": -8,
+    "x": -10.5,
     "y": 17,
     "text": "retry on timeout",
+    "note": true,
     "icons": [
      "hypothesis"
     ]
@@ -143,6 +149,10 @@
      "from": "payh",
      "to": "psp",
      "label": "retry on timeout",
+     "note": {
+      "heading": "r1",
+      "body": "#### Evidence\n\nIllustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim."
+     },
      "icons": [
       "hypothesis"
      ]

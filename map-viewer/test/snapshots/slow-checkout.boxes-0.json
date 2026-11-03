@@ -3,9 +3,9 @@
   {
    "kind": "frame",
    "id": "shop",
-   "x": -77,
+   "x": -79.5,
    "y": 0,
-   "w": 936.6,
+   "w": 1030.6,
    "h": 354,
    "cls": "mmv-frame mmv-k2 mmv-l1 mmv-d1 mmv-c0 mmv-p0",
    "name": "Shop system, level 1, 5 children, has a note, a box",
@@ -22,12 +22,12 @@
     "sel": false
    },
    "note": {
-    "x": 906.6,
+    "x": 1000.6,
     "y": 6,
     "size": 16
    },
    "dot": {
-    "x": 935.6,
+    "x": 1029.6,
     "y": 1,
     "closed": false,
     "count": null
@@ -36,9 +36,9 @@
   {
    "kind": "frame",
    "id": "orders",
-   "x": -68.3,
+   "x": -51.3,
    "y": -26.5,
-   "w": 174,
+   "w": 197,
    "h": 218,
    "cls": "mmv-frame mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "name": "Orders service, level 2, 2 children, a box",
@@ -56,7 +56,7 @@
    },
    "note": null,
    "dot": {
-    "x": 173,
+    "x": 196,
     "y": 1,
     "closed": false,
     "count": null
@@ -65,7 +65,7 @@
   {
    "kind": "frame",
    "id": "pay",
-   "x": 286.8,
+   "x": 331.3,
    "y": 54,
    "w": 181,
    "h": 218,
@@ -97,7 +97,7 @@
   {
    "kind": "node",
    "id": "customer",
-   "x": -633.8,
+   "x": -683.3,
    "y": 0,
    "w": 89,
    "h": 72,
@@ -137,7 +137,7 @@
   {
    "kind": "node",
    "id": "ui",
-   "x": -480.8,
+   "x": -530.3,
    "y": -26.5,
    "w": 101,
    "h": 60,
@@ -167,13 +167,13 @@
   {
    "kind": "node",
    "id": "gw",
-   "x": -314.8,
+   "x": -336.8,
    "y": -26.5,
-   "w": 99,
+   "w": 122,
    "h": 60,
    "cls": "mmv-node mmv-k2 mmv-l2 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
-   "name": "Gateway, level 2",
+   "name": "Gateway, level 2, has a note",
    "marks": {
     "hit": false,
     "sel": false
@@ -186,7 +186,7 @@
      "color": "var(--mmv-icon-green)",
      "label": "Checked in the source",
      "size": 15,
-     "x": 12,
+     "x": 94.9,
      "y": 22.5
     }
    ],
@@ -198,16 +198,21 @@
       "text": "Gateway",
       "bold": false,
       "italic": false,
-      "x": 33,
+      "x": 12,
       "y": 34.3
      }
     ]
+   },
+   "note": {
+    "x": 73.9,
+    "y": 22.5,
+    "size": 15
    }
   },
   {
    "kind": "node",
    "id": "stock",
-   "x": -68.3,
+   "x": -51.3,
    "y": -65.5,
    "w": 109,
    "h": 60,
@@ -237,13 +242,13 @@
   {
    "kind": "node",
    "id": "ord",
-   "x": -68.3,
+   "x": -51.3,
    "y": 38.5,
-   "w": 146,
+   "w": 169,
    "h": 60,
    "cls": "mmv-node mmv-k2 mmv-l3 mmv-d2 mmv-c0 mmv-p0",
    "grow": 1,
-   "name": "Order handler, level 3",
+   "name": "Order handler, level 3, has a note",
    "marks": {
     "hit": false,
     "sel": false
@@ -256,7 +261,7 @@
      "color": "var(--mmv-icon-blue)",
      "label": "Reasoned from what was read",
      "size": 15,
-     "x": 12,
+     "x": 141.1,
      "y": 22.5
     }
    ],
@@ -268,16 +273,21 @@
       "text": "Order handler",
       "bold": false,
       "italic": false,
-      "x": 33,
+      "x": 12,
       "y": 34.3
      }
     ]
+   },
+   "note": {
+    "x": 120.1,
+    "y": 22.5,
+    "size": 15
    }
   },
   {
    "kind": "node",
    "id": "db",
-   "x": 286.8,
+   "x": 331.3,
    "y": -107,
    "w": 161,
    "h": 60,
@@ -318,7 +328,7 @@
   {
    "kind": "node",
    "id": "payh",
-   "x": 286.8,
+   "x": 331.3,
    "y": 15,
    "w": 140,
    "h": 60,
@@ -348,7 +358,7 @@
   {
    "kind": "node",
    "id": "fraud",
-   "x": 286.8,
+   "x": 331.3,
    "y": 119,
    "w": 153,
    "h": 60,
@@ -367,7 +377,7 @@
      "color": "var(--mmv-icon-purple)",
      "label": "A guess to test",
      "size": 15,
-     "x": 12,
+     "x": 125.7,
      "y": 22.5
     }
    ],
@@ -379,13 +389,13 @@
       "text": "Fraud check",
       "bold": false,
       "italic": false,
-      "x": 33,
+      "x": 12,
       "y": 34.3
      }
     ]
    },
    "note": {
-    "x": 125.7,
+    "x": 104.7,
     "y": 22.5,
     "size": 15
    }
@@ -393,13 +403,13 @@
   {
    "kind": "node",
    "id": "psp",
-   "x": 609.8,
+   "x": 656.8,
    "y": 0,
-   "w": 137,
+   "w": 142,
    "h": 72,
    "cls": "mmv-node mmv-k1 mmv-l1 mmv-d1 mmv-cm mmv-p0 is-figure",
    "grow": 1,
-   "name": "Card provider, level 1",
+   "name": "Card provider, level 1, has a note",
    "marks": {
     "hit": true,
     "sel": false
@@ -412,7 +422,7 @@
      "color": null,
      "label": "Globe",
      "size": 38,
-     "x": 28.5,
+     "x": 52,
      "y": 4
     },
     {
@@ -420,8 +430,8 @@
      "ph": "seal-warning",
      "color": "var(--mmv-icon-grey)",
      "label": "Source not found / not reviewed",
-     "size": 38,
-     "x": 70.5,
+     "size": 17,
+     "x": 119,
      "y": 4
     }
    ],
@@ -433,10 +443,15 @@
       "text": "Card provider",
       "bold": false,
       "italic": false,
-      "x": 6.1,
+      "x": 8.6,
       "y": 63.2
      }
     ]
+   },
+   "note": {
+    "x": 96,
+    "y": 4,
+    "size": 17
    }
   }
  ],
@@ -444,14 +459,15 @@
   {
    "kind": "rel",
    "id": "stock>db",
-   "d": "M-13.8,-65.5 L152.3,-65.5 Q160.3,-65.5 160.3,-73.5 L160.3,-109 Q160.3,-117 168.3,-117 L206.3,-117",
+   "d": "M3.2,-65.5 L196.8,-65.5 Q204.8,-65.5 204.8,-73.5 L204.8,-109 Q204.8,-117 212.8,-117 L250.8,-117",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 72.83,
+    "x": 112,
     "y": -61.5,
     "text": "stock levels",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -461,6 +477,17 @@
      "from": "stock",
      "to": "db",
      "label": "stock levels",
+     "note": {
+      "heading": "e7",
+      "body": "#### Evidence\n\nIllustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+      "evidence": {
+       "refs": [],
+       "text": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "prose": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "before": "",
+       "after": ""
+      }
+     },
      "icons": [
       "verified"
      ]
@@ -470,14 +497,15 @@
   {
    "kind": "rel",
    "id": "ui>gw",
-   "d": "M-430.3,-26.5 L-364.3,-26.5",
+   "d": "M-479.8,-26.5 L-397.8,-26.5",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": -401.3,
+    "x": -442.8,
     "y": -22.5,
     "text": "",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -487,6 +515,17 @@
      "from": "ui",
      "to": "gw",
      "label": "",
+     "note": {
+      "heading": "e1",
+      "body": "#### Evidence\n\nIllustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+      "evidence": {
+       "refs": [],
+       "text": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "prose": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "before": "",
+       "after": ""
+      }
+     },
      "icons": [
       "verified"
      ]
@@ -496,12 +535,12 @@
   {
    "kind": "rel",
    "id": "ord>db",
-   "d": "M4.7,18.5 L162.3,18.5 Q170.3,18.5 170.3,10.5 L170.3,-89 Q170.3,-97 178.3,-97 L206.3,-97",
+   "d": "M33.2,18.5 L206.8,18.5 Q214.8,18.5 214.8,10.5 L214.8,-89 Q214.8,-97 222.8,-97 L250.8,-97",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 59.7,
+    "x": 88.2,
     "y": 22.5,
     "text": "order rows"
    },
@@ -516,7 +555,7 @@
   {
    "kind": "rel",
    "id": "customer>ui",
-   "d": "M-589.3,-26.5 L-531.3,-26.5",
+   "d": "M-638.8,-26.5 L-580.8,-26.5",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
@@ -532,12 +571,12 @@
   {
    "kind": "rel",
    "id": "payh>psp",
-   "d": "M356.8,15 L541.3,15",
+   "d": "M401.3,15 L585.8,15",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 449.05,
+    "x": 493.55,
     "y": 19,
     "text": "card token",
     "note": true,
@@ -552,7 +591,14 @@
      "label": "card token",
      "note": {
       "heading": "Card token to the provider",
-      "body": "Someone said the provider is slow at peak. Nobody has traced it."
+      "body": "#### Evidence\n\nSomeone said the provider is slow at peak. Nobody has traced it.",
+      "evidence": {
+       "refs": [],
+       "text": "Someone said the provider is slow at peak. Nobody has traced it.",
+       "prose": "Someone said the provider is slow at peak. Nobody has traced it.",
+       "before": "",
+       "after": ""
+      }
      },
      "icons": [
       "unsourced"
@@ -563,14 +609,15 @@
   {
    "kind": "rel",
    "id": "ord>payh",
-   "d": "M4.7,38.5 L172.3,38.5 Q180.3,38.5 180.3,30.5 L180.3,23 Q180.3,15 188.3,15 L216.8,15",
+   "d": "M33.2,38.5 L216.8,38.5 Q224.8,38.5 224.8,30.5 L224.8,23 Q224.8,15 232.8,15 L261.3,15",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 54.1,
+    "x": 90.6,
     "y": 42.5,
     "text": "charge",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -580,6 +627,17 @@
      "from": "ord",
      "to": "payh",
      "label": "charge",
+     "note": {
+      "heading": "e4",
+      "body": "#### Evidence\n\nIllustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+      "evidence": {
+       "refs": [],
+       "text": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "prose": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "before": "",
+       "after": ""
+      }
+     },
      "icons": [
       "verified"
      ]
@@ -589,14 +647,15 @@
   {
    "kind": "rel",
    "id": "gw>stock",
-   "d": "M-265.3,-36.5 L-179.3,-36.5 Q-171.3,-36.5 -171.3,-44.5 L-171.3,-57.5 Q-171.3,-65.5 -163.3,-65.5 L-122.8,-65.5",
+   "d": "M-275.8,-36.5 L-173.8,-36.5 Q-165.8,-36.5 -165.8,-44.5 L-165.8,-57.5 Q-165.8,-65.5 -157.8,-65.5 L-105.8,-65.5",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": -219.3,
+    "x": -221.8,
     "y": -32.5,
     "text": "stock",
+    "note": true,
     "icons": [
      "inferred"
     ]
@@ -606,6 +665,17 @@
      "from": "gw",
      "to": "stock",
      "label": "stock",
+     "note": {
+      "heading": "e3",
+      "body": "#### Evidence\n\nIllustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+      "evidence": {
+       "refs": [],
+       "text": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "prose": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "before": "",
+       "after": ""
+      }
+     },
      "icons": [
       "inferred"
      ]
@@ -615,14 +685,15 @@
   {
    "kind": "rel",
    "id": "gw>ord",
-   "d": "M-265.3,-16.5 L-179.3,-16.5 Q-171.3,-16.5 -171.3,-8.5 L-171.3,30.5 Q-171.3,38.5 -163.3,38.5 L-141.3,38.5",
+   "d": "M-275.8,-16.5 L-173.8,-16.5 Q-165.8,-16.5 -165.8,-8.5 L-165.8,30.5 Q-165.8,38.5 -157.8,38.5 L-135.8,38.5",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": -219.3,
+    "x": -221.8,
     "y": -12.5,
     "text": "order",
+    "note": true,
     "icons": [
      "inferred"
     ]
@@ -632,6 +703,17 @@
      "from": "gw",
      "to": "ord",
      "label": "order",
+     "note": {
+      "heading": "e2",
+      "body": "#### Evidence\n\nIllustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+      "evidence": {
+       "refs": [],
+       "text": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "prose": "Illustrative trust assignment in this fictional example; no external source\nrevision is captured for this claim.",
+       "before": "",
+       "after": ""
+      }
+     },
      "icons": [
       "inferred"
      ]
@@ -641,12 +723,12 @@
   {
    "kind": "rel",
    "id": "ord>fraud",
-   "d": "M4.7,58.5 L152.3,58.5 Q160.3,58.5 160.3,66.5 L160.3,111 Q160.3,119 168.3,119 L210.3,119",
+   "d": "M33.2,58.5 L196.8,58.5 Q204.8,58.5 204.8,66.5 L204.8,111 Q204.8,119 212.8,119 L254.8,119",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,
    "label": {
-    "x": 58.7,
+    "x": 87.2,
     "y": 62.5,
     "text": "score",
     "note": true,
@@ -661,7 +743,14 @@
      "label": "score",
      "note": {
       "heading": "Order handler scores the order",
-      "body": "Hypothesis: the order handler waits for the fraud score before charging. If so, the\ntwo calls run one after the other, not side by side."
+      "body": "#### Evidence\n\nHypothesis: the order handler waits for the fraud score before charging. If so, the\ntwo calls run one after the other, not side by side.",
+      "evidence": {
+       "refs": [],
+       "text": "Hypothesis: the order handler waits for the fraud score before charging. If so, the\ntwo calls run one after the other, not side by side.",
+       "prose": "Hypothesis: the order handler waits for the fraud score before charging. If so, the\ntwo calls run one after the other, not side by side.",
+       "before": "",
+       "after": ""
+      }
      },
      "icons": [
       "hypothesis"

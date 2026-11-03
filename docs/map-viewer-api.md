@@ -629,3 +629,20 @@ the list), so the host page's print styles are untouched.
 closes panels and the node's page, `Cmd/Ctrl+P` print. While a sequence plays: `←` / `→`
 step, `Space` play or pause, `Escape` stops it. Keys go to the viewer last clicked or focused (a
 lone viewer always), and never while focus is elsewhere in the host page.
+
+## Verification display (WO-46)
+
+**Contract**, addition: `options.prefs.trustMarks` and
+`viewer.setPrefs({trustMarks: true|false})` set initial/current diagram trust-mark
+visibility. Default is true, preserving existing maps. The reader's Show/Hide choice
+is remembered with viewer prefs; an explicit host preference overrides it without
+saving that host request. This is independent of sparkles and icon filtering.
+
+`viewer.snapshot()` captures current trustMarks in packed startup preferences; source
+text is never rewritten. SVG/PNG/print follow diagram visibility. Notes and node pages
+always retain evidence, with the node page's trust icons visible even while diagram
+marks are hidden. The neutral Verification button follows Info and is absent if the file has neither
+trust marks nor verification notes. The legend includes only categories used anywhere
+in the file. Only the source list
+scrolls, with foldable sources and Expand all/Collapse all on its header. Sparkles use
+the same Show/Hide segmented control.

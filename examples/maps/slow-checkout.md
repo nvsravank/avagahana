@@ -54,6 +54,70 @@ flowchart LR
 
 ## Details
 
+
+### <a id="e1"></a>e1
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="e2"></a>e2
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="e3"></a>e3
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="e4"></a>e4
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="e7"></a>e7
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="r1"></a>r1
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="psp"></a>psp
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="ord"></a>ord
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="gw"></a>gw
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
 ### <a id="shop"></a>Shop system
 
 An investigation in progress: why checkout takes eight seconds. Each box and arrow
@@ -63,13 +127,19 @@ not traced to anything).
 
 ### <a id="fraud"></a>Fraud check
 
+#### Evidence
+
 Suspect: it calls out to a scoring service on every order. Not yet seen in a trace.
 
 ### <a id="e5"></a>Order handler scores the order
+
+#### Evidence
 
 Hypothesis: the order handler waits for the fraud score before charging. If so, the
 two calls run one after the other, not side by side.
 
 ### <a id="e6"></a>Card token to the provider
+
+#### Evidence
 
 Someone said the provider is slow at peak. Nobody has traced it.

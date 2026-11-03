@@ -317,7 +317,7 @@ async function onChange() {
 async function onShow(d) {
   const state = {};
   for (const k of ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'step', 'edition']) if (d[k]) state[k] = d[k];
-  const prefs = d.colourBy || d.theme ? { ...(d.colourBy ? { colourBy: d.colourBy } : {}), ...(d.theme ? { theme: d.theme } : {}) } : null;
+  const prefs = d.colourBy || d.theme || typeof d.trustMarks === 'boolean' ? { ...(typeof d.trustMarks === 'boolean' ? { trustMarks: d.trustMarks } : {}), ...(d.colourBy ? { colourBy: d.colourBy } : {}), ...(d.theme ? { theme: d.theme } : {}) } : null;
   if (d.path === shown?.path) {
     picker.close();
     // an earlier version sent or forgotten: the viewer takes it, then the rest

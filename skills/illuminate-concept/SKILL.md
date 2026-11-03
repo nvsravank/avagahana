@@ -82,6 +82,16 @@ Mermaid's own syntax: a map is valid Mermaid, so GitHub draws it too.
   `references/boxes.md`, "Several diagrams in one file"), unless the user asks for
   separate files.
 
+## Source evidence
+
+For general diagrams, verification is optional: use it when it helps the reader
+assess the explanation. When useful, read
+`references/verification.md`: capture the inspected commits, record Sources and
+connect each checked claim to file/line Evidence in its existing note. Keep all
+metadata outside Mermaid. Display visibility is a runtime preference, never map text. Trust marks and nonempty
+Evidence must be authored together; the checker rejects either alone. The viewer
+warns and continues displaying such a file.
+
 ## Icons: sparingly
 
 Labels, shapes and classes carry most meaning; icons are for the few nodes where a

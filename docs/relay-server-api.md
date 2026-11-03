@@ -250,3 +250,11 @@ canonical targeted CSS. Fonts served and packed use the same reader; static
 directory indexes receive the same checks as direct files. Disallowed HTTP assets
 keep returning 404. Theme reads report problems and writes fail explicitly.
 See [theme styling](theme-styling.md) and [local operation](security.md).
+
+## Trust-mark visibility (WO-46)
+
+**Contract**, addition: `POST /api/show` accepts optional `trustMarks: true|false`,
+sent unchanged on the show event. Links use `trustMarks=1|0`, including an explicit 0.
+`POST /api/render` accepts the same boolean at the request's top level. Neither changes
+the map text. `show.py`, `render.py` and `pack.py` accept `--trust-marks show|hide`.
+The viewer's own HTML export records the reader's current choice in startup prefs.

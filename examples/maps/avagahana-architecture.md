@@ -27,7 +27,7 @@ flowchart LR
   skill --> files
   files --> relay
   relay --> atlas
-  atlas --> viewer
+  atlas embeds@-->|embeds| viewer
   viewer --> reader
   skill -.->|point, render| relay
   class agent,reader person
@@ -57,56 +57,121 @@ flowchart LR
 
 Code review of the local repository on 2026-10-27, updated 2026-11-01 for the contents bar (WO-30), change marks (WO-31), rendering for documents, the layout report and the maps folder's themes (WO-32, with its follow-up: underscores kept in labels, each box's outline in the report), narrow screens and the keyboard outline (WO-17), plan marks and Before and After from an earlier version (WO-34), portable snapshots: one map in one HTML file that opens from disk with no server (WO-33), the whole map from the viewer's Export menu, packed in the browser (WO-35), the sparkles button: sparkles hidden until the reader shows them, Clear this view or the whole map (WO-36), and crossings untangled by the order of lines: drafts drawn out of sight (render.py --draft, draft_report), a box's own direction kept (WO-37), the Poster look: a main icon per node, details on hover, a look per diagram type (WO-38), and a node page that follows a switch of light and dark, the earlier version asked for without an error, and render.py's warning for a --seq the map does not have, and expand 0 in a box diagram showing its top-level boxes (WO-39), and labels that break lines: a box's title at <br> and when long, and the labels of arrows, ER relationships and sequence messages with bold, italic and two lines, cut with … past two and shown whole on hover, the checker warning past two (WO-41), and ER Before and After at column level: columns compared by name with renames in a Renames section, connection pairs and cardinality in ER words, row signs and sparkles per column, nullable types, and emphasis in table titles and comments (WO-22 follow-up), and ER tables coloured by the classes the agent writes: six table classes built in (fact, dimension, bridge, master, transaction, lookup), the Role colouring and its guessing removed, a table with no class in one plain colour, and Mermaid's ER subgraph read as groups of tables that close like boxes, their tables' lines lifted to a closed group (WO-44), the rename to perspectives, scenarios and edition (no old names), walkthroughs over the map's own items with a panel on the left that follows the reader, and every diagram reachable from the atlas's plain items with their popups and from the viewer's whole-map picker (WO-40), and a map picked as Before from the atlas's map list, kept in the link (WO-43). This map describes the current implementation, rather than treating older work orders as current facts. The top-level bands are Author, Authoring and validation, Map storage, Local relay, Browser presentation, and Reader. These group workflow responsibilities; the map folder and people sit outside the installed product. Start with the components, then open linked diagrams. Five supported Mermaid families are included, with relation views, deployment placements, a sequence overlay and state/ER scenarios. Changes colouring is a planning feature, not a sixth diagram family; no unapproved future work is presented as implemented.
 
-
 ### <a id="agent"></a>AI agent
 
 Writes Markdown on disk and invokes the skill commands. The product is a one-way explanation channel: the reader does not edit maps and the relay sends no reader feedback to the agent. A render is the agent's own request, answered by the open page with a picture file; it carries nothing the reader did. Evidence: skills/illuminate-concept/SKILL.md; docs/relay-server-api.md.
-
 
 ### <a id="files"></a>Map files
 
 External maps folder. Relative slash-separated paths identify .md and .mmd files. Hidden files and directories are excluded. Content is Markdown plus Mermaid and extension sections; there is no application database. Evidence: relay-server/serve_maps.py scan and safe_join; atlas/sources.js.
 
-
 ### <a id="skill"></a>Shared map skills
 
 Two skills. illuminate-concept writes one map: it reads AVAGAHANA_MAP_DIR or the plain-text ~/.config/avagahana/maps-dir setting, then writes, checks, shows and points; its references cover each family, and three more are read only when needed: render.md (pictures for documents, render.py, the layout report), themes.md (a brand or house style, themes.py) and compare.md (two versions of a map: show.py and render.py --before, the changes as data); render.md also says when to send a snapshot (pack.py) instead of a picture; boxes.md says where the order of lines sets the picture and how to untangle crossings by trying orders on drafts (draft_report); state-and-er.md says the same for ER tables, tells the agent to class every table and to group tables with subgraph. trace-architecture reviews a whole project into one map file and builds on illuminate-concept. Evidence: skills/illuminate-concept/SKILL.md and references/; skills/trace-architecture/SKILL.md; docs/deploy-targets.md.
-
 
 ### <a id="checker"></a>Standalone format checker
 
 Python 3.9+ standard library checker. Validates syntax, extension sections, identifiers, cross-map targets, diagram reachability, sequence overlays and scenarios. Shares problem codes with the JavaScript viewer. Evidence: format/check_map.py and format/problems.json.
 
+#### Evidence
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: format/check_map.py
+  - Lines: 1-29
+  - Supports: The standalone checker validates Mermaid, extension sections and references.
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: format/check_common.py
+  - Lines: 1-27
+  - Supports: Checker modules share the problem-code catalog and structured diagnostics.
 
 ### <a id="relay"></a>Optional relay
 
 Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams changes and broadcasts agent pointers. Passes the agent's render requests to one open page and returns the picture (render.py), or the report for a draft's text drawn in the map's place (--draft, or draft_report() in-process for a trial script), and serves the maps folder's .themes/ (themes.py lists, checks and derives them). Keeps a map's earlier version in memory when show.py sends one (--before) and serves it to pages (an empty 204 when there is none and the page asks with empty=1). render.py warns when --seq names no sequence or scenario of the map, by the checker's names (check_map.seq_names), and still draws. Beside it, pack.py needs no running server: it fills map-viewer/snapshot.html (the page the viewer's own pack.js fills by the same rules) with one map, the viewer's modules (as blob: modules started by map-viewer/snapshot.js), only the icons used and the theme with its font into one HTML file under a policy that loads and sends nothing; its footer always says Built with Avagahana. /api/info carries build, the code's commit, for an export's generator tag. It never writes map contents. Bound to 127.0.0.1. Evidence: relay-server/serve_maps.py, relay-server/pack.py. In the static-folder deployment it is shown on disk as an available tool, not as a running process; that runtime uses browser folder access instead. Direct embedding also needs only viewer assets and a host page, with text supplied by that host.
 
+#### Evidence
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: relay-server/serve_maps.py
+  - Lines: 509-533
+  - Supports: Relay keeps the maps directory, file-serving configuration and event hub.
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: relay-server/serve_maps.py
+  - Lines: 822-843
+  - Supports: The standard-library HTTP server binds to loopback and runs the relay.
 
 ### <a id="atlas"></a>Atlas owns the outside world
 
 Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its bar above the viewer is the navigation (Walks, then every diagram, from viewer.contents()); it mounts the viewer with no picker of its own. Mounts the viewer with the maps folder's themes and the relay's build, passes a map's earlier version and saved time (asOf, for an export's footer) from the relay, and answers the agent's renders in a hidden second viewer. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
 
+#### Evidence
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: atlas/app.js
+  - Lines: 1-22
+  - Supports: Atlas owns page navigation, source adapters and hosting the viewer.
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: atlas/app.js
+  - Lines: 53-78
+  - Supports: The host mounts the viewer and supplies the map state and preferences.
 
 ### <a id="viewer"></a>Embeddable viewer
 
 mount(element, options) returns load, setState, on, ready, contents, export, snapshot, theme and preference controls, slot and destroy. All viewer imports stay inside map-viewer/. No API URLs or location ownership. Assets resolve from import.meta.url when used, or come from the host's assets option (a snapshot); crossMapNote marks links to maps a page cannot open. CSS is scoped to .mmv. Its picker lists the whole map (walkthroughs, then every diagram with what is under it). A walkthrough (model/walkthroughs.js: ## Walkthrough sections, ### Kind: name stops) opens in a panel on the left with Previous and Next; exploring inside a stop stays on it, another stop's place moves to it, anything else is off the path. Evidence: map-viewer/index.js, viewer.js, model/walkthroughs.js, base.css; docs/map-viewer-api.md.
 
+#### Evidence
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: map-viewer/index.js
+  - Lines: 1-20
+  - Supports: The public entry exports the embeddable viewer and theme support.
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: map-viewer/viewer.js
+  - Lines: 2479-2523
+  - Supports: The mounted viewer exposes loading, state, export, snapshots and preferences.
 
 ### <a id="reader"></a>Reader interaction
 
 Drill, select, search, filter icons, open notes and node pages, change view/deployment, play sequences, inspect changes, export and print. Each diagram type keeps its own look; a flowchart's Poster look draws nodes as their main icon and shows the rest in a pop-up on hover. Multiple viewer instances can coexist; only read-only caches are shared. Evidence: viewer.js, page.js, player.js, export.js.
 
+### <a id="embeds"></a>Atlas embeds the viewer
+
+The atlas uses the public viewer entry instead of importing its internal modules.
+
+#### Evidence
+
+- Source: [Avagahana](#revision-architecture-reviewed)
+  - File: atlas/app.js
+  - Lines: 13-19
+  - Supports: Imports mount and applyTheme from map-viewer/index.js.
 
 ## Node icons
 
-- av : verified
-- skill : verified
 - checker : verified
 - relay : verified
 - atlas : verified
 - viewer : verified
-- files : verified
+- embeds : verified
+
+## Sources
+
+### Repository: avagahana
+
+- Name: Avagahana
+- URL: https://github.com/nvsravank/avagahana
+
+The core component contracts were reviewed at the published master revision below,
+so the evidence links are available independently of this local work-order branch.
+Detailed diagrams remain reading aids without a separate layer of trust marks.
+
+#### Revision: architecture-reviewed
+
+- Branch: master
+- Commit: 776697f735cb844f1ff795e912c49b6c0d4c57b8
+- Reviewed: 2026-11-03
 
 ## Perspective: Runtime
 
@@ -235,7 +300,7 @@ Per-instance closure coordinates model, state, DOM, redraw and event subscriptio
 
 ### <a id="m"></a>model/map.js
 
-Shared parseMap orchestrates type parsing, notes, classes, relations, deployments, further diagrams, scenarios and sequence linkage. Each node gets its main icon (model/main-icon.js: the first cloud icon, its class's, else one marked main), and a flowchart its ## Look: line. Evidence: model/map.js; model/main-icon.js.
+Shared parseMap orchestrates type parsing, notes, classes, relations, deployments, further diagrams, scenarios and sequence linkage. model/provenance.js reads file-wide Sources and structured Evidence from each claim’s note. Each node gets its main icon (model/main-icon.js: the first cloud icon, its class's, else one marked main), and a flowchart its ## Look: line. Evidence: model/map.js; model/main-icon.js.
 
 
 ### <a id="p"></a>paint.js
@@ -250,7 +315,7 @@ Mount-relative camera, pan, pointer zoom, fit and semantic level of detail. Whee
 
 ### <a id="pg"></a>page.js and aspects.js
 
-Node pages show note, connections, linked diagrams, views, deployment placement, sequence participation and change removals. A page grows out of its node, then takes its colours from the theme, so it follows a switch of light and dark. A page is a modal dialog: it takes focus, keeps Tab inside and gives focus back on close. aspects.js supports these derived views. Evidence: page.js and aspects.js.
+Node pages show trust icons and foldable evidence first, then the remaining note, connections, linked diagrams, views, deployment placement, sequence participation and change removals. verification.js shares evidence rendering with claim popups and full notes; runtime visibility hides diagram marks without rewriting the map. A page grows out of its node, then takes its colours from the theme, so it follows a switch of light and dark. A page is a modal dialog: it takes focus, keeps Tab inside and gives focus back on close. aspects.js supports these derived views. Evidence: page.js and aspects.js.
 
 
 ### <a id="pl"></a>player.js

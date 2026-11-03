@@ -107,7 +107,7 @@ MODE = re.compile(r"^[a-z][a-z-]{0,23}$")
 COLOUR_BY = ("category", "level", "class", "changes")
 # what a show may ask for (a render's state may ask for more: expand, close, highlight, crop)
 BEFORE_MAX = 2 * 1024 * 1024   # an earlier version's text, in POST /api/show
-SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "step", "view", "env", "edition")
+SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "trustMarks", "step", "view", "env", "edition")
 NODE_ID = re.compile(r"^[A-Za-z][\w-]{0,99}$")
 PART_ID = re.compile(r"^[\w-]{1,100}$")   # a diagram heading's anchor
 THEME_ID = re.compile(r"^[A-Za-z0-9][\w-]{0,63}$")
@@ -204,7 +204,7 @@ def map_url(port: int, map_rel=None, **params) -> str:
     url = f"http://127.0.0.1:{port}/"
     if not map_rel:
         return url
-    query = urlencode({k: v for k, v in params.items() if v})
+    query = urlencode({k: ("1" if v else "0") if k == "trustMarks" else v for k, v in params.items() if v or (k == "trustMarks" and isinstance(v, bool))})
     return url + "#/" + quote(map_rel) + (f"?{query}" if query else "")
 
 
@@ -235,6 +235,11 @@ def picture_fields(body: dict, out: dict):
         if not isinstance(seq, str) or not PART_ID.match(seq):
             return "seq must be a heading anchor like checkout"
         out["seq"] = seq
+    trust_marks = body.get("trustMarks")
+    if trust_marks is not None:
+        if not isinstance(trust_marks, bool):
+            return "trustMarks must be true or false"
+        out["trustMarks"] = trust_marks
     colour_by = body.get("colourBy")
     if colour_by is not None:
         # open in this colouring, e.g. "changes" for a plan map
@@ -295,6 +300,10 @@ def render_fields(body: dict):
         if not isinstance(theme, str) or not THEME_ID.match(theme):
             return None, "theme must be a theme id"
         out["theme"] = theme
+    if "trustMarks" in body:
+        if not isinstance(body["trustMarks"], bool):
+            return None, "trustMarks must be true or false"
+        out["trustMarks"] = body["trustMarks"]
     appearance = body.get("appearance")
     if appearance is not None:
         if appearance not in ("light", "dark"):

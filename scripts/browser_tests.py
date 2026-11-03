@@ -283,6 +283,7 @@ def viewer_pack_tests(browser, base, tmp, check):
         ("a deployment with cloud icons", "checkout-release-after.md", {"state": {"env": "Production"}}),
         ("a sequence at step 3", "job-race.md", {"act": {"seq": "main", "step": 3}}),
         ("an earlier version and a host's since", "checkout-release-after.md", {"before": before, "since": before, "sinceLabel": "last release"}),
+        ("trust marks hidden, source notes retained", "source-review.md", {"prefs": {"trustMarks": False}}),
         ("dark, coloured by level", "garden.md", {"prefs": {"appearance": "dark", "colourBy": "level"}}),
         ("a .themes theme with its font", "garden.md", {"theme": brand}),
     ]
@@ -296,7 +297,9 @@ def viewer_pack_tests(browser, base, tmp, check):
         mine = payload(made)
         args = []
         for key, value in {**mine["options"].get("state", {}), **mine["options"].get("prefs", {})}.items():
-            if key in FLAGS:
+            if key == "trustMarks":
+                args += ["--trust-marks", "show" if value else "hide"]
+            elif key in FLAGS:
                 args += [FLAGS[key], str(value)]
         for flag in ("before", "since"):
             if flag in mine["options"]:
@@ -381,7 +384,7 @@ def snapshot_tests(browser, base=None):
         sparks = "document.querySelectorAll('#avagahana-map .mmv-change').length"
         # hidden until the reader shows them (WO-36): the button, then Show sparkles
         show = ("(async () => { const q = (s) => document.querySelector(`#avagahana-map [data-mmv=${s}]`); q('sparklesBtn').click();"
-                " await new Promise((r) => setTimeout(r, 50)); q('showSparkles').click(); await new Promise((r) => setTimeout(r, 200)); return "
+                " await new Promise((r) => setTimeout(r, 50)); q('sparklesShow').click(); await new Promise((r) => setTimeout(r, 200)); return "
                 + sparks + "; })()")
         first = open_snapshot(browser, out, lambda ev, _c: [ev(sparks), ev("!document.querySelector('#avagahana-map [data-mmv=sparklesBtn]').hidden"), ev(show)])[1]
         second = open_snapshot(browser, out, lambda ev, _c: ev(show))[1]
@@ -412,6 +415,13 @@ def snapshot_tests(browser, base=None):
         })()"""
         drawn, said, _ = open_snapshot(browser, planted, lambda ev, _c: ev(probe))
         check("the policy blocks a planted script, fetches and images", drawn and said == "blocked blocked blocked blocked blocked", said)
+
+        # Verification display belongs to startup prefs, never the source Markdown.
+        _, verified = pack("source-review.md", tmp / "verification.html", "--trust-marks", "hide")
+        drawn, state, errors = open_snapshot(browser, verified, lambda ev, _c: ev("({hidden:document.querySelector('.mmv').classList.contains('hide-trust'),button:!document.querySelector('[data-mmv=verificationBtn]').hidden})"))
+        check("offline verification: hidden diagram marks retain the toolbar", drawn and state == {"hidden": True, "button": True} and not errors, f"{state}; {errors[:3]}")
+        drawn, info, errors = open_snapshot(browser, verified, lambda ev, click: click('[data-note="atlas"]') and ev("({icon:!!document.querySelector('.mmv-page .mmv-evidence-mark svg'),evidence:document.querySelector('.mmv-page .mmv-evidence')?.textContent.includes('atlas/app.js')})"))
+        check("offline verification: node page retains icons and evidence when hidden", drawn and info == {"icon": True, "evidence": True} and not errors, f"{info}; {errors[:3]}")
 
         # inside a snapshot (WO-35): no interactive file; the Markdown saves under the policy
         saved = tmp / "saved"

@@ -8,6 +8,7 @@
 // detail, collapse) repaints; selection and search repaint only the marks, related
 // links only their own layer and dots.
 import { UI, RETURN_PATH, RETURN_W, SPARKLE_PATH, PLAN_GLYPH, PLAN_WORD } from './chrome.js';
+import { TRUST } from './model/provenance.js';
 import { picture } from './icons.js';
 import { diagramOf } from './diagrams/index.js';
 import { measure } from './measure.js';
@@ -220,6 +221,7 @@ export function createPainter(v) {
     if (s.bar) {
       g.dataset.bar = '1';
       svgEl('rect', { class: `mmv-bar${marked ? ' is-marked' : ''}`, y: s.h / 2 - 4, width: s.w, height: 8, rx: 4 }, g);
+      extraTrust(g, s);
       markNode(g, false);
       if (v.isFresh?.(s.id)) g.classList.add('is-glow');
       return;
@@ -234,6 +236,7 @@ export function createPainter(v) {
         svgEl('rect', { class: 'mmv-hit', x: -5, y: -5, width: s.note.size + 10, height: s.note.size + 10 }, ng);
         svgEl('g', { transform: `scale(${s.note.size / 24})` }, ng).innerHTML = UI.note;
       }
+      extraTrust(g, s);
       markNode(g, false);
       if (v.isFresh?.(s.id)) g.classList.add('is-glow');
       return;
@@ -248,6 +251,7 @@ export function createPainter(v) {
     if (marked) drawMarks(g, null, s.marks, s.w, s.h, s.shape);
     for (const ic of s.icons) drawIcon(g, ic);
     if (s.main) drawIcon(g, s.main);
+    if (s.hover) extraTrust(g, s);
     // Poster (WO-38): the pop-up names it all, so no browser tooltips on the screen (an
     // export keeps every title, for labelled pictures)
     if (s.hover && !S.exporting) g.querySelectorAll('title').forEach((t) => t.remove());
@@ -324,7 +328,15 @@ export function createPainter(v) {
   // an icon: a Phosphor symbol in the node's colour, or a cloud icon's own picture
   // (ic.src; the product's name is its title). A tile (a Poster main icon, WO-38): the
   // symbol in the background colour on a square of the node's colour.
+  function extraTrust(g, s) {
+    const codes = S.map.byId[s.id]?.icons.filter((c) => TRUST.has(c) && !s.icons?.some((ic) => ic.code === c)) || [];
+    codes.forEach((code, i) => {
+      const def = v.iconDef(code, v.legend());
+      drawIcon(g, { code, ph: def.ph, color: def.color, label: def.label, size: 16, x: s.w - 20 - (codes.length - 1 - i) * 22, y: s.note?.y ?? 5 });
+    });
+  }
   function drawIcon(g, ic) {
+    if (S.exporting && !v.trustMarks() && TRUST.has(ic.code)) return;
     if (ic.tile && !ic.src) {
       const tg = svgEl('g', { class: 'mmv-icon is-tile', transform: `translate(${ic.x},${ic.y})` }, g);
       svgEl('rect', { class: 'mmv-tile', width: ic.size, height: ic.size, rx: Math.round(ic.size / 7) }, tg);
@@ -344,7 +356,7 @@ export function createPainter(v) {
       svgEl('title', {}, ig).textContent = ic.label;
       return;
     }
-    const ig = svgEl('g', { class: 'mmv-icon', transform: `translate(${ic.x},${ic.y})`, style: ic.color ? `color:${ic.color}` : null }, g);
+    const ig = svgEl('g', { class: `mmv-icon${TRUST.has(ic.code) ? ' mmv-trust-mark' : ''}`, ...(TRUST.has(ic.code) ? { 'data-trust': ic.code, tabindex: 0, role: 'button', 'aria-label': `${ic.label}: evidence`, 'aria-expanded': 'false' } : {}), transform: `translate(${ic.x},${ic.y})`, style: ic.color ? `color:${ic.color}` : null }, g);
     svgEl('use', { href: v.symbols.href(ic.ph), width: ic.size, height: ic.size }, ig);
     svgEl('title', {}, ig).textContent = ic.label;
   }
@@ -362,6 +374,7 @@ export function createPainter(v) {
     if (s.marks.hit || s.marks.sel) drawMarks(g, null, s.marks, s.w, s.h, 'frame');
     for (const ic of s.icons || []) drawIcon(g, ic);
     if (s.main) drawIcon(g, s.main);
+    if (s.hover) extraTrust(g, s);
     // Poster: the pop-up names it, so no browser tooltip on the screen (exports keep it)
     if (s.hover && !S.exporting) g.querySelectorAll('title').forEach((t) => t.remove());
     const title = svgEl('text', { class: 'mmv-frame-title', x: s.title.x, y: s.title.y, 'font-size': s.title.size, 'font-weight': s.title.weight }, g);
@@ -467,15 +480,20 @@ export function createPainter(v) {
       }
       if (s.label && (s.label.note || s.label.icons)) {
         // the label, its icons, then a note mark; the note mark clicks like the arrow
-        const icons = (s.label.icons || []).map((c) => v.iconDef(c, v.legend()));
+        const icons = (s.label.icons || []).map((c) => ({ ...v.iconDef(c, v.legend()), code: c }));
         const tw = s.label.text ? labelW(s.label) + 4 : 0;
-        const iw = icons.length * 16;
+        const ordinaryCount = icons.filter((ic) => !TRUST.has(ic.code)).length;
+        icons.sort((a, b) => Number(TRUST.has(a.code)) - Number(TRUST.has(b.code)));
+        const trustGap = icons.length > ordinaryCount ? 6 : 0;
+        const iw = icons.length * 16 + trustGap;
         const x0 = s.label.x - (tw + iw + (s.label.note ? 14 : 0)) / 2;
         const lg = s.dim ? svgEl('g', { class: 'is-dim' }, frag) : frag;
         if (s.label.text) labelText(lg, { class: s.cls ? 'mmv-flow-label' : 'mmv-rel-label', x: x0, y: s.label.y, 'text-anchor': 'start', 'font-size': 12, 'data-for': s.id }, s);
         const iy = labelTop(s.label) - 11;   // the icons and note mark sit on the first line
         icons.forEach((def, k) => {
-          const ig = svgEl('g', { class: 'mmv-icon mmv-flow-icon', transform: `translate(${x0 + tw + k * 16},${iy})`, style: def.color ? `color:${def.color}` : null }, lg);
+          if (S.exporting && !v.trustMarks() && TRUST.has(def.code)) return;
+          const iconX = x0 + tw + k * 16 + (TRUST.has(def.code) ? (s.label.note ? 14 : 0) + trustGap : 0);
+          const ig = svgEl('g', { class: `mmv-icon mmv-flow-icon${TRUST.has(def.code) ? ' mmv-trust-mark' : ''}`, ...(TRUST.has(def.code) ? { 'data-trust': def.code, 'data-trust-arrow': s.id, tabindex: 0, role: 'button', 'aria-label': `${def.label}: evidence`, 'aria-expanded': 'false' } : {}), transform: `translate(${iconX},${iy})`, style: def.color ? `color:${def.color}` : null }, lg);
           svgEl('rect', { class: 'mmv-flow-note-bg', x: -1, y: -1, width: 16, height: 16, rx: 3 }, ig);
           if (def.vendor) {
             const dark = def.dark && picture(def.dark);
@@ -486,7 +504,7 @@ export function createPainter(v) {
           svgEl('title', {}, ig).textContent = def.label;
         });
         if (s.label.note) {
-          const ng = svgEl('g', { class: 'mmv-note-ic mmv-flow-note', 'data-arrow': s.id, transform: `translate(${x0 + tw + iw},${iy})` }, lg);
+          const ng = svgEl('g', { class: 'mmv-note-ic mmv-flow-note', 'data-arrow': s.id, transform: `translate(${x0 + tw + ordinaryCount * 16},${iy})` }, lg);
           svgEl('rect', { class: 'mmv-flow-note-bg', x: -1, y: -1, width: 16, height: 16, rx: 3 }, ng);
           svgEl('g', { transform: 'scale(0.5833)' }, ng).innerHTML = UI.note;
           svgEl('title', {}, ng).textContent = 'Note: click to read';

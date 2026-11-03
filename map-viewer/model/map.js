@@ -12,6 +12,7 @@ import { resolveMain } from './main-icon.js';
 import { parseClasses, mergeClasses, classOf, reservedTwice, assignSlots, strokeOf, withClassIcon, CHANGE_CLASSES, planOf } from './classes.js';
 import { readDeployment, infraOf, buildDeployment, syncWarnings } from './deployments.js';
 import { SCENARIO_TYPES, readScenario, scenarioText } from './scenarios.js';
+import { parseSources, evidenceOf, checkVerificationPairs } from './provenance.js';
 import { readWalkthroughs } from './walkthroughs.js';
 
 // A big map is drawn in full, with a warning that drawing may be slow.
@@ -93,6 +94,13 @@ export function parseMap(text, fileName) {
   linkSequences(main);
   main.unlinked = unreachable(main);
   for (const a of main.unlinked) main.warnings.push(problem('diagram-unreachable', `Diagram "${main.parts.get(a).title}" is linked from nowhere: no click, note link or Plays over leads to it from the first diagram.`));
+  const sources = parseSources(src, main.warnings);
+  for (const part of [main, ...main.parts.values()]) {
+    part.sources = sources;
+    const notes = new Set([...Object.values(part.byId), ...part.relations, ...(part.sequence?.messages || [])].map((x) => x.note).filter(Boolean));
+    for (const note of notes) { const evidence = evidenceOf(note, sources, part.warnings); if (evidence) note.evidence = evidence; }
+    checkVerificationPairs(part, part.warnings);
+  }
   for (const p of main.parts.values()) for (const w of p.warnings) main.warnings.push({ ...w, message: `Diagram "${p.title}": ${w.message}` });
   // coded problems for checks (format/problems.json), the messages for people
   for (const m of [main, ...main.parts.values()]) {

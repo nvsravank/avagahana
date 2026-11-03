@@ -37,6 +37,7 @@ export function parseHash(hash) {
   if (p.get('rels') === '1' || p.get('rels') === '0') state.rels = p.get('rels') === '1';
   if (p.get('edition') === 'before' || p.get('edition') === 'after') state.edition = p.get('edition');
   const prefs = {};
+  if (p.get('trustMarks') === '0' || p.get('trustMarks') === '1') prefs.trustMarks = p.get('trustMarks') === '1';
   // old links: theme=light|dark was the appearance; scheme=colorful|blues the colours
   const theme = p.get('theme');
   if (theme === 'light' || theme === 'dark') prefs.appearance = theme;
@@ -63,6 +64,7 @@ export function buildHash(path, state = {}, prefs = null, before = null) {
   if (state.seq && state.step) p.set('step', String(state.step));
   if (state.rels) p.set('rels', '1');
   if (state.edition === 'before') p.set('edition', 'before');
+  if (typeof prefs?.trustMarks === 'boolean') p.set('trustMarks', prefs.trustMarks ? '1' : '0');
   if (prefs?.colourBy) p.set('colourBy', prefs.colourBy);
   if (prefs?.theme) p.set('theme', prefs.theme);
   if (before) p.set('before', before);

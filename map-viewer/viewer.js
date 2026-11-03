@@ -20,6 +20,8 @@ import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml, 
 import { createSeen } from './seen.js';
 import { summarize } from './model/changes.js';
 import { compareFiles, markFile, changesIn, changesOf } from './model/compare.js';
+import { createVerification, visibilityControl } from './verification.js';
+import { TRUST } from './model/provenance.js';
 import { renderNoteBody } from './notes.js';
 import { STOP_KINDS } from './model/walkthroughs.js';
 import { problemList, mapProblems } from './problems.js';
@@ -29,7 +31,7 @@ import { clearMeasureCache } from './measure.js';
 const CHANGE_ICONS = ['ph sparkle'];   // new or changed (seen.js)
 const FRESH_MS = 2500;   // how long what a load brought counts as just arrived (it glows)
 const APPEARANCES = ['light', 'dark', 'auto'];
-const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'looks', 'rels', 'infoClosed', 'stepSeconds', 'sparkles'];
+const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'looks', 'rels', 'infoClosed', 'stepSeconds', 'sparkles', 'trustMarks'];
 // below this the viewer shows a message and nothing else
 const MIN_W = 320;
 const MIN_H = 280;
@@ -135,7 +137,7 @@ export function mount(element, options = {}) {
 
   // ---------- state ----------
   const S = {
-    themeId: null, appearance: 'auto', colourBy: 'category', looks: {}, mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0',
+    themeId: null, appearance: 'auto', colourBy: 'category', looks: {}, mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0', trustMarks: '1',
     relNode: null, noteSticky: false, noteOpen: false,
     path: null, text: null, map: null, focus: null, collapsed: new Set(), selected: null,
     // a file may hold several diagrams (model/map.js): file is the first, map the one
@@ -158,6 +160,7 @@ export function mount(element, options = {}) {
   if (saved.looks && typeof saved.looks === 'object') for (const [t, x] of Object.entries(saved.looks)) S.looks[t] = String(x);
   else if (typeof saved.look === 'string') S.looks = { mindmap: saved.look, er: saved.look };
   for (const k of ['appearance', 'colourBy']) if (link[k] != null) S[k] = String(link[k]);
+  if (typeof link.trustMarks === 'boolean') S.trustMarks = link.trustMarks ? '1' : '0';
   // a link's look: for every diagram that offers it, this visit only
   const linkLook = link.look != null ? String(link.look) : null;
   // a look set from outside (setPrefs) or by the reader on this file, by diagram (part
@@ -255,9 +258,21 @@ export function mount(element, options = {}) {
     if (n.plan) out.push(S.map?.compared ? `${n.plan} since the earlier version` : `planned: ${n.plan}`);
     return out;
   };
-  v.renderNote = (note, el) => { if (note?.body != null) renderNoteBody(note.body, el, wireLink); };
+  v.renderNote = (note, el) => verification.renderNote(note, el);
+  v.trustMarks = () => S.trustMarks !== '0';
   // the picture's name: the map, and the diagram when it is not the file's first
   v.fullTitle = () => (!S.map ? 'Map' : S.file && S.map !== S.file && S.file.title && S.file.title !== S.map.title ? `${S.file.title}: ${S.map.title}` : S.map.title || 'Map');
+  const verification = createVerification(v, {
+    wireLink, setVisible: (shown) => setTrustMarks(shown, true), hideNote,
+    closePanels, openPanel: () => { togglePanel('verificationPanel'); verification.renderPanel(); },
+    arrow: (id) => painter.arrow(id), listArrow: (id, index) => S.map?.relations.filter((r) => !r.cross && (r.from === id || r.to === id))[index], fullNote: (target, anchor) => { if (target.id) openPage(target.id); else if (anchor.dataset.trustArrow) showArrow(anchor.dataset.trustArrow, anchor); else { showNote(target, anchor); S.noteSticky = true; } },
+  });
+  v.verification = verification;
+  function setTrustMarks(shown, keep = false) {
+    S.trustMarks = shown ? '1' : '0'; verification.close();
+    verification.decorate();
+    verification.renderPanel(); if (keep) savePrefs();
+  }
   const painter = createPainter(v);
   const stage = createStage(v, {
     onLod: () => painter.lod(),
@@ -623,6 +638,7 @@ export function mount(element, options = {}) {
     return !again;
   };
   function canvasClick(target) {
+    if (target.closest('[data-trust]')) return;
     const dot = target.closest('[data-dot]');
     if (dot) { if (once(`dot:${dot.dataset.dot}`)) toggle(dot.dataset.dot); return; }
     const rel = target.closest('[data-rel]');
@@ -662,21 +678,21 @@ export function mount(element, options = {}) {
   }
   function hoverNote(id, anchor) {
     clearTimeout(hideTimer);
-    if (S.noteSticky || page.isOpen()) return;
+    if (verification.isOpen() || S.noteSticky || page.isOpen()) return;
     showNote(S.map.byId[id], anchor, true);
   }
   // Poster (WO-38): hovering a node, or a box's title strip, shows what the drawing
   // leaves out (showDetails)
   function hoverDetails(id, anchor) {
     clearTimeout(hideTimer);
-    if (S.noteSticky || page.isOpen() || !S.map?.byId[id]) return;
+    if (verification.isOpen() || S.noteSticky || page.isOpen() || !S.map?.byId[id]) return;
     showDetails(S.map.byId[id], anchor);
   }
   // an arrow label cut to two lines (WO-41): hovering it shows the whole label
   function hoverLabel(id, anchor) {
     clearTimeout(hideTimer);
     const cut = painter.cutLabel(id);
-    if (S.noteSticky || page.isOpen() || !cut) return;
+    if (verification.isOpen() || S.noteSticky || page.isOpen() || !cut) return;
     $.noteTitle.textContent = cut.title;
     $.noteBody.replaceChildren(...cut.runs.map((runs) => {
       const p = Object.assign(document.createElement('p'), { className: 'mmv-label-line' });
@@ -689,6 +705,7 @@ export function mount(element, options = {}) {
   }
   $.canvas.addEventListener('mouseover', (e) => {
     if (stage.dragging()) return;
+    if (e.target.closest('[data-trust]')) return;
     const ni = e.target.closest('[data-note]');
     if (ni) { hoverNote(ni.dataset.note, ni); return; }
     const lb = e.target.closest('[data-label]');
@@ -718,6 +735,7 @@ export function mount(element, options = {}) {
     render(false);
   }
   function drill(id) {
+    verification.close();
     const n = S.map.byId[id];
     if (!n) return;
     S.focus = n === S.map.root ? null : id;
@@ -735,6 +753,7 @@ export function mount(element, options = {}) {
   // into the diagram a node links to (its `click` "#anchor")
   // via: opened from the node's page, so coming back runs the page's motion backwards
   function enterPart(anchor, fromId, via = false) {
+    verification.close();
     const part = anchor && S.file?.parts.get(anchor);
     if (!part) return;
     S.trail.push({ anchor: S.part, focus: S.focus, node: fromId, view: { ...S.view }, ...(via ? { via: true } : {}) });
@@ -765,6 +784,7 @@ export function mount(element, options = {}) {
   }
   // ---------- the node's page (page.js) ----------
   function openPage(id) {
+    verification.close();
     if (!S.map?.byId[id]) return;
     hideNote();
     S.selected = id;
@@ -787,7 +807,7 @@ export function mount(element, options = {}) {
   function thumbOf(el, at) {
     const state = typeof at === 'string' ? { part: at } : { part: S.part, ...at };
     const t = mount(el, { storageKey: null, showProblems: 'none', themes: options.themes, defaultTheme: options.defaultTheme, theme: S.themeId,
-      prefs: { appearance: S.appearance }, state, text: S.text, path: S.path, thumbnail: true, file: S.file });
+      prefs: { appearance: S.appearance, trustMarks: S.trustMarks !== '0' }, state, text: S.text, path: S.path, thumbnail: true, file: S.file });
     return () => t.destroy();
   }
   // the way into a diagram from the first one (for a link or setState): its trail
@@ -927,6 +947,10 @@ export function mount(element, options = {}) {
 
   // ---------- notes (one at a time) ----------
   function wireLink(a) {
+    const ref = a.getAttribute('href')?.slice(1);
+    if (a.getAttribute('href')?.startsWith('#') && S.map?.sources?.byRef[ref]) {
+      a.addEventListener('click', (e) => { e.preventDefault(); hideNote(); verification.close(); closePanels(); $.verificationPanel.hidden = false; verification.renderPanel().then(() => { const entry = $.verificationPanel.querySelector(`[data-source="${ref}"]`); const repo = entry?.closest('.mmv-source'); if (repo) repo.open = true; entry?.scrollIntoView({ block: 'nearest' }); }); }); return;
+    }
     // `#<anchor>`: another diagram of this file, opened in place (plain text if none)
     const href = a.getAttribute('href');
     if (href.startsWith('#')) {
@@ -1000,7 +1024,7 @@ export function mount(element, options = {}) {
     $.noteTitle.textContent = n.plain || '(untitled)';
     const body = $.noteBody;
     body.replaceChildren();
-    if (n.note) renderNoteBody(n.note.body, body, wireLink);
+    if (n.note) verification.renderNote(n.note, body);
     else body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-muted', textContent: 'No note for this node.' }));
     if (!peek) relatedRows(n, body);
     $.note.hidden = false;
@@ -1043,6 +1067,8 @@ export function mount(element, options = {}) {
       for (const code of icons) {
         const span = document.createElement('span');
         span.innerHTML = iconHtml(code, legend, 'mmv-inline-ic', 'var(--mmv-ink)');
+        if (TRUST.has(code)) Object.assign(span.dataset, { trust: code, trustNode: n.id });
+        if (TRUST.has(code)) { span.classList.add('mmv-trust-mark'); span.tabIndex = 0; span.setAttribute('role', 'button'); }
         span.appendChild(document.createTextNode(iconDef(code, legend).label));
         row.appendChild(span);
       }
@@ -1050,7 +1076,7 @@ export function mount(element, options = {}) {
     }
     const change = v.changeOf(n.id);
     if (change) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: change === 'new' ? `New ${sinceWords}.` : `Changed ${sinceWords}.` }));
-    if (n.note) renderNoteBody(n.note.body, body, wireLink);
+    if (n.note) verification.renderNote(n.note, body);
     if (n.inners?.length) {
       body.appendChild(Object.assign(document.createElement('h4'), { textContent: 'Opens' }));
       for (const inner of n.inners) {
@@ -1097,7 +1123,7 @@ export function mount(element, options = {}) {
     if (change) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-since', textContent: change === 'new' ? 'New since you looked.' : 'Changed since you looked.' }));
     // a relation's own words (an ER relationship's cardinality, diagrams/er)
     if (a.items.length === 1 && a.items[0].words) body.appendChild(Object.assign(document.createElement('p'), { className: 'mmv-arrow-words', textContent: a.items[0].words }));
-    if (a.items.length === 1 && a.items[0].note) renderNoteBody(a.items[0].note.body, body, wireLink);
+    if (a.items.length === 1 && a.items[0].note) verification.renderNote(a.items[0].note, body);
     for (const r of a.items) {
       const b = document.createElement('button');
       b.className = 'mmv-relrow';
@@ -1219,6 +1245,8 @@ export function mount(element, options = {}) {
       useView(other.name);
       S.relNode = null;
       renderInfo();
+      verification.decorate();
+      verification.renderPanel();
       painter.animateNext();
     }
     $.searchCount.textContent = `${S.hitIdx + 1} / ${S.hits.length}${other ? ` · ${labelOf(other)}` : ''}`;
@@ -1448,9 +1476,9 @@ export function mount(element, options = {}) {
   function hideError() { $.errorbar.hidden = true; }
 
   // ---------- panels ----------
-  const PANELS = ['warnPanel', 'infoPanel', 'sparklesPanel', 'changesPanel'];
-  function closePanels() { PANELS.forEach((p) => { $[p].hidden = true; }); }
-  function togglePanel(id) { const open = $[id].hidden; closePanels(); $[id].hidden = !open; }
+  const PANELS = ['warnPanel', 'infoPanel', 'verificationPanel', 'sparklesPanel', 'changesPanel'];
+  function closePanels() { PANELS.forEach((p) => { $[p].hidden = true; }); $.verificationBtn.setAttribute('aria-expanded', 'false'); }
+  function togglePanel(id) { const open = $[id].hidden; closePanels(); $[id].hidden = !open; $.verificationBtn.setAttribute('aria-expanded', String(!$.verificationPanel.hidden)); }
   $.relBtn.addEventListener('click', () => {
     S.rels = S.rels === '1' ? '0' : '1';
     S.relNode = null;
@@ -1459,6 +1487,7 @@ export function mount(element, options = {}) {
     emitState();
   });
   $.warnBtn.addEventListener('click', () => togglePanel('warnPanel'));
+  $.verificationBtn.addEventListener('click', () => { togglePanel('verificationPanel'); verification.renderPanel(); });
   $.infoBtn.addEventListener('click', () => { togglePanel('infoPanel'); renderInfo(); });
   $.sparklesBtn.addEventListener('click', () => { togglePanel('sparklesPanel'); renderSparkles(); });
   $.changesBtn.addEventListener('click', () => { togglePanel('changesPanel'); renderChanges(); });
@@ -1495,12 +1524,7 @@ export function mount(element, options = {}) {
     panel.replaceChildren();
     const el = (tag, cls, text) => Object.assign(document.createElement(tag), { className: cls, ...(text != null ? { textContent: text } : {}) });
     panel.appendChild(el('div', 'mmv-legend-head', sinceWords[0].toUpperCase() + sinceWords.slice(1)));
-    const label = el('label', 'mmv-sparkles-show');
-    const box = Object.assign(document.createElement('input'), { type: 'checkbox', checked: S.sparkles === '1' });
-    box.dataset.mmv = 'showSparkles';
-    box.addEventListener('change', () => setSparkles(box.checked));
-    label.append(box, 'Show sparkles');
-    panel.appendChild(label);
+    panel.appendChild(visibilityControl('Sparkles', S.sparkles === '1', setSparkles, 'sparkles'));
     const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
     const words = (c) => [c.diagrams && n(c.diagrams, 'new diagram', 'new diagrams'), c.new && `${c.new} new`, c.changed && `${c.changed} changed`, c.removed && `${c.removed} removed`].filter(Boolean).join(', ');
     const keys = currentSeenKeys();
@@ -1576,7 +1600,7 @@ export function mount(element, options = {}) {
   // like the other menus, the panels close on a click anywhere else (in the host page too)
   function outsidePanels(e) {
     const t = e.target;
-    if (PANELS.some((p) => !$[p].hidden) && ![$.infoPanel, $.warnPanel, $.sparklesPanel, $.changesPanel, $.infoBtn, $.warnBtn, $.sparklesBtn, $.changesBtn, $.perspBtn].some((el) => el.contains(t))) closePanels();
+    if (PANELS.some((p) => !$[p].hidden) && ![$.verificationPanel, $.verificationBtn, $.infoPanel, $.warnPanel, $.sparklesPanel, $.changesPanel, $.infoBtn, $.warnBtn, $.sparklesBtn, $.changesBtn, $.perspBtn].some((el) => el.contains(t))) closePanels();
   }
   document.addEventListener('pointerdown', outsidePanels, true);
   // the mode buttons come from the diagram type
@@ -1762,6 +1786,7 @@ export function mount(element, options = {}) {
     if (list.length === 1) player.open(list[0].anchor);
   });
   function setView(name) {
+    verification.close();
     if (!S.map?.root || !viewNamed(name)) return;
     const before = S.relView;
     useView(name);
@@ -1776,6 +1801,8 @@ export function mount(element, options = {}) {
     S.rels = '1';
     S.relNode = null;
     renderInfo();
+    verification.decorate();
+    verification.renderPanel();
     // the view decides the layout: fit the new picture unless the reader has moved it
     if (diagram().layoutByView) { painter.animateNext(); render(S.userMoved ? false : 'all'); }
     else if (S.mode === 'list') render(false);
@@ -1890,10 +1917,10 @@ export function mount(element, options = {}) {
       }
     }
     // icons: those no class explains (a class's own icon is in the colour key)
-    const rest = [...used].filter((c) => !classIcons.has(c));
+    const rest = [...used].filter((c) => !classIcons.has(c) && !TRUST.has(c));
     if (rest.length || !classIcons.size) {
       section('icons', 'Icons on this map');
-      if (!rest.length) box.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-legend-empty', textContent: 'No icons on this map.' }));
+      if (!rest.length) box.appendChild(Object.assign(document.createElement('div'), { className: 'mmv-legend-empty', textContent: [...used].some((c) => TRUST.has(c)) ? 'No other icons on this map.' : 'No icons on this map.' }));
       rest.map((code) => ({ code, label: iconDef(code, v.legend()).label })).sort(byLabel)
         .forEach(({ code, label }) => row(iconHtml(code, v.legend(), '', 'var(--mmv-ink)'), label, code));
     }
@@ -2036,6 +2063,7 @@ export function mount(element, options = {}) {
     const generation = ++loadGeneration;
     await ready;
     if (destroyed || generation !== loadGeneration || context.signal?.aborted) return;
+    verification.close();
     const keep = path != null && path === S.path && sourceId === (context.sourceId ?? null) && !!S.map?.root;
     // the earlier version goes with its map: given with the load, else kept only for the same map
     if ('before' in context) beforeText = context.before == null || options.thumbnail ? null : String(context.before);
@@ -2106,6 +2134,7 @@ export function mount(element, options = {}) {
       }
     }
     if (destroyed || generation !== loadGeneration || context.signal?.aborted) return;
+    verification.close();
     sourceId = context.sourceId ?? null;
     problems.set('map', [...mapProblems(file), ...extra]);
     S.path = path;
@@ -2206,6 +2235,8 @@ export function mount(element, options = {}) {
     $.title.textContent = showTitle ? map.title : '';
     buildIconBar();
     renderInfo();
+    verification.decorate();
+    verification.renderPanel();
   }
 
   // ---------- walkthrough: a side panel of stops, moved by the reader ----------
@@ -2378,7 +2409,7 @@ export function mount(element, options = {}) {
       ...(marks ? { since: sinceText, ...(options.sinceLabel ? { sinceLabel: options.sinceLabel } : {}) } : {}),
       ...(beforeText != null ? { before: beforeText } : {}),
       state,
-      prefs: { ...(S.appearance !== 'auto' ? { appearance: S.appearance } : {}), colourBy: S.colourBy },
+      prefs: { trustMarks: S.trustMarks !== '0', ...(S.appearance !== 'auto' ? { appearance: S.appearance } : {}), colourBy: S.colourBy },
     };
     const { packSnapshot } = await import(new URL('./pack.js', import.meta.url).href);
     return packSnapshot({ text: S.text, path: S.path, theme: themeSources.get(S.themeId) || currentTheme(), options: opts, asOf, version: options.version ?? null });
@@ -2446,7 +2477,8 @@ export function mount(element, options = {}) {
     if (options.assets) useAssets(options.assets);
     await Promise.all([useCss(options.assets), loadIconIndex()]);
     // the change marks' icons (seen.js) and those diagram types draw themselves (an ER key)
-    await ensureIcons([...CHANGE_ICONS, ...DIAGRAMS.flatMap((d) => d.icons || [])]);
+    await ensureIcons([...CHANGE_ICONS, ...TRUST, 'ph seal-check', ...DIAGRAMS.flatMap((d) => d.icons || [])]);
+    verification.decorate();
     const loadBuiltIn = async () => {
       try { return (await import('./themes/default/theme.js')).default; } catch (x) {
         problems.add('theme', [{ level: 'error', code: 'default-theme-missing', message: `The built-in theme could not be loaded (${x.message || x}).` }]);
@@ -2508,18 +2540,22 @@ export function mount(element, options = {}) {
       if (S.path != null || S.text) await load(S.text, S.path, { sourceId });
     },
     setPrefs(p = {}) {
+      if (typeof p.trustMarks === 'boolean') setTrustMarks(p.trustMarks);
       if (APPEARANCES.includes(p.appearance)) S.appearance = p.appearance;
       const was = posterNow();
       if (p.look != null && looksOf().some(([id]) => id === p.look)) lookHere.set(S.part || '', String(p.look));
       if (p.colourBy != null && colourChoices().some(([id]) => id === p.colourBy)) S.colourBy = p.colourBy;
       lookChanged(was);
       renderInfo();
+      verification.decorate();
+      verification.renderPanel();
     },
     destroy() {
       if (destroyed) return;
       destroyed = true;
       viewers.delete(api);
       if (activeViewer === api) activeViewer = null;
+      verification.destroy();
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', outsidePanels, true);
       media.removeEventListener('change', onMedia);

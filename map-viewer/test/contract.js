@@ -1,6 +1,7 @@
 // Browser-run checks of the viewer contract (docs/map-viewer-api.md).
 // Open through any static server or the relay; results show on the page and in
 // window.testResults. scripts/browser_tests.py runs it in headless Chrome.
+import { testVerification } from './verification.js';
 import { testErConnections } from './er-connections.js';
 import { testDiagramLinks } from './diagram-links.js';
 import { testContents } from './contents.js';
@@ -33,6 +34,7 @@ const styleCount = () => document.querySelectorAll('style[data-mmv-theme]').leng
 const linkCount = () => document.querySelectorAll('link[href$="map-viewer/base.css"]').length;
 
 try {
+  await testVerification(check, wait);
   await testErConnections(check);
   await testDiagramLinks(check);
   await testContents(check);
@@ -745,6 +747,7 @@ try {
     document.querySelector('#a .mmv-lrow[data-id="orders"] .mmv-lnote-ic').click();
     await wait(50);
     const pg = document.querySelector('#a .mmv-page');
+    await waitFor(() => pg?.querySelectorAll('.mmv-page-thumb[data-anchor]').length === 3 && /charges/.test(pg.querySelector('.mmv-strip-svg')?.textContent));
     check('the note icon opens the node\'s page: note, thumbnails, arrows, a crumb', !!pg && /Owns an order/.test(pg.textContent)
       && pg.querySelectorAll('.mmv-page-thumb[data-anchor]').length === 3 && /Payments service/.test(pg.querySelector('.mmv-strip-svg')?.textContent) && /charges/.test(pg.querySelector('.mmv-strip-svg')?.textContent)
       && /Orders service$/.test(document.querySelector('#a [data-mmv=crumbs]').textContent), pg?.textContent.slice(0, 200));

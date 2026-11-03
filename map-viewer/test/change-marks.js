@@ -9,8 +9,8 @@ export async function showSparkles(host, wait, on = true) {
   const q = (sel) => host.querySelector(sel);
   q('[data-mmv=sparklesBtn]').click();
   await wait(20);
-  const box = q('[data-mmv=showSparkles]');
-  if (box.checked !== on) box.click();
+  const choice = q(`[data-mmv=sparkles${on ? 'Show' : 'Hide'}]`);
+  if (choice.getAttribute('aria-pressed') !== 'true') choice.click();
   q('[data-mmv=sparklesBtn]').click();
   await wait(20);
 }
@@ -91,7 +91,7 @@ export async function testChangeMarks(check, wait) {
   check('the info panel has no since section, the info button no ring', !/Since you looked/.test(infoNow) && !q('[data-mmv=infoBtn]').classList.contains('has-changes'));
   q('[data-mmv=sparklesBtn]').click();
   await wait(30);
-  check('the sparkles panel opens with Show sparkles off', !q('[data-mmv=sparklesPanel]').hidden && q('[data-mmv=showSparkles]').checked === false
+  check('the sparkles panel opens with Hide selected', !q('[data-mmv=sparklesPanel]').hidden && q('[data-mmv=sparklesHide]').getAttribute('aria-pressed') === 'true'
     && /Since you looked/.test(q('[data-mmv=sparklesPanel]').textContent));
   q('[data-mmv=sparklesBtn]').click();
   // hidden: reading clears nothing (a node, its page, a whole new diagram)

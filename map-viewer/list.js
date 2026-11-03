@@ -1,3 +1,4 @@
+import { TRUST } from './model/provenance.js';
 // list.js — any diagram as an indented outline (list mode): the list scene (rows,
 // pure data) and its painting. Rows carry the mmv-k / mmv-l classes like drawn
 // nodes, so the theme colours them.
@@ -119,7 +120,12 @@ export function renderList(v, on) {
     label.className = 'mmv-llabel';
     const text = document.createElement('span');
     text.className = s.depth === 0 ? 'mmv-d0' : s.depth === 1 ? 'mmv-d1' : '';
-    s.icons.forEach((code) => text.insertAdjacentHTML('beforeend', v.iconHtml(code, legend, 'mmv-inline-ic', 'var(--n)')));
+    const trustMarks = [];
+    s.icons.forEach((code) => {
+      const span = document.createElement('span'); span.innerHTML = v.iconHtml(code, legend, 'mmv-inline-ic', 'var(--n)');
+      if (TRUST.has(code)) { span.className = 'mmv-trust-mark'; span.dataset.trust = code; span.dataset.trustNode = s.id; span.tabIndex = 0; span.setAttribute('role', 'button'); span.setAttribute('aria-label', `${words(code)}: evidence`); }
+      if (TRUST.has(code)) trustMarks.push(span); else text.append(span);
+    });
     s.runs.forEach((runs, i) => {
       if (i) text.appendChild(document.createTextNode(' '));
       for (const r of runs) {
@@ -161,6 +167,7 @@ export function renderList(v, on) {
       di.addEventListener('click', (e) => { e.stopPropagation(); on.openDiagram(x.anchor, s.id); });
       label.appendChild(di);
     }
+    label.append(...trustMarks);
     row.addEventListener('click', () => { k.key = `n:${s.id}`; on.click(s.id); });
     // read in full: label, icons' meanings, its class or planned change, note, children
     const kids = n?.children.length || 0;
@@ -190,11 +197,15 @@ export function renderList(v, on) {
       if (r.plan) b.insertAdjacentHTML('beforeend', planSignSvg(r.plan, 14));
       b.append(Object.assign(document.createElement('span'), { className: 'mmv-lrel-arrow', textContent: r.glyph, ariaHidden: 'true' }), ` ${r.name}`);
       if (r.label) b.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lrel-label', textContent: ` · ${r.label}` }));
+      const arrowTrust = [];
       for (const code of r.icons || []) {
         const label = words(code);
-        b.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-rel-ic', title: label, innerHTML: v.iconHtml(code, legend, 'mmv-inline-ic', 'var(--mmv-ink)') }));
+        const mark = Object.assign(document.createElement('span'), { className: 'mmv-rel-ic', title: label, innerHTML: v.iconHtml(code, legend, 'mmv-inline-ic', 'var(--mmv-ink)') });
+        if (TRUST.has(code)) { mark.classList.add('mmv-trust-mark'); mark.dataset.trust = code; mark.dataset.trustRel = String(i); mark.dataset.trustNode = s.id; mark.tabIndex = 0; mark.setAttribute('role', 'button'); mark.setAttribute('aria-label', `${label}: evidence`); }
+        if (TRUST.has(code)) arrowTrust.push(mark); else b.append(mark);
       }
       if (r.note) b.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lnote-ic', innerHTML: uiSvg('note', 14) }));
+      b.append(...arrowTrust);
       const way = DIRECTION[r.dir];   // "to" or "from" the other end
       b.title = `${way[0].toUpperCase()}${way.slice(1)} ${r.name}: go there`;
       const key = `r:${s.id}:${i}`;

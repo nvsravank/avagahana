@@ -3,6 +3,7 @@
 // routed column connections behind the tables (scene.relsBehind) with the cardinality marks at
 // their ends, the groups (subgraph) frames behind them. A selected table with a grain says
 // what one row is (its caption) and its lines light up. Pure: no DOM, no viewer state.
+import { TRUST } from '../../model/provenance.js';
 import { nodeShaper, nodeName, MIN_LABEL_PX, planClass, passesFilter } from '../../geometry.js';
 import { strokeStyle } from '../../model/classes.js';
 import { HEAD, tablesIn } from './table.js';
@@ -52,7 +53,7 @@ export function buildScene(input) {
         // carries the marks of the lines it stands for (one kind, else changed)
         ...(open ? {} : hiddenPlan(order.slice(geo.shownCount))), hiddenCols: order.slice(geo.shownCount).map((r) => r.a.name) } : null,
     };
-    if (n.note) s.note = { x: p.w - 22, y: (HEAD - 16) / 2, size: 16 };
+    if (n.note) s.note = { x: p.w - 22 - n.icons.filter((c) => TRUST.has(c)).length * 22, y: (HEAD - 16) / 2, size: 16 };
     // the grain sentence under a selected table
     if (input.selected === n.id) {
       const text = grainSentence(n);

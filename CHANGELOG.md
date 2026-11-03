@@ -6,6 +6,22 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): file-wide Sources with repository/revision identity and
+  per-claim Evidence inside existing Details notes, including several file/line
+  references at one captured commit. Trust marks and nonempty verification text must
+  be paired: checker errors, viewer warnings without refusing display. All metadata
+  remains outside valid Mermaid.
+- Verification: a neutral seal beside Info opens the trust legend and foldable source
+  list, shown only for files with trust marks/notes; its legend lists only used
+  categories. Click trust marks for claim evidence. Marks follow the note on the right;
+  their slots stay reserved when hidden, including on initial load and in exports. Node pages keep their trust icons and
+  evidence above diagrams, including when diagram marks are hidden. Sparkles and
+  trust marks share Show/Hide controls.
+- **Contract** (viewer/relay): runtime `trustMarks` preference and show/render boolean,
+  `--trust-marks show|hide` CLI flags. HTML stores current visibility separately from
+  unchanged source text; SVG, PNG and print remain static with no evidence links. Skills
+  teach committed-source review, sanitized remotes and honest non-Git identities.
+
 - **Contract** (themes): targeted CSS support through defined class hooks, selectors
   and properties, checked consistently in Python and the viewer. Numeric appearance
   controls cover rectangular corners, strokes/dashes and background alpha; colours,

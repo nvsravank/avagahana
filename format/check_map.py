@@ -45,6 +45,7 @@ from check_er import read_er  # noqa: E402
 from check_common import icon_codes
 from check_connections import check_connections, check_renames
 from check_scenarios import check_scenarios  # noqa: E402
+from check_provenance import check_provenance, check_verification_pairs
 from check_vendor import VENDOR_CODE, nearest, vendor_ok  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -543,7 +544,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     seen = {}
     for title, _, hl in secs:
         key = title.lower()
-        single = key in ("details", "notes", "icons", "node icons", "classes", "plays over", "renames")
+        single = key in ("details", "notes", "icons", "node icons", "classes", "plays over", "renames", "sources")
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
@@ -585,6 +586,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
 
     # classes: this diagram's own, with the first diagram's shared
     classes = dict(shared_classes)
+    class_trust = dict(part.get("shared_trust", {}))
     class_clouds = dict(part.get("shared_clouds", {}))
     for title, body, hl in secs:
         if title.lower() != "classes":
@@ -601,9 +603,11 @@ def check_part(m, part, shared_classes, anchors, legend_out):
                 m.report(ln, "plan-class-reserved", f"class {mm.group(1)}: a built-in planned-change class; this line is ignored")
                 continue
             classes[mm.group(1)] = True
+            class_trust[mm.group(1)] = set(codes) & {"verified", "inferred", "hypothesis", "unsourced"}
             class_clouds[mm.group(1)] = next((c for c in codes if VENDOR_CODE.fullmatch(c)), None)
     part["classes"] = classes
     part["class_clouds"] = class_clouds
+    part["class_trust"] = class_trust
 
     # mind map ::icon codes
     for n in ids.values():
@@ -717,6 +721,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             part["plays_over"].append((mm.group(1), mm.group(2), ln))
 
     # notes
+    part["view_eids"] = view_eids
     noted = {}
     part["note_links"] = set()
     for title, body, hl in secs:
@@ -790,6 +795,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if dm and dm.group(1).strip() and not any(x.strip().lower() in with_block for x in dm.group(1).split(",")):
             m.report(hl, "deployment-no-block", f"## {title} has no Mermaid block (a flowchart of where things run)")
     check_deployments(m, part, views)
+    check_verification_pairs(m, part, secs, own_icons, class_trust, classes)
 
 
 def plan_classes_twice(m, pairs):
@@ -1241,17 +1247,21 @@ def check(path):
         anchors.setdefault(p["anchor"], p)
     shared = {}
     clouds = {}
+    shared_trust = {}
     legend = {}
     for i, p in enumerate(parts):
         p["shared_clouds"] = clouds
+        p["shared_trust"] = shared_trust
         check_part(m, p, shared, anchors, legend)
         if i == 0:
             shared = p.get("classes", {})
             clouds = p.get("class_clouds", {})
+            shared_trust = p.get("class_trust", {})
     tm = re.search(r"^# (.+)$", src[:fences[0].start()], re.M)
     if parts:
         parts[0]["anchor_self"] = anchor_of(tm.group(1)) if tm else None
         check_links(m, parts, anchors)
+    check_provenance(m)
     check_walkthroughs(m, src, parts, tm.group(1).strip() if tm else None)
     m.problems.sort(key=lambda x: x[0])
     return m.problems

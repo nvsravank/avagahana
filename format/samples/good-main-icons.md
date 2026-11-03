@@ -13,6 +13,24 @@ flowchart LR
   class q queue
 ```
 
+## Details
+
+### <a id="api"></a>api
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="sched"></a>sched
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+
+
 ## Look: poster
 
 ## Classes

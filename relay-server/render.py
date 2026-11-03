@@ -152,6 +152,7 @@ def main(argv=None) -> int:
     ap.add_argument("--edition", choices=("before", "after"), help="with --before: draw the earlier file (before) or the map (after, the default)")
     ap.add_argument("--draft", help="draw this file (any file) in the map's place: a change tried before it is made")
     ap.add_argument("--theme", help="a theme id (themes.py list)")
+    ap.add_argument("--trust-marks", choices=("show", "hide"), help="show or hide trust marks in this picture")
     ap.add_argument("--appearance", choices=("light", "dark"))
     ap.add_argument("--look", help="a flowchart's look: outline or poster (default: the map's ## Look: line, else outline)")
     size = ap.add_mutually_exclusive_group()
@@ -220,7 +221,7 @@ def main(argv=None) -> int:
             print(status_line("failed", error=f"cannot read --draft {args.draft}: {exc.strerror or exc}"))
             return 1
     body = {k: v for k, v in {"path": args.map, "text": draft, "state": state, "format": fmt, "theme": args.theme,
-                              "appearance": args.appearance, "look": args.look, "width": args.width, "scale": args.scale,
+                              "appearance": args.appearance, "look": args.look, "trustMarks": None if args.trust_marks is None else args.trust_marks == "show", "width": args.width, "scale": args.scale,
                               "background": args.background, "report": args.report, "before": before}.items() if v is not None}
 
     def one(st, target):

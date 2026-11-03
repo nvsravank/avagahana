@@ -8,6 +8,17 @@ mindmap
       ::icon(ph cloud ph gear-six)
 ```
 
+## Details
+
+### <a id="root"></a>root
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+
+
 ## Classes
 - store : ph hard-drives verified : Storage
 

@@ -5,6 +5,15 @@ description: Review a project, repository or codebase and explain it as an Avaga
 
 # Diagram a codebase
 
+Verification is the default for trace-architecture. Read
+`../illuminate-concept/references/verification.md` before inspecting source:
+review captured committed trees, record repository revisions in Sources, and attach
+file/line Evidence to the verified nodes and arrows in their existing Details notes.
+Use inferred, hypothesis or unsourced honestly when a claim is not verified, with
+an Evidence explanation of that status. Do this by default; it is not an optional
+extra pass. Each trust-marked claim needs verification text, and each Evidence
+section needs the matching trust mark.
+
 The output is **one map file** holding every diagram, linked from the first, unless
 the user asks for separate files. Everything about the format, checking and showing
 the map is in the illuminate-concept skill: read `../illuminate-concept/SKILL.md` and the references it names

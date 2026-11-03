@@ -45,6 +45,7 @@ def main(argv=None) -> int:
     ap.add_argument("--seq", help="play this sequence over its view: its heading's anchor (main: the first diagram)")
     ap.add_argument("--step", type=int, help="the sequence's step, from 1")
     ap.add_argument("--colour-by", choices=list(COLOUR_BY), help="open in this colouring: changes shows a plan's added, changed and removed")
+    ap.add_argument("--trust-marks", choices=("show", "hide"), help="initial visibility of trust marks; does not change map text")
     ap.add_argument("--theme", help="switch the page to this theme (themes.py list)")
     ap.add_argument("--before", help="an earlier version of the map, from any file (for example git show v1.4:<map> > /tmp/old.md): "
                     "the page switches between Before and After and lists what changed; none forgets it")
@@ -63,6 +64,8 @@ def main(argv=None) -> int:
     body = {k: v for k, v in {"path": args.map, "part": args.part, "node": args.node, "focus": args.focus, "page": args.page,
                               "mode": args.mode, "view": args.view, "env": args.env, "seq": args.seq,
                               "step": args.step if args.seq else None, "colourBy": args.colour_by, "theme": args.theme}.items() if v}
+    if args.trust_marks is not None:
+        body["trustMarks"] = args.trust_marks == "show"
     if args.before is not None:
         if args.before == "none":
             body["before"] = None
@@ -89,7 +92,7 @@ def main(argv=None) -> int:
         print(status_line("failed", error=exc))
         return 1
     url = map_url(port, args.map, mode=args.mode, part=args.part, focus=args.focus, node=args.node, page=args.page, view=args.view, env=args.env,
-                  seq=args.seq, step=args.step if args.seq else None, colourBy=args.colour_by, theme=args.theme)
+                  seq=args.seq, step=args.step if args.seq else None, colourBy=args.colour_by, theme=args.theme, trustMarks=None if args.trust_marks is None else args.trust_marks == "show")
     print(status_line("shown" if delivered else "none", url=url))
     return 0
 

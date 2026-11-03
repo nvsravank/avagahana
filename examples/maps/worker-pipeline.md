@@ -71,7 +71,17 @@ flowchart LR
 
 ## Details
 
+
+### <a id="fn"></a>fn
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
 ### <a id="server"></a>Server
+
+#### Evidence
 
 The API server. Takes requests from the Lambda, writes jobs to the queue and keeps
 sessions in the cache.
@@ -81,6 +91,8 @@ sessions in the cache.
 Postgres on RDS, with a read cache in front. Nightly exports go to S3.
 
 ### <a id="queue"></a>Queue
+
+#### Evidence
 
 SQS standard queue. Not yet checked whether it is FIFO.
 

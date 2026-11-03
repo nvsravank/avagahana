@@ -10,7 +10,7 @@ export async function testDiagramLinks(check) {
     ['Other flow', 'flowchart LR\n  a[Other] --> b[End]'],
   ];
   const text = '# Links\n```mermaid\nflowchart LR\n  viewer[Map viewer]\n' + parts.map(([name]) => `  click viewer "#${name.toLowerCase().replaceAll(' ', '-')}"`).join('\n')
-    + '\n```\n## Node icons\n- viewer : verified\n## Details\n### <a id="viewer"></a>Viewer\nNode note.\n'
+    + '\n```\n## Node icons\n- viewer : ph gear-six verified\n## Details\n### <a id="viewer"></a>Viewer\nNode note.\n\n#### Evidence\n\nThis fixture checks the viewer quick links.\n'
     + parts.map(([name, body]) => `\n## ${name}\n\n\`\`\`mermaid\n${body}\n\`\`\`\n`).join('');
   const host = document.getElementById('a'), v = mount(host, { storageKey: null });
   await v.load(text, 'links.md');
@@ -23,10 +23,11 @@ export async function testDiagramLinks(check) {
   const bounds = links.map((g) => g.getBoundingClientRect());
   check('all six diagram quick links occupy a separate row below the title', links.length === 6 && bounds.every((b) => b.top > title.bottom && Math.abs(b.top - bounds[0].top) < 0.1));
   check('quick-link hit targets fit the box and do not overlap', bounds.every((b, i) => b.left >= box.left && b.right <= box.right && b.bottom <= box.bottom && (!i || b.left > bounds[i - 1].right)));
-  const content = node.querySelector('.mmv-icon').getBoundingClientRect();
+  const content = node.querySelector('.mmv-icon:not(.mmv-trust-mark)').getBoundingClientRect();
   const note = node.querySelector('.mmv-note-ic').getBoundingClientRect();
   const centered = (r) => Math.abs((r.top + r.bottom - box.top - box.bottom) / 2) < 1;
-  check('content and note icons flank the title and are vertically centered', content.right < title.left && note.left > title.right && centered(content) && centered(note));
+  const trust = node.querySelector('.mmv-trust-mark').getBoundingClientRect();
+  check('identity stays left; note and verification follow the title on the right', content.right < title.left && note.left > title.right && trust.left >= note.right && centered(content) && centered(note) && centered(trust));
   const drawings = links.map((g) => g.querySelector('g').innerHTML);
   check('quick links group by type and preserve author order within a type', links.map((g) => g.dataset.anchor).join(',') === 'tables,flow,other-flow,mindmap,sequence,state');
   check('five diagram types have distinct icons; two flowchart links share one', new Set(drawings).size === 5 && drawings[1] === drawings[2]);

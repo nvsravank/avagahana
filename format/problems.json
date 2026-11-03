@@ -588,6 +588,26 @@
    "level": "error",
    "side": "checker",
    "what": "A walkthrough stop naming an item the map does not have (checked by kind and name)"
+  },
+  "source-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "Malformed source repository or revision metadata"
+  },
+  "evidence-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "Malformed Evidence section in a note"
+  },
+  "evidence-reference": {
+   "level": "error",
+   "side": "both",
+   "what": "Evidence names no inspected source revision"
+  },
+  "verification-pair": {
+   "level": "error",
+   "side": "both",
+   "what": "A claim has trust marks without nonempty Evidence, or Evidence without trust marks"
   }
  }
 }

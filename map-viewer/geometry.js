@@ -4,6 +4,7 @@
 // (diagrams/<type>/scene.js add their own lines, dots and relations around it).
 // Pure: no DOM. Colours never appear here: shapes carry the mmv-k / mmv-l / mmv-d
 // classes and the theme's CSS colours them.
+import { TRUST } from './model/provenance.js';
 import { wrapRuns } from './measure.js';
 import { strokeStyle } from './model/classes.js';
 
@@ -39,7 +40,8 @@ export function nodeGeometry(n, rel, font, measureFn, look = {}) {
   const shown = {
     hover: !!look.poster,   // its details are in the hover pop-up, not on the drawing
     main: n.main || null,
-    tags: poster ? [] : n.icons.filter((c) => c !== n.main),
+    tags: poster ? [] : n.icons.filter((c) => c !== n.main && !TRUST.has(c)),
+    trust: n.icons.filter((c) => TRUST.has(c)),
     note: !poster && !!n.note,
     inners: poster ? [] : n.inners || [],
   };
@@ -58,7 +60,8 @@ export function nodeGeometry(n, rel, font, measureFn, look = {}) {
   // vendor's own colours, any other in the node's
   const logoSize = Math.round(type.size * 2);
   const logo = shown.main ? { size: logoSize, rowW: logoSize, h: logoSize + 4 } : null;
-  const blockW = Math.max(bodyW + iconsW + (shown.note ? iconSize + 8 : 0), logo ? logo.rowW : 0);
+  const trustW = shown.trust.length * (iconSize + 6);
+  const blockW = Math.max(bodyW + iconsW + (shown.note ? iconSize + 8 : 0) + trustW, logo ? logo.rowW : 0);
   const blockH = lines.length * lh + (inners ? iconSize + 8 : 0) + (logo ? logo.h : 0);
   const linkRow = inners ? { linkRow: { w: linksW, bodyW, y: lines.length * lh + 8 } } : {};
   const geo = { type, lines, lh, iconSize, iconsW, textW, logo, ...linkRow, ...shown };
@@ -67,20 +70,20 @@ export function nodeGeometry(n, rel, font, measureFn, look = {}) {
     // Poster its main icon (else its first) alone
     // (in Poster as large as the other nodes' icons, and centred like them)
     const big = look.poster ? posterIconSize(type) : Math.round(type.size * 2.4);
-    const row = look.poster ? [n.main || n.icons[0]].filter(Boolean) : [...(n.main ? [n.main] : []), ...n.icons.filter((c) => c !== n.main)];
+    const row = look.poster ? [n.main || n.icons.find((c) => !TRUST.has(c))].filter(Boolean) : [...(n.main ? [n.main] : []), ...n.icons.filter((c) => c !== n.main && !TRUST.has(c))];
     const count = row.length;
     const rowW = count ? count * big + (count - 1) * 4 : 0;
     const note = !look.poster && !!n.note;
     const figInners = look.poster ? [] : n.inners || [];
-    const side = (note ? iconSize + 6 : 0) + figInners.length * (iconSize + 6);   // small icons beside the row
+    const side = (note ? iconSize + 6 : 0) + figInners.length * (iconSize + 6) + shown.trust.length * (iconSize + 6);   // small icons beside the row
     const w = Math.ceil(Math.max(textW, rowW + 2 * side) + 12);
     const top = count ? big + 6 : 0;
     if (look.poster && count) {
       const h = Math.ceil(2 * (big / 2 + 6 + lines.length * lh + 4));
-      return { type, lines, lh, iconSize: big, iconsW: 0, textW, figure: { big, rowW, top, row }, hover: true, anchor: { y: h / 2, half: rowW / 2, top: big / 2 },
+      return { type, lines, lh, iconSize: big, iconsW: 0, textW, figure: { big, rowW, top, row }, trust: shown.trust, hover: true, anchor: { y: h / 2, half: rowW / 2, top: big / 2 },
         main: n.main || null, tags: [], note: false, inners: [], w, h, ox: 6, oy: h / 2 - big / 2 };
     }
-    return { type, lines, lh, iconSize: big, iconsW: 0, textW, figure: { big, rowW, top, row }, hover: !!look.poster, main: n.main || null, tags: [], note, inners: figInners, w, h: Math.ceil(4 + top + lines.length * lh + 4), ox: 6, oy: 4 };
+    return { type, lines, lh, iconSize: big, iconsW: 0, textW, figure: { big, rowW, top, row }, trust: shown.trust, hover: !!look.poster, main: n.main || null, tags: [], note, inners: figInners, w, h: Math.ceil(4 + top + lines.length * lh + 4), ox: 6, oy: 4 };
   }
   // a state diagram's marks: small fixed shapes, no label (diagrams/state)
   if (STATE_MARK[n.shape]) return { type, lines: [], lh, iconSize, iconsW: 0, textW: 0, ox: 0, oy: 0, main: null, tags: [], note: !!n.note, inners: [], ...STATE_MARK[n.shape](n) };
@@ -118,7 +121,7 @@ function posterGeometry(n, type, font, measureFn, shown) {
   const lh = Math.round(type.size * 1.25);
   const big = posterIconSize(type);
   const textW = Math.max(...lines.map((l) => l.w), 0);
-  const w = Math.ceil(Math.max(textW, big) + 12);
+  const w = Math.ceil(Math.max(textW, big) + 12 + shown.trust.length * 22);
   // the icon at the box's centre (as much room above it as its name takes below), so
   // icons line up across a row and arrows meet them straight; anchor: where arrows end
   const below = big / 2 + 6 + lines.length * lh + 4;
@@ -357,6 +360,11 @@ export function nodeShaper(input) {
     // with a description the marks sit on the name's line, else in the middle
     const markY = n.compartment && !geo.linkRow ? ty + (geo.lh - geo.iconSize) / 2 : geo.logo ? ty + (geo.lh - geo.iconSize) / 2 : (p.h - geo.iconSize) / 2;
     if (geo.note) s.note = { x: geo.linkRow ? ox + geo.iconsW + geo.linkRow.bodyW + 8 : tx + geo.textW + 8, y: markY, size: geo.iconSize };
+    if (geo.trust?.length) {
+      const end = geo.linkRow ? ox + geo.iconsW + geo.linkRow.bodyW : tx + geo.textW;
+      const start = end + (geo.note ? geo.iconSize + 14 : 6);
+      s.icons.push(...geo.trust.map((code, i) => iconOf(code, geo.iconSize, start + i * (geo.iconSize + 6), markY)));
+    }
     if (geo.linkRow) s.inners = geo.inners.map((x, i) => ({ ...x, x: ox + geo.iconsW + (geo.linkRow.bodyW - geo.linkRow.w) / 2 + i * (geo.iconSize + LINK_GAP), y: ty + geo.linkRow.y, size: geo.iconSize }));
     // the related-links dot: the top right corner, or the circle's edge at 45° (in
     // Poster: in the hover pop-up)
@@ -395,6 +403,10 @@ export function nodeShaper(input) {
     const small = Math.round(geo.type.size * 1.05);
     if (geo.note) s.note = { x: (p.w + rowW) / 2 + 6, y: geo.oy, size: small };
     if (geo.inners.length) s.inners = geo.inners.map((x, i) => ({ ...x, x: (p.w + rowW) / 2 + 6 + (geo.note ? small + 6 : 0) + i * (small + 6), y: geo.oy, size: small }));
+    if (!geo.hover && geo.trust?.length) {
+      const start = (p.w + rowW) / 2 + 6 + (geo.note ? small + 6 : 0) + geo.inners.length * (small + 6);
+      s.icons.push(...geo.trust.map((code, i) => iconOf(code, small, start + i * (small + 6), geo.oy)));
+    }
     if (geo.hover) { s.hover = true; if (geo.anchor) s.top = geo.oy; }
     if (!geo.hover && input.relCount(n.id)) s.relDot = { x: p.w - 1, y: 1, on: input.rels || input.relNode === n.id };
     return s;

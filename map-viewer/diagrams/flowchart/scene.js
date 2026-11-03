@@ -8,6 +8,7 @@
 // stay apart. Every arrow looks the same whether lifted or not. The layout routes them
 // (layout.routes): straight runs with rounded corners; labels where the layout put them
 // (layout.labels), else on the longest run.
+import { TRUST } from '../../model/provenance.js';
 import { nodeShaper, nodeName, typeFor, planClass, passesFilter } from '../../geometry.js';
 import { strokeStyle } from '../../model/classes.js';
 import { labelLines, SIGN_W } from '../../connection-labels.js';
@@ -57,10 +58,13 @@ export function buildScene(input) {
       }
       // the box's icons (its class's, say) in the title strip, before its name
       const size = Math.min(type.size, 15) + 1;
-      const icons = n.icons.filter((c) => c !== n.main).map((code, i) => iconOf(code, size, TITLE_X + i * (size + 3), TITLE_Y - size + 3));
+      const icons = n.icons.filter((c) => c !== n.main && !TRUST.has(c)).map((code, i) => iconOf(code, size, TITLE_X + i * (size + 3), TITLE_Y - size + 3));
       const titleX = TITLE_X + icons.length * (size + 3) + (icons.length ? 2 : 0);
       // its main icon (model/main-icon.js) at the top right, left of the note icon
-      const right = p.w - 8 - (n.note ? 26 : 0);
+      const trust = n.icons.filter((c) => TRUST.has(c));
+      const trustW = trust.length * 22;
+      const right = p.w - 8 - trustW - (n.note ? 26 : 0);
+      icons.push(...trust.map((code, i) => iconOf(code, 16, p.w - 24 - (trust.length - 1 - i) * 22, 6)));
       const main = n.main ? iconOf(n.main, 22, right - 22, 4) : null;
       frames.push({
         kind: 'frame', id: n.id, x: p.x, y: p.y, w: p.w, h: p.h,
@@ -72,7 +76,7 @@ export function buildScene(input) {
         ...(main ? { main } : {}),
         marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
         ...(n.plan ? { plan: n.plan } : {}),
-        note: n.note ? { x: p.w - 30, y: 6, size: 16 } : null,
+        note: n.note ? { x: p.w - 30 - trustW, y: 6, size: 16 } : null,
         // a frame round a drilled-in box's neighbour: faded, no dot (drill out to open)
         dot: n !== root && !L.context?.has(n) ? { x: p.w - 1, y: 1, closed: false, count: null } : null,
       });
@@ -127,7 +131,8 @@ export function relationShapes(input) {
     // icons: those all of them carry (as with the colour); the icon filter finds an
     // arrow when any of its relations carries a picked icon
     // (Poster, WO-38: none on the line, nor the note mark; the arrow's pop-up has them)
-    const icons = input.poster ? [] : items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), first.icons || []);
+    const sharedIcons = items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), first.icons || []);
+    const icons = input.poster ? sharedIcons.filter((c) => TRUST.has(c)) : sharedIcons;
     const noteMark = !input.poster && first.note;
     const dim = input.iconFilter?.size > 0 && !items.some((r) => passesFilter(r, input.iconFilter));
     out.push({

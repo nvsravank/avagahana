@@ -33,7 +33,7 @@
     ]
    }
   ],
-  "note": false
+  "note": true
  },
  {
   "kind": "row",
@@ -85,6 +85,7 @@
     "name": "Stock check",
     "label": "stock levels",
     "glyph": "←",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -158,6 +159,7 @@
     "name": "Order handler",
     "label": "charge",
     "glyph": "←",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -225,6 +227,7 @@
     "name": "Gateway",
     "label": null,
     "glyph": "→",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -287,6 +290,7 @@
     "name": "Orders database",
     "label": "stock levels",
     "glyph": "→",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -297,6 +301,7 @@
     "name": "Gateway",
     "label": "stock",
     "glyph": "←",
+    "note": true,
     "icons": [
      "inferred"
     ]
@@ -338,6 +343,7 @@
     "name": "Payment handler",
     "label": "charge",
     "glyph": "→",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -348,6 +354,7 @@
     "name": "Gateway",
     "label": "order",
     "glyph": "←",
+    "note": true,
     "icons": [
      "inferred"
     ]
@@ -364,7 +371,7 @@
     ]
    }
   ],
-  "note": false
+  "note": true
  },
  {
   "kind": "row",
@@ -393,6 +400,7 @@
     "name": "Storefront",
     "label": null,
     "glyph": "←",
+    "note": true,
     "icons": [
      "verified"
     ]
@@ -403,6 +411,7 @@
     "name": "Stock check",
     "label": "stock",
     "glyph": "→",
+    "note": true,
     "icons": [
      "inferred"
     ]
@@ -413,12 +422,13 @@
     "name": "Order handler",
     "label": "order",
     "glyph": "→",
+    "note": true,
     "icons": [
      "inferred"
     ]
    }
   ],
-  "note": false
+  "note": true
  },
  {
   "kind": "row",

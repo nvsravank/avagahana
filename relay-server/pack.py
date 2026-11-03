@@ -225,6 +225,7 @@ def main(argv=None) -> int:
     ap.add_argument("--seq", help="open this sequence over its view: its heading's anchor (main: the first diagram)")
     ap.add_argument("--step", type=int, help="the sequence's step, from 1")
     ap.add_argument("--theme", help="a theme from the maps folder's .themes/ (themes.py list), or default")
+    ap.add_argument("--trust-marks", choices=("show", "hide"), help="initial trust-mark visibility, separate from map text")
     ap.add_argument("--appearance", choices=("light", "dark"), help="default: the reader's system setting")
     ap.add_argument("--since", help="an older version of the map (any file): every reader sees what changed since it")
     ap.add_argument("--since-label", help='with --since: "Since <label>" in the info panel')
@@ -259,6 +260,7 @@ def main(argv=None) -> int:
     if state:
         options["state"] = state
     prefs = {k: v for k, v in {"appearance": args.appearance, "colourBy": args.colour_by}.items() if v}
+    prefs["trustMarks"] = args.trust_marks != "hide"
     if prefs:
         options["prefs"] = prefs
 

@@ -39,6 +39,16 @@ flowchart LR
 
 The front door.
 
+#### Evidence
+
+Illustrative verified API in this test fixture.
+
+### <a id="q"></a>Queue
+
+#### Evidence
+
+The queue is a hypothesis in this fixture.
+
 ## Inside
 
 \`\`\`mermaid
@@ -80,8 +90,8 @@ export async function testPoster(check, wait) {
   check('Poster: a node with a main icon has no outline', !q('.mmv-node[data-id="api"] > .mmv-shape'));
   check('Poster: a Phosphor main icon sits on a tile', !!q('.mmv-node[data-id="sched"] .mmv-icon.is-tile .mmv-tile'));
   check('Poster: a node with no main icon is a box with its name alone', !!q('.mmv-node[data-id="plain"] > .mmv-shape') && !q('.mmv-node[data-id="plain"] .mmv-icon'));
-  check('Poster: no tags, trust marks, note icon or quick links on the drawing', q('.mmv-node[data-id="api"]').querySelectorAll('.mmv-vendor-ic').length === 1
-    && !q('.mmv-node[data-id="api"] .mmv-note-ic, .mmv-node[data-id="api"] .mmv-inner-ic, .mmv-node[data-id="q"] use'));
+  check('Poster: trust marks remain clickable, other tags and note icons stay in details', q('.mmv-node[data-id="api"]').querySelectorAll('.mmv-vendor-ic').length === 1
+    && !q('.mmv-node[data-id="api"] .mmv-note-ic, .mmv-node[data-id="api"] .mmv-inner-ic, .mmv-node[data-id="q"] .mmv-icon:not(.mmv-trust-mark) use') && !!q('.mmv-node[data-id="api"] [data-trust=verified]'));
   check('Poster: no browser tooltips on a node on screen', !q('.mmv-node[data-id="api"] title'));
   check('Poster: the arrow drops its icons and note mark', !host.querySelector('[data-mmv=rels] .mmv-flow-label-ic, [data-mmv=rels] .mmv-icon'));
   const net = q('.mmv-frame[data-id="net"]');

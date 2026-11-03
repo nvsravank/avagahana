@@ -14,6 +14,31 @@ flowchart LR
   classDef money stroke-dasharray: 4 2
 ```
 
+## Details
+
+### <a id="e1"></a>e1
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="r1"></a>r1
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+### <a id="a"></a>a
+
+#### Evidence
+
+Illustrative trust assignment in this fictional example; no external source
+revision is captured for this claim.
+
+
+
 ## Perspective: Reads
 
 - b r1@--> a : rows

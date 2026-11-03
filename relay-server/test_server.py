@@ -27,7 +27,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import serve_maps  # noqa: E402
-from serve_maps import Relay, build_server, run  # noqa: E402
+from serve_maps import Relay, build_server, run, map_url  # noqa: E402
 
 EXAMPLES = HERE.parent / "examples" / "maps"
 
@@ -153,6 +153,13 @@ class RelayTests(unittest.TestCase):
             self.assertEqual(self.s.request("GET", "/api/map?p=alias.md")[0], 404)
         finally:
             link.unlink()
+
+    def test_show_trust_marks(self):
+        for value in (True, False):
+            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "trustMarks": value})[0], 200)
+        for value in (0, 1, "hide", [], {}):
+            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "trustMarks": value})[0], 400)
+        self.assertIn("trustMarks=0", map_url(18300, "garden.md", trustMarks=False))
 
     def test_show_mode_extensibility(self):
         for mode in ("tables", "future-mode"):
@@ -704,7 +711,7 @@ class PackTests(unittest.TestCase):
         self.assertTrue(o["marks"])
         self.assertEqual((o["since"], o["sinceLabel"], o["before"]), (old.read_text(encoding="utf-8"), "v1", old.read_text(encoding="utf-8")))
         self.assertEqual(o["state"], {"focus": "n6"})
-        self.assertEqual(o["prefs"], {"appearance": "dark", "colourBy": "level"})
+        self.assertEqual(o["prefs"], {"appearance": "dark", "colourBy": "level", "trustMarks": True})
         footer = re.search(r"<footer>(.*?)</footer>", page, re.S).group(1)
         # always the mark and "Built with Avagahana", linking home; the map's saved time; the
         # version only in the page's generator tag, never in the footer
