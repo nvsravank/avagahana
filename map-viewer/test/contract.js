@@ -34,6 +34,39 @@ const styleCount = () => document.querySelectorAll('style[data-mmv-theme]').leng
 const linkCount = () => document.querySelectorAll('link[href$="map-viewer/base.css"]').length;
 
 try {
+  // Built-in font requests survive a transient transport/server failure, but
+  // missing files and persistent failures remain visible to the theme loader.
+  {
+    const realFetch = window.fetch;
+    const [regular, italic, semibold, , bold] = defaultTheme.font.faces;
+    let requests = 0, bytes, failure;
+    try {
+      window.fetch = (...args) => ++requests === 1 ? Promise.reject(new TypeError('Failed to fetch')) : realFetch(...args);
+      try { [bytes] = await Promise.all([regular.data(), regular.data()]); } catch (e) { failure = e; }
+      check('built-in font retries a transient fetch and shares concurrent requests', requests === 2 && bytes instanceof ArrayBuffer && bytes.byteLength > 0 && !failure, `${requests}: ${failure || ''}`);
+      const before = requests;
+      try { await regular.data(); } catch (_) { /* checked below */ }
+      check('built-in font reuses successfully fetched bytes across viewer mounts', requests === before);
+
+      requests = 0; failure = null; bytes = null;
+      window.fetch = (...args) => ++requests === 1 ? Promise.resolve(new Response('', { status: 503 })) : realFetch(...args);
+      try { bytes = await italic.data(); } catch (e) { failure = e; }
+      check('built-in font retries a temporary server failure', requests === 2 && bytes instanceof ArrayBuffer && !failure, `${requests}: ${failure || ''}`);
+
+      requests = 0; failure = null;
+      window.fetch = () => { requests++; return Promise.resolve(new Response('', { status: 404 })); };
+      try { await semibold.data(); } catch (e) { failure = e; }
+      check('built-in font reports a missing file without retrying', requests === 1 && /HTTP 404/.test(failure?.message), `${requests}: ${failure || ''}`);
+      window.fetch = realFetch;
+      bytes = await semibold.data();
+      check('built-in font can load again after an unsuccessful request', bytes instanceof ArrayBuffer && bytes.byteLength > 0);
+
+      requests = 0; failure = null;
+      window.fetch = () => { requests++; return Promise.reject(new TypeError('Failed to fetch')); };
+      try { await bold.data(); } catch (e) { failure = e; }
+      check('built-in font stops after three failed attempts and reports the error', requests === 3 && failure?.message === 'Failed to fetch', `${requests}: ${failure || ''}`);
+    } finally { window.fetch = realFetch; }
+  }
   await testVerification(check, wait);
   await testErConnections(check);
   await testDiagramLinks(check);

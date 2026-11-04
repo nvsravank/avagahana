@@ -12,11 +12,36 @@ import os
 from pathlib import Path
 import queue
 import secrets
+import shutil
 import socket
 import struct
 import subprocess
 import threading
+import tempfile
 import time
+
+
+@contextlib.contextmanager
+def browser_profile():
+    """A private profile, removed after Chrome releases its Windows file handles.
+
+    Browser.close and waiting for the main process do not guarantee that its cache
+    subprocess has released every file. Retry only Windows sharing/access errors;
+    persistent locks and unrelated IO errors still fail validation.
+    """
+    profile = tempfile.mkdtemp(prefix='avagahana-browser-')
+    try:
+        yield profile
+    finally:
+        deadline = time.monotonic() + 10
+        while True:
+            try:
+                shutil.rmtree(profile)
+                break
+            except OSError as error:
+                if getattr(error, 'winerror', None) not in (5, 32, 33) or time.monotonic() >= deadline:
+                    raise
+                time.sleep(.1)
 
 
 class WebSocket:

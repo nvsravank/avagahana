@@ -11,14 +11,27 @@
 // Font: Atkinson Hyperlegible Next (OFL, fonts/OFL.txt). Its bytes load only
 // when this theme is first used.
 
-const face = (file, weight, style) => ({
-  weight,
-  style,
-  data: () => fetch(new URL(`fonts/AtkinsonHyperlegibleNext-${file}.woff2`, import.meta.url)).then((r) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.arrayBuffer();
-  }),
-});
+// Share successful bytes across mounts; a released theme may otherwise fetch all
+// six faces again. Retry transient transport/5xx failures, never missing files.
+const face = (file, weight, style) => {
+  let pending = null;
+  const load = async () => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const r = await fetch(new URL(`fonts/AtkinsonHyperlegibleNext-${file}.woff2`, import.meta.url));
+        if (!r.ok) throw Object.assign(new Error(`HTTP ${r.status}`), { status: r.status });
+        return await r.arrayBuffer();
+      } catch (error) {
+        if (attempt >= 2 || (error.status != null && error.status < 500)) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 50 * (attempt + 1)));
+      }
+    }
+  };
+  return {
+    weight, style,
+    data: () => pending ||= load().catch((error) => { pending = null; throw error; }),
+  };
+};
 
 export default {
   id: 'default',

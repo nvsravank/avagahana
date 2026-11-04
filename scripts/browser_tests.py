@@ -31,6 +31,7 @@ import threading
 import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from browser_connection import browser_profile
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = ["map-viewer/test/theme-styling.html", "map-viewer/test/index.html", "map-viewer/test/scene.html", "atlas/test/index.html"]
@@ -45,7 +46,17 @@ BROWSERS = [
 ]
 
 
+class BrowserServer(ThreadingHTTPServer):
+    # Match Python 3.15 on older interpreters too. Python 3.9's default of five
+    # pending connections is too small for a browser's burst of asset requests.
+    request_queue_size = 128
+
+
 class Quiet(SimpleHTTPRequestHandler):
+    # Keep asset connections alive. HTTP/1.0 churns a new socket per file across
+    # many viewer mounts/exports, which can exhaust Windows networking buffers.
+    protocol_version = "HTTP/1.1"
+
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
         super().end_headers()
@@ -72,10 +83,13 @@ def dump(browser, url, profile):
 def dump_pipe(browser, url, profile, limit=180):
     """The page's DOM once window.testResults is set (or after limit seconds), waiting in
     real time."""
+    events = []
     try:
-        with chrome_pipe(browser, profile) as (send, _events):
-            target = send("Target.createTarget", {"url": url})["targetId"]
+        with chrome_pipe(browser, profile) as (send, events):
+            target = send("Target.createTarget", {"url": "about:blank"})["targetId"]
             session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
+            send("Network.enable", session=session)
+            send("Page.navigate", {"url": url}, session)
             send("Emulation.setEmulatedMedia", {"features": [{"name": "prefers-reduced-motion", "value": "no-preference"}]}, session)
             done = "window.testResults ? document.documentElement.outerHTML : null"
             end = time.time() + limit
@@ -87,6 +101,16 @@ def dump_pipe(browser, url, profile, limit=180):
             return send("Runtime.evaluate", {"expression": "document.documentElement.outerHTML", "returnByValue": True}, session).get("result", {}).get("value") or ""
     except RuntimeError:
         return ""
+    finally:
+        requests = {}
+        for event in events:
+            params = event.get("params", {})
+            if event["method"] == "Network.requestWillBeSent":
+                requests[params["requestId"]] = params["request"]["url"]
+            elif event["method"] == "Network.loadingFailed":
+                request = requests.get(params["requestId"], "unknown request")
+                print(f"note browser network: {request} — {params.get('errorText', '')} "
+                      f"blocked={params.get('blockedReason', '')} cancelled={params.get('canceled', False)}", flush=True)
 
 
 @contextlib.contextmanager
@@ -163,6 +187,7 @@ def chrome_pipe(browser, profile):
             proc.wait(10)
         except subprocess.TimeoutExpired:
             proc.kill()
+            proc.wait(10)
         os.close(to_w)
         os.close(from_r)
 
@@ -190,7 +215,7 @@ def open_snapshot(browser, path, act=None, downloads=None):
 
 def drive(browser, url, act=None, wait_drawn=True, downloads=None):
     """open_snapshot for any URL; wait_drawn False runs act once the page has loaded."""
-    with tempfile.TemporaryDirectory() as profile, chrome_pipe(browser, profile) as (send, events):
+    with browser_profile() as profile, chrome_pipe(browser, profile) as (send, events):
         if downloads:
             send("Browser.setDownloadBehavior", {"behavior": "allow", "downloadPath": str(downloads)})
         target = send("Target.createTarget", {"url": url, "width": 1200, "height": 900, "newWindow": True})["targetId"]
@@ -457,11 +482,11 @@ def main():
         print("browser tests: SKIPPED (no Chrome, Chromium or Edge found; set AVAGAHANA_CHROME)")
         return 1 if args.require_browser else 0
 
-    server = ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=str(ROOT)))
+    server = BrowserServer(("127.0.0.1", 0), functools.partial(Quiet, directory=str(ROOT)))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{server.server_address[1]}/"
     failed = 0
-    with tempfile.TemporaryDirectory() as profile:
+    with browser_profile() as profile:
         if args.update:
             dom = dump(browser, base + "map-viewer/test/scene.html?update=1", profile)
             m = re.search(r'<pre id="snapshots">(.*?)</pre>', dom, re.S)
@@ -485,7 +510,7 @@ def main():
                 # Seen now and then on CI runners, never locally: say where the page
                 # stopped, then give it one more go in a fresh profile.
                 print(f"note {page}: did not finish ({stopped(dom)}); retrying once")
-                with tempfile.TemporaryDirectory() as again:
+                with browser_profile() as again:
                     dom = dump(browser, base + page, again)
                 m = re.search(r"(\d+) / (\d+) passed", dom)
             if not m:

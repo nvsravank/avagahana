@@ -6,6 +6,13 @@ marked **Contract**.
 
 ## Unreleased
 
+- Built-in fonts share fetched bytes across viewers and retry temporary network or
+  server failures; missing files and persistent failures still report errors.
+  Browser validation waits briefly for Windows Chrome profile locks to release
+  during cleanup, and reports locks that persist. Its static test server reuses
+  HTTP connections and uses a consistent accept queue on Python 3.9 and 3.15,
+  reducing connection pressure during repeated exports.
+
 - **Contract** (map format): file-wide Sources with repository/revision identity and
   per-claim Evidence inside existing Details notes, including several file/line
   references at one captured commit. Trust marks and nonempty verification text must
