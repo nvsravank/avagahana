@@ -6,6 +6,22 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format, intentional removal): authored `## Joins:` equality
+  views are retired, including their former drawings. `joins-retired` directs authors
+  to actual SQL under Query, or to Perspectives for genuine model relationships.
+  Old equality pairs are not enough to guess query semantics. Examples/walkthroughs
+  are migrated; saved links to old join views need new query destinations.
+
+- **Contract** (map format): ER `Query` sections explain SQL through alias table
+  occurrences, grouped table-level joins and dependency-ordered columns, CTE/subquery
+  drill-through, calculation notes and isolated fixed pivots. Unsupported structures
+  and unresolved references report `query-syntax`; no SQL is executed. Generated
+  diagrams and join views use existing contents, state, walkthrough and export APIs.
+- **Contract** (map format): ER Perspective options accept explicit Columns, including
+  Columns-only views. Omitted fields remain expandable. Notes render fenced code
+  literally; generated calculation notes link to their input columns.
+- A branching refund query and quarterly pivot demonstrate the SQL reading experience.
+
 - **Contract** (map format): optional Perspective options (Open named containers,
   Focus) restore authored flowchart detail on entry. Walkthrough introductions and
   Stop options (Title, Label, Notes, Diagram qualifier) remain optional and keep old

@@ -34,7 +34,7 @@ from pathlib import Path
 from browser_connection import browser_profile
 
 ROOT = Path(__file__).resolve().parent.parent
-PAGES = ["map-viewer/test/theme-styling.html", "map-viewer/test/index.html", "map-viewer/test/reading.html", "map-viewer/test/scene.html", "atlas/test/index.html"]
+PAGES = ["map-viewer/test/theme-styling.html", "map-viewer/test/index.html", "map-viewer/test/query.html", "map-viewer/test/reading.html", "map-viewer/test/scene.html", "atlas/test/index.html"]
 SNAPSHOTS = ROOT / "map-viewer" / "test" / "snapshots"
 BROWSERS = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",

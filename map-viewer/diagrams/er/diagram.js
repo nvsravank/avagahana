@@ -32,7 +32,7 @@ export const stableColours = true;
 export const branchOrder = (kids) => kids;
 // Only wide tables with optional columns start collapsed.
 // (groups start open)
-export const defaultCollapsed = (root) => new Set(tablesIn(root).filter((n) => n.attrs?.length > 15 && n.attrs.some((a) => !a.keys.has('PK') && !a.grain && !a.keys.has('FK') && !a.connected)).map((n) => n.id));
+export const defaultCollapsed = (root) => new Set(tablesIn(root).filter((n) => n.visibleColumns ? n.attrs.some((a) => !n.visibleColumns.has(a.name)) : n.attrs?.length > 15 && n.attrs.some((a) => !a.keys.has('PK') && !a.grain && !a.keys.has('FK') && !a.connected)).map((n) => n.id));
 export const layoutByView = true;
 // a selected table says what one row is and lights its lines: selecting draws again
 export const drawsSelection = true;

@@ -877,7 +877,7 @@ erDiagram
     string label
     array fromColumns
     array toColumns
-    boolean join
+    int queryJoin
     boolean cross
   }
   MESSAGE {
@@ -901,14 +901,13 @@ erDiagram
 - MESSAGE.to message-target@}o--|| NODE.id : received by
 - MESSAGE.connectionId message-connection@}o--o| RELATION.eid : selects when present
 
-## Joins: Message routing
+## Perspective: Message routing
 
 - message-connection
 - relation-source
 - relation-target
 - message-source
 - message-target
-- MESSAGE.(from,to) message-endpoints@--- RELATION.(from,to) : same directed endpoints
 
 ## Scenario: Resolve a message | Message routing
 
@@ -923,7 +922,7 @@ This picture shows actual ID-bearing fields in the in-memory model, not a SQL sc
 
 ### <a id="RELATION"></a>Optional identity and local versus cross-map targets
 
-from is a source node ID in the owning diagram. For a local connection, to is a target node ID in that same diagram. A cross-map relation instead stores a map path and optional node fragment in to, so that end has zero matching local nodes. eid is optional on native Mermaid relationships; explicit column relationships and joins have stable IDs. An ID reused in another view refers to the same connection, not a second definition. fromColumns and toColumns store the optional column lists used by the new ER format.
+from is a source node ID in the owning diagram. For a local connection, to is a target node ID in that same diagram. A cross-map relation instead stores a map path and optional node fragment in to, so that end has zero matching local nodes. eid is optional on native Mermaid relationships; explicit column relationships have stable IDs; SQL join dependencies share a queryJoin number. An ID reused in another view refers to the same connection, not a second definition. fromColumns and toColumns store the optional column lists used by the new ER format.
 
 ### <a id="MESSAGE"></a>Message identity is i, not its displayed number
 
@@ -933,9 +932,9 @@ i is the message's zero-based position in sequence.messages and is unique within
 
 For an ID-bearing generated scenario step, MESSAGE.connectionId resolves to RELATION.eid in the scenario's selected view. Some source connections have no eid, and ordinary sequence messages carry no connectionId. The relationship is therefore optional at the connection end, not a claim that every message references exactly one identified relationship. The owning diagram and selected view provide the lookup scope; the model does not store invented diagram_id or view_id columns.
 
-### <a id="message-endpoints"></a>Endpoint equality does not establish relationship identity
+#### Endpoint equality does not establish relationship identity
 
-Within a specific Plays over target diagram and view, equal from/to IDs can find candidate directed relationships. Multiple relationships can have those same endpoints, so this two-column equality is an additional join, not a unique foreign-key relationship. Reverse traversal also reverses the endpoint comparison; this example compares only the directed case. Use connectionId when a scenario selects one identified connection exactly.
+Within a specific Plays over target diagram and view, equal from/to IDs can find candidate directed relationships. Multiple relationships can have those same endpoints, so this two-column comparison finds candidates, not a unique foreign-key relationship. Reverse traversal also reverses the endpoint comparison; this example compares only the directed case. Use connectionId when a scenario selects one identified connection exactly.
 
 ## Plugin and quality
 

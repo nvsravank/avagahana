@@ -32,7 +32,7 @@ export function optionsSection(text, name, fields, code, warnings) {
       const m = line.match(/^[-*]\s+([^:]+):\s*(.*?)\s*$/);
       const key = m?.[1].trim().toLowerCase();
       if (!m || !fields.includes(key) || !m[2] || Object.hasOwn(options, key)) { bad = true; continue; }
-      options[key] = ['open', 'notes'].includes(key) ? [...new Set(m[2].split(',').map((s) => s.trim()).filter(Boolean))] : m[2];
+      options[key] = ['open', 'notes', 'columns'].includes(key) ? [...new Set(m[2].split(',').map((s) => s.trim()).filter(Boolean))] : m[2];
       if (Array.isArray(options[key]) && !options[key].length) bad = true;
     }
   }
@@ -45,7 +45,15 @@ export function optionsSection(text, name, fields, code, warnings) {
 
 export function perspectiveOptions(options, type, byId, warnings) {
   if (!options) return null;
-  let valid = type === 'flowchart';
+  if (type === 'er') {
+    const valid = options.columns && !options.open && !options.focus && options.columns.every((ref) => {
+      const [id, col, extra] = ref.split('.');
+      return !extra && byId[id]?.attrs?.some((a) => a.name === col);
+    });
+    if (!valid) { warnings.push(problem('perspective-options', 'ER Perspective options require Columns: TABLE.column references.')); return null; }
+    return options;
+  }
+  let valid = type === 'flowchart' && !options.columns;
   const ids = [...(options.open || []), ...(options.focus ? [options.focus] : [])];
   for (const id of ids) if (!byId[id]?.children.length) valid = false;
   if (options.focus) for (const id of options.open || []) {

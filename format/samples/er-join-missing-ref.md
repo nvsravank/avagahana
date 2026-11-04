@@ -18,13 +18,13 @@ erDiagram
 - A.tenant_id tenant@}o--|| B.id : tenant
 - A.other_id other@}o--|| B.id : other
 
-## Joins: Composite
+## Perspective: Composite
 - tenant
-- A.(tenant_id,other_id) composite@--- B.(tenant_id,id) : equal pairs
+- A.(tenant_id,other_id) composite@}o--|| B.(tenant_id,id) : equal pairs
 
 ## Scenario: Composite scenario | Composite
 - A composite@--> B : Match both columns.
 
-## Joins: Missing
+## Perspective: Missing
 - nonexistent
 - tenant

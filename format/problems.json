@@ -623,6 +623,16 @@
    "level": "error",
    "side": "both",
    "what": "Stop options reference no owning diagram or existing note"
+  },
+  "query-syntax": {
+   "level": "error",
+   "side": "both",
+   "what": "SQL query structure, scope or references cannot be explained"
+  },
+  "joins-retired": {
+   "level": "error",
+   "side": "both",
+   "what": "Authored Joins sections are retired; migrate query intent to SQL or keep model relations in Perspectives"
   }
  }
 }

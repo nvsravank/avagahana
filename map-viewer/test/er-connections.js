@@ -43,9 +43,9 @@ export async function testErConnections(check) {
   check('ER column connections parse without problems', !map.problems.length, JSON.stringify(map.problems));
   check('ER parallel relationships retain stable IDs', map.relations.map((r) => r.eid).join() === 'tenant,other');
   const view = map.views.find((v) => v.name === 'Composite');
-  check('join views reuse relationship objects without adding joins to the model', view.relations[0] === map.relations[0] && !map.relations.some((r) => r.join));
+  check('model perspectives reuse relationship identity', view.relations[0] === map.relations[0] && view.relations[0].toCard==='one');
   const composite = view.relations[1];
-  check('composite joins pair columns by position and carry no cardinalities', composite.fromColumns.join() === 'tenant_id,other_id' && composite.toColumns.join() === 'tenant_id,id' && !composite.head && !composite.tail);
+  check('composite model relationships pair columns with declared cardinalities', composite.fromColumns.join() === 'tenant_id,other_id' && composite.toColumns.join() === 'tenant_id,id' && composite.head==='er-one' && composite.tail==='er-zero-many');
   const scenario = [...map.parts.values()].find((p) => p.scenario);
   check('scenarios preserve selected connection ID through sequence compilation', scenario.sequence.messages[0].connectionId === 'composite' && scenario.sequence.steps[0].msgs[0].connectionId === 'composite' && scenario.playsOver[0].view === 'Composite');
   const measure = (t) => t.length * 7;
@@ -100,7 +100,7 @@ export async function testErConnections(check) {
   check('ER small table controls are absent in the live viewer', !document.querySelector('#a .mmv-table-more'));
   check('ER live rendering keeps both parallel connection paths', !!document.querySelector('#a [data-arrow="tenant"]') && !!document.querySelector('#a [data-arrow="other"]'));
   live.setState({ view: 'Composite' });
-  check('ER join view switches and renders all composite column pairs', !!document.querySelector('#a [data-arrow="composite"]') && !!document.querySelector('#a [data-arrow="composite#1"]'));
+  check('ER model perspective switches and renders all composite column pairs', !!document.querySelector('#a [data-arrow="composite"]') && !!document.querySelector('#a [data-arrow="composite#1"]'));
   const originalWarn = console.warn;
   let warningCount = 0;
   console.warn = (...args) => { warningCount++; originalWarn(...args); };
@@ -132,11 +132,11 @@ export async function testErConnections(check) {
     check(`ER ${view.name}: every connection label has a placement`, labelBoxes.length === expectedLabels, `${labelBoxes.length}/${expectedLabels}`);
     const tableBoxes = [...layout.pos.values()].map((p) => ({ l: p.x - p.w / 2, r: p.x + p.w / 2, t: p.y - p.h / 2, b: p.y + p.h / 2 }));
     check(`ER ${view.name}: tables do not overlap`, tableBoxes.every((b, i) => tableBoxes.slice(i + 1).every((other) => !over(b, other))));
-    if (view.name === 'Fulfilment') {
+    if (view.name === 'Fulfilment relationships') {
       const hub = layout.pos.get(data.byId.ORDER), positions = [...layout.pos.values()];
       const height = Math.max(...tableBoxes.map((b) => b.b)) - Math.min(...tableBoxes.map((b) => b.t));
-      check('ER Fulfilment retains a star with branches on both sides of Order', positions.some((p) => p.x < hub.x - hub.w) && positions.some((p) => p.x > hub.x + hub.w) && positions.some((p) => Math.abs(p.y - hub.y) > hub.h));
-      check('ER Fulfilment does not turn horizontal label width into huge vertical gaps', height < positions.reduce((sum, p) => sum + p.h, 0) * 1.5, String(height));
+      check('ER Fulfilment relationships retains a star with branches on both sides of Order', positions.some((p) => p.x < hub.x - hub.w) && positions.some((p) => p.x > hub.x + hub.w) && positions.some((p) => Math.abs(p.y - hub.y) > hub.h));
+      check('ER Fulfilment relationships does not turn horizontal label width into huge vertical gaps', height < positions.reduce((sum, p) => sum + p.h, 0) * 1.5, String(height));
     }
     const bad = labelBoxes.flatMap((b, i) => [...tableBoxes, ...labelBoxes.slice(i + 1)].filter((other) => over(b, other)).map(() => b.key));
     check(`ER ${view.name}: labels clear tables and each other`, !bad.length, bad.join(', '));

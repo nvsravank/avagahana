@@ -75,7 +75,7 @@ export function parseViews(sections, byId, warnings, own = null) {
   for (const s of sections) {
     const name = s.name || 'Relations';
     const key = name.toLowerCase();
-    const parsed = s.name ? optionsSection(s.text, 'Perspective options', ['open', 'focus'], 'perspective-options', warnings) : { text: s.text, options: null };
+    const parsed = s.name ? optionsSection(s.text, 'Perspective options', ['open', 'focus', 'columns'], 'perspective-options', warnings) : { text: s.text, options: null };
     const relations = parseRelations(parsed.text, byId, warnings);
     if (seen.has(key)) {
       // a second section of the same name adds to it (an own default view included)

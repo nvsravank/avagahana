@@ -82,7 +82,7 @@ def score(text):
 ```
 
 Score every mode and view, not only the one the person reads (an ER diagram's views
-are its `## Joins:` sections). The reader can switch
+are model perspectives; SQL queries have generated numbered join items). The reader can switch
 between Boxes and Layers, and a view lays out the first block's nodes in the first
 block's order, so a reorder that helps the default view can tangle a view. `view=`
 takes the name after `## Perspective: `; `part=` a further diagram's heading anchor. Keep

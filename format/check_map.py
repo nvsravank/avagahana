@@ -44,6 +44,7 @@ from check_common import Map, check_label, MAX_LINE, MAX_LABEL, EMOJI, PROBLEMS 
 from check_state import read_state  # noqa: E402
 from check_er import read_er  # noqa: E402
 from check_common import icon_codes
+from check_query import check_queries
 from check_connections import check_connections, check_renames
 from check_scenarios import check_scenarios  # noqa: E402
 from check_provenance import check_provenance, check_verification_pairs
@@ -546,7 +547,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     for title, body, hl in secs:
         if re.match(r'^perspective\s*:', title, re.I):
             report = lambda msg, line=hl: m.report(line, 'perspective-options', msg)
-            clean, opts = options_section(body, 'Perspective options', ['open', 'focus'], report)
+            clean, opts = options_section(body, 'Perspective options', ['open', 'focus', 'columns'], report)
             check_perspective(opts, kind, ids, report)
             perspective_bodies[hl] = clean
     seen = {}
@@ -556,8 +557,10 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
-        if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*)$", title, re.I):
+        if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|query\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*)$", title, re.I):
             m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over, Renames), and no Mermaid block follows")
+        if re.fullmatch(r'joins\s*:\s*.+',title,re.I):
+            m.report(hl,'joins-retired','Joins sections are retired. Put query joins in Query SQL; keep model relationships in Relations/Perspective. Migrate using actual SQL or confirmed intent, without guessing join types or outputs.')
         if key == "plays over" and kind != "sequence":
             m.report(hl, "plays-over-not-sequence", "## Plays over is for a sequence diagram")
     # ## Look: the look a flowchart opens in (WO-38)
@@ -628,8 +631,6 @@ def check_part(m, part, shared_classes, anchors, legend_out):
 
     if kind != 'er':
         for title, _, hl in secs:
-            if re.fullmatch(r'joins\s*:\s*(.+)', title, re.I):
-                m.report(hl, 'relation-syntax', 'Join views are for ER diagrams')
             if title.lower() == 'renames':
                 m.report(hl, 'rename-syntax', 'Renames are for ER diagrams')
 
@@ -716,6 +717,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     part.setdefault("connection_views", scenario_views)
     part["view_rels"] = view_rels
     check_scenarios(m, part, secs)
+    check_queries(m, part, secs, anchors)
 
     # a sequence's Plays over lines (checked against the other diagrams in check())
     part["plays_over"] = []
@@ -1154,7 +1156,7 @@ def check_walkthroughs(m, src, parts, title):
             if p['kind'] == 'sequence':
                 own['names']['sequence'].add(heading.lower())
         for t, body, hl in sections_of(p['after'], p['after_line']):
-            for key, pat in (('view', r'perspective\s*:\s*(.+)'), ('join', r'joins\s*:\s*(.+)'), ('scenario', r'scenario\s*:\s*([^|]+)')):
+            for key, pat in (('view', r'perspective\s*:\s*(.+)'), ('scenario', r'scenario\s*:\s*([^|]+)')):
                 match = re.fullmatch(pat, t, re.I)
                 if match:
                     own['names'][key].add(match[1].strip().lower())
@@ -1171,6 +1173,25 @@ def check_walkthroughs(m, src, parts, title):
         for key in names:
             names[key].update(own['names'][key])
         owners.append(own)
+    def query_owner(q, title):
+        own = {'title':title, 'names':{k:set() for k in names}, 'notes':set()}
+        own['names']['diagram'].add(title.lower())
+        for j in q['joins']:
+            own['names']['join'].add(('{} · {}'.format(j['number'],j['type'])).lower())
+        for k in names:
+            names[k].update(own['names'][k])
+        owners.append(own)
+        for c in q['ctes']:
+            query_owner(c['query'], title+' / '+c['name'])
+        for s in q['sources']:
+            if 'query' in s:
+                query_owner(s['query'],title+' / '+s['alias'])
+            if 'pivot' in s:
+                pivot = {'ctes':[], 'sources':[s['pivot']['input']], 'joins':[]}
+                query_owner(pivot,title+' / Pivot '+s['alias'])
+    for part in parts:
+        for name,q in part.get('queries',[]):
+            query_owner(q,'Query: '+name)
     heads = [h for h in headings(src) if h['level'] == 2]
     seen = {}
     for i, h in enumerate(heads):

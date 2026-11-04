@@ -4,7 +4,7 @@
 // same file (the viewer opens it).
 import { extractEmoji, inlineRuns } from './model/labels.js';
 
-export function safeHref(u) { return /^(https?:|mailto:)/i.test(u) || /^#[\w-]+$/.test(u) ? u : null; }
+export function safeHref(u) { return /^(https?:|mailto:)/i.test(u) || /^#[\w-]+$/.test(u) || /^#column:[A-Za-z0-9_%.-]+:[A-Za-z0-9_%.-]+$/.test(u) ? u : null; }
 
 // onLink(a): wires one link (host callback or plain new-tab link)
 function appendInline(parent, text, onLink) {
@@ -50,8 +50,19 @@ function appendInline(parent, text, onLink) {
 export function renderNoteBody(md, parent, onLink) {
   let ul = null;
   let item = null;   // the list item an indented line goes on
+  let fence = null, code = null;
   let p = null;      // the paragraph a plain line goes on
   for (const line of md.split('\n')) {
+    const f = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (fence) {
+      if (f && f[1][0] === fence[0] && f[1].length >= fence.length && !f[2].trim()) { fence=null; code=null; }
+      else code.textContent += `${code.textContent ? '\n' : ''}${line}`;
+      continue;
+    }
+    if (f) {
+      fence=f[1]; const pre=document.createElement('pre'); code=document.createElement('code'); pre.appendChild(code); parent.appendChild(pre);
+      ul=null; item=null; p=null; continue;
+    }
     const li = line.match(/^\s*[-*]\s+(.*)$/);
     if (li) {
       if (!ul) { ul = document.createElement('ul'); parent.appendChild(ul); }

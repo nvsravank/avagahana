@@ -34,7 +34,10 @@ export function tablePage(n) {
       name.insertAdjacentHTML('beforeend', planSignSvg(a.plan, 14));
       name.title = `${PLAN_WORD[a.plan]} since the earlier version${a.planWhat?.length ? `: ${a.planWhat.join(', ')}` : ''}`;
     }
-    name.appendChild(document.createTextNode(a.name));
+    if (a.note) {
+      const button = Object.assign(document.createElement('button'), {className:'mmv-relrow',textContent:`${a.expression ? 'ƒ ' : ''}${a.name}`});
+      button.dataset.queryTable = n.id; button.dataset.queryColumn = a.name; name.appendChild(button);
+    } else name.appendChild(document.createTextNode(a.name));
     r.insertCell().textContent = a.type;
     commentInto(r.insertCell(), a.grain ? '' : a.comment || '');
   }

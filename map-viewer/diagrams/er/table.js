@@ -30,7 +30,7 @@ export function tableGeometry(n, rel, font, measure) {
   const type = typeFor(1);
   const titleLines = wrapRuns(n.runs || [[{ text: n.plain || n.id, bold: false, italic: false }]], type, font, MAX_LINE, measure);
   const trustW = (n.icons || []).filter((c) => TRUST.has(c)).length * 22;
-  const title = Math.max(...titleLines.map((l) => l.w), 0) + trustW + (trustW && n.note ? 22 : 0);
+  const title = Math.max(...titleLines.map((l) => l.w), 0) + (n.inners?.length || 0) * 24 + trustW + (trustW && n.note ? 22 : 0);
   const lh = Math.round(type.size * 1.25);
   // a group (subgraph): closed, a box with its name; lines meet it at its middle
   if (!n.attrs) {
@@ -44,7 +44,7 @@ export function tableGeometry(n, rel, font, measure) {
     const kind = a.keys.has('PK') ? 'key' : 'col';
     const st = ROW[kind];
     const w = MARK_W + (a.keys.has('FK') ? FK_W : 0) + measure(a.name, st.size, st.weight, false, font) + GAP + measure(a.type, 11, 400, false, font) + signW;
-    return { a, kind, size: st.size, weight: st.weight, h: st.h, w, shown: n.attrs.length <= 15 || a.keys.has('PK') || a.grain || a.keys.has('FK') || a.connected };
+    return { a, kind, size: st.size, weight: st.weight, h: st.h, w, shown: n.visibleColumns ? n.visibleColumns.has(a.name) : n.attrs.length <= 15 || a.keys.has('PK') || a.grain || a.keys.has('FK') || a.connected };
   });
   const shown = rows.filter((r) => r.shown);
   const hidden = rows.filter((r) => !r.shown);

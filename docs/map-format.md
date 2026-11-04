@@ -832,7 +832,7 @@ erDiagram
   `er-group-direction`; for
   `## Renames`, `rename-syntax`, `rename-unknown-column`, `rename-stale` (viewer only).
 
-## ER column relationships and join views
+## ER column relationships and perspectives
 
 Mermaid blocks stay valid Mermaid. Define column connections in Markdown after the
 block; use each definition once. Existing Mermaid relationships remain table-level,
@@ -844,23 +844,23 @@ attached at the header rather than suggesting a particular column.
 - ORDER.billing_address_id billing@}o--|| ADDRESS.id : billed to
 - ORDER.shipping_address_id shipping@}o--|| ADDRESS.id : shipped to
 
-## Joins: Order details
+## Perspective: Order details
 - order-tenant
-- ORDER_LINE.(tenant_id,order_id) line-order@--- ORDER.(tenant_id,id) : order details
+- ORDER_LINE.(tenant_id,order_id) line-order@}o--|| ORDER.(tenant_id,id) : belongs to
 ```
 
 - Declare all tables and referenced columns in the Mermaid block. A column endpoint
   is `TABLE.column` or `TABLE.(column1,column2)`. Lists must be nonempty, contain no
   repeated columns, and have matching lengths; columns pair by position.
-- Column relationships under `## Relations[: name]` require a stable `id@` and ER
+- Column relationships under `## Relations` or `## Perspective: <name>` require a stable `id@` and ER
   cardinalities, as in Mermaid's table relationships. Composite relationships are
   allowed when explicitly declared; no relationship is inferred from names or joins.
   The unnamed section adds to the default Relations view without repeating native
   Mermaid relationships. Named relationship sections define other model views.
-- `## Joins: <name>` defines a named equality view. Use `- <connection-id>` to reuse
-  an existing connection, or define a new column connection with `id@---`. References
-  may precede definitions. A new join does not add a model relationship or cardinality. No SQL block, join execution order, LEFT or RIGHT is implied.
-  Fan-out is known only when reusing a relationship with declared cardinality.
+- A named `## Perspective: <name>` may reuse a model relationship as `- <connection-id>`
+  or declare a column relationship with its actual model cardinality. References may
+  precede definitions. This describes the model, not a SQL operation. Query joins
+  belong in `## Query: <name>` SQL, including their join type and full conditions.
 - Definition IDs are unique within their diagram, independent of labels and file order.
 
 ### `## Renames`: a column renamed since the earlier version
@@ -886,7 +886,7 @@ A column that was renamed says so in the later file, new name first:
   Reusing an ID in another view refers to the original object; it does not redefine it.
   Use existing `## Details` anchors (`### <a id="billing"></a>Billing address`) and
   `## Node icons` to annotate connection IDs. Names of views must be distinct,
-  ignoring case. Empty join views are reported.
+  ignoring case. Empty perspectives are reported unless they select Columns explicitly.
 - Each mapped line leaves and enters its column row horizontally, normally in three
   segments. Parallel connections keep separate routes. Composite connections draw
   each column pair, sharing the connection's identity and one label. Self connections
@@ -919,9 +919,9 @@ gets stuck, how a query joins its tables. Played over the diagram like a sequenc
 - Select a specific connection with `- A connection-id@--> B : explanation`.
   A table-only step must identify exactly one connection; missing or ambiguous
   selections are checker errors (`scenario-not-step`), never a first-match fallback.
-  Use `## Scenario: <name> | <view name>` to scenario a named relationship or join view;
+  Use `## Scenario: <name> | <view name>` to scenario a named model perspective;
   otherwise the default Relations view is used. The viewer skips invalid steps and
-  reports problems. Join-only equalities do not claim a known fan-out.
+  reports problems. SQL join walkthrough items belong to generated query diagrams.
 - The viewer offers each scenario on the play button. Playing greys the diagram and lights
   each step's states or tables and its line in turn (a numbered step, the transition's
   event or the relationship's label), with the step's words in the side panel. A step
@@ -945,7 +945,7 @@ Each stop is a `### <Kind>: <name>` heading, with its note as Markdown underneat
 - `Perspective` a relation view, `## Perspective: <name>`.
 - `Deployment` an environment, `## Deployment: <env>`.
 - `Scenario` a scenario, `## Scenario: <name>`.
-- `Join` an ER join view, `## Joins: <name>`.
+- `Join` a generated numbered SQL join item in a `Query: <name>` diagram.
 - `Sequence` a sequence diagram, by its heading.
 
 ```markdown
@@ -1119,3 +1119,131 @@ Trust visibility is a runtime preference, not a map section. Interactive HTML ke
 the reader's current selection separately from the unchanged source text. SVG, PNG and print
 are static diagrams with no clickable evidence links, popups, source lists or extra
 printed URLs. Use HTML or the source Markdown to retain the complete evidence.
+
+## SQL query pictures: `## Query: <name>`
+
+A query section belongs to the preceding ER diagram. It explains SQL without
+executing it or accessing a database. One section holds one fenced `sql` block;
+optional `sql postgres` or `sql sqlserver` labels identify the source syntax. The
+same explanation grammar applies to both. Unsupported structure or unresolved
+references reports `query-syntax`; the viewer keeps the model and other valid
+queries but does not create a partial picture of the failed query.
+
+````markdown
+## Query: Refunds
+
+```sql
+WITH orders AS (SELECT id, customer_id FROM ORDER)
+SELECT o.id, c.name AS customer
+FROM orders o
+LEFT JOIN CUSTOMER c ON o.customer_id = c.id
+```
+
+#### Physical names
+- sales.orders: ORDER
+````
+
+Table IDs and column names resolve case-insensitively. SQL aliases identify distinct
+occurrences, even when they share a physical table or CTE definition. A qualified
+physical table name needs an explicit mapping under `#### Physical names` (inside
+that query section). Do not guess schema equivalence. A derived FROM table needs
+an alias. Output names must be unique; calculated expressions need output aliases.
+`_map` and `_result` are reserved occurrence IDs.
+
+The picture is a generated ER diagram named `Query: <name>`. Its anchor is
+`<owning-diagram-anchor>-query-<query-name-slug>`. It is listed in contents and accepts
+existing `part` navigation, links, render/export and walkthrough Diagram stops.
+CTE and FROM-subquery occurrences have an Open diagram control in their header.
+A shared definition can be opened from each occurrence. The query shows only used
+columns initially, including ON/filter/group/order/expression inputs; expand a table
+to inspect its remaining declared columns. The Result lists selected outputs.
+
+Joins connect table headers, never column rows. Each connection is labelled with
+the join number and type. Every earlier occurrence referenced by ON has a connection
+to the new occurrence; these connections share one join identity. Select any line
+to highlight the entire join and read its complete ON clause. There is no primary
+predicate and no secondary line style. The join applies to the accumulated left
+input, not separately to each displayed dependency. A per-join view, such as
+`4 · LEFT JOIN`, is a single Join walkthrough target; qualify it with Stop options
+`Diagram: Query: <name>` where names repeat.
+
+The main input starts in the first column. Each joined occurrence goes one column
+beyond the rightmost earlier occurrence referenced by ON; peers stack in SQL order.
+A CROSS JOIN or constant condition goes after the rightmost prior input and connects
+to the earlier inputs, since it depends on the accumulated left input. Parenthesized
+join trees are not supported in this grammar; parentheses in FROM introduce a SELECT.
+
+Crow's-foot endpoints describe matching cardinality, independently of row
+preservation named by INNER/LEFT/RIGHT/FULL OUTER JOIN. Exact conjunctive equality
+pairs can use PK/UK uniqueness and explicitly mapped model relationships. Unknown
+ends have no marker. Minimum matching counts are conservative: a mandatory model match is
+shown only for an exact mapped equality to a physical input from a nonnullable
+occurrence. Extra conditions and derived/nullable inputs do not imply mandatory
+matches. Counts describe matching inputs before later WHERE/HAVING filters. OR/NOT/CASE predicates do not infer cardinality. An unrelated comparison
+does not invent a model relationship. No fan-out or correctness verdict is claimed.
+
+A calculated column bears `ƒ`. Selecting it opens a note with its exact expression
+and links to input columns. A derived column can open its definition in the inner
+scope. CASE, arithmetic, function calls, aggregates and window expressions stay in
+column notes rather than becoming boxes. Result notes expose WHERE, GROUP BY,
+HAVING, ORDER BY, LIMIT/OFFSET and DISTINCT, with a grouping/row-grain explanation.
+Aggregates without GROUP BY have a single aggregate row; a window expression does
+not itself collapse input rows. Function names/signatures and full scalar expression
+syntax are not validated by this structural reader.
+
+Fixed-column SQL Server-style `PIVOT (aggregate FOR column IN (...)) alias` is
+supported with SUM/COUNT/AVG/MIN/MAX. The outer query sees the pivot's exposed
+columns. Its header opens an isolated diagram containing only the pivot input and
+result, with its row keys, pivot column, aggregation and named output columns.
+Other outer-query joins and calculations remain outside. A nested definition may
+be opened from the input. Dynamic pivot columns are not inferred or executed.
+
+Supported structure: SELECT/DISTINCT, FROM, nested nonrecursive CTEs (including
+explicit CTE output names), FROM subqueries, aliases, INNER/LEFT/RIGHT/FULL OUTER and
+CROSS JOIN, ON/USING, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT/OFFSET, qualified or
+unambiguous unqualified columns, SELECT wildcards, scalar/aggregate/window
+expressions and fixed PIVOT. Unsupported: recursive CTEs, UNION/EXCEPT/INTERSECT,
+scalar/correlated subqueries, lateral sources, parenthesized join trees, NATURAL
+JOIN, QUALIFY/named WINDOW clauses, dynamic pivots and multiple statements.
+USING needs an unambiguous left occurrence; write ON explicitly otherwise.
+Queries are explanations, not database execution plans or SQL correctness proofs.
+
+### ER perspective column selection
+
+An ER perspective may define explicit initially visible columns:
+
+```markdown
+## Perspective: Customer lookup
+
+#### Perspective options
+- Columns: ORDER.customer_id, CUSTOMER.id, CUSTOMER.name
+```
+
+Columns must resolve to declared `TABLE.column` names. Unlike ordinary automatic
+ER collapsing, this explicit selection can hide PK/grain/FK rows too. The remaining
+columns stay available through the table's expand control. Listed tables and those
+used by the perspective's connections appear; a Columns-only perspective can show
+a single table or disconnected tables. Leaving the perspective restores ordinary
+column visibility. ER options accept Columns; flowchart options keep Open/Focus.
+
+Notes also render fenced code as literal text (including SQL), with no raw HTML
+injection or interpretation of links inside the code fence.
+
+### Migrating retired `## Joins:` sections
+
+Authored `## Joins:` sections and their old equality-view drawings are retired.
+The checker reports `joins-retired`; the viewer diagnoses the section and does not
+create its former view. This is an intentional format change, not an automatic
+compatibility translation.
+
+When updating a map, inspect any old Joins section. If it explains a query, replace
+it with `## Query: <name>` and the actual SQL, then update its links and walkthrough
+stops to the generated query/join items. Equality pairs alone do not specify INNER
+versus LEFT/RIGHT/FULL, selected outputs, filters or grouping: recover these from
+source SQL or confirmed intent. Ask for the missing intent instead of inventing it.
+
+If the old view only selects genuine model relationships, make it an ER Perspective
+and reuse their IDs. Do not promote a query-only equality to a declared model
+relationship or invent cardinality. Model scenarios can still traverse those actual
+relationships. Old saved `view=` links to retired views need new destinations.
+SQL pictures require a viewer version that supports Query sections.

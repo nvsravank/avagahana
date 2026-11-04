@@ -1,5 +1,6 @@
-"""Column relationships and declarative join views, matching ER connections.js."""
+"""Column model relationships and their perspectives, matching ER connections.js."""
 import re
+from check_options import options_section
 
 ID = r'[A-Za-z_][\w-]*'
 COL = r'[A-Za-z_*][\w-]*'
@@ -7,7 +8,7 @@ END = rf'{ID}(?:\.(?:{COL}|\(\s*{COL}(?:\s*,\s*{COL})*\s*\)))?'
 LINE = re.compile(rf'^\s*[-*]\s*({END})\s+({ID})@(\}}o|\}}\||\|o|\|\|)?(--|\.\.|---)(o\{{|\|\{{|o\||\|\|)?\s+({END})(?:\s*:\s*(.*))?$')
 
 
-def connection(m, line, ln, ids, join=False):
+def connection(m, line, ln, ids):
     def bad(message):
         m.report(ln, 'relation-syntax', message)
         return None
@@ -15,8 +16,8 @@ def connection(m, line, ln, ids, join=False):
     if not mm:
         return bad(f'column connection not understood: {line.strip()}')
     frm, eid, tail, body, head, to, label = mm.groups()
-    if (join and (tail or head or body != '---')) or (not join and (not tail or not head or body == '---')):
-        return bad(f'{eid}: use --- for joins and ER cardinalities for relationships')
+    if not tail or not head or body == '---':
+        return bad(f'{eid}: use ER cardinalities for model relationships; author query joins in SQL')
     ends = []
     for endpoint in (frm, to):
         table, _, cols = endpoint.partition('.')
@@ -30,7 +31,7 @@ def connection(m, line, ln, ids, join=False):
     (a, ac), (b, bc) = ends
     if not ac or len(ac) != len(bc):
         return bad(f'{eid}: both ends need the same number of columns')
-    return {'from': a, 'to': b, 'eid': eid, 'line': ln, 'label': label or '', 'join': join}
+    return {'from': a, 'to': b, 'eid': eid, 'line': ln, 'label': label or ''}
 
 
 def check_connections(m, part, secs, legacy):
@@ -55,23 +56,26 @@ def check_connections(m, part, secs, legacy):
 
     for r in read['arrows']:
         register(r)
-    pending = []
+    column_views = set()
     seen_sections = set()
     for title, body, hl in secs:
         rm = re.fullmatch(r'relations|perspective\s*:\s*(.+)', title, re.I)
-        jm = re.fullmatch(r'joins\s*:\s*(.+)', title, re.I)
-        if not rm and not jm:
+        if not rm:
             continue
-        name = ((rm or jm).group(1) or 'Relations').strip()
-        if jm:
-            pending.append((name, body, hl))
-            continue
+        name = (rm.group(1) or 'Relations').strip()
         if name.lower() in seen_sections:
             m.report(hl, 'view-twice', f'relations {name} appears twice')
         seen_sections.add(name.lower())
+        body, opts = options_section(body, 'Perspective options', ['columns'], lambda msg: m.report(hl, 'perspective-options', msg)) if rm.group(1) else (body, None)
+        if opts and opts.get('columns'):
+            column_views.add(name)
         view = views.setdefault(name.lower(), (name, []))[1]
         for i, line in enumerate(body.split('\n')):
             if not line.strip():
+                continue
+            ref = re.fullmatch(r'\s*[-*]\s+([\w-]+)\s*',line)
+            if ref:
+                view.append({'ref':ref[1],'line':hl+i})
                 continue
             if re.match(r'^\s*[-*]\s*[A-Za-z_][\w-]*\.', line):
                 r = connection(m, line, hl + i, ids)
@@ -80,36 +84,20 @@ def check_connections(m, part, secs, legacy):
             if register(r):
                 view.append(r)
     for name, rels in views.values():
-        if name != 'Relations' and not rels:
-            m.report(part['line'], 'view-empty', f'relation view {name} has no connections')
-    joins = []
-    for name, body, hl in pending:
-        items = []
-        for i, line in enumerate(body.split('\n')):
-            if not line.strip():
-                continue
-            ref = re.fullmatch(r'\s*[-*]\s+([\w-]+)\s*', line)
-            if ref:
-                items.append((ref.group(1), hl + i))
-            else:
-                r = connection(m, line, hl + i, ids, True)
-                if register(r):
-                    items.append((r, hl + i))
-        joins.append((name, items, hl))
-    for name, items, hl in joins:
-        if name.lower() in views:
-            m.report(hl, 'view-twice', f'join view {name} has the name of another view')
-            continue
-        rels = []
-        for item, ln in items:
-            r = registry.get(item) if isinstance(item, str) else item
-            if not r:
-                m.report(ln, 'relation-syntax', f'unknown connection id {item}')
-            elif r not in rels:
-                rels.append(r)
-        if not rels:
-            m.report(hl, 'view-empty', f'join view {name} has no connections')
-        views[name.lower()] = (name, rels)
+        resolved=[]
+        for r in rels:
+            if 'ref' in r:
+                ref=r['ref']
+                target=registry.get(ref)
+                if not target:
+                    m.report(r['line'],'relation-syntax','unknown model relationship '+ref)
+                r=target
+            if r and r not in resolved:
+                resolved.append(r)
+        rels[:] = resolved
+    for name, rels in views.values():
+        if name != 'Relations' and not rels and name not in column_views:
+            m.report(part['line'], 'view-empty', f'perspective {name} has no relationships')
     part['connection_views'] = views
     read['arrows'] = views['relations'][1]
     return views

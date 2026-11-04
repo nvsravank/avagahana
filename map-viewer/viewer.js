@@ -640,7 +640,7 @@ export function mount(element, options = {}) {
     return !again;
   };
   function canvasClick(target) {
-    if (target.closest('[data-trust]')) return;
+    if (target.closest('[data-trust], [data-query-column]')) return;
     const dot = target.closest('[data-dot]');
     if (dot) { if (once(`dot:${dot.dataset.dot}`)) toggle(dot.dataset.dot); return; }
     const rel = target.closest('[data-rel]');
@@ -948,7 +948,39 @@ export function mount(element, options = {}) {
   }
 
   // ---------- notes (one at a time) ----------
+  function openColumn(table, column, anchorEl) {
+    const n = S.map?.byId[table], a = n?.attrs?.find((a) => a.name === column);
+    if (!a?.note) return;
+    hideNote();
+    $.noteTitle.textContent = `${n.plain} · ${a.name}`;
+    $.noteBody.replaceChildren();
+    if (a.definition) {
+      const b = Object.assign(document.createElement('button'), {className:'mmv-relrow',textContent:'Open column definition'});
+      b.addEventListener('click', () => { const d=a.definition; goPart(d.part); openColumn(d.table,d.column,$.canvas); });
+      $.noteBody.appendChild(b);
+    } else verification.renderNote(a.note, $.noteBody);
+    $.note.hidden=false; S.noteOpen=true; S.noteSticky=true; placeNote(anchorEl || $.canvas);
+  }
+  root.addEventListener('click', (e) => {
+    const el=e.target.closest('[data-query-column]');
+    if (el) openColumn(el.dataset.queryTable,el.dataset.queryColumn,el);
+  });
+  root.addEventListener('keydown', (e) => {
+    const inner=e.target.closest('g[data-inner]');
+    if (inner && ['Enter',' '].includes(e.key)) {e.preventDefault(); e.stopPropagation(); canvasClick(inner); return;}
+    const el=e.target.closest('g[data-query-column]');
+    if (el && ['Enter',' '].includes(e.key)) { e.preventDefault(); e.stopPropagation(); openColumn(el.dataset.queryTable,el.dataset.queryColumn,el); }
+  });
   function wireLink(a) {
+    const column = a.getAttribute('href')?.match(/^#column:([^:]+):(.+)$/);
+    if (column) {
+      a.addEventListener('click', (e) => { e.preventDefault(); const table=decodeURIComponent(column[1]), col=decodeURIComponent(column[2]);
+        const n=S.map.byId[table]; if (!n) return;
+        S.collapsed.delete(table); painter.clearSizes(); render(false);
+        if (n.attrs?.some((a)=>a.name===col && a.note)) openColumn(table,col,$.canvas);
+        else { jumpTo(table); showNote({note:{heading:`${table}.${col}`,body:`Source column ${table}.${col}.`}},$.canvas); S.noteSticky=true; }
+      }); return;
+    }
     const ref = a.getAttribute('href')?.slice(1);
     if (a.getAttribute('href')?.startsWith('#') && S.map?.sources?.byRef[ref]) {
       a.addEventListener('click', (e) => { e.preventDefault(); hideNote(); verification.close(); closePanels(); $.verificationPanel.hidden = false; verification.renderPanel().then(() => { const entry = $.verificationPanel.querySelector(`[data-source="${ref}"]`); const repo = entry?.closest('.mmv-source'); if (repo) repo.open = true; entry?.scrollIntoView({ block: 'nearest' }); }); }); return;
@@ -1105,6 +1137,8 @@ export function mount(element, options = {}) {
   // Clicking one opens the boxes round both its ends and selects where it starts. A
   // single relation's note comes first (a merged arrow shows no notes).
   function showArrow(id, anchorEl) {
+    const join = S.map.query && S.map.relations.find((r) => r.eid === id)?.queryJoin;
+    if (join && S.map.root.queryJoin !== join) { setView(S.map.views.find((v) => v.queryJoin === join).name); anchorEl = $.canvas; }
     const a = painter.arrow(id);
     if (!a) return;
     const name = (nid) => S.map.byId[nid]?.plain || nid;
@@ -1648,13 +1682,20 @@ export function mount(element, options = {}) {
   function useView(name) {
     const view = viewNamed(name) || S.map.views[0] || null;
     S.relView = view && view !== S.map.views[0] ? view.name : null;
+    if (S.map.query) S.map.root.queryJoin = view?.queryJoin || null;
     S.map.relations = view ? view.relations : [];
     const before = S.map.root;
     S.map.root = view?.deploy ? view.deploy.root : S.map.base.root;
     S.map.byId = view?.deploy ? view.deploy.byId : S.map.base.byId;
     // another tree (a deployment's): its nodes share ids with the diagram's but not their
     // sizes (a diagram node's links to other diagrams are not in a deployment)
-    if (S.map.root !== before) painter.clearSizes();
+    if (S.map.type === 'er') {
+      S.map.root.columnTables = view?.options?.columns ? new Set(view.options.columns.map((ref)=>ref.split('.')[0])) : null;
+      for (const n of Object.values(S.map.byId)) if (n.attrs) {
+        n.visibleColumns = view?.options?.columns ? new Set(view.options.columns.filter((x) => x.startsWith(`${n.id}.`)).map((x) => x.slice(n.id.length + 1))) : n.queryColumns || null;
+      }
+      painter.clearSizes();
+    } else if (S.map.root !== before) painter.clearSizes();
     buildViews();
   }
   // A configured perspective owns its opening picture, not the reader's subsequent
@@ -2076,7 +2117,8 @@ export function mount(element, options = {}) {
   }
 
   // ---------- loading ----------
-  const thumbFile = (f) => ({ ...f, parts: new Map([...f.parts].map(([k, p]) => [k, { ...p }])) });
+  const thumbFile = (f) => f.type === 'er' || [...f.parts.values()].some((p)=>p.type==='er')
+    ? structuredClone(f) : { ...f, parts: new Map([...f.parts].map(([k,p])=>[k,{...p}])) };
   let pageSince = null;   // the opened page's changes since you looked (seen.js)
   let firstLoad = true;
   let freshTimer = 0;

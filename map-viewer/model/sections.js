@@ -15,7 +15,7 @@ import { headings } from './options.js';
 //     scenarios: [{name, text}], walkthroughs: [{name, text}]}
 //    (a relation name null = unnamed)
 export function splitSections(after) {
-  const out = { relations: [], deployments: [], scenarios: [], joins: [], walkthroughs: [] };
+  const out = { relations: [], deployments: [], scenarios: [], joins: [], walkthroughs: [], queries: [] };
   const heads = headings(after).filter((h) => h.level === 2).map((h) => ({ ...h, name: h.title.toLowerCase() }));
   heads.forEach((h, idx) => {
     const text = after.slice(h.end, idx + 1 < heads.length ? heads[idx + 1].start : after.length);
@@ -28,6 +28,8 @@ export function splitSections(after) {
     if (/^relations$/i.test(h.title)) out.relations.push({ name: null, text });
     const persp = h.title.match(/^perspective\s*:\s*(.+)$/i);
     if (persp) out.relations.push({ name: persp[1].trim(), text });
+    const query = h.title.match(/^query\s*:\s*(.+)$/i);
+    if (query) out.queries.push({ name: query[1].trim(), text });
     const join = h.title.match(/^joins\s*:\s*(.+)$/i);
     if (join) out.joins.push({ name: join[1].trim(), text });
     const dep = h.title.match(/^deployment\s*:\s*(.+)$/i);

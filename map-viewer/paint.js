@@ -216,7 +216,7 @@ export function createPainter(v) {
     if (s.top) g.dataset.top = s.top;
     if (s.hover) g.dataset.hover = s.id;   // Poster: hovering the node shows its details (WO-38)
     if (s.grow > 1) g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${s.grow}) translate(${-s.w / 2},${-s.h / 2})`);
-    g.setAttribute('role', 'img');
+    g.setAttribute('role', s.rows?.some((r)=>r.columnNote) || s.inners?.length ? 'group' : 'img');
     g.setAttribute('aria-label', planName(s));
     if (s.bar) {
       g.dataset.bar = '1';

@@ -354,29 +354,44 @@ erDiagram
 - ORDER.billing_address_id order-billing@}o--|| ADDRESS.id : billed to
 - ORDER.shipping_address_id order-shipping@}o--|| ADDRESS.id : shipped to
 
-## Joins: Paid amount per line
-
-- line-order
-- payment-order
-
-## Joins: Fulfilment
+## Perspective: Fulfilment relationships
 
 - shipment-order
+- payment-order
 - order-shipping
 - order-billing
-- PAYMENT.order_id payment-shipment@--- SHIPMENT.order_id : attempts and shipments for the same order
 
-## Details
+## Query: Paid amount per line
 
-### <a id="payment-shipment"></a>Equality is not a declared relationship
+This deliberately keeps every payment attempt. Joining lines and attempts through
+an order repeats each line once per attempt; choose the payment outcome and the
+aggregation according to the business question.
 
-Payment attempts and shipments can be joined on order_id, but neither identifies the other. Multiple attempts and shipments can multiply rows. This join exists only in the Fulfilment view; it adds no schema relationship or cardinality.
+```sql
+SELECT l.id AS line_id, o.id AS order_id, p.id AS payment_id,
+       p.amount AS payment_amount, p.outcome
+FROM ORDER_LINE l
+JOIN ORDER o ON l.order_id = o.id
+JOIN PAYMENT p ON p.order_id = o.id
+```
 
-## Scenario: Payment to shipment | Fulfilment
+## Query: Fulfilment
 
-- PAYMENT payment-shipment@--> SHIPMENT : Match order_id; this equality does not imply a foreign key between these tables.
+This example explicitly matches payment attempts and shipments on order_id.
+Neither identifies the other; several attempts and shipments can multiply rows.
+The address aliases are separate occurrences of the same physical table.
 
-## Scenario: Paid amount per line | Paid amount per line
+```sql
+SELECT p.id AS payment_id, s.id AS shipment_id, o.id AS order_id,
+       billing.id AS billing_address, shipping.id AS shipping_address
+FROM PAYMENT p
+JOIN SHIPMENT s ON p.order_id = s.order_id
+JOIN ORDER o ON p.order_id = o.id
+LEFT JOIN ADDRESS billing ON o.billing_address_id = billing.id
+LEFT JOIN ADDRESS shipping ON o.shipping_address_id = shipping.id
+```
+
+## Scenario: Paid amount per line
 
 - ORDER_LINE line-order@--> ORDER : Each line joins its order on order_id.
 - ORDER payment-order@--> PAYMENT : An order has one payment attempt per try, so a retried order's lines appear once per attempt. Filter to outcome = paid before summing.
@@ -542,7 +557,7 @@ retrying returns to Charging instead of creating another order.
 - Title: Follow one retry from beginning to end
 - Label: Retry
 
-### Join: Paid amount per line
+### Diagram: Query: Paid amount per line
 
 Each order line belongs to an order; each payment attempt also belongs to that
 order. Joining through order_id repeats an order's lines across its payment attempts.

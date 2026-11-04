@@ -42,16 +42,16 @@ export async function testErCompare(check, wait) {
     && rel.changed?.includes('Arrow Payment → Order: pays: cardinality at Payment: zero or one → zero or more'), JSON.stringify(rel));
 
   // the same map, with columns and composite pairs reordered: nothing
-  const a = er('  A {\n    int id PK\n    int t FK\n    int o FK\n  }\n  B {\n    int id PK\n    int t\n  }', '\n## Joins: J\n- A.(t,o) j@--- B.(t,id) : both\n');
-  const b = er('  A {\n    int o FK\n    int id PK\n    int t FK\n  }\n  B {\n    int t\n    int id PK\n  }', '\n## Joins: J\n- A.(o,t) j@--- B.(id,t) : both\n');
+  const a = er('  A {\n    int id PK\n    int t FK\n    int o FK\n  }\n  B {\n    int id PK\n    int t\n  }', '\n## Perspective: J\n- A.(t,o) j@}o--|| B.(t,id) : both\n');
+  const b = er('  A {\n    int o FK\n    int id PK\n    int t FK\n  }\n  B {\n    int t\n    int id PK\n  }', '\n## Perspective: J\n- A.(o,t) j@}o--|| B.(id,t) : both\n');
   const same = compareFiles(parseMap(a, 'a.md'), parseMap(b, 'b.md'));
   check('ER compare: reordered columns and pairs read as no change', !changesIn(same, '', 'J', false).groups.length, JSON.stringify(changesIn(same, '', 'J', false)));
   // a pair changed on the same connection id
-  const c = er('  A {\n    int o FK\n    int id PK\n    int t FK\n  }\n  B {\n    int t\n    int id PK\n  }', '\n## Joins: J\n- A.o j@--- B.id : both\n');
+  const c = er('  A {\n    int o FK\n    int id PK\n    int t FK\n  }\n  B {\n    int t\n    int id PK\n  }', '\n## Perspective: J\n- A.o j@}o--|| B.id : both\n');
   const pair = lines(changesIn(compareFiles(parseMap(a, 'a.md'), parseMap(c, 'c.md')), '', 'J', false));
   check('ER compare: a connection\'s pairs changed', pair.changed?.join('|') === 'Arrow A → B: both: columns (o = id, t = t) → o = id', JSON.stringify(pair));
   // a rename the connection follows: the column is renamed, the line unchanged
-  const d = er('  A {\n    int id PK\n    int tenant FK\n    int o FK\n  }\n  B {\n    int id PK\n    int t\n  }', '\n## Joins: J\n- A.(tenant,o) j@--- B.(t,id) : both\n\n## Renames\n- A.tenant was t\n');
+  const d = er('  A {\n    int id PK\n    int tenant FK\n    int o FK\n  }\n  B {\n    int id PK\n    int t\n  }', '\n## Perspective: J\n- A.(tenant,o) j@}o--|| B.(t,id) : both\n\n## Renames\n- A.tenant was t\n');
   const ren = lines(changesIn(compareFiles(parseMap(a, 'a.md'), parseMap(d, 'd.md')), '', 'J', false));
   check('ER compare: a rename is followed by the connection', ren.changed?.join('|') === 'A: columns|A.tenant: renamed from t' && !ren.added && !ren.removed, JSON.stringify(ren));
   // stale: the old name is not in the earlier version

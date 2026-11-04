@@ -2,6 +2,7 @@
 // says which diagram type it is (diagrams/index.js); that type reads the block into
 // the tree, and the parts every type shares are read here: the title, notes, icon
 // legend, node and arrow icons, relation views and the size warnings.
+import { addQueries } from '../query/model.js';
 import { diagramForHeader, DIAGRAMS } from '../diagrams/index.js';
 import { MAX_LABEL_LINE, MAX_LABEL } from './labels.js';
 import { problem } from './problem.js';
@@ -89,6 +90,7 @@ export function parseMap(text, fileName) {
       delete n.links;
     }
   }
+  addQueries(main);
   addScenarios(main, fileName);
   // walkthroughs belong to the file: each diagram's sections count (model/walkthroughs.js)
   main.walkthroughs = readWalkthroughs([main, ...main.parts.values()].flatMap((p) => p.walkthroughs || []), main.warnings);
@@ -201,7 +203,7 @@ function parsePart(text, fileName, shared) {
   for (const { n } of infra) own.set(n, classOf(n, classes, styleOnly));
   const views = diagram.parseViews ? diagram.parseViews(sections, byId, warnings, read.relations || []) : parseViews(sections.relations, byId, warnings, read.relations || null);
   for (const view of views) if (view.options) view.options = perspectiveOptions(view.options, diagram.type, byId, warnings);
-  if (sections.joins.length && !diagram.parseViews) warnings.push(problem('relation-syntax', 'Join views are for ER diagrams.'));
+  for (const section of sections.joins) warnings.push(problem('joins-retired', `Joins: ${section.name} is retired. Put query joins in a Query section with SQL; keep model relationships in Relations/Perspective. Migrate from the actual SQL or confirmed intent, without guessing join types or outputs.`));
   // ## Renames: columns renamed since an earlier version, used when comparing (model/compare.js)
   const renames = sections.renames == null ? null : diagram.parseRenames ? diagram.parseRenames(sections.renames, byId, warnings) : null;
   if (sections.renames != null && !diagram.parseRenames) warnings.push(problem('rename-syntax', 'Renames are for ER diagrams: not read.'));
@@ -301,7 +303,7 @@ function parsePart(text, fileName, shared) {
     hasPlan: Object.values(byId).some((n) => n.plan) || infra.some(({ n }) => n.plan) || views.some((x) => x.relations.some((r) => r.plan)),
     ...(diagram.type === 'sequence' ? { playsOver } : {}), notesText: sections.details || '',
     scenarios: SCENARIO_TYPES.has(diagram.type) ? sections.scenarios : [],
-    walkthroughs: sections.walkthroughs,
+    walkthroughs: sections.walkthroughs, querySections: sections.queries,
     ...(look ? { look } : {}),
     ...(renames ? { renames } : {}),
   };

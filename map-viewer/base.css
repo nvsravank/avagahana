@@ -724,3 +724,8 @@ marker.is-kind .mmv-er-end { stroke: var(--n); stroke-opacity: 1; }
 .mmv .mmv-llabel > .mmv-trust-mark, .mmv .mmv-lrel > .mmv-trust-mark { margin-left: 6px; display: inline-flex; vertical-align: middle; }
 
 .mmv .mmv-bl > .mmv-pill.mmv-icon { width: 34px; min-width: 34px; padding: 0; justify-content: center; }
+
+/* Literal calculation/SQL notes. Text is inserted through textContent. */
+.mmv .mmv-note-body pre, .mmv .mmv-page pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px; background: var(--mmv-bg); border: 1px solid var(--mmv-chrome-border); border-radius: 4px; }
+.mmv [data-query-column] { cursor: pointer; }
+.mmv [data-query-column]:focus-visible { outline: 2px solid var(--mmv-accent); }

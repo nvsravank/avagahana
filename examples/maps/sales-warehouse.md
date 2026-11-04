@@ -114,13 +114,19 @@ erDiagram
 - PRODUCT_TAG.product_key tag-product@}o--|| PRODUCT.product_key : tagged by
 - PRODUCT_TAG.tag_key tag-tag@}o--|| TAG.tag_key : tags
 
-## Joins: Sales against stock
+## Query: Sales against stock
 
-- line-date
-- line-product
-- stock-date
-- stock-product
-- ORDER_LINE.(date_key,product_key) sales-stock@--- STOCK_LEVEL.(date_key,product_key) : same day and product
+This query intentionally compares each order line with stock rows for the same
+product and day. Different warehouses remain separate result rows; this is not a
+model foreign-key relationship between the fact tables.
+
+```sql
+SELECT l.order_line_key, l.date_key, l.product_key, l.net_amount,
+       s.warehouse_key, s.on_hand
+FROM ORDER_LINE l
+JOIN STOCK_LEVEL s ON l.date_key = s.date_key
+                 AND l.product_key = s.product_key
+```
 
 ## Details
 
@@ -134,11 +140,6 @@ currency comes from the daily rate table, which is not drawn.
 One row per line of a return. It shares the date, product and customer dimensions with
 order lines (conformed dimensions), so sales and returns add up by the same day,
 product or customer.
-
-### <a id="sales-stock"></a>Same day and product
-
-Drilling across the two facts: an order line meets the stock count for the same day
-and product, through the shared date and product dimensions.
 
 ## Scenario: Revenue by region
 

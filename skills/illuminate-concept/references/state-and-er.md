@@ -96,7 +96,7 @@ erDiagram
   move the picture (tables with as many relationships as each other are placed in the
   order they are written). When the lines tangle, try table orders as for box diagrams
   (`boxes.md`, "Crossing arrows": when, and the draft script), with the mode `tables`
-  and each `## Joins:` view.
+  and each model perspective. SQL query layouts follow dependency columns instead.
 
 ## Scenario: `## Scenario: <name>`
 
@@ -121,7 +121,7 @@ joins its tables. After the diagram's block, a step per line:
   above: `order-states-scenario-payment-fails-twice`):
   `show.py "<map>" --seq order-states-scenario-payment-fails-twice --step 1`.
 
-## Column relationships and named join views
+## Column relationships and model perspectives
 
 Keep Mermaid valid. Put column connections outside its block:
 
@@ -130,12 +130,9 @@ Keep Mermaid valid. Put column connections outside its block:
 - ORDER.customer_id order-customer@}o--|| CUSTOMER.id : placed by
 - PAYMENT.order_id payment-order@}o--|| ORDER.id : pays
 
-## Joins: Payment by customer
+## Perspective: Payment by customer
 - order-customer
 - payment-order
-
-## Joins: Attempts and shipments
-- PAYMENT.order_id payment-shipment@--- SHIPMENT.order_id : same order
 
 ## Scenario: Follow payment | Payment by customer
 - PAYMENT payment-order@--> ORDER : Follow the declared relationship.
@@ -143,12 +140,44 @@ Keep Mermaid valid. Put column connections outside its block:
 ```
 
 Declare all tables and columns in Mermaid. `TABLE.(a,b)` pairs with `TABLE.(x,y)`
-by position. Relationship operators carry ER cardinality; join-only definitions use
-`---` and do not create model relationships. IDs are unique per diagram; reuse one as
-`- id` in another join view. Notes use existing `### <a id="id"></a>Title` anchors.
-No SQL or LEFT/RIGHT direction is required for these equality diagrams.
+by position. Relationship operators carry actual model cardinality; SQL query joins belong
+inside Query sections. IDs are unique per diagram; reuse one as
+`- id` in another model perspective. Notes use existing `### <a id="id"></a>Title` anchors.
+No query-only equality belongs in this model perspective.
 
 Up to 15 columns all show with no expand control. Above 15, PK, grain, FK and connected
 columns always show. Every mapped endpoint aligns with its column, including separate
 relationships between the same tables. Give scenario steps explicit IDs when table pairs
 are ambiguous: the checker rejects ambiguous, missing or out-of-view selections.
+
+## Explain SQL
+
+Use `## Query: <name>` with one fenced `sql` block after the ER model. See
+`docs/map-format.md` for the supported grammar and limitations. This is a query
+picture, not execution or automatic correctness review. Declare the real tables
+and columns first; map schema-qualified physical names with `#### Physical names`
+inside the query section. Keep output aliases unique and name calculated outputs.
+
+The viewer makes alias occurrences, table-level labelled joins, relevant-column
+visibility, CTE/FROM-subquery drill-through, calculated-column notes and isolated
+fixed-pivot explanations. Do not hand-write duplicate diagrams for those. A compound
+ON join may have several lines but remains one numbered join/walkthrough item.
+Use `### Diagram: Query: <name>` and `### Join: 4 · LEFT JOIN`, qualified with
+`#### Stop options` / `- Diagram: Query: <name>` when needed. No automatic playback
+is required. Use a normal scenario when there is no SQL to explain.
+
+For a manual ER perspective, `#### Perspective options` / `- Columns: TABLE.column,
+OTHER.column` limits initially visible fields, including on small tables. Omitted
+fields remain expandable. Never hide a query's join/filter/grouping inputs merely
+because they are absent from SELECT. Unsupported query structure must be rewritten
+into supported scopes or explained in prose, not presented as fully understood.
+
+### Updating maps with retired Joins sections
+
+When updating an existing map, look for authored `## Joins:` sections. They no longer
+draw a view: `joins-retired` requires migration. Move query intent into `## Query:`
+using its actual SQL, and update walkthrough/link destinations. Do not infer join
+types, selected outputs, filters or grain from equality pairs alone; find the SQL
+or ask for missing intent. If the section only selects real model relationships,
+make it a Perspective referencing their IDs. Never invent a model relationship
+just to retain a query equality. Model relationship scenarios remain supported.

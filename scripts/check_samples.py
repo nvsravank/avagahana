@@ -61,7 +61,7 @@ def main():
     # the names render.py takes for --seq, as the viewer names them (model/map.js)
     for name, want in (("job-race.md", {"main", "job-queue-race"}),
                        ("shop-layers.md", {"checkout", "order-lifecycle-scenario-soft-decline-then-paid",
-                                           "orders-data-scenario-paid-amount-per-line", "orders-data-scenario-payment-to-shipment"})):
+                                           "orders-data-scenario-paid-amount-per-line"})):
         got = check_map.seq_names((ROOT / "examples" / "maps" / name).read_text(encoding="utf-8"))
         if got != want:
             bad.append(f"seq_names {name}: {sorted(got)}, expected {sorted(want)}")

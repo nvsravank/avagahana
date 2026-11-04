@@ -1,5 +1,6 @@
-// Column connections live outside Mermaid. Relationships describe the model;
-// named join views describe equality pairs and may reuse relationship IDs.
+// Column connections describe model relationships outside Mermaid. Perspectives
+// may reuse their stable IDs. SQL Query sections own all query joins.
+import { optionsSection } from '../../model/options.js';
 import { problem } from '../../model/problem.js';
 import { arrowLabel } from '../../model/labels.js';
 import { parseRelations, DEFAULT_VIEW_LABEL } from '../../model/relations.js';
@@ -18,12 +19,12 @@ export function endpoint(text) {
   };
 }
 
-export function parseConnection(line, byId, warnings, join = false) {
+export function parseConnection(line, byId, warnings) {
   const m = line.match(LINE);
   const bad = (message) => { warnings.push(problem('relation-syntax', message)); return null; };
   if (!m) return bad(`Column connection not understood: "${line.trim()}".`);
   const [, from, eid, tail, body, head, to, label = ''] = m;
-  if (join ? tail || head || body !== '---' : !LEFT[tail] || !RIGHT[head] || body === '---') return bad(`Connection ${eid}: use ${join ? '--- for an equality join' : 'ER cardinalities for a relationship'}.`);
+  if (!LEFT[tail] || !RIGHT[head] || body === '---') return bad(`Connection ${eid}: use ER cardinalities for a model relationship; author query joins in SQL.`);
   const a = endpoint(from), b = endpoint(to);
   for (const e of [a, b]) {
     if (!byId[e.id]?.attrs) return bad(`Connection ${eid}: unknown table ${e.id}.`);
@@ -33,7 +34,7 @@ export function parseConnection(line, byId, warnings, join = false) {
   if (!a.columns.length || a.columns.length !== b.columns.length) return bad(`Connection ${eid}: both ends need the same number of columns.`);
   return { from: a.id, to: b.id, fromColumns: a.columns, toColumns: b.columns, eid, ...arrowLabel(label), cross: false,
     line: body === '..' ? 'dotted' : 'solid', tail: tail ? `er-${LEFT[tail]}` : null, head: head ? `er-${RIGHT[head]}` : null,
-    ...(join ? { join: true } : { fromCard: LEFT[tail], toCard: RIGHT[head] }) };
+    fromCard: LEFT[tail], toCard: RIGHT[head] };
 }
 
 // ## Renames: a column renamed since the earlier version, new name first, so a comparison
@@ -74,31 +75,22 @@ export function parseErViews(sections, byId, warnings, own = []) {
     seenSections.add(name.toLowerCase());
     let view = views.find((v) => v.name.toLowerCase() === name.toLowerCase());
     if (!view) { view = { name, relations: [] }; views.push(view); }
-    for (const line of section.text.split('\n').filter((x) => x.trim())) {
+    const parsed = section.name ? optionsSection(section.text, 'Perspective options', ['columns'], 'perspective-options', warnings) : { text: section.text };
+    view.options = parsed.options || null;
+    for (const line of parsed.text.split('\n').filter((x) => x.trim())) {
+      const ref = line.match(/^\s*[-*]\s+([\w-]+)\s*$/);
+      if (ref) {view.relations.push({relationshipRef:ref[1]}); continue;}
       const r = /^\s*[-*]\s*[A-Za-z_][\w-]*\./.test(line) ? parseConnection(line, byId, warnings) : parseRelations(line, byId, warnings)[0];
       if (register(r)) view.relations.push(r);
     }
-    if (section.name && !view.relations.length) warnings.push(problem('view-empty', `Relation view ${name} has no relations.`));
   }
-  // Definitions are collected first, so references need not depend on section order.
-  const joins = (sections.joins || []).map((s) => ({ ...s, lines: s.text.split('\n').filter((x) => x.trim()).map((line) => {
-    if (/^\s*[-*]\s+[\w-]+\s*$/.test(line)) return line.trim().slice(1).trim();
-    const r = parseConnection(line, byId, warnings, true);
-    return register(r) ? r : null;
-  }) }));
-  for (const section of joins) {
-    if (views.some((v) => v.name.toLowerCase() === section.name.toLowerCase())) {
-      warnings.push(problem('view-twice', `Join view ${section.name} has the name of another view.`)); continue;
-    }
-    const relations = [];
-    for (const item of section.lines) {
-      const r = typeof item === 'string' ? ids.get(item) : item;
-      if (!r) { if (item) warnings.push(problem('relation-syntax', `Join view ${section.name}: unknown connection id ${item}.`)); continue; }
-      if (!relations.includes(r)) relations.push(r);
-    }
-    if (!relations.length) warnings.push(problem('view-empty', `Join view ${section.name} has no connections.`));
-    views.push({ name: section.name, relations, join: true });
-  }
+  for (const view of views) view.relations = view.relations.flatMap((r)=>{
+    if (!r.relationshipRef) return [r];
+    const target=ids.get(r.relationshipRef);
+    if (!target) warnings.push(problem('relation-syntax', `Perspective ${view.name}: unknown relationship ${r.relationshipRef}.`));
+    return target ? [target] : [];
+  }).filter((r,i,all)=>all.indexOf(r)===i);
+  for (const v of views.slice(1)) if (!v.relations.length && !v.options?.columns) warnings.push(problem('view-empty', `Perspective ${v.name} has no relationships.`));
   for (const r of views.flatMap((v) => v.relations)) {
     for (const [id, cols] of [[r.from, r.fromColumns], [r.to, r.toColumns]]) {
       for (const col of cols || []) byId[id].attrs.find((a) => a.name === col).connected = true;

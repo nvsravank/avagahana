@@ -37,7 +37,7 @@ def options_section(text, name, fields, report):
             if not m or key not in fields or not m[2] or key in options:
                 bad = True
                 continue
-            options[key] = list(dict.fromkeys(x.strip() for x in m[2].split(',') if x.strip())) if key in ('open', 'notes') else m[2]
+            options[key] = list(dict.fromkeys(x.strip() for x in m[2].split(',') if x.strip())) if key in ('open', 'notes', 'columns') else m[2]
             if not options[key]:
                 bad = True
     bad = bad or not options
@@ -53,7 +53,15 @@ def options_section(text, name, fields, report):
 def check_perspective(options, kind, ids, report):
     if options is None:
         return
-    valid = kind == 'flowchart'
+    if kind == 'er':
+        valid = bool(options.get('columns')) and not options.get('open') and not options.get('focus')
+        for ref in options.get('columns', []):
+            table, _, col = ref.partition('.')
+            valid = valid and col in ids.get(table, {}).get('attrs', [])
+        if not valid:
+            report('ER Perspective options require Columns: TABLE.column references')
+        return
+    valid = kind == 'flowchart' and 'columns' not in options
     for nid in options.get('open', []) + ([options['focus']] if 'focus' in options else []):
         if nid not in ids or not ids[nid].get('children'):
             valid = False
