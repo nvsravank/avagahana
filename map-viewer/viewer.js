@@ -13,7 +13,9 @@ import { diagramOf, DIAGRAMS } from './diagrams/index.js';
 import { renderList } from './list.js';
 import { createPainter } from './paint.js';
 import { createStage } from './stage.js';
-import { createExporter } from './export.js';
+import { createExporter, embeddedFontCss } from './export.js';
+import { renderWith } from './render-map.js';
+import { buildReading } from './reading.js';
 import { createPage } from './page.js';
 import { createPlayer } from './player.js';
 import { loadIconIndex, iconDef, iconKnown, ensureIcons, symbolTable, iconHtml, useAssets, tintOf } from './icons.js';
@@ -25,7 +27,7 @@ import { TRUST } from './model/provenance.js';
 import { renderNoteBody } from './notes.js';
 import { STOP_KINDS } from './model/walkthroughs.js';
 import { problemList, mapProblems } from './problems.js';
-import { checkTheme, acquire, release, loadFont } from './themes/theme.js';
+import { checkTheme, acquire, release, loadFont, familyName, fontFaces } from './themes/theme.js';
 import { clearMeasureCache } from './measure.js';
 
 const CHANGE_ICONS = ['ph sparkle'];   // new or changed (seen.js)
@@ -1655,6 +1657,26 @@ export function mount(element, options = {}) {
     if (S.map.root !== before) painter.clearSizes();
     buildViews();
   }
+  // A configured perspective owns its opening picture, not the reader's subsequent
+  // exploration. Call only at an explicit entry/restoration, never from render().
+  function applyPerspectiveDefaults() {
+    const opts = viewNamed(S.relView)?.options;
+    if (!opts) return false;
+    S.focus = opts.focus || null;
+    // Returning through a diagram's trail selects its entry node. Selection adds
+    // that node's path to a box layout, so it cannot survive an authored reset.
+    S.selected = null;
+    hideNote();
+    const top = viewRoot();
+    S.collapsed = new Set();
+    if (opts.open) {
+      (function close(n) { if (n !== top && n.children.length) S.collapsed.add(n.id); n.children.forEach(close); })(top);
+      for (const id of opts.open) for (let n = S.map.byId[id]; n; n = n.parent) S.collapsed.delete(n.id);
+    } else setExpand('default');
+    painter.clearSizes();
+    updateExpandBtn();
+    return true;
+  }
   // The picker: the whole map, as the atlas lists it. Walks (the walkthroughs and their
   // stops) first, then every diagram, linked from the first or not, each with its
   // perspectives, joins, deployments and scenarios nested under it. Rows open and close;
@@ -1790,7 +1812,8 @@ export function mount(element, options = {}) {
     if (!S.map?.root || !viewNamed(name)) return;
     const before = S.relView;
     useView(name);
-    if (S.relView === before) return;
+    const restored = applyPerspectiveDefaults();
+    if (S.relView === before && !restored) return;
     // a sequence playing over the old view stops: it is linked to that view
     if (player.onMap()) player.close(false);
     // a deployment has its own tree: what is not in it is let go
@@ -1804,7 +1827,7 @@ export function mount(element, options = {}) {
     verification.decorate();
     verification.renderPanel();
     // the view decides the layout: fit the new picture unless the reader has moved it
-    if (diagram().layoutByView) { painter.animateNext(); render(S.userMoved ? false : 'all'); }
+    if (diagram().layoutByView) { painter.animateNext(); render(restored || !S.userMoved ? 'all' : false); }
     else if (S.mode === 'list') render(false);
     else paintRels();
     emitState();
@@ -2166,6 +2189,7 @@ export function mount(element, options = {}) {
       if (named && viewNamed(named)) useView(named);
       if (st.rels != null) S.rels = st.rels ? '1' : '0';
       applyChrome();
+      applyPerspectiveDefaults();
       if (st.focus && S.map.byId[st.focus]) drill(st.focus); else render('levels');
       if (pictureState(st)) render(S.expand === 'all' ? 'all' : 'levels');
       // a thumbnail marks the node where the fit put it (no camera move)
@@ -2267,6 +2291,9 @@ export function mount(element, options = {}) {
     if (!S.walkthrough || openingStop || stateDepth) return;
     const w = walkthroughs().find((x) => x.name === S.walkthrough);
     if (!w) return;
+    // An unavailable authored stop stays visibly unavailable. The unchanged live
+    // diagram must not silently substitute another stop while opening it.
+    if (!w.stops[S.stop - 1]?.state) return;
     const here = currentState();
     if (w.stops[S.stop - 1]?.state && atPlace(w.stops[S.stop - 1].state, here)) { S.offPath = false; return; }
     const k = w.stops.findIndex((st) => st.state && atPlace(st.state, here));
@@ -2289,7 +2316,7 @@ export function mount(element, options = {}) {
     $.stopWalk.textContent = w.name;
     $.stopCount.textContent = `Stop ${S.stop} of ${w.stops.length}`;
     $.stopKind.textContent = kind;
-    $.stopTitle.textContent = st.state ? st.name : `${st.name} (not in this map)`;
+    $.stopTitle.textContent = st.state ? st.title : `${st.name} (not in this map)`;
     $.stopNote.replaceChildren();
     if (st.text) renderNoteBody(st.text, $.stopNote, wireLink);
     // no Previous on the first stop, no Next on the last
@@ -2302,6 +2329,23 @@ export function mount(element, options = {}) {
   $.stopBack.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop));
   $.stopPrev.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop - 1));
   $.stopNext.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop + 1));
+  $.stopExport.addEventListener('click', async () => {
+    const button = $.stopExport;
+    if (button.disabled) return;
+    const name = S.walkthrough;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.title = 'Preparing walkthrough…';
+    try {
+      exporter.save(new Blob([await reading(name)], { type: 'text/html' }), `${wholeName()}-${name.replace(/[^\w.-]+/g, '_') || 'walkthrough'}.html`);
+    } catch (error) {
+      hostProblem('reading-failed', `The walkthrough could not be made (${error.message || error}).`);
+    } finally {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+      button.title = 'Export walkthrough';
+    }
+  });
   $.stopMin.addEventListener('click', () => { S.stopMin = true; renderWalkthrough(); });
   $.stopTab.addEventListener('click', () => { S.stopMin = false; renderWalkthrough(); });
 
@@ -2374,6 +2418,7 @@ export function mount(element, options = {}) {
     if (link && st.mode !== 'lifelines' && !(st.mode === 'list' && st.part === key)) {
       openDiagramOf(link.anchor);
       if (viewNamed(link.view) && S.relView !== (viewNamed(link.view) === S.map.views[0] ? null : link.view)) { useView(link.view); render('all'); }
+      if (applyPerspectiveDefaults()) render('all');
     } else {
       openDiagramOf(key);
       if (modeIds().includes(st.mode) && st.mode !== S.mode) setMode(st.mode);
@@ -2415,6 +2460,21 @@ export function mount(element, options = {}) {
     return packSnapshot({ text: S.text, path: S.path, theme: themeSources.get(S.themeId) || currentTheme(), options: opts, asOf, version: options.version ?? null });
   }
 
+  // Capture one edition, authored walk and effective theme before any async work.
+  // The live camera, selection, expansion and player never enter the document.
+  async function reading(name = S.walkthrough) {
+    await ready;
+    const walk = walkthroughs().find(w => w.name === name);
+    if (!walk || options.thumbnail) throw new Error('There is no walkthrough to export.');
+    const text = S.compare && S.edition === 'before' ? beforeText : S.text;
+    const path = S.path, saved = asOf, theme = currentTheme(), appearance = effectiveAppearance(theme), assets = options.assets;
+    const [faces, fontCss] = await Promise.all([fontFaces(theme.id), embeddedFontCss(theme.id)]);
+    const capturedTheme = { ...theme, ...(theme.font ? {font:{...theme.font,faces:faces.map(f=>({weight:f.weight,style:f.style,data:f.bytes}))}} : {}) };
+    const mark = assets ? await assets('mark.svg') : await fetch(new URL('mark.svg', import.meta.url)).then(r=>{if(!r.ok)throw new Error('Brand mark is unavailable.');return r.text();});
+    return buildReading({ text, path, walk, theme, appearance, mark, asOf:saved, fontCss, fontFamily:`"${familyName(theme.id)}"`,
+      render: state => renderWith(mount, {text,path,state,format:'svg'}, {themes:[capturedTheme],defaultTheme:false,theme:theme.id,prefs:{appearance},...(assets?{assets}:{})}) });
+  }
+
   // ---------- contents ----------
   // Everything a reader can open in the file, in file order: each diagram (a sequence
   // as kind sequence), then its relation views when it has more than one (the default
@@ -2452,9 +2512,9 @@ export function mount(element, options = {}) {
     const list = S.file?.walkthroughs || [];
     if (!list.length || !S.file?.root || options.thumbnail) return [];
     const entries = items();
-    return list.map((w) => ({ name: w.name, stops: w.stops.map((st) => {
-      const hit = st.known && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name);
-      return { kind: st.kind, name: st.name, text: st.text, state: hit ? hit.state : null };
+    return list.map((w) => ({ name: w.name, intro: w.intro, stops: w.stops.map((st) => {
+      const hit = st.known && !st.invalidReference && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name && (!st.options?.diagram || (e.diagram || (e.part ? S.file.parts.get(e.part)?.title : S.file.title)) === st.options.diagram));
+      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, state: hit ? hit.state : null };
     }) }));
   }
   // the walkthroughs come first (the menu's Walks), then the items
@@ -2521,6 +2581,8 @@ export function mount(element, options = {}) {
     async export(opts = {}) { await ready; return exporter.exportImage(opts); },
     // the whole map as one HTML file that opens offline (WO-35), as the Export menu makes it
     snapshot,
+    // One complete, themed, offline HTML reading document for a named walkthrough.
+    reading,
     get themes() { return [...themes.values()].map((t) => ({ id: t.id, label: t.label })); },
     ready,
     slot: $.slot,

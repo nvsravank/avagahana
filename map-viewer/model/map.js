@@ -14,6 +14,7 @@ import { readDeployment, infraOf, buildDeployment, syncWarnings } from './deploy
 import { SCENARIO_TYPES, readScenario, scenarioText } from './scenarios.js';
 import { parseSources, evidenceOf, checkVerificationPairs } from './provenance.js';
 import { readWalkthroughs } from './walkthroughs.js';
+import { perspectiveOptions, noteTargets } from './options.js';
 
 // A big map is drawn in full, with a warning that drawing may be slow.
 export const LARGE_MAP = 5000;
@@ -91,6 +92,20 @@ export function parseMap(text, fileName) {
   addScenarios(main, fileName);
   // walkthroughs belong to the file: each diagram's sections count (model/walkthroughs.js)
   main.walkthroughs = readWalkthroughs([main, ...main.parts.values()].flatMap((p) => p.walkthroughs || []), main.warnings);
+  const maps = [main, ...main.parts.values()];
+  for (const w of main.walkthroughs) for (const stop of w.stops) {
+    if (!stop.options) continue;
+    const candidates = maps.filter((p) => !p.scenario && (!stop.options.diagram || p.title === stop.options.diagram));
+    const owner = candidates.find((p) => stop.kind === 'diagram' || stop.kind === 'sequence' ? p.title === stop.name && (stop.kind !== 'sequence' || p.type === 'sequence')
+      : stop.kind === 'scenario' ? maps.some((x) => x.scenarioName === stop.name && x.scenarioOf === (p === main ? null : p.anchor))
+        : (p.views || []).some((v) => (v.label || v.name) === stop.name && (stop.kind === 'deployment' ? v.deploy : stop.kind === 'join' ? v.join : !v.deploy && !v.join)));
+    if (!owner || (stop.options.notes || []).some((id) => !noteTargets(owner).has(id))) {
+      main.warnings.push(problem('walkthrough-reference', `Stop "${stop.name}": Diagram/Notes must resolve in the destination's owning diagram.`));
+      // Invalid options must not partially redirect or mislabel the narrative.
+      stop.invalidReference = true;
+      stop.options = null;
+    }
+  }
   linkSequences(main);
   main.unlinked = unreachable(main);
   for (const a of main.unlinked) main.warnings.push(problem('diagram-unreachable', `Diagram "${main.parts.get(a).title}" is linked from nowhere: no click, note link or Plays over leads to it from the first diagram.`));
@@ -185,6 +200,7 @@ function parsePart(text, fileName, shared) {
   const infra = raw.flatMap((d) => infraOf(d, byId).map((n) => ({ n, d })));
   for (const { n } of infra) own.set(n, classOf(n, classes, styleOnly));
   const views = diagram.parseViews ? diagram.parseViews(sections, byId, warnings, read.relations || []) : parseViews(sections.relations, byId, warnings, read.relations || null);
+  for (const view of views) if (view.options) view.options = perspectiveOptions(view.options, diagram.type, byId, warnings);
   if (sections.joins.length && !diagram.parseViews) warnings.push(problem('relation-syntax', 'Join views are for ER diagrams.'));
   // ## Renames: columns renamed since an earlier version, used when comparing (model/compare.js)
   const renames = sections.renames == null ? null : diagram.parseRenames ? diagram.parseRenames(sections.renames, byId, warnings) : null;

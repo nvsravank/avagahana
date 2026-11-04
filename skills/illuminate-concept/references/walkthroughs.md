@@ -1,72 +1,100 @@
 # Walkthroughs (`## Walkthrough: <name>`)
 
-A story for one audience told over the map's own items: a security review, a new
-joiner's first hour, what a release changes. The map already holds the diagrams; a
-walkthrough picks the ones that matter to that reader, puts them in the order the story
-needs and says, at each stop, what to notice. Full rules: `../../../docs/map-format.md`,
-"Walkthrough".
+A story for one audience over the map's diagrams: a security review, a new joiner's
+first hour, what a release changes. Use one when the reader needs help connecting
+several pictures. Full rules: `../../../docs/map-format.md`, "Walkthrough".
 
-## When to write one
+## Choose the picture before writing the explanation
 
-- The map has several diagrams and a reader would not know where to start or what
-  connects them.
-- One audience needs a path through it (security, operations, the team taking it over).
-  Write one walkthrough per audience; do not try to serve everyone in one.
-- Skip it for a map of one or two diagrams: their own notes are enough.
+Prefer named perspectives that select the relationships needed for the takeaway.
+Reuse a diagram through several purposeful perspectives rather than duplicating it.
+For flowcharts, use `#### Perspective options` with Open container IDs and optional
+Focus when the explanation needs particular subgraphs open. See `boxes.md`.
+Filtering arrows alone does not guarantee a readable picture: inspect the result.
 
-## Choosing and ordering the stops
+Each stop names one existing destination with `### Diagram: <heading>`,
+`### Perspective: <name>`, `### Deployment: <env>`, `### Scenario: <name>`,
+`### Join: <name>` or `### Sequence: <heading>`. Use the heading's exact name; the first
+diagram uses its `# Title`. Start with the boundary, then the relevant behavior and
+data or deployment. Let the explanation determine the number of stops. Walks stay
+inside one map.
 
-- Each stop is one place in the map: `### Diagram: <heading>`, `### Perspective:
-  <name>`, `### Deployment: <env>`, `### Scenario: <name>`, `### Join: <name>` or
-  `### Sequence: <heading>`. The name is spelled as its heading gives it (the first
-  diagram by its `# Title`).
-- Start wide (the first diagram, the boundary), then narrow to what the audience cares
-  about, then show it move (a scenario or a sequence), then where it runs or the data
-  under it. End where the reader should act.
-- Five to nine stops. Revisit a diagram through another perspective rather than adding a
-  diagram the story does not need.
-- Only items of this map. A walkthrough never crosses into another map.
+## Write one explanation for live and reading forms
 
-## Writing the notes
-
-- Two to four sentences, in Markdown: what to look at first, why it matters to this
-  audience, and what to notice that the picture alone does not say.
-- Name the boxes and arrows the reader sees on screen, as they are labelled.
-- A link to a node's or diagram's anchor is fine (`[Payments](#payments)`); raw HTML is
-  not shown.
-- A stop with no note is allowed but wastes the stop.
+An optional introduction states the audience and purpose. Each stop explains what
+to notice and why it matters, using visible box/arrow labels. Write enough to stand
+alone when read by scrolling. Add optional Stop options after the explanation:
 
 ````markdown
 ## Walkthrough: Payments for the security team
 
-### Diagram: Shop platform
+Follow the boundary, card exchange and retry behavior.
 
-Start with the whole system. Card data leaves the shop only on its way to Payments.
+### Perspective: Payment boundary
 
-### Perspective: Checkout (synchronous)
+Orders coordinates checkout. Payments sends the card-charge request to the external
+Card provider. Start with this boundary before following the full exchange.
 
-The calls on the way to payment, and which of them wait for an answer.
+#### Stop options
+- Title: Start with the payment boundary
+- Label: Boundary
+- Notes: orders, e1
+- Diagram: Shop platform
+
+### Sequence: Checkout
+
+Read the calls and replies in order, including the retry branch.
+
+#### Stop options
+- Label: Exchange
+- Notes: m-charge
 
 ### Scenario: Soft decline, then paid
 
-The retry a security reviewer will ask about first: the same token is charged twice.
-
-### Deployment: Production
-
-Where Payments runs, and the one route out to the card provider.
+The retry reuses the idempotency key, so a repeated request does not create another
+charge. Follow both attempts through to confirmation.
 ````
 
-## What the reader sees
+These IDs/destinations are in `examples/maps/shop-layers.md`. Title defaults to the
+destination name; Label defaults to Title/name. The reading eyebrow repeats Label
+before the diagram kind, matching its navigation. Notes explicitly includes existing
+note-bearing node, arrow or sequence-message IDs from the owning diagram, including
+their evidence. Do not rely on the reader clicking a tiny note or trust icon. Diagram
+qualifies a name reused across diagrams; prefer it when names are ambiguous.
+All fields are optional; old walkthroughs still work. No JSON blocks or new delimiters.
+Subsection/field names are case-insensitive. Blank lines do not end options: the next
+same-level or shallower heading does. Put explanation before Stop options.
 
-A panel on the right with the stop, its note, Previous and Next; it minimises to a tab.
-The reader may explore inside a stop (open a box, a node's page, another mode) and stays
-on it. Opening another stop's place moves the panel there; opening anything else shows
-"You are off the path" with Return to the stop. Nothing plays by itself. The atlas and
-the viewer's picker list walkthroughs first, under Walks.
+## Reader behavior
 
-## Checking
+The walkthrough panel shows the stop, explanation, Previous and Next, and minimises
+to a tab. Previous/Next/Return open the authored destination, applying its perspective
+defaults. Exploring inside it (opening boxes, drilling, notes, another mode) stays on
+track. Another stop's destination moves to that stop; unrelated destinations show
+"You are off the path" and Return. No expansion mismatch tracker or extra reset button.
 
-The checker reports `walkthrough-empty` (no stops), `walkthrough-twice` (a name used
-twice), `walkthrough-stop-kind` (a stop that is not one of the six kinds) and
-`walkthrough-stop-unknown` (a name this map does not have). Fix each before showing the
-map.
+The panel's Export walkthrough icon makes a complete offline HTML reading document.
+The current camera/expanded boxes do not affect it. The selected theme and effective
+light/dark appearance are frozen; diagrams/fonts are embedded. A horizontal section
+strip sticks after the intro scrolls away; the branded footer stays visible. Reading
+requires only scrolling. Zoom/pan/Fit are optional, and wheel/touch scrolling normally
+moves the document until Pan is explicitly enabled on an enlarged diagram.
+
+A Sequence stop uses full native lifelines, even when live playback runs over a
+perspective. Keep its native version readable too. A Scenario uses a static highlighted
+path plus every derived step and ER fan-out warning. Keep branching semantics in
+native sequences; do not invent one execution order for alternatives/parallelism.
+Included notes and evidence are visible inline. Essential explanation belongs here,
+not in a separate export narrative or in a link the reader must open.
+
+## Check the authored story and output
+
+Run the checker; fix walkthrough-empty/twice/stop-kind/stop-unknown and new
+walkthrough-options/reference or perspective-options errors. Then inspect the real
+walk: first entry, Previous/Next, and Return after another diagram should restore the
+same authored picture. Exploration stays on track.
+
+When browser capability is available, inspect the exported reading HTML too: every
+stop, full sequences/scenarios, notes/evidence, theme, narrow layout, fixed footer and
+sticky strip. Fix crowding with useful perspectives and source explanations. If you
+cannot inspect output, say it is unverified; do not present a mockup as a tested export.

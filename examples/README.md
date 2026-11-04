@@ -11,6 +11,9 @@
   checks). Every map here passes
   `format/check_map.py`.
 - `embed.html`: the map viewer in a plain page, the map inlined, no host callbacks.
+- `maps/shop-layers.md`: a six-stop payment walkthrough with a focused payment
+  perspective, authored container defaults, native sequence, retry scenario, ER join
+  and included notes. Open Walks, then use Export walkthrough to read it offline.
 - `two-viewers.html`: two viewers side by side. Left: built-in theme and every host
   callback (logged). Right: built-in theme hidden, a host theme passed as an object
   with its font as bytes (only one face, so the viewer reports what it borrowed).

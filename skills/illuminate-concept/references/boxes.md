@@ -122,6 +122,23 @@ agent may be using.)
   there). There is no "All" view, by design.
 - View lines: `- from --> to : label`, with Mermaid's arrow operators.
 
+Prefer purposeful perspectives for explanation, especially walkthrough stops. A named
+flowchart perspective may own its opening detail after the relationship list:
+
+```markdown
+#### Perspective options
+- Open: services, outside
+```
+
+Open names containers/subgraphs by ID, starts other containers closed and opens only
+those IDs and their ancestor paths. Descendants stay closed unless named. The arrows
+still filter participation. Optional `- Focus: platform` drills to that container;
+Open targets must be inside it. Focus alone uses normal defaults there. Omitted Focus
+restores the whole diagram. These defaults restore on explicit entry, including
+walkthrough Previous/Next/Return; ordinary expansion and drilling remain exploration.
+Without options, existing behavior is unchanged. Use actual container IDs, not levels
+or new stop-level expansion settings. Inspect the rendered picture.
+
 ## Arrows and labels
 
 - Operators carry meaning: `-->` a call, `-.->` asynchronous or an event, `==>` the main

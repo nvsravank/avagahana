@@ -115,7 +115,7 @@ def icon_files(texts, modules):
     names = {c["ph"] for c in index.get("codes", {}).values() if isinstance(c, dict) and c.get("ph")}
     names |= set(ICON_CODE.findall(text + "\n".join(modules.values())))
     names.add("circle-dashed")   # the unknown icon (icons.js)
-    files = {"base.css": (VIEWER / "base.css").read_text(encoding="utf-8"), "icons.json": compact(index)}
+    files = {"base.css": (VIEWER / "base.css").read_text(encoding="utf-8"), "icons.json": compact(index), "mark.svg": (VIEWER / "mark.svg").read_text(encoding="utf-8")}
     for name in sorted(names):
         f = VIEWER / "vendor/phosphor/duotone" / f"{name}-duotone.svg"
         if f.is_file():

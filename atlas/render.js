@@ -4,10 +4,9 @@
 // others after a moment), draws the map in a second, hidden viewer mounted with the
 // state asked for, exports it, posts the file back and destroys that viewer. The
 // reader's own viewer, its diagram, camera and marks, never move.
-import { mount } from '../map-viewer/index.js';
+import { renderMap } from '../map-viewer/index.js';
 
 const UNFOCUSED_WAIT_MS = 600;   // a page in the background lets the focused one answer first
-const SIZE = { w: 1200, h: 800 };   // the hidden viewer's box: the layout does not depend on it
 
 const toBase64 = async (blob) => {
   const u = new Uint8Array(await blob.arrayBuffer());
@@ -24,52 +23,30 @@ const toBase64 = async (blob) => {
 export async function answerRender(req, { source, themeSet, wait = UNFOCUSED_WAIT_MS }) {
   if (!document.hasFocus() && wait && !(req.pages <= 1)) await new Promise((r) => setTimeout(r, wait));
   if (!(await source.claimRender(req.id))) return;   // another page has it
-  const host = document.createElement('div');
-  host.setAttribute('aria-hidden', 'true');
-  // drawn but out of sight: a hidden (display: none) element cannot be measured
-  Object.assign(host.style, { position: 'fixed', left: '-20000px', top: '0', width: `${SIZE.w}px`, height: `${SIZE.h}px`, visibility: 'hidden', pointerEvents: 'none' });
-  document.body.appendChild(host);
-  let v = null;
   try {
     // a draft (render.py --draft): text the agent sent, drawn in the map's place; the
     // path still names the map (WO-37)
     const draft = typeof req.text === 'string';
     const text = draft ? req.text : await source.read(req.path);
     const st = req.state || {};
-    v = mount(host, {
-      storageKey: null, marks: false, showProblems: 'none',
+    const out = await renderMap({ ...req, text }, {
       themes: themeSet?.themes || [], defaultTheme: themeSet?.settings?.builtIn !== false,
       theme: req.theme || themeSet?.settings?.default || undefined,
       prefs: { ...(typeof req.trustMarks === 'boolean' ? { trustMarks: req.trustMarks } : {}), ...(req.theme ? { theme: req.theme } : {}), ...(req.appearance ? { appearance: req.appearance } : {}), ...(req.look ? { look: req.look } : {}), ...(st.colourBy ? { colourBy: st.colourBy } : {}) },
-      state: st,
-      // an earlier version: the picture marks what differs (WO-34)
-      ...(req.before != null ? { before: req.before } : {}),
     });
-    await v.ready;
-    await v.load(text, req.path);
-    if (!v.title) throw new Error(v.problems.find((p) => p.level === 'error')?.message || 'The map could not be read.');
-    // a sequence's step lights once the player has drawn it (a timer: a page in the
-    // background gets no animation frames)
-    if (st.seq) await new Promise((r) => setTimeout(r, 60));
-    const out = await v.export({ format: req.format, width: req.width, scale: req.scale, background: req.background, report: req.report, crop: st.crop });
-    // a sequence's number of steps, so the agent can ask for each (render.py --steps)
-    const steps = st.seq ? v.contents().find((c) => c.state?.seq === st.seq)?.steps ?? null : null;
     await source.answerRender(req.id, {
       format: out.format,
       encoding: out.format === 'png' ? 'base64' : 'utf-8',
       data: out.format === 'png' ? await toBase64(out.data) : out.data,
       width: out.width, height: out.height, scaledDown: out.scaledDown,
       ...(out.report ? { report: out.report } : {}),
-      ...(steps != null ? { steps } : {}),
+      ...(out.steps != null ? { steps: out.steps } : {}),
       // says it drew the draft, so render.py can tell an older page that read the file
       ...(draft ? { draft: true } : {}),
       // what the agent should hear: a theme that is not here (the default was used)
-      problems: v.problems.filter((p) => p.code === 'theme-unknown' || p.code === 'theme-built-in-used').map((p) => p.message),
+      problems: out.problems,
     });
   } catch (x) {
     await source.answerRender(req.id, { error: x?.message || String(x) }).catch(() => {});
-  } finally {
-    v?.destroy();
-    host.remove();
   }
 }

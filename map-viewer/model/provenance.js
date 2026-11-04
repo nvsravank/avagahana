@@ -1,5 +1,6 @@
 // Authored provenance is Markdown outside Mermaid. No Git access or remote fetching.
 import { problem } from './problem.js';
+import { headings } from './options.js';
 export const TRUST = new Set(['verified', 'inferred', 'hypothesis', 'unsourced']);
 const ID = /^[a-z][a-z0-9-]*$/;
 const uncode = (s) => s.trim().replace(/^`(.*)`$/, '$1');
@@ -55,7 +56,11 @@ export function parseSources(text, warnings = []) {
 }
 export function evidenceOf(note, sources, warnings = []) {
   if (!note) return null;
-  const matches = [...note.body.matchAll(/^####\s+Evidence\s*\n([\s\S]*?)(?=^#{1,4}\s|$(?![\s\S]))/gmi)];
+  const hs = headings(note.body);
+  const matches = hs.filter((h) => h.level === 4 && h.title.toLowerCase() === 'evidence').map((h) => {
+    const end = hs.find((x) => x.start > h.start && x.level <= 4)?.start ?? note.body.length;
+    return { index: h.start, 0: note.body.slice(h.start, end), 1: note.body.slice(h.end, end) };
+  });
   if (!matches.length) return null;
   const fail = (code, msg) => warnings.push(problem(code, msg));
   if (matches.length > 1) fail('evidence-syntax', 'One Evidence section is allowed per note.');

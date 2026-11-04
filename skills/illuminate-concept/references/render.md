@@ -22,6 +22,11 @@ It prints:
 
 ## What is in the picture
 
+A named flowchart perspective's Perspective options apply before explicit render
+flags. Caller-supplied focus/expand/close override them; omit incidental overrides to
+render the authored picture. Walkthrough reading HTML uses authored destinations,
+not the live camera; its authoring and export guidance is in `walkthroughs.md`.
+
 The same flags as `show.py`, plus the picture's own:
 
 - `--part <anchor>`, `--view <name>`, `--env <name>`, `--focus <id>`, `--mode <mode>`,

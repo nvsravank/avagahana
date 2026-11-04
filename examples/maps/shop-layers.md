@@ -106,6 +106,15 @@ flowchart TB
 - payments --> psp : card charge :::money
 - orders --> orderdb : save order
 
+## Perspective: Payment boundary
+
+- orders e1@--> payments : charges :::money
+- payments e2@--> psp : card charge :::money
+
+#### Perspective options
+
+- Open: services, outside
+
 ## Perspective: Events (asynchronous)
 
 - orders -.-> bus : order placed
@@ -471,22 +480,76 @@ and stock released.
 
 ## Walkthrough: Payments for the security team
 
-### Diagram: Shop platform
+Follow the payment boundary, the calls that charge a card, the retry after a soft
+decline, and the data needed to count paid amounts. Each perspective selects the
+relationships this review needs from the same Shop platform model.
 
-Start with the whole system. Card data leaves the shop only on its way to Payments.
+### Perspective: Payment boundary
+
+Orders coordinates checkout. Payments sends the card-charge request to the external
+Card provider. Start with that boundary before following the full checkout exchange.
+The other services and external systems are outside this perspective.
+
+#### Stop options
+
+- Title: Start with the payment boundary
+- Label: Boundary
+- Notes: orders, e1
 
 ### Perspective: Checkout (synchronous)
 
-The calls on the way to payment, and which of them wait for an answer.
+The gateway checks the token and forwards the order to Orders. Orders reserves stock,
+asks Payments to charge and saves the order. These calls wait for answers; the
+payment perspective above isolates the external boundary within that larger path.
+
+#### Stop options
+
+- Title: Follow the calls that wait for an answer
+- Label: Calls
+
+### Sequence: Checkout
+
+Read the request and its replies in order. A timeout while charging rejects the
+order and releases stock. The sequence shows the exchange; its linked perspective
+shows which components take part.
+
+#### Stop options
+
+- Title: Read the checkout exchange
+- Label: Exchange
+- Notes: m-charge
 
 ### Diagram: Order lifecycle
 
-Where a payment can fail and be tried again.
+A paid result confirms the order. A soft decline retries Charging after backoff;
+a hard decline releases stock before rejection. Every retry reuses the same
+idempotency key. Shipping follows confirmation.
+
+#### Stop options
+
+- Title: A decline is a branch, not always the end
+- Label: Lifecycle
+- Notes: Charging
 
 ### Scenario: Soft decline, then paid
 
-The retry a security reviewer will ask about first.
+The first attempt receives a soft decline. One second later the same key is used
+again; this time the provider reports Paid. Follow every transition to see how
+retrying returns to Charging instead of creating another order.
+
+#### Stop options
+
+- Title: Follow one retry from beginning to end
+- Label: Retry
 
 ### Join: Paid amount per line
 
-Which order lines a paid amount is counted against.
+Each order line belongs to an order; each payment attempt also belongs to that
+order. Joining through order_id repeats an order's lines across its payment attempts.
+The related scenario says to filter to outcome = paid before summing. The correct
+aggregation still depends on the question being answered.
+
+#### Stop options
+
+- Title: Keep payment attempts distinct from order lines
+- Label: Data

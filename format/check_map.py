@@ -39,6 +39,7 @@ if sys.version_info < (3, 9):
 
 # the checker's modules sit beside it (also under `python3 -I`, which leaves this folder off the path)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_options import headings, options_section, check_perspective
 from check_common import Map, check_label, MAX_LINE, MAX_LABEL, EMOJI, PROBLEMS  # noqa: E402
 from check_state import read_state  # noqa: E402
 from check_er import read_er  # noqa: E402
@@ -469,10 +470,10 @@ def read_block(m, block, start_line, allow_mmd=False):
 def sections_of(text, base_line):
     """-> [(title, body, line of the heading)] for every ## heading."""
     out = []
-    heads = list(re.finditer(r"^##\s+(.+?)\s*$", text, re.M))
+    heads = [h for h in headings(text) if h['level'] == 2]
     for i, h in enumerate(heads):
-        body = text[h.end():heads[i + 1].start() if i + 1 < len(heads) else len(text)]
-        out.append((h.group(1), body, base_line + text.count("\n", 0, h.start())))
+        body = text[h['end']:heads[i + 1]['start'] if i + 1 < len(heads) else len(text)]
+        out.append((h['title'], body, base_line + text.count('\n', 0, h['start'])))
     return out
 
 
@@ -541,6 +542,13 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         return
     ids, eids = read["ids"], read["eids"]
     secs = sections_of(part["after"], part["after_line"])
+    perspective_bodies = {}
+    for title, body, hl in secs:
+        if re.match(r'^perspective\s*:', title, re.I):
+            report = lambda msg, line=hl: m.report(line, 'perspective-options', msg)
+            clean, opts = options_section(body, 'Perspective options', ['open', 'focus'], report)
+            check_perspective(opts, kind, ids, report)
+            perspective_bodies[hl] = clean
     seen = {}
     for title, _, hl in secs:
         key = title.lower()
@@ -638,6 +646,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         rm = re.fullmatch(r"relations|perspective\s*:\s*(.+)", title, re.I)
         if not rm or kind == "er":
             continue
+        body = perspective_bodies.get(hl, body)
         name = (rm.group(1) or "Relations").strip()
         if name.lower() in views:
             m.report(hl, "view-twice", f'relation view "{name}" appears twice (or names the diagram\'s own arrows)')
@@ -1136,48 +1145,63 @@ def check_walkthroughs(m, src, parts, title):
     naming an item the map has (a diagram's heading or title, a perspective, a join, a
     deployment environment, a scenario, a sequence diagram)."""
     names = {k: set() for k in set(WALK_KINDS.values())}
-    if title:
-        names["diagram"].add(title.lower())
-    for p in parts[1:]:
-        if p.get("heading"):
-            names["diagram"].add(p["heading"].strip().lower())
-            if p["kind"] == "sequence":
-                names["sequence"].add(p["heading"].strip().lower())
-    heads = list(re.finditer(r"^##\s+(.+?)\s*$", src, re.M))
-    for h in heads:
-        t = h.group(1)
-        for key, pat in (("view", r"perspective\s*:\s*(.+)"), ("join", r"joins\s*:\s*(.+)"),
-                         ("scenario", r"scenario\s*:\s*([^|]+)")):
-            mm = re.fullmatch(pat, t, re.I)
-            if mm:
-                names[key].add(mm.group(1).strip().lower())
-        mm = re.fullmatch(r"deployment\s*:\s*(.+)", t, re.I)
-        if mm:
-            names["deployment"].update(x.strip().lower() for x in mm.group(1).split(",") if x.strip())
+    owners = []
+    for i, p in enumerate(parts):
+        heading = title if i == 0 else p.get('heading')
+        own = {'title': heading, 'names': {k: set() for k in names}, 'notes': set()}
+        if heading:
+            own['names']['diagram'].add(heading.lower())
+            if p['kind'] == 'sequence':
+                own['names']['sequence'].add(heading.lower())
+        for t, body, hl in sections_of(p['after'], p['after_line']):
+            for key, pat in (('view', r'perspective\s*:\s*(.+)'), ('join', r'joins\s*:\s*(.+)'), ('scenario', r'scenario\s*:\s*([^|]+)')):
+                match = re.fullmatch(pat, t, re.I)
+                if match:
+                    own['names'][key].add(match[1].strip().lower())
+            match = re.fullmatch(r'deployment\s*:\s*(.+)', t, re.I)
+            if match:
+                own['names']['deployment'].update(x.strip().lower() for x in match[1].split(','))
+            if t.lower() in ('details', 'notes'):
+                hs = [h for h in headings(body) if h['level'] == 3]
+                for j, h in enumerate(hs):
+                    mid = re.search(r'<a\s+id="([^"]+)"\s*></a>', h['title'], re.I)
+                    note = body[h['end']:hs[j + 1]['start'] if j + 1 < len(hs) else len(body)].strip()
+                    if mid and note:
+                        own['notes'].add(mid[1])
+        for key in names:
+            names[key].update(own['names'][key])
+        owners.append(own)
+    heads = [h for h in headings(src) if h['level'] == 2]
     seen = {}
     for i, h in enumerate(heads):
-        mm = re.fullmatch(r"walkthrough\s*:\s*(.+)", h.group(1), re.I)
+        mm = re.fullmatch(r'walkthrough\s*:\s*(.+)', h['title'], re.I)
         if not mm:
             continue
-        line = m.line_at(h.start())
-        name = mm.group(1).strip()
-        end = heads[i + 1].start() if i + 1 < len(heads) else len(src)
+        line, name = m.line_at(h['start']), mm[1].strip()
+        end = heads[i + 1]['start'] if i + 1 < len(heads) else len(src)
         if name.lower() in seen:
-            m.report(line, "walkthrough-twice", f'two walkthroughs are named "{name}" (first on line {seen[name.lower()]})')
+            m.report(line, 'walkthrough-twice', 'two walkthroughs are named "{}"'.format(name))
         seen.setdefault(name.lower(), line)
-        stops = list(re.finditer(r"^###\s+(.+?)\s*$", src[h.end():end], re.M))
+        body = src[h['end']:end]
+        stops = [x for x in headings(body) if x['level'] == 3]
         if not stops:
-            m.report(line, "walkthrough-empty", f'walkthrough "{name}" has no stops')
-        for st in stops:
-            sline = m.line_at(h.end() + st.start())
-            sm = re.fullmatch(r"([A-Za-z]+)\s*:\s*(.+)", st.group(1))
-            kind = sm.group(1).lower() if sm else None
-            if not sm or kind not in WALK_KINDS:
-                m.report(sline, "walkthrough-stop-kind", f'walkthrough "{name}": stop "{st.group(1)}" must start with Diagram, Perspective, Deployment, Scenario, Join or Sequence')
+            m.report(line, 'walkthrough-empty', 'walkthrough "{}" has no stops'.format(name))
+        for j, st in enumerate(stops):
+            sline = m.line_at(h['end'] + st['start'])
+            sm = re.fullmatch(r'([A-Za-z]+)\s*:\s*(.+)', st['title'])
+            kind = sm[1].lower() if sm else None
+            if kind not in WALK_KINDS:
+                m.report(sline, 'walkthrough-stop-kind', 'stop "{}" must start with Diagram, Perspective, Deployment, Scenario, Join or Sequence'.format(st['title']))
                 continue
-            want = WALK_KINDS[kind]
-            if sm.group(2).strip().lower() not in names[want]:
-                m.report(sline, "walkthrough-stop-unknown", f'walkthrough "{name}": {kind} "{sm.group(2).strip()}" is not in this map')
+            want, dest = WALK_KINDS[kind], sm[2].strip().lower()
+            if dest not in names[want]:
+                m.report(sline, 'walkthrough-stop-unknown', '{} "{}" is not in this map'.format(kind, sm[2].strip()))
+            stop_body = body[st['end']:stops[j + 1]['start'] if j + 1 < len(stops) else len(body)]
+            _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram'], lambda msg: m.report(sline, 'walkthrough-options', msg))
+            if opts is not None:
+                owner = next((x for x in owners if dest in x['names'][want] and ('diagram' not in opts or x['title'] == opts['diagram'])), None)
+                if not owner or any(nid not in owner['notes'] for nid in opts.get('notes', [])):
+                    m.report(sline, 'walkthrough-reference', 'Diagram/Notes must resolve in the destination owning diagram')
 
 
 def check(path):

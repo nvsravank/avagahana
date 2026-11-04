@@ -15,20 +15,22 @@
 // A stop is found by its kind and name (the viewer's walkthroughs(), the checker's
 // check_walkthroughs). The file's walkthroughs are read from every diagram's sections.
 import { problem } from './problem.js';
+import { headings, optionsSection } from './options.js';
 
 // a stop's kind -> the contents entry kind it opens (viewer.js contents())
 export const STOP_KINDS = { diagram: 'diagram', perspective: 'view', join: 'join', deployment: 'deployment', scenario: 'scenario', sequence: 'sequence' };
 
 // -> [{kind, name, text, known}] in the order written
-export function readStops(text) {
+export function readStops(text, warnings = []) {
   const stops = [];
-  for (const part of text.split(/^###\s+/m).slice(1)) {
-    const nl = part.indexOf('\n');
-    const head = (nl < 0 ? part : part.slice(0, nl)).trim();
-    const body = (nl < 0 ? '' : part.slice(nl + 1)).trim();
+  const hs = headings(text).filter((h) => h.level === 3);
+  for (const [i, h] of hs.entries()) {
+    const head = h.title;
+    const body = text.slice(h.end, hs[i + 1]?.start ?? text.length).trim();
+    const parsed = optionsSection(body, 'Stop options', ['title', 'label', 'notes', 'diagram'], 'walkthrough-options', warnings);
     const m = head.match(/^([A-Za-z]+)\s*:\s*(.+)$/);
     const kind = m ? m[1].toLowerCase() : null;
-    stops.push({ kind, name: m ? m[2].trim() : head, text: body, known: !!(kind && STOP_KINDS[kind]) });
+    stops.push({ kind, name: m ? m[2].trim() : head, text: parsed.text, options: parsed.options, invalidReference: !!parsed.invalid, known: !!(kind && STOP_KINDS[kind]) });
   }
   return stops;
 }
@@ -41,10 +43,11 @@ export function readWalkthroughs(sections, warnings) {
     const key = s.name.toLowerCase();
     if (seen.has(key)) { warnings.push(problem('walkthrough-twice', `Two walkthroughs are named "${s.name}": only the first is used.`)); continue; }
     seen.add(key);
-    const stops = readStops(s.text);
+    const stops = readStops(s.text, warnings);
     if (!stops.length) warnings.push(problem('walkthrough-empty', `Walkthrough "${s.name}" has no stops.`));
     for (const st of stops) if (!st.known) warnings.push(problem('walkthrough-stop-kind', `Walkthrough "${s.name}": stop "${st.name}" must start with Diagram, Perspective, Deployment, Scenario, Join or Sequence.`));
-    out.push({ name: s.name, stops });
+    const first = headings(s.text).find((h) => h.level === 3);
+    out.push({ name: s.name, intro: s.text.slice(0, first?.start ?? s.text.length).trim(), stops });
   }
   return out;
 }

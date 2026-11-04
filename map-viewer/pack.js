@@ -1,4 +1,6 @@
 import { checkTheme } from './themes/theme.js';
+import { sha256 } from './sha256.js';
+export { sha256 } from './sha256.js';
 // pack.js — the viewer's own packer (WO-35): the whole map in one HTML file, a snapshot
 // as relay-server/pack.py makes it, for the Export menu's "Interactive HTML" and
 // viewer.snapshot(). Loaded on first use; never part of a snapshot itself.
@@ -63,46 +65,6 @@ function base64(bytes) {
   let s = '';
   for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000));
   return btoa(s);
-}
-
-// SHA-256 for a page that is no secure context (plain http on another machine), where
-// crypto.subtle is missing. bytes: Uint8Array -> Uint8Array(32).
-export function sha256(bytes) {
-  const k = [];
-  let h = [];
-  for (let n = 2; k.length < 64; n++) {
-    let prime = true;
-    for (let d = 2; d * d <= n; d++) if (n % d === 0) { prime = false; break; }
-    if (!prime) continue;
-    if (h.length < 8) h.push((n ** (1 / 2) * 2 ** 32) | 0);
-    k.push((n ** (1 / 3) * 2 ** 32) | 0);
-  }
-  const total = Math.ceil((bytes.length + 9) / 64) * 64;
-  const buf = new Uint8Array(total);
-  buf.set(bytes);
-  buf[bytes.length] = 0x80;
-  const view = new DataView(buf.buffer);
-  view.setUint32(total - 8, Math.floor((bytes.length * 8) / 2 ** 32));
-  view.setUint32(total - 4, (bytes.length * 8) >>> 0);
-  const rot = (x, n) => (x >>> n) | (x << (32 - n));
-  const w = new Int32Array(64);
-  for (let at = 0; at < total; at += 64) {
-    for (let i = 0; i < 16; i++) w[i] = view.getInt32(at + i * 4);
-    for (let i = 16; i < 64; i++) {
-      const a = w[i - 15], b = w[i - 2];
-      w[i] = (w[i - 16] + (rot(a, 7) ^ rot(a, 18) ^ (a >>> 3)) + w[i - 7] + (rot(b, 17) ^ rot(b, 19) ^ (b >>> 10))) | 0;
-    }
-    let [a, b, c, d, e, f, g, x] = h;
-    for (let i = 0; i < 64; i++) {
-      const t1 = (x + (rot(e, 6) ^ rot(e, 11) ^ rot(e, 25)) + ((e & f) ^ (~e & g)) + k[i] + w[i]) | 0;
-      const t2 = ((rot(a, 2) ^ rot(a, 13) ^ rot(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
-      x = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
-    }
-    h = [a, b, c, d, e, f, g, x].map((v, i) => (v + h[i]) | 0);
-  }
-  const out = new DataView(new ArrayBuffer(32));
-  h.forEach((v, i) => out.setInt32(i * 4, v));
-  return new Uint8Array(out.buffer);
 }
 
 async function digestOf(text) {
@@ -171,7 +133,7 @@ async function iconFiles(texts, modules) {
   const names = new Set(Object.values(index.codes || {}).filter((c) => plain(c) && c.ph).map((c) => c.ph));
   for (const m of (text + Object.values(modules).join('\n')).matchAll(ICON_CODE)) names.add(m[1]);
   names.add('circle-dashed');   // the unknown icon (icons.js)
-  const files = { 'base.css': css, 'icons.json': JSON.stringify(index) };
+  const files = { 'base.css': css, 'icons.json': JSON.stringify(index), 'mark.svg': await readText('mark.svg') };
   const sorted = [...names].sort();
   const icons = await Promise.all(sorted.map((n) => optionalText(`vendor/phosphor/duotone/${n}-duotone.svg`)));
   sorted.forEach((n, i) => { if (icons[i] != null) files[`vendor/phosphor/duotone/${n}-duotone.svg`] = icons[i]; });

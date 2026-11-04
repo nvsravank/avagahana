@@ -65,6 +65,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.contents()` | Everything a reader can open in the map, in file order (below). A new array each call. |
 | `viewer.export(opts)` | The picture as a file instead of a download: a promise of `{format, type, data, width, height, scaledDown, report}`. Below (added in WO-32). The toolbar's SVG and PNG buttons use it. |
 | `viewer.snapshot()` | The whole map as one HTML file that opens offline: a promise of its text, as the Export menu's "Interactive HTML" makes it. Below (added in WO-35). |
+| `viewer.reading(name?)` | Promise of a complete offline HTML reading document for a walkthrough. Name defaults to the active walkthrough; rejects when absent or any stop is unavailable. Added in WO-49. |
 | `viewer.problems` | The current problems, below. |
 | `viewer.themes` | `[{id, label}]` of the registered themes. |
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
@@ -533,6 +534,25 @@ Whole map     Interactive HTML           explore offline: every diagram, one fil
 
 **Source file** saves the map's Markdown text as the viewer was given it, under the map
 file's name (`<name>.md`, or its title when there is no path).
+
+**Walkthrough reading HTML** (`viewer.reading(name?)`) captures the selected edition,
+authored stops and effective theme/appearance once, renders each destination in an
+isolated viewer, and returns a complete reading document. It does not change the live
+viewer, camera, marks or storage. All SVGs, fonts and the footer mark are embedded;
+the file makes no network requests and works from disk. A small hashed local script
+supports sticky section navigation and optional diagram zoom/pan/Fit. Content remains
+visible without scripts. Native full sequences and complete scenario explanations
+replace live playback. Notes/evidence selected by Stop options are expanded inline.
+The walkthrough panel has its own Export walkthrough icon; the general Export menu
+is unchanged. Reading export also works inside current interactive snapshots (`assets`).
+
+**Isolated rendering**: `import { renderMap } from './map-viewer/index.js'` then
+`await renderMap({text, path?, state?, format:'svg'|'png', width?, scale?, background?, report?, before?}, options?)`.
+Options accept the normal themes/defaultTheme/theme/prefs/assets inputs. The helper
+creates and destroys a hidden measurable viewer without host callbacks or storage.
+It returns the same image object as `viewer.export()`, plus `steps` for a requested
+sequence/scenario when found and `problems` containing theme fallback messages.
+Atlas uses it for agent renders; no relay or atlas is needed by an embedding host.
 
 **Interactive HTML** (`viewer.snapshot()`) packs a snapshot, as `relay-server/pack.py`
 does (below), with no server and no atlas: `map-viewer/pack.js`, loaded on first use,

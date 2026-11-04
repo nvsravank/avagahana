@@ -1,6 +1,7 @@
 """Source/revision and per-note evidence checks. No Git or network access."""
 import re
 import datetime
+from check_options import mask_fences
 from urllib.parse import urlsplit
 
 
@@ -15,7 +16,7 @@ def safe_url(value, repository=False):
 
 
 def check_provenance(m):
-    src, repositories, refs = m.text, [], {}
+    src, repositories, refs = mask_fences(m.text), [], {}
     repo = revision = None
 
     def fail(code, ln, msg):
@@ -155,6 +156,7 @@ def check_verification_pairs(m, part, sections, own_icons, class_trust, classes)
     for title, body, hl in sections:
         if title.lower() not in ('details', 'notes'):
             continue
+        body = mask_fences(body)
         for note in re.finditer(r'^###\s+.*?<a\s+id="([^"]+)"\s*></a>.*\n([\s\S]*?)(?=^###\s|\Z)', body, re.M | re.I):
             nid = note.group(1)
             em = re.search(r'^####\s+Evidence\s*\n([\s\S]*?)(?=^#{1,4}\s|\Z)', note.group(2), re.M | re.I)

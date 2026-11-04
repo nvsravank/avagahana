@@ -585,6 +585,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
    reader (Previous, Next); minimised to a small route icon */
 .mmv-stop-panel { top: 62px; left: 14px; bottom: 64px; width: min(320px, calc(100cqw - 28px)); overflow: auto; font-size: 13px; line-height: 1.45; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
 .mmv-stop-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mmv-stop-walk { flex: 1; }
 .mmv-stop-walk { font-size: 12px; color: var(--mmv-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mmv-stop-count { font-size: 12px; color: var(--mmv-muted); }
 .mmv-stop-kind { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--mmv-muted); margin-top: 4px; }

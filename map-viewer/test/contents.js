@@ -73,7 +73,7 @@ export async function testContents(check) {
     const have = fromContents(v.contents());
     for (const k of Object.keys(want)) check(`contents: ${name} ${k} match the gallery's`, JSON.stringify(have[k]) === JSON.stringify(want[k]), `${JSON.stringify(have[k])} vs ${JSON.stringify(want[k])}`);
   }
-  await v.load(await fetch('../../examples/maps/shop-layers.md').then((r) => r.text()), 'shop-layers.md');
+  await v.load(await fetch('./fixtures/legacy-shop-walkthrough.txt').then((r) => r.text()), 'shop-layers.md');
   const list = v.contents();
   check('contents: the first diagram is marked first, and only it', list.filter((x) => x.first).length === 1 && list.find((x) => x.kind !== 'walkthrough').first && list.find((x) => x.kind !== 'walkthrough').part === null);
   check('contents: each entry has kind, label, part and state', list.every((x) => typeof x.kind === 'string' && typeof x.label === 'string' && 'part' in x && x.state && typeof x.state === 'object'));
@@ -148,7 +148,7 @@ export async function testContents(check) {
   v.setState({ walkthrough: null });
 
   // ---- live reload: the event only when the list changes ----
-  const shopText = await fetch('../../examples/maps/shop-layers.md').then((r) => r.text());
+  const shopText = await fetch('./fixtures/legacy-shop-walkthrough.txt').then((r) => r.text());
   const n = got.length;
   await v.load(shopText, 'shop-layers.md');
   check('contents: a reload with the same list fires no event', got.length === n);

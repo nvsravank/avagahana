@@ -9,16 +9,14 @@
 import { parseIconCodes, normalizeIconCode } from './icon-codes.js';
 import { problem } from './problem.js';
 import { takeMain, MAIN } from './main-icon.js';
+import { headings } from './options.js';
 
 // -> {details, icons, nodeIcons, playsOver, relations: [{name, text}], deployments: [{names, text}],
 //     scenarios: [{name, text}], walkthroughs: [{name, text}]}
 //    (a relation name null = unnamed)
 export function splitSections(after) {
   const out = { relations: [], deployments: [], scenarios: [], joins: [], walkthroughs: [] };
-  const re = /^##\s+(.+?)\s*$/gm;
-  const heads = [];
-  let m;
-  while ((m = re.exec(after))) heads.push({ title: m[1], name: m[1].toLowerCase(), start: m.index, end: re.lastIndex });
+  const heads = headings(after).filter((h) => h.level === 2).map((h) => ({ ...h, name: h.title.toLowerCase() }));
   heads.forEach((h, idx) => {
     const text = after.slice(h.end, idx + 1 < heads.length ? heads[idx + 1].start : after.length);
     if (h.name === 'details' || h.name === 'notes') out.details = text;

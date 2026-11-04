@@ -34,7 +34,7 @@ from pathlib import Path
 from browser_connection import browser_profile
 
 ROOT = Path(__file__).resolve().parent.parent
-PAGES = ["map-viewer/test/theme-styling.html", "map-viewer/test/index.html", "map-viewer/test/scene.html", "atlas/test/index.html"]
+PAGES = ["map-viewer/test/theme-styling.html", "map-viewer/test/index.html", "map-viewer/test/reading.html", "map-viewer/test/scene.html", "atlas/test/index.html"]
 SNAPSHOTS = ROOT / "map-viewer" / "test" / "snapshots"
 BROWSERS = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -195,7 +195,7 @@ def chrome_pipe(browser, profile):
 # ---------- snapshots: relay-server/pack.py's files, opened from disk with no server ----------
 SNAPSHOT_MAX = 1_500_000   # bytes, agreed for the examples (WO-33)
 EXAMPLES = ROOT / "examples" / "maps"
-DRAWN = "document.querySelectorAll('#avagahana-map [data-id]').length"
+DRAWN = "document.querySelectorAll('#avagahana-map [data-id]').length || (document.querySelectorAll('#avagahana-reading .reading-board img').length && [...document.images].every(i => i.complete && i.naturalWidth > 0))"
 
 
 def pack(name, out, *args, maps_dir=EXAMPLES):
@@ -205,19 +205,19 @@ def pack(name, out, *args, maps_dir=EXAMPLES):
     return run.stdout.strip(), out
 
 
-def open_snapshot(browser, path, act=None, downloads=None):
+def open_snapshot(browser, path, act=None, downloads=None, download_events=None):
     """Open a snapshot from file:// in a fresh profile: (drawn, act's answer, errors).
     act(evaluate, click) runs once it has drawn. errors: console errors, exceptions and
     blocked loads (a security-policy report is an error too). downloads: a folder files
     the page saves go to."""
-    return drive(browser, path.resolve().as_uri(), act, downloads=downloads)
+    return drive(browser, path.resolve().as_uri(), act, downloads=downloads, download_events=download_events)
 
 
-def drive(browser, url, act=None, wait_drawn=True, downloads=None):
+def drive(browser, url, act=None, wait_drawn=True, downloads=None, download_events=None):
     """open_snapshot for any URL; wait_drawn False runs act once the page has loaded."""
     with browser_profile() as profile, chrome_pipe(browser, profile) as (send, events):
         if downloads:
-            send("Browser.setDownloadBehavior", {"behavior": "allow", "downloadPath": str(downloads)})
+            send("Browser.setDownloadBehavior", {"behavior": "allow", "downloadPath": str(downloads), "eventsEnabled": True})
         target = send("Target.createTarget", {"url": url, "width": 1200, "height": 900, "newWindow": True})["targetId"]
         session = send("Target.attachToTarget", {"targetId": target, "flatten": True})["sessionId"]
         send("Emulation.setEmulatedMedia", {"features": [{"name": "prefers-reduced-motion", "value": "no-preference"}]}, session)
@@ -248,6 +248,8 @@ def drive(browser, url, act=None, wait_drawn=True, downloads=None):
         errors += [str(e["params"]["args"][:1]) for e in events if e["method"] == "Runtime.consoleAPICalled" and e["params"]["type"] == "error"]
         if not drawn:
             errors.append("page did not draw: " + str(evaluate("document.body.innerText.slice(0, 300)")))
+        if download_events is not None:
+            download_events.extend(e for e in events if e['method'].startswith('Browser.download'))
         return drawn, answer, errors
 
 
@@ -307,6 +309,7 @@ def viewer_pack_tests(browser, base, tmp, check):
         ("garden in List mode, a node page open", "garden.md", {"act": {"mode": "list", "page": "n38"}}),
         ("a deployment with cloud icons", "checkout-release-after.md", {"state": {"env": "Production"}}),
         ("a sequence at step 3", "job-race.md", {"act": {"seq": "main", "step": 3}}),
+        ("a walkthrough with authored perspectives", "shop-layers.md", {}),
         ("an earlier version and a host's since", "checkout-release-after.md", {"before": before, "since": before, "sinceLabel": "last release"}),
         ("trust marks hidden, source notes retained", "source-review.md", {"prefs": {"trustMarks": False}}),
         ("dark, coloured by level", "garden.md", {"prefs": {"appearance": "dark", "colourBy": "level"}}),
@@ -349,6 +352,9 @@ def viewer_pack_tests(browser, base, tmp, check):
         mine_file.write_bytes(made.encode("utf-8"))
         drawn, _, errors = open_snapshot(browser, mine_file)
         check(f"the viewer's file opens from file:// with no errors: {name}", drawn and not errors, f"{drawn} nodes; {errors[:3]}")
+        if md == "shop-layers.md":
+            for label, packed in (("browser", mine_file), ("Python", out)):
+                reading_snapshot_test(browser, packed, tmp / f"reading-{label}", label, check)
 
     # what the viewer's file carries: where the reader was, and what it drops
     ask = json.dumps({"text": (EXAMPLES / "job-race.md").read_text(encoding="utf-8"), "path": "job-race.md", "version": "abc123", "act": {"seq": "main", "step": 3}})
@@ -461,6 +467,34 @@ def snapshot_tests(browser, base=None):
         if base:
             viewer_pack_tests(browser, base, tmp, check)
     return results
+
+
+def reading_snapshot_test(browser, packed, saved, label, check):
+    """Reading export must work with blob modules and supplied assets, offline."""
+    saved.mkdir()
+    action = """(async () => {
+      const b=document.querySelector('[data-mmv=stopExport]'),end=Date.now()+30000;
+      while(b.disabled && Date.now()<end) await new Promise(r=>setTimeout(r,50));
+      return {done:!b.disabled,title:document.querySelector('[data-mmv=stopTitle]')?.textContent};
+    })()"""
+    out = saved / "shop-layers-Payments_for_the_security_team.html"
+    def export_reading(ev, click):
+        ev("[...document.querySelectorAll('[data-mmv=viewMenu] button')].find(b=>b.entry?.kind==='walk').click()")
+        # Downloads must be initiated by the same browser input as the real UI.
+        # A synthetic DOM click does not grant user activation on every platform.
+        clicked = click('[data-mmv=stopExport]')
+        done = ev(action, wait=40)
+        end = time.time() + 30
+        while not out.is_file() and time.time() < end:
+            ev('true')  # Drain native download events while the file is being saved.
+            time.sleep(0.1)
+        return dict(done or {}, clicked=clicked)
+    events = []
+    drawn, result, errors = open_snapshot(browser, packed, export_reading, downloads=saved, download_events=events)
+    check(f"{label} snapshot exports reading HTML offline", drawn and result and result.get('done') and result.get('clicked') and out.is_file() and not errors, f"result: {result}; files: {[p.name for p in saved.iterdir()]}; downloads: {events[-3:]}; errors: {errors[:3]}")
+    if out.is_file():
+        drawn, got, errors = open_snapshot(browser, out, lambda ev, _c: ev("({sections:document.querySelectorAll('.reading-section').length,script:![...document.querySelectorAll('.reading-controls')].some(n=>n.hidden)})"))
+        check(f"{label} snapshot's reading file opens with controls and no errors", drawn and got == {"sections": 6, "script": True} and not errors, f"{got}; {errors[:3]}")
 
 
 def stopped(dom):

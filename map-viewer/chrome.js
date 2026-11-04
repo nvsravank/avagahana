@@ -172,6 +172,7 @@ export function chromeHtml(uid) {
 <aside class="mmv-panel mmv-stop-panel" data-mmv="stopPanel" aria-label="Walkthrough" hidden>
   <div class="mmv-stop-head">
     <span class="mmv-stop-walk" data-mmv="stopWalk"></span>
+    <button class="mmv-pill mmv-icon" data-mmv="stopExport" title="Export walkthrough" aria-label="Export walkthrough">${ic('download')}</button>
     <button class="mmv-pill mmv-icon" data-mmv="stopMin" title="Minimise">${ic('close')}</button>
   </div>
   <div class="mmv-stop-count" data-mmv="stopCount"></div>

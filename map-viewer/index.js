@@ -3,8 +3,12 @@
 //   import { mount, applyTheme } from './map-viewer/index.js';
 //   const viewer = mount(element, { text, path, host, state, theme, themes, prefs });
 import { checkTheme, acquire, release, loadFont, registered } from './themes/theme.js';
+import { mount } from './viewer.js';
+import { renderWith } from './render-map.js';
 
 export { mount } from './viewer.js';
+// Render supplied map text without atlas, a relay, storage or a visible viewer.
+export const renderMap = (request, options = {}) => renderWith(mount, request, options);
 export { checkTheme } from './themes/theme.js';
 // the small sparkle a viewer puts on a diagram's icon when something in it changed
 // (contents() entries' changed), for a host's own chips: an <svg> string

@@ -44,6 +44,8 @@ things connect.
 4. **Point** at what you are talking about (below), then, if you have a browser tool,
    take a screenshot of the page and look at it: crossing arrows, cramped labels or a
    picture too dense to read mean the map needs another view or fewer labels.
+   For a walkthrough, prefer focused named perspectives and inspect its authored
+   entry/return pictures and reading HTML too; see `references/walkthroughs.md`.
 
 ## Pick the diagram
 

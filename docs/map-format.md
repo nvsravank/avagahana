@@ -292,6 +292,32 @@ bar); its heading stays `## Relations`, and links and `setState` may name it eit
   drilled into) is drawn to the nearest box that is shown. Several that land on one
   pair merge into one arrow with a count; clicking it lists them.
 
+### Authored perspective detail
+
+A named flowchart perspective may include one optional subsection after its arrows:
+
+```markdown
+#### Perspective options
+- Open: services, outside
+- Focus: platform
+```
+
+`Open` is a comma-separated list of container/subgraph IDs. Begin with containers
+closed, keep the effective root open, then open those containers and their ancestors.
+Descendants are not automatically opened; the perspective's arrows still determine
+which nodes participate. `Focus` optionally selects a container as the effective root;
+Open targets must be inside it. With Focus alone, use normal defaults at that root.
+Omitted Focus means the whole diagram. These defaults apply on explicit opening,
+including walkthrough Previous/Next/Return, clearing incidental selection. Exploration,
+redraws and playback ticks keep the reader's changes. Explicit caller focus/expand/close
+settings apply afterward. A perspective without options keeps its existing behavior.
+
+Fields and subsection names are case-insensitive. One nonempty value per field; Open
+targets must be containers. Invalid configuration warns and is ignored as a whole
+(`perspective-options`). Options are supported only on named flowchart perspectives.
+The next heading at the same or a shallower level ends the subsection; blank lines do not.
+Headings inside fenced examples remain literal.
+
 ## Box diagrams: a `flowchart` block
 
 A Mermaid flowchart, read as boxes inside boxes. A C4 container diagram is one.
@@ -909,7 +935,7 @@ A story for one audience (a security review, a new joiner) over the map's own it
 diagrams, perspectives, deployments, scenarios, joins and sequences. It belongs to the
 file, not to one diagram: write it after any diagram's sections (the usual place is the
 end of the file). The order is the order written. The reader moves through it with
-Previous and Next in a panel on the right; nothing plays by itself. Exploring inside a
+Previous and Next in the walkthrough panel; nothing plays by itself. Exploring inside a
 stop (a box opened, a node's page, another mode) stays on it; opening another stop's place
 moves to that stop; opening any other place is off the path, with Return to the stop.
 
@@ -938,6 +964,39 @@ The name after the colon must be an item of this map, spelled as its heading. Th
 plain Markdown (links, emphasis, lists); raw HTML is not shown. Several walkthroughs may
 share a map, one section each. Checker problems: `walkthrough-empty`, `walkthrough-twice`,
 `walkthrough-stop-kind`, `walkthrough-stop-unknown`.
+
+An optional introduction precedes the first stop. After each stop's explanation,
+one optional subsection supplies narrative metadata:
+
+```markdown
+#### Stop options
+- Title: Start with the payment boundary
+- Label: Boundary
+- Notes: orders, charge
+- Diagram: Shop platform
+```
+
+Title is the section/panel title (default: destination name). Label is the short
+reading-document navigation and section-eyebrow label (default: Title/name). Notes lists existing
+note-bearing node, arrow or message IDs from the destination's owning diagram; these
+notes and their evidence appear visibly in the reading document. Repeated IDs are
+included once. Diagram optionally qualifies a destination name that occurs in several
+diagrams; unqualified old files keep their first-match resolution. An invalid explicit
+qualifier never falls back to another diagram. Field/subsection names are case-insensitive;
+duplicate, empty or unknown fields are `walkthrough-options`; invalid Diagram/Notes
+references are `walkthrough-reference`. Invalid stop metadata leaves that stop
+unavailable, rather than opening a different destination. The next heading of level
+four or shallower (or enclosing section end) ends options. Blank lines do not end them;
+fenced headings stay literal. Optional metadata never appears in the explanation.
+
+The walkthrough panel's **Export walkthrough** icon makes one offline HTML reading
+document from the authored stops, independent of the current camera or expanded boxes.
+It freezes the viewer's effective theme/appearance, embeds SVGs and fonts, keeps the
+footer visible and pins the horizontal section strip after the introduction scrolls
+away. All content is available by scrolling; zoom/pan/Fit are optional inspection.
+Sequences show their complete native lifelines, even when live playback runs over a
+perspective. Scenarios show the static highlighted path and all ordered explanations,
+including ER fan-out warnings. No PDF, Word or paper pagination is implied.
 
 ## The node's page
 

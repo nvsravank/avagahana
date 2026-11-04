@@ -6,6 +6,19 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): optional Perspective options (Open named containers,
+  Focus) restore authored flowchart detail on entry. Walkthrough introductions and
+  Stop options (Title, Label, Notes, Diagram qualifier) remain optional and keep old
+  files valid. Checker and viewer diagnose invalid options and references.
+- **Contract** (viewer API): `reading(name?)` returns complete offline walkthrough
+  HTML; `renderMap(request, options?)` exposes isolated image generation through the
+  viewer entry. Atlas keeps the relay adapter and uses this shared renderer.
+- The walkthrough's Export walkthrough icon creates a reading document with frozen
+  theme, embedded SVGs/fonts, full native sequences, complete scenarios and selected
+  notes/evidence. Its section strip sticks after the introduction, footer stays visible,
+  and optional zoom/pan/Fit inspect diagrams. Authoring guidance prefers focused
+  perspectives and shares one explanation between live and reading forms.
+
 - Built-in fonts share fetched bytes across viewers and retry temporary network or
   server failures; missing files and persistent failures still report errors.
   Browser validation waits briefly for Windows Chrome profile locks to release

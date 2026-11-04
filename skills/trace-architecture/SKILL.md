@@ -58,6 +58,10 @@ When the map has more than a few diagrams, end with a walkthrough for its main r
 (`## Walkthrough: Getting around <project>` for a new joiner, or one for the review's
 audience): the entry diagram first, then the parts and flows that matter, each stop
 saying what to notice. See `../illuminate-concept/references/walkthroughs.md`.
+Prefer focused named perspectives for each explanation, using Open container IDs
+when needed. Reuse claim notes/evidence through Stop options Notes so the reading
+HTML contains the supporting detail. Keep one authored story for live and reading
+forms; inspect both when browser capability is available.
 
 ## 3. Work from the code
 

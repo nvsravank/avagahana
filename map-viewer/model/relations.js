@@ -13,6 +13,7 @@
 // <--> both ends, --o circle, --x cross (longer ones, ---->, mean the same).
 import { problem } from './problem.js';
 import { arrowLabel } from './labels.js';
+import { optionsSection } from './options.js';
 
 // one operator: an optional tail end, a body (--, -.-, ==), an optional head end
 export const EDGE_OP = /(<|o|x)?(-{2,}|-\.+-|={2,})(>|o|x)?/;
@@ -74,7 +75,8 @@ export function parseViews(sections, byId, warnings, own = null) {
   for (const s of sections) {
     const name = s.name || 'Relations';
     const key = name.toLowerCase();
-    const relations = parseRelations(s.text, byId, warnings);
+    const parsed = s.name ? optionsSection(s.text, 'Perspective options', ['open', 'focus'], 'perspective-options', warnings) : { text: s.text, options: null };
+    const relations = parseRelations(parsed.text, byId, warnings);
     if (seen.has(key)) {
       // a second section of the same name adds to it (an own default view included)
       warnings.push(problem('view-twice', `Relations "${name}" appear twice; read as one view.`));
@@ -83,7 +85,7 @@ export function parseViews(sections, byId, warnings, own = null) {
     }
     seen.add(key);
     if (s.name && !relations.length) warnings.push(problem('view-empty', `Relations "${name}" has no relations.`));
-    views.push(s.name ? { name, relations } : { name, label: DEFAULT_VIEW_LABEL, relations });
+    views.push(s.name ? { name, relations, options: parsed.options } : { name, label: DEFAULT_VIEW_LABEL, relations });
   }
   return views;
 }

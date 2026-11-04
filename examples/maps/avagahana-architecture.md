@@ -103,7 +103,7 @@ Local Python HTTP bridge. Serves atlas and viewer files, reads maps, streams cha
 
 ### <a id="atlas"></a>Atlas owns the outside world
 
-Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its bar above the viewer is the navigation (Walks, then every diagram, from viewer.contents()); it mounts the viewer with no picker of its own. Mounts the viewer with the maps folder's themes and the relay's build, passes a map's earlier version and saved time (asOf, for an export's footer) from the relay, and answers the agent's renders in a hidden second viewer. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
+Imports mount/applyTheme through map-viewer/index.js. Owns location, document.title, file selection and source callbacks. Supplies text and optional host capabilities to the viewer. Its bar above the viewer is the navigation (Walks, then every diagram, from viewer.contents()); it mounts the viewer with no picker of its own. Mounts the viewer with the maps folder's themes and the relay's build, passes a map's earlier version and saved time (asOf, for an export's footer) from the relay, and answers the agent's renders through the public renderMap helper in the viewer. The same isolated renderer supplies complete walkthrough reading HTML, with authored perspective defaults, embedded SVGs/fonts and selected notes/evidence. Evidence: atlas/app.js, atlas/bar.js, atlas/themes.js, atlas/render.js; docs/map-source.md.
 
 #### Evidence
 
@@ -571,7 +571,7 @@ The maps folder's own themes (.themes/): from the relay (api/themes, font files 
 
 ### <a id="pageRender"></a>render.js
 
-Answers the agent's render: claims it (a focused page or the only page listening at once, others after 0.6 s), mounts a hidden second viewer with the state asked for (no reader marks, nothing selected; an earlier version when the render brings one; a draft's text in place of the map's file, said back as draft), exports, posts the file back and destroys it. The reader's viewer never moves. Evidence: atlas/render.js; docs/relay-server-api.md.
+Answers the agent's render: claims it (a focused page or the only page listening at once, others after 0.6 s), mounts a hidden second viewer with the state asked for (no reader marks, nothing selected; an earlier version when the render brings one; a draft's text in place of the map's file, said back as draft), exports, posts the file back and destroys it. The reader's viewer never moves. Evidence: atlas/render.js; map-viewer/render-map.js; docs/relay-server-api.md.
 
 
 ### <a id="viewerHost"></a>Viewer public API
@@ -725,7 +725,7 @@ sequenceDiagram
 
 ### <a id="hidden"></a>Hidden viewer
 
-A second viewer, off screen, mounted for one render and destroyed after it: the reader's viewer, its place and marks, never move. No headless browser: the open page draws. Evidence: atlas/render.js; docs/relay-server-api.md.
+The shared map-viewer/render-map.js helper mounts an offscreen viewer for one render and destroys it afterward; atlas/render.js keeps source/claim/answer transport: the reader's viewer, its place and marks, never move. No headless browser: the open page draws. Evidence: atlas/render.js; map-viewer/render-map.js; docs/relay-server-api.md.
 
 
 ## Live reload

@@ -608,6 +608,21 @@
    "level": "error",
    "side": "both",
    "what": "A claim has trust marks without nonempty Evidence, or Evidence without trust marks"
+  },
+  "perspective-options": {
+   "level": "error",
+   "side": "both",
+   "what": "Malformed or invalid Perspective options"
+  },
+  "walkthrough-options": {
+   "level": "error",
+   "side": "both",
+   "what": "Malformed Stop options"
+  },
+  "walkthrough-reference": {
+   "level": "error",
+   "side": "both",
+   "what": "Stop options reference no owning diagram or existing note"
   }
  }
 }
