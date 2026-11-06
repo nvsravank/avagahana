@@ -93,7 +93,7 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
     }
     const targets=noteTargets(owner);
     if(stop.notes.length){const notes=el('aside','reading-notes');notes.setAttribute('aria-label','Included notes');section.append(notes);
-      for(const id of stop.notes){const note=targets.get(id);if(!note)throw new Error(`Stop ${i+1}: note ${id} is unavailable.`);const body=el('div','reading-note reading-prose');body.append(el('h3','',note.title || owner.byId[id]?.plain || id));renderClaimNote(note,body,{wireLink:wire});notes.append(body);}
+      for(const id of stop.notes){const note=targets.get(id);if(!note)throw new Error(`Stop ${i+1}: note ${id} is unavailable.`);const body=el('div','reading-note reading-prose');body.append(el('h3','',note.heading || owner.byId[id]?.plain || id));renderClaimNote(note,body,{wireLink:wire});notes.append(body);}
     }
   }
   const footer=el('footer','reading-footer');root.append(footer);

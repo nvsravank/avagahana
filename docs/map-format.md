@@ -225,11 +225,34 @@ One note per node:
   The arrow shows a note mark after its label; clicking the arrow or the mark shows the
   note. An arrow that stands for several relations (merged) says how many it holds and
   shows no notes.
-- The body is Markdown. Links go here, as `[title](<url>)`; only `http`, `https` and
-  `mailto` links are clickable. A node with a link should carry `::icon(link)` so the
-  link shows on the map.
+- The body is Markdown (the subset below). Links go here, as `[title](<url>)`; only
+  `http`, `https` and `mailto` links are clickable. A node with a link should carry
+  `::icon(link)` so the link shows on the map.
 - A link to a map on the server's own host
   (`http://127.0.0.1:<port>/#/<folder>/<file>.md?focus=<id>`) opens that map in the viewer.
+
+### Markdown in notes
+
+The same subset applies wherever a map holds prose: notes, walkthrough text, Sources
+descriptions and evidence.
+
+| Written | Shown as |
+|---|---|
+| `####`, `#####`, `######` | Three heading levels. `#` to `###` belong to the map's structure: `##` starts a section and `###` starts the next note, so they are never note headings. |
+| `**bold**`, `__bold__`, `*italic*`, `_italic_`, `~~struck~~` | Inline styling, which may nest. A backslash keeps a marker literal: `\*`. |
+| `` `code` `` | Literal text: a URL, brackets or markers inside stay as written. |
+| `[label](url)`, a bare `https://` URL | A link. A label may hold balanced or escaped brackets. |
+| `-`, `*`, `+` | A bulleted list. |
+| `1.`, `1)` | An ordered list, keeping its first number. Only a list starting at 1 interrupts a paragraph. |
+| An item indented under another | A nested list, in any combination of bullets and numbers. |
+| `- [ ]`, `- [x]` | A task item, as a display-only checkbox: the viewer is read-only. |
+| `>` | A quote, which may nest. |
+| `---`, `***`, `___` on their own line | A horizontal rule. There are no underlined headings. |
+| `\| a \| b \|` over `\|:--\|--:\|` | A table, with column alignment. `\\|` is a literal pipe in a cell. A wide table scrolls in its own box. |
+| ` ``` ` or `~~~` fences | Literal code, with no highlighting. |
+
+Anything else stays readable text. A note never carries HTML, which shows as text;
+images, footnotes, reference links, subscript and superscript are not read.
 
 ### Icon namespaces
 
@@ -1106,8 +1129,13 @@ Repository-only references are permitted but do not imply file-level support.
 GitHub.com, GitLab.com and Bitbucket.org file/line links use the captured commit.
 Unknown hosts require an explicit pinned evidence URL for a clickable citation;
 without it the metadata remains readable. Git evidence's explicit URL must contain
-the recorded commit as a path segment. Source URLs must be HTTP(S), without user
-credentials or query strings; repository URLs also have no fragment. The viewer
+the recorded commit as a path segment, or be an Azure Repos or TFS Git file link pinned
+by its query: a `_git/<repo>` path with `path` and `version=GC<commit>`, and otherwise only
+`line`, `lineEnd`, `lineStartColumn`, `lineEndColumn`, `lineStyle` and `_a=contents`, each
+once. A branch (`GB`), tag (`GT`), another commit or any other parameter is an error. A query
+is only accepted in this pinned form, so non-Git evidence, including TFVC, stays query-free.
+Other source URLs must be HTTP(S), without user credentials or query strings; repository
+URLs also have no fragment. SVG and PNG exports carry none of these links. The viewer
 never fetches repository content. Malformed authored sources/evidence and unpaired marks/verification text are checker
 errors. The viewer warns without refusing to draw. Evidence may contain ordinary
 Markdown explaining a trust judgment, with or without structured references.

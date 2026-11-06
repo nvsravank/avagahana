@@ -22,8 +22,16 @@ flowchart LR
 #### Perspective options
 - Open: internal
 ## Details
-### <a id="a"></a>A
+### <a id="a"></a>The A service
 A note.
+
+1. First
+2. Second
+   - [x] done
+
+| Name | Size |
+|---|--:|
+| a | 1 |
 ## Walkthrough: Read
 An introduction.
 ### Perspective: Calls
@@ -98,6 +106,11 @@ export async function testReadingOptions(check) {
     const deploy=new DOMParser().parseFromString(await v.reading('Deployment review'),'text/html');
     check('reading HTML: deployment destination renders independently', deploy.querySelectorAll('.reading-board img').length===1 && deploy.querySelector('figcaption').textContent==='Production');
     const evidence=await (await fetch('../../format/samples/good-verification-prose.md')).text();
+    await v.load(READING_EXAMPLE,'reading.md');
+    const richDoc=new DOMParser().parseFromString(await v.reading('Read'),'text/html');
+    const included=richDoc.querySelector('.reading-note');
+    check('reading HTML: an included note keeps its authored heading', included?.querySelector('h3')?.textContent==='The A service',included?.innerHTML);
+    check('reading HTML: note lists, tasks and aligned tables survive the document, styled', included?.querySelector('ol li ul input[checked][disabled]') && included.querySelector('.mmv-md-table td.mmv-md-right')?.textContent==='1' && richDoc.querySelector('style').textContent.includes('.mmv-md-table'),included?.innerHTML);
     await v.load(evidence+'\n## Walkthrough: Claims\n### Diagram: Reasoned design\nRead <script>alert(1)</script> as text.\n#### Stop options\n- Notes: cache, tentative\n', 'claims.md');
     const claims=new DOMParser().parseFromString(await v.reading('Claims'),'text/html');
     check('reading HTML: evidence visible inline and hostile prose remains text', claims.querySelectorAll('.mmv-evidence').length===2 && claims.body.textContent.includes('<script>alert(1)</script>') && claims.querySelectorAll('script').length===1);

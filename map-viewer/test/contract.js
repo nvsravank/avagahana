@@ -939,6 +939,59 @@ try {
     check('a note may link to another diagram of the file (#anchor), never to script', la?.getAttribute('href') === '#orders-service-components' && !la.target && lk.querySelectorAll('a').length === 1, lk.innerHTML);
     check('note lines next to each other make one paragraph', nb.querySelectorAll('p').length === 2 && nb.querySelector('p').textContent === 'One line and the next.'
       && nb.querySelector('li').textContent === 'an item carried on', nb.innerHTML);
+    const md = (text, links = []) => { const d = document.createElement('div'); renderNoteBody(text, d, (a) => links.push(a)); return d; };
+    const tags = (d) => [...d.children].map((e) => e.tagName.toLowerCase()).join(' ');
+    // inline
+    let d = md('`https://example.test/doc` and `[a](b)` and ``a`b``');
+    check('notes: code spans stay literal, URLs and link syntax included', [...d.querySelectorAll('code')].map((c) => c.textContent).join('|') === 'https://example.test/doc|[a](b)|a`b' && !d.querySelector('a'), d.innerHTML);
+    d = md('[Result [draft]](https://example.test/doc) [esc \\] x](https://example.test/e) [`a]`](https://example.test/f)');
+    check('notes: link labels keep balanced, escaped and code brackets', [...d.querySelectorAll('a')].map((a) => a.textContent).join('|') === 'Result [draft]|esc ] x|a]' && d.querySelector('a').getAttribute('href') === 'https://example.test/doc', d.innerHTML);
+    d = md('[open [x](https://example.test [y](z) ) [z](javascript:alert(1)) [q](data:text/html,x)');
+    check('notes: malformed and unsafe links stay readable text, never active', d.textContent.includes('javascript:alert(1)') && d.textContent.includes('data:text/html,x') && ![...d.querySelectorAll('a')].some((a) => /^(javascript|data):/i.test(a.getAttribute('href'))), d.innerHTML);
+    d = md('**b** __b__ *i* _i_ ***both*** ~~gone~~ **[l](https://example.test)** snake_case_name 2 * 3 * 4 \\*no\\* ~one~');
+    check('notes: bold, italics, strikethrough, nesting and literals', d.querySelectorAll('strong').length === 4 && d.querySelector('s').textContent === 'gone' && d.querySelector('strong em')?.textContent === 'both' && d.querySelector('strong a') && d.textContent.includes('snake_case_name') && d.textContent.includes('2 * 3 * 4') && d.textContent.includes('*no*') && d.textContent.includes('~one~'), d.innerHTML);
+    d = md('See https://example.test/a?b=1&c=2. Then **https://example.test/b**');
+    check('notes: a bare link leaves trailing punctuation and emphasis outside', [...d.querySelectorAll('a')].map((a) => a.textContent).join('|') === 'https://example.test/a?b=1&c=2|https://example.test/b', d.innerHTML);
+    d = md('<img src=x onerror=alert(1)> <script>x</script>\n\n| <b>a</b> |\n|---|\n| <i>b</i> |');
+    check('notes: HTML in a note is text, also in a table', !d.querySelector('img, script, b, i') && d.textContent.includes('<img src=x'), d.innerHTML);
+    // headings: 4 to 6 only
+    d = md('#### Four\n##### Five\n###### Six\n####### Seven\n# One');
+    check('notes: #### to ###### are three heading levels, nothing else is', tags(d) === 'h4 h5 h6 p' && d.querySelector('h6').className === 'mmv-md-h6', d.innerHTML);
+    // lists
+    d = md('1. First\n2. Second\n   more\n\n3. Third');
+    check('notes: ordered steps are one list across a blank line, with continuation', tags(d) === 'ol' && d.querySelectorAll('li').length === 3 && d.querySelectorAll('li')[1].textContent === 'Second more', d.innerHTML);
+    d = md('3. Third\n4) Fourth');
+    check('notes: an ordered list keeps its first number', d.querySelector('ol').getAttribute('start') === '3' && d.querySelector('ol').start === 3, d.innerHTML);
+    d = md('The year was\n1986. A good one.\n\nText\n1. One');
+    check('notes: only a list starting at 1 interrupts a paragraph', tags(d) === 'p p ol' && d.querySelector('p').textContent === 'The year was 1986. A good one.', d.innerHTML);
+    d = md('- a\n  - b\n    1. c\n    2. d\n  - e\n+ f\n* g\n\n1. h\n  - i\n2. j\n\nAfter\n- k\nplain');
+    check('notes: lists nest in any combination, and bullets share a list', tags(d) === 'ul ol p ul p' && d.querySelector('ul').children.length === 3 && d.querySelector('ul > li > ul > li > ol')?.children.length === 2 && d.querySelector('ol > li > ul')?.textContent === 'i' && d.querySelector('ol').children.length === 2, d.innerHTML);
+    d = md('- one\n\n  second paragraph\n\n  \`\`\`\n  - code\n\n  more\n  \`\`\`\n- two');
+    check('notes: an item holds paragraphs and a fence with blank lines', tags(d) === 'ul' && d.querySelector('li').querySelectorAll('p').length === 2 && d.querySelector('li pre code').textContent === '- code\n\nmore' && d.querySelectorAll('ul > li').length === 2, d.innerHTML);
+    d = md('- [ ] todo\n- [x] done\n  - [X] nested **bold**\n- [y] not a task\n1. [ ] step');
+    const boxes = [...d.querySelectorAll('input')];
+    check('notes: task lists are display-only checkboxes that survive serialising', boxes.length === 4 && boxes.every((b) => b.type === 'checkbox' && b.disabled) && boxes.map((b) => b.hasAttribute('checked')).join() === 'false,true,true,false' && d.querySelectorAll('li')[3].textContent.includes('[y] not a task'), d.innerHTML);
+    // quotes, rules
+    d = md('> one\nlazy\n> > deep\n>\n> - item\n\nafter\n---\n***\n___\n- - -');
+    check('notes: quotes nest and carry lazy lines; rules are rules', d.querySelector('blockquote > blockquote p')?.textContent === 'deep' && d.querySelector('blockquote > p').textContent === 'one lazy' && d.querySelector('blockquote ul') && d.querySelectorAll('hr').length === 4 && d.querySelector(':scope > p').textContent === 'after', d.innerHTML);
+    // tables
+    d = md('Intro\n| L | C | R | N |\n|:--|:-:|--:|---|\n| a \\| b | \`c\` | **d** |\n| 1 | 2 | 3 | 4 | 5 |\n\nAfter');
+    const th = d.querySelectorAll('th'), rows = d.querySelectorAll('tbody tr');
+    check('notes: pipe tables, aligned, with escaped pipes, inline text and uneven rows', tags(d) === 'p div p' && th.length === 4 && th[0].className === 'mmv-md-left' && th[1].className === 'mmv-md-center' && th[2].className === 'mmv-md-right' && !th[3].className
+      && rows.length === 2 && rows[0].children[0].textContent === 'a | b' && rows[0].querySelector('code') && rows[0].querySelector('strong') && rows[0].children.length === 4 && rows[1].children.length === 4, d.innerHTML);
+    d = md('a | b\nnot a rule\n\n| a | b |\n|---|\n| c |');
+    check('notes: pipes without a matching rule row stay text', !d.querySelector('table') && tags(d) === 'p p', d.innerHTML);
+    d = md('x | y\n--- | ---\n1 | 2');
+    check('notes: outer pipes are optional', d.querySelectorAll('th').length === 2 && d.querySelectorAll('td').length === 2, d.innerHTML);
+    // fences and depth
+    d = md('\`\`\`sql\n#### no\n- no\n| a |\n|---|\n\`\`\`\nafter');
+    check('notes: nothing is read inside a fence', tags(d) === 'pre p' && d.querySelector('code').textContent === '#### no\n- no\n| a |\n|---|', d.innerHTML);
+    d = md(`${'> '.repeat(5000)}deep\n\n${Array.from({ length: 300 }, (_, i) => `${' '.repeat(i * 2)}- x`).join('\n')}\n\n${'*a '.repeat(3000)}${'['.repeat(3000)}`);
+    check('notes: extreme nesting stays readable and does not overflow', d.textContent.includes('deep') && d.querySelectorAll('blockquote').length <= 13, d.innerHTML.length);
+    d = md('[x](#column:a:b) [y](#orders)', []);
+    check('notes: internal links still have no new tab', [...d.querySelectorAll('a')].every((a) => !a.target) && d.querySelector('a').getAttribute('href') === '#column:a:b', d.innerHTML);
+    const wired = []; md('[a](https://example.test/a) https://example.test/b [c](#c)', wired);
+    check('notes: every link goes through the host callback', wired.length === 3, wired.length);
   }
 
   // ---- a mind map node's page: parent, children and related links as a strip ----

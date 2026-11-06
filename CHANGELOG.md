@@ -6,6 +6,16 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): notes read a documented wider Markdown subset: `####` to
+  `######` as three styled heading levels, strikethrough, nested lists, ordered lists, `+`
+  bullets, display-only task lists, nested quotes, horizontal rules and aligned tables.
+  Bold, italics and links can now nest. `#` to `###` stay the map's own structure.
+- Notes: code spans keep URLs and link syntax literal, and link labels may hold brackets.
+- Reading documents head an included note with its authored heading, not its diagram label.
+- Evidence says "no revision web link" once per source, not under every file.
+- **Contract** (map format): Git evidence may use an Azure Repos or TFS file link pinned by
+  `version=GC<commit>` in its query. Branch, tag, other-commit and unknown parameters are
+  `evidence-syntax` errors. SVG and PNG stay free of these links.
 - Queries: a WHERE, GROUP BY or HAVING after the last input of a set operation now belongs
   to that input. It was drawn as a filter on the combined rows, and its names went unchecked.
 - New example `query-revenue-report.md`, for the gallery.

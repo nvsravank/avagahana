@@ -1,5 +1,5 @@
 // Evidence composition shared by the viewer and the offline reading document.
-import { TRUST, evidenceUrl, sourceUrl } from './model/provenance.js';
+import { TRUST, evidenceUrl } from './model/provenance.js';
 import { iconHtml, iconDef } from './icons.js';
 import { renderNoteBody } from './notes.js';
 const el = (tag, cls, text) => Object.assign(document.createElement(tag), { className: cls || '', ...(text != null ? { textContent: text } : {}) });
@@ -37,13 +37,15 @@ export function renderEvidence(note, parent, { codes = [], fold = false, legend 
         for (const ref of refs) {
           const item = el('div', 'mmv-evidence-ref');
           if (ref.file) link(`${ref.file}${ref.lines ? ` · ${ref.lines.includes('-') ? 'lines' : 'line'} ${ref.lines.replace('-', '–')}` : ''}`, evidenceUrl(ref), item);
-          else if (ref.url) link('Evidence', sourceUrl(ref.url), item);
+          else if (ref.url) link('Evidence', evidenceUrl(ref), item);
           else item.append(el('span', 'mmv-muted', 'Repository-level reference'));
           if (ref.supports) { const p = el('div', 'mmv-evidence-support'); renderNoteBody(ref.supports, p, wireLink); item.append(p); }
           if (ref['sha-256']) item.append(el('code', 'mmv-evidence-hash', `SHA-256: ${ref['sha-256']}`));
-          if (!evidenceUrl(ref) && ref.file) item.append(el('small', 'mmv-muted', 'No revision web link available.'));
           group.append(item);
         }
+        // Said once per source: a missing web link says nothing about the evidence itself.
+        const unlinked = refs.filter((ref) => ref.file && !evidenceUrl(ref)).length;
+        if (unlinked) group.append(el('small', 'mmv-muted mmv-evidence-nolink', unlinked === refs.length ? 'No revision web link available for this source.' : 'Files shown without a link have no revision web link available.'));
         box.append(group);
       }
     }

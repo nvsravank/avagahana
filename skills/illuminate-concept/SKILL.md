@@ -146,7 +146,10 @@ Card charge with an idempotency key, so a retry never charges twice.
 
 - Every node has an id (a letter, then letters, digits, `_`, `-`); labels in quotes.
 - Notes go under `## Details`, one `### <a id="<id>"></a><label>` per node or arrow id.
-  Put what the picture cannot say in a note; never list the arrows again.
+  Put what the picture cannot say in a note; never list the arrows again. Note bodies read
+  bold, italics, `~~strikethrough~~`, code, links, nested and numbered lists, `- [ ]` tasks,
+  `>` quotes, `---` rules, pipe tables and code fences. Headings inside a note are `####` to
+  `######` only: `###` starts the next note. No HTML or images.
 - Mark how sure you are with the trust icons `verified`, `inferred`, `hypothesis`,
   `unsourced` (`## Node icons` for boxes and arrow ids: `- e1 : verified`; `::icon(...)`
   in a mind map), and put the evidence in the note.

@@ -2,7 +2,7 @@
 import re
 import datetime
 from check_options import mask_fences
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qsl
 
 
 def safe_url(value, repository=False):
@@ -13,6 +13,30 @@ def safe_url(value, repository=False):
                 and not (repository and u.fragment) and not re.search(r'[\x00-\x20]', value))
     except ValueError:
         return False
+
+
+AZURE_PARAMS = {'path', 'version', 'line', 'lineEnd', 'lineStartColumn', 'lineEndColumn', 'lineStyle', '_a'}
+
+
+def azure_git_url(value, commit):
+    """An Azure Repos / TFS Git file link pinned by version=GC<commit>; same rule as the viewer's azureGitUrl."""
+    if not commit or not re.fullmatch(r'[a-fA-F0-9]{40}|[a-fA-F0-9]{64}', commit) or re.search(r'[\x00-\x20;\\]|/(?:\.|%2e){1,2}(?:[/?]|$)', value, re.I):
+        return False
+    try:
+        u = urlsplit(value)
+        parts = u.path.split('/')
+        if (u.scheme.lower() not in ('http', 'https') or not u.hostname or u.username or u.password or u.fragment
+                or '_git' not in parts or not (parts[parts.index('_git') + 1:] or [''])[0]):
+            return False
+        pairs = parse_qsl(u.query, keep_blank_values=True)
+    except ValueError:
+        return False
+    params = dict(pairs)
+    if len(params) != len(pairs) or set(params) - AZURE_PARAMS or not params.get('path'):
+        return False
+    if params.get('version') not in ('GC' + commit.lower(), 'GC' + commit.upper()):
+        return False
+    return params.get('_a', 'contents') == 'contents'
 
 
 def check_provenance(m):
@@ -124,9 +148,11 @@ def check_provenance(m):
                     match = re.fullmatch(r'(\d+)(?:-(\d+))?', ref['lines'])
                     if not file or not match or int(match[1]) < 1 or int(match[2] or match[1]) < int(match[1]) or int(match[2] or match[1]) > 9007199254740991:
                         fail('evidence-syntax', ln, 'Lines needs a File and a positive line or ordered range.')
-                if ref.get('url') and safe_url(ref['url']) and entry and entry[1] and entry[1].get('commit') not in urlsplit(ref['url']).path.split('/'):
-                    fail('evidence-syntax', ln, 'Git evidence URL must contain its captured full commit as a path segment.')
-                if ref.get('url') and not safe_url(ref['url']):
+                commit = entry[1].get('commit') if entry and entry[1] else None
+                pinned = bool(ref.get('url')) and azure_git_url(ref['url'], commit)
+                if ref.get('url') and not pinned and safe_url(ref['url']) and commit and commit not in urlsplit(ref['url']).path.split('/'):
+                    fail('evidence-syntax', ln, 'Git evidence URL must contain its captured full commit as a path segment, or be an Azure Repos file link with version=GC and that commit.')
+                if ref.get('url') and not pinned and not safe_url(ref['url']):
                     fail('evidence-syntax', ln, 'Evidence URL must be HTTP(S) without credentials or a query.')
                 if ref.get('sha-256') and not re.fullmatch(r'[a-f0-9]{64}', ref['sha-256'], re.I):
                     fail('evidence-syntax', ln, 'SHA-256 needs 64 hexadecimal characters.')

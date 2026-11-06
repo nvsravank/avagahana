@@ -384,7 +384,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-note-body { padding: 8px 12px 12px; overflow: auto; }
 .mmv-note-body p { margin: 4px 0; }
 .mmv-note-body ul { margin: 4px 0; padding-left: 18px; }
-.mmv-note-body a { color: var(--mmv-accent); word-break: break-all; }
+.mmv-note-body a { color: var(--mmv-accent); overflow-wrap: anywhere; }
 .mmv-note-body .mmv-muted { color: var(--mmv-muted); }
 .mmv-note-body h4 { margin: 10px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--mmv-muted); }
 .mmv-note-body .mmv-relrow { display: block; border: 0; background: none; color: var(--mmv-accent); cursor: pointer; padding: 2px 0; text-align: left; }
@@ -392,6 +392,30 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-note-body .mmv-missing { color: var(--mmv-bad); font-size: 12px; margin-left: 4px; }
 .mmv-note-body .mmv-elsewhere { color: var(--mmv-muted); font-size: 12px; }
 .mmv-note-body code { font: 12px/1.3 ui-monospace, Menlo, Consolas, monospace; background: var(--mmv-chrome-hover); padding: 1px 4px; border-radius: 4px; }
+/* Note Markdown (notes.js), wherever a note is shown. Headings are the note's own, under
+   its ### title, so they stay modest: strong, then plain, then quiet. */
+.mmv .mmv-md-code { font: .92em/1.3 ui-monospace, Menlo, Consolas, monospace; background: var(--mmv-chrome-hover); padding: 1px 4px; border-radius: 4px; overflow-wrap: anywhere; }
+.mmv .mmv-md-pre code { background: none; padding: 0; }
+.mmv .mmv-md-h4, .mmv .mmv-md-h5, .mmv .mmv-md-h6 { margin: 14px 0 4px; line-height: 1.3; color: var(--mmv-ink); text-transform: none; letter-spacing: 0; font-weight: 650; }
+.mmv .mmv-md-h4 { font-size: 1.15em; }
+.mmv .mmv-md-h5 { font-size: 1em; }
+.mmv .mmv-md-h6 { font-size: .92em; font-weight: 600; color: var(--mmv-muted); }
+.mmv .mmv-md-h4:first-child, .mmv .mmv-md-h5:first-child, .mmv .mmv-md-h6:first-child { margin-top: 2px; }
+.mmv .mmv-md-list { margin: 4px 0; padding-left: 20px; }
+.mmv .mmv-md-list .mmv-md-list { margin: 2px 0; }
+.mmv .mmv-md-list > li { margin: 2px 0; }
+.mmv .mmv-md-list > li.mmv-md-task { list-style: none; margin-left: -20px; }
+.mmv .mmv-md-task > .mmv-md-list { margin-left: 20px; }
+.mmv .mmv-md-task input { margin: 0 2px 0 0; vertical-align: -1px; accent-color: var(--mmv-accent); }
+.mmv .mmv-md-quote { margin: 6px 0; padding: 1px 0 1px 10px; border-left: 3px solid var(--mmv-chrome-border); color: var(--mmv-muted); }
+.mmv .mmv-md-rule { border: 0; border-top: 1px solid var(--mmv-chrome-border); margin: 10px 0; }
+.mmv .mmv-md-table { margin: 6px 0; max-width: 100%; overflow-x: auto; }
+.mmv .mmv-md-table:focus-visible { outline: 2px solid var(--mmv-accent); }
+.mmv .mmv-md-table table { border-collapse: collapse; font-size: .95em; }
+.mmv .mmv-md-table th, .mmv .mmv-md-table td { padding: 3px 8px; border: 1px solid var(--mmv-chrome-border); text-align: left; vertical-align: top; }
+.mmv .mmv-md-table th { font-weight: 600; background: var(--mmv-chrome-hover); }
+.mmv .mmv-md-table .mmv-md-center { text-align: center; }
+.mmv .mmv-md-table .mmv-md-right { text-align: right; }
 /* cloud icons with a dark twin: the one for the appearance shown */
 .mmv[data-appearance="dark"] .mmv-vendor-ic.is-light, .mmv[data-appearance="dark"] .mmv-vendor-ic .is-light,
 .mmv:not([data-appearance="dark"]) .mmv-vendor-ic.is-dark, .mmv:not([data-appearance="dark"]) .mmv-vendor-ic .is-dark { display: none; }
@@ -471,7 +495,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-page-note { margin-top: 10px; line-height: 1.5; }
 .mmv-page-note p, .mmv-page-relnote p { margin: 6px 0; }
 .mmv-page-note ul, .mmv-page-relnote ul { margin: 6px 0; padding-left: 20px; }
-.mmv-page a { color: var(--mmv-accent); word-break: break-all; }
+.mmv-page a { color: var(--mmv-accent); overflow-wrap: anywhere; }
 .mmv-page h4 { margin: 18px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--mmv-muted); }
 .mmv-page-rel { padding: 3px 0; }
 .mmv-page .mmv-relrow { display: block; border: 0; background: none; color: var(--mmv-accent); cursor: pointer; padding: 2px 0; text-align: left; }
@@ -713,6 +737,7 @@ marker.is-kind .mmv-er-end { stroke: var(--n); stroke-opacity: 1; }
 .mmv .mmv-evidence-ref { margin-top: 7px; overflow-wrap: anywhere; }
 .mmv .mmv-evidence-support p { margin: 4px 0; }
 .mmv .mmv-evidence-ref small { display: block; }
+.mmv .mmv-evidence-nolink { display: block; margin-top: 7px; }
 .mmv .mmv-evidence-hash { display: block; font-size: 11px; overflow-wrap: anywhere; }
 .mmv .mmv-evidence-actions { display: flex; gap: 12px; padding-top: 8px; border-top: 1px solid var(--mmv-chrome-border); }
 .mmv .mmv-evidence-actions button { border: 0; background: none; color: var(--mmv-accent); font: inherit; font-size: 12px; padding: 0; cursor: pointer; }
@@ -733,7 +758,7 @@ marker.is-kind .mmv-er-end { stroke: var(--n); stroke-opacity: 1; }
 .mmv .mmv-bl > .mmv-pill.mmv-icon { width: 34px; min-width: 34px; padding: 0; justify-content: center; }
 
 /* Literal calculation/SQL notes. Text is inserted through textContent. */
-.mmv .mmv-note-body pre, .mmv .mmv-page pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px; background: var(--mmv-bg); border: 1px solid var(--mmv-chrome-border); border-radius: 4px; }
+.mmv .mmv-md-pre, .mmv .mmv-note-body pre, .mmv .mmv-page pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px; background: var(--mmv-bg); border: 1px solid var(--mmv-chrome-border); border-radius: 4px; }
 .mmv [data-query-column] { cursor: pointer; }
 .mmv [data-query-column]:focus-visible { outline: 2px solid var(--mmv-accent); }
 .mmv .mmv-query-grain,.mmv .mmv-query-effect{font-style:italic;opacity:.85}

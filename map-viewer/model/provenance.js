@@ -4,6 +4,26 @@ import { headings, maskFences } from './options.js';
 export const TRUST = new Set(['verified', 'inferred', 'hypothesis', 'unsourced']);
 const ID = /^[a-z][a-z0-9-]*$/;
 const uncode = (s) => s.trim().replace(/^`(.*)`$/, '$1');
+// An Azure Repos / TFS Git file link carries its revision in the query:
+// .../_git/<repo>?path=/a.js&version=GC<commit>&line=1&lineEnd=2. It is pinned only when
+// version names the captured commit as a commit (GC, not GB branch or GT tag), and every
+// other parameter is one that selects a file or lines, never another revision.
+// format/check_provenance.py holds the same rule.
+const AZURE_PARAMS = new Set(['path', 'version', 'line', 'lineEnd', 'lineStartColumn', 'lineEndColumn', 'lineStyle', '_a']);
+export function azureGitUrl(value, commit) {
+  if (!/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/i.test(commit || '') || /[\x00-\x20;\\]|\/(?:\.|%2e){1,2}(?:[/?]|$)/i.test(String(value))) return null;
+  try {
+    const u = new URL(value);
+    const at = u.pathname.split('/').indexOf('_git');
+    if (!['http:', 'https:'].includes(u.protocol) || u.username || u.password || u.hash || at < 0 || !u.pathname.split('/')[at + 1]) return null;
+    const names = [...u.searchParams.keys()];
+    if (new Set(names).size !== names.length || names.some((n) => !AZURE_PARAMS.has(n))) return null;
+    if (!u.searchParams.get('path') || u.searchParams.get('version') !== `GC${commit.toLowerCase()}` && u.searchParams.get('version') !== `GC${commit.toUpperCase()}`) return null;
+    if (u.searchParams.has('_a') && u.searchParams.get('_a') !== 'contents') return null;
+    return u.href;
+  } catch { return null; }
+}
+
 export function sourceUrl(value, repository = false) {
   try {
     if (/[\x00-\x20]/.test(value)) return null;
@@ -82,14 +102,14 @@ export function evidenceOf(note, sources, warnings = []) {
     if (r.file && (/^[\\/]|^[a-z]:/i.test(r.file) || r.file.split(/[\\/]/).some((p) => p === '..' || !p) || /[\x00-\x1f]/.test(r.file))) { fail('evidence-syntax', 'Evidence File must be a relative path without traversal.'); delete r.file; }
     const lines = /^(\d+)(?:-(\d+))?$/.exec(r.lines || '');
     if (r.lines && (!r.file || !lines || +lines[1] < 1 || +(lines[2] || lines[1]) < +lines[1] || +(lines[2] || lines[1]) > Number.MAX_SAFE_INTEGER)) { fail('evidence-syntax', 'Evidence Lines needs a File and a positive line or ordered range.'); delete r.lines; }
-    if (r.url && r.target?.revision && !new URL(sourceUrl(r.url) || 'https://invalid.test').pathname.split('/').includes(r.target.revision.commit)) { fail('evidence-syntax', 'Git evidence URL must contain its captured full commit as a path segment.'); delete r.url; }
-    if (r.url && !sourceUrl(r.url)) { fail('evidence-syntax', 'Evidence URL must be HTTP(S), without credentials or a query.'); delete r.url; }
+    if (r.url && r.target?.revision && !azureGitUrl(r.url, r.target.revision.commit) && !new URL(sourceUrl(r.url) || 'https://invalid.test').pathname.split('/').includes(r.target.revision.commit)) { fail('evidence-syntax', 'Git evidence URL must contain its captured full commit as a path segment, or be an Azure Repos file link with version=GC and that commit.'); delete r.url; }
+    if (r.url && !sourceUrl(r.url) && !azureGitUrl(r.url, r.target?.revision?.commit)) { fail('evidence-syntax', 'Evidence URL must be HTTP(S), without credentials or a query.'); delete r.url; }
     if (r['sha-256'] && !/^[a-f0-9]{64}$/i.test(r['sha-256'])) fail('evidence-syntax', 'Evidence SHA-256 needs 64 hexadecimal characters.');
   }
   return { refs, text: m[1].trim(), prose: prose.join('\n').trim(), before: note.body.slice(0, m.index).trim(), after: note.body.slice(m.index + m[0].length).trim() };
 }
 export function evidenceUrl(ref) {
-  if (ref.url) return sourceUrl(ref.url);
+  if (ref.url) return sourceUrl(ref.url) || azureGitUrl(ref.url, ref.target?.revision?.commit);
   const { repository: repo, revision: rev } = ref.target || {};
   if (!repo?.url || !rev?.commit || !ref.file || !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/i.test(rev.commit)) return null;
   const base = repo.url.replace(/\/$/, '').replace(/\.git$/, '');

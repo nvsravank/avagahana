@@ -113,7 +113,7 @@ export function inlineRuns(line) {
   return out.filter((r) => r.text);
 }
 
-function decode(s) {
+export function decode(s) {
   return s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/#quot;/g, '"').replace(/  +/g, ' ');
 }

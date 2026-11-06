@@ -62,7 +62,7 @@ unique across repository and revision headings. One repository can have several
 Revision headings, including different branches or Before/After investigations.
 Name is optional (alias is the fallback). Version control defaults to git. Every
 Git repository needs at least one revision and every revision a full Commit.
-Reviewed is an ISO date or UTC timestamp. Descriptions are Markdown.
+Reviewed is an ISO date or UTC timestamp. Descriptions are Markdown, as in notes (the subset is in SKILL.md).
 
 ## Evidence belongs to its claim's existing note
 
@@ -105,8 +105,10 @@ outputs are artifacts too: describe what they establish without pretending they
 are source-code citations. Use an explicit stable HTTP(S) URL if appropriate.
 
 GitHub, GitLab.com and Bitbucket.org file links are built from the full inspected
-commit. Other hosts may use an explicit pinned URL. URLs cannot carry credentials or
-queries. For Git evidence, any explicit URL must identify the same recorded commit.
+commit. Other hosts may use an explicit pinned URL. URLs cannot carry credentials,
+or queries apart from that pinned form. For Git evidence, any explicit URL must identify the
+same recorded commit: in a path segment, or in an Azure Repos or TFS file link as
+`?path=/file&version=GC<full commit>`.
 No URL: the reader still gets the source identity, file and line range offline.
 Every trust-marked node or arrow needs a nonempty Evidence section; every Evidence
 section needs a trust mark. The checker treats either missing half as an error. The

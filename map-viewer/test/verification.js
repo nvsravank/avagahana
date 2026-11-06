@@ -1,6 +1,7 @@
 import { mount } from '../index.js';
 import { parseMap } from '../model/map.js';
-import { evidenceUrl } from '../model/provenance.js';
+import { renderEvidence } from '../evidence.js';
+import { evidenceUrl, azureGitUrl, sourceUrl } from '../model/provenance.js';
 const SHA = '1234567890abcdef1234567890abcdef12345678';
 const refs = `- Source: [Service](#revision-app-reviewed)
   - File: src/checkout.py
@@ -94,6 +95,33 @@ export async function testVerification(check, wait) {
   check('provenance: multiple revisions and non-Git sources', model.sources.repositories.length === 3 && model.sources.repositories[0].revisions.length === 2 && model.sources.repositories[2].vcs === 'none');
   const evidence = model.byId.app.note.evidence;
   check('provenance: two files share one inspected revision', evidence.refs.length === 2 && evidence.refs.every((r) => r.target.revision.commit === SHA));
+  {
+    const az = `https://tfs.example.test/tfs/Coll/Proj/_git/repo`;
+    const good = [`${az}?path=/src/a.py&version=GC${SHA}`, `${az}?path=%2Fsrc%2Fa.py&version=GC${SHA}&line=4&lineEnd=12&lineStartColumn=1&lineEndColumn=1&lineStyle=plain&_a=contents`, `https://dev.azure.com/org/proj/_git/repo?version=GC${SHA}&path=/a`];
+    const bad = [`${az}?path=/a&version=GBmain`, `${az}?path=/a&version=GB${SHA}`, `${az}?path=/a&version=GT${SHA}`, `${az}?path=/a`, `${az}?version=GC${SHA}`, `${az}?path=/a&version=GC${'0'.repeat(40)}`,
+      `${az}?path=/a&version=GC${SHA}&version=GBmain`, `${az}?path=/a&version=GC${SHA}&token=abc`, `${az}?path=/a&version=GC${SHA}&_a=history`, `${az}?path=/a&version=GC${SHA}#x`, `${az}?path=/a;x=1&version=GC${SHA}`,
+      `https://user:pw@tfs.example.test/_git/repo?path=/a&version=GC${SHA}`, `https://tfs.example.test/a/b?path=/a&version=GC${SHA}`, `https://tfs.example.test/x/_git/../r?path=/a&version=GC${SHA}`, `ftp://tfs.example.test/_git/r?path=/a&version=GC${SHA}`];
+    check('provenance: Azure Repos links pinned by version=GC and the captured commit are accepted', good.every((u) => azureGitUrl(u, SHA)), good.filter((u) => !azureGitUrl(u, SHA)));
+    check('provenance: branch, tag, other-commit, conflicting and extra selectors are rejected', bad.every((u) => !azureGitUrl(u, SHA)), bad.filter((u) => azureGitUrl(u, SHA)));
+    check('provenance: a query link needs a captured commit, and repository URLs stay query-free', !azureGitUrl(good[0], undefined) && !sourceUrl(good[0]) && !sourceUrl(good[0], true));
+    const withUrl = (url) => parseMap(PROVENANCE.replace('  - Lines: 4-12\n', `  - Lines: 4-12\n  - URL: ${url}\n`), 'review.md');
+    const pinned = withUrl(good[1]);
+    check('provenance: a pinned query link is the citation', evidenceUrl(pinned.byId.app.note.evidence.refs[0]) === good[1] && !pinned.problems.some((p) => p.code === 'evidence-syntax'));
+    const branch = withUrl(bad[0]);
+    check('provenance: a branch link is an error and not a citation', branch.problems.some((p) => p.code === 'evidence-syntax') && !branch.byId.app.note.evidence.refs[0].url);
+    // one quiet explanation per source, none where every file links
+    const unknown = parseMap(PROVENANCE.replace('https://github.com/example/shop', 'https://git.example.test/shop'), 'review.md');
+    const box = document.createElement('div');
+    renderEvidence(unknown.byId.app.note, box, {});
+    check('evidence: one missing-link line per source, files and claims still shown', box.querySelectorAll('.mmv-evidence-nolink').length === 1 && box.textContent.includes('src/checkout.py') && box.textContent.includes('src/payments.py') && box.textContent.includes('Leaves failed payments') && box.querySelector('.mmv-evidence-nolink').textContent === 'No revision web link available for this source.', box.innerHTML);
+    const mixed = parseMap(PROVENANCE.replace('https://github.com/example/shop', 'https://git.example.test/shop').replace('  - Lines: 4-12\n', `  - Lines: 4-12\n  - URL: ${good[1]}\n`), 'review.md');
+    const box2 = document.createElement('div');
+    renderEvidence(mixed.byId.app.note, box2, {});
+    check('evidence: a source with some links says which files lack one', box2.querySelectorAll('a').length === 1 && box2.querySelectorAll('.mmv-evidence-nolink').length === 1 && box2.querySelector('.mmv-evidence-nolink').textContent.startsWith('Files shown without a link'), box2.innerHTML);
+    const linked = document.createElement('div');
+    renderEvidence(model.byId.app.note, linked, {});
+    check('evidence: no missing-link line where every file links', !linked.querySelector('.mmv-evidence-nolink'), linked.innerHTML);
+  }
   check('provenance: file links are commit-pinned', evidenceUrl(evidence.refs[0]) === `https://github.com/example/shop/blob/${SHA}/src/checkout.py#L4-L12`);
   for (const [url, expected] of [['https://gitlab.com/team/shop', `https://gitlab.com/team/shop/-/blob/${SHA}/src/checkout.py#L4-12`], ['https://bitbucket.org/team/shop', `https://bitbucket.org/team/shop/src/${SHA}/src/checkout.py#lines-4:12`], ['https://git.example.test/team/shop', null]]) {
     const parsed = parseMap(PROVENANCE.replace('https://github.com/example/shop', url), 'review.md');
