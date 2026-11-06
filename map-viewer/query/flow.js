@@ -86,6 +86,8 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
     const n = { id, label: title, plain: title, shape: 'default', icons: [], children: [], note: null, cls: null, queryGenerated: true, ...extra, parent };
     labelToRuns(n, []); parent.children.push(n); owner.byId[id] = n; return n;
   };
+  // The parts of a query box, by the words the reader sees: a stop can Point to them.
+  const part = (scope, name, n) => { (scope.queryParts ||= Object.create(null))[name.toLowerCase()] = n; };
   const prepare = (n) => { n.container = true; n.queryScope = true; n.dir = 'LR'; scopeNodes.add(n.id); };
   const edge = (a, b, label = '', extra = {}) => { if (a && b) generated.push({ from: a.id, to: b.id, label, line: 'solid', head: 'arrow', tail: null, cross: false, queryDetail: true, ...extra }); };
   const card = (parent, title, attrs, role = 'source', extra = {}) => {
@@ -244,17 +246,20 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
   const compileSetOperation = (q, container, local, outer, depth) => {
     const legs = q.branches.map((branch, i) => {
       const box = node(container, `Input ${i + 1}`, { container: true, queryScope: true, dir: 'LR' });
+      part(container, `Input ${i + 1}`, box);
       return compile(branch, box, local, outer, depth + 1);
     });
     if (legs.some((n) => n.attrs.length !== legs[0].attrs.length)) throw new QueryError('Set operation inputs need the same number of columns.');
     let previous = null;
     if (q.operators.length) {
       previous = block(container, q.operators.join(' / '), q.operators.join('\n'));
+      part(container, q.operators[0], previous);
       legs.forEach((n) => edge(n, previous));
     } else previous = legs[0];
     hintBlock(container, q.hints);
     for (const [name, ts] of Object.entries(q.setClauses || {})) {
       const op = block(container, clauseTitle(name), sqlText(ts));
+      part(container, clauseTitle(name), op);
       edge(previous, op); previous = op;
       bindsInto(ts, container, op);
     }
@@ -265,6 +270,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
       note: { heading: a.name, body: `Set operation columns correspond by position.\n\n${legs.map((n) => columnLink(`${n.plain}.${n.attrs[i].name}`, n.id, n.attrs[i].name)).join('\n')}` },
     })), 'output', { queryOwner: container.id,
       queryGrain: kept.endsWith('ALL') ? 'Every row of each input is kept.' : kept ? `${kept}: duplicates removed.` : '' });
+    part(container, 'Output', output);
     edge(previous, output);
     return output;
   };
@@ -282,6 +288,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
       if (s.pivot || s.unpivot) definition = reshapeDefinition(s, container, local, reach, depth);
       else if (s.query) {
         const box = node(container, `${s.alias} · subquery`, { container: true, queryScope: true });
+        part(container, `Subquery ${s.alias}`, box);
         definition = { output: compile(s.query, box, local, reach, depth + 1), name: s.alias };
       } else if (!definition && !s.open && !s.values) {
         physical = physicalOf(s.name);
@@ -347,6 +354,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
     if (sources.length) {
       const first = sources[0];
       previous = card(joins, `0 · FROM ${first.alias} · ${first.text || first.name}`, [], 'from', { queryFrom: true, queryOwner: container.id });
+      part(container, 'FROM', previous);
       edge(first.node, previous);
     }
     const marked = q.clauses.WHERE ? outerMarks(q.clauses.WHERE) : new Set();
@@ -355,6 +363,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
       const type = j.type === 'IMPLICIT JOIN' && (marked.has(key(right.alias)) || marked.has(key(sources[j.number - 1].alias))) ? 'IMPLICIT OUTER JOIN (+)' : j.type;
       const op = block(joins, `${j.number} · ${type}`, j.sql);
       op.queryJoin = j.number;
+      part(container, `JOIN ${j.number}`, op);
       op.queryEffect = joinEffect(j, right);
       edge(previous, op); edge(right.node, op);
       previous = op;
@@ -363,6 +372,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
     const stages = [];
     for (const [name, ts] of Object.entries(q.clauses)) {
       const op = block(name === 'WHERE' ? filter : other, clauseTitle(name), sqlText(ts));
+      part(container, clauseTitle(name), op);
       edge(previous, op); previous = op; stages.push(op);
       nestedTargets.push({ tokens: ts, target: op });
       bindsInto(ts, container, op);
@@ -374,6 +384,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
     const available = [...sources, ...outer];
     for (const { tokens, target } of nestedTargets) for (const nested of nestedQueries(tokens, parseOptions, depth)) {
       const box = node(target ? target.parent : resultGroup, `Subquery ${++nestedNumber}`, { container: true, queryScope: true, dir: 'LR' });
+      part(container, `Subquery ${nestedNumber}`, box);
       const result = compile(nested, box, local, available, depth + 1);
       if (target) edge(result, target, 'subquery');
       else nestedValues.set(nested.sql, result);
@@ -402,6 +413,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
         note: { heading: name ?? 'Unnamed expression', body: `${fenced(cleanSql(text))}${window ? '\n\nA window function: it reads other rows but does not reduce the row count.' : ''}${uses}` } });
     }
     const output = card(resultGroup, container.queryName || container.plain, outputs, 'output', { queryOwner: container.id, queryGrain: rowsOf(q) });
+    part(container, 'Output', output);
     edge(previous, output, q.distinct ? 'SELECT DISTINCT' : 'SELECT');
     for (const result of nestedValues.values()) edge(result, output, 'scalar value');
     for (const s of correlated) edge(s.node, stages[0] || output, 'correlation', { queryCorrelation: true });

@@ -52,11 +52,15 @@ export function createStage(v, handlers) {
   function fitView(levelsOnly, quiet = false) {
     if (!S.layout) return;
     let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
+    // a walkthrough stop pointing at one part of a query fits that part
+    const point = S.point && S.map.byId[S.point];
+    const only = point && S.layout.pos.has(point) ? point : null;
     for (const [n, p] of S.layout.pos) {
+      if (only && n !== only) continue;
       // A focused query fits its own content. Faded outside dependencies still
       // exist around it, but must not shrink its SQL to make every neighbour fit.
       const focus = v.viewRoot();
-      if (S.map.queryFlow && focus.queryScope) {
+      if (!only && S.map.queryFlow && focus.queryScope) {
         let ancestor = n;
         while (ancestor && ancestor !== focus) ancestor = ancestor.parent;
         if (!ancestor) continue;
@@ -67,16 +71,18 @@ export function createStage(v, handlers) {
     }
     S.lastFit = levelsOnly ? 'levels' : 'all';
     S.userMoved = false;
-    const { w: W, h: H } = v.size();
-    if (W < 120 || H < 120) return;   // not laid out yet; the resize observer refits
+    const { w: full, h: H } = v.size();
+    if (full < 120 || H < 120) return;   // not laid out yet; the resize observer refits
+    // what a panel covers is not there to fit into
+    const left = v.fitInset?.() || 0, W = full - left;
     const pad = S.thumb ? 8 : Math.min(70, W / 10);
     const k = Math.min(1.4, (W - pad * 2) / Math.max(1, x1 - x0), (H - pad * 2) / Math.max(1, y1 - y0));
     if (k < MIN_ZOOM && !S.thumb) {   // a thumbnail fits whatever it takes
       // too big to fit at a readable size: open on the centre at minimum zoom (the
       // drawing's middle when the root is not drawn, as a box diagram's top is not)
       const r = S.layout.pos.get(v.viewRoot()) || { x: (x0 + x1) / 2, y: (y0 + y1) / 2 };
-      S.view = { k: MIN_ZOOM, x: W / 2 - r.x * MIN_ZOOM, y: H / 2 - r.y * MIN_ZOOM };
-    } else S.view = { k, x: W / 2 - ((x0 + x1) / 2) * k, y: H / 2 - ((y0 + y1) / 2) * k };
+      S.view = { k: MIN_ZOOM, x: left + W / 2 - r.x * MIN_ZOOM, y: H / 2 - r.y * MIN_ZOOM };
+    } else S.view = { k, x: left + W / 2 - ((x0 + x1) / 2) * k, y: H / 2 - ((y0 + y1) / 2) * k };
     if (!quiet) applyView();
   }
   function zoomAt(factor, cx, cy) {

@@ -6,6 +6,10 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): a walkthrough stop can `Point to` one part of a query (`JOIN 2`,
+  `WHERE`, `Subquery 1`, `Input 1 / WHERE`). It opens that part, fits it and dims the rest, and the
+  reading document shows the same part.
+- While the walkthrough panel is showing, a fit frames the picture beside it.
 - **Contract** (map format): a perspective's `Focus` and `Open` accept a box a query fills
   (a CTE's box or the `Into` box), so a walkthrough stop can land inside a CTE. In the
   viewer and the checker alike.

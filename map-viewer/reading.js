@@ -63,6 +63,8 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
     section.append(el('div','reading-section-kind',`${number} · ${stop.label} - ${stop.kind}`),el('h2','',stop.title));
     const words=el('div','reading-prose');renderNoteBody(stop.text,words,wire);section.append(words);
     let state={...stop.state},owner=m,caption=stop.name,steps=null;
+    // a stop pointing at one part of a query shows that part, as the live stop does
+    if(state.point)state.crop=state.point;
     if(stop.kind==='sequence'){
       // A native sequence reads as a whole exchange, never as one playback frame.
       state={part:m===file?null:m.anchor,seq:null,mode:'lifelines'};

@@ -211,7 +211,8 @@ export function createExporter(v) {
     if (!n || !me) return null;
     const holds = (oid) => { for (let c = S.map.byId[oid]; c; c = c.parent) if (c === n) return true; return false; };
     const ids = new Set([id]);
-    for (const r of S.map.relations || []) {
+    // a part a walkthrough stop points at is the picture, not what connects to it
+    if (S.point !== id) for (const r of S.map.relations || []) {
       if (holds(r.from)) ids.add(r.to);
       if (holds(r.to)) ids.add(r.from);
     }

@@ -2,7 +2,7 @@
 // says which diagram type it is (diagrams/index.js); that type reads the block into
 // the tree, and the parts every type shares are read here: the title, notes, icon
 // legend, node and arrow icons, relation views and the size warnings.
-import { addQueries } from '../query/model.js';
+import { addQueries, queryPart } from '../query/model.js';
 import { diagramForHeader, DIAGRAMS } from '../diagrams/index.js';
 import { MAX_LABEL_LINE, MAX_LABEL } from './labels.js';
 import { problem } from './problem.js';
@@ -111,6 +111,17 @@ export function parseMap(text, fileName) {
       // Invalid options must not partially redirect or mislabel the narrative.
       stop.invalidReference = true;
       stop.options = null;
+      continue;
+    }
+    if (stop.options['point to']) {
+      const view = stop.kind === 'perspective' ? owner.views.find((v) => (v.label || v.name) === stop.name) : null;
+      const scope = view?.options?.focus ? owner.byId[view.options.focus] : null;
+      const at = scope && queryPart(scope, stop.options['point to']);
+      if (!at) {
+        main.warnings.push(problem('walkthrough-reference', `Stop "${stop.name}": Point to "${stop.options['point to']}" must name a part of the query box its perspective focuses on.`));
+        stop.invalidReference = true;
+        stop.options = null;
+      } else stop.point = at.id;
     }
   }
   linkSequences(main);

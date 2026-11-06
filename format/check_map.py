@@ -44,7 +44,7 @@ from check_common import Map, check_label, MAX_LINE, MAX_LABEL, EMOJI, PROBLEMS 
 from check_state import read_state  # noqa: E402
 from check_er import read_er  # noqa: E402
 from check_common import icon_codes
-from check_query import check_queries
+from check_query import check_queries, part_exists
 from check_connections import check_connections, check_renames
 from check_scenarios import check_scenarios  # noqa: E402
 from check_provenance import check_provenance, check_verification_pairs
@@ -550,6 +550,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             report = lambda msg, line=hl: m.report(line, 'perspective-options', msg)
             clean, opts = options_section(body, 'Perspective options', ['open', 'focus', 'columns'], report)
             perspective_options.append((opts, report))
+            if opts and 'focus' in opts:
+                part.setdefault('perspective_focus', {})[re.match(r'^perspective\s*:\s*(.+)', title, re.I)[1].strip().lower()] = opts['focus']
             perspective_bodies[hl] = clean
     seen = {}
     for title, _, hl in secs:
@@ -1156,7 +1158,7 @@ def check_walkthroughs(m, src, parts, title):
     owners = []
     for i, p in enumerate(parts):
         heading = title if i == 0 else p.get('heading')
-        own = {'title': heading, 'names': {k: set() for k in names}, 'notes': set()}
+        own = {'title': heading, 'names': {k: set() for k in names}, 'notes': set(), 'part': p}
         if heading:
             own['names']['diagram'].add(heading.lower())
             if p['kind'] == 'sequence':
@@ -1205,11 +1207,16 @@ def check_walkthroughs(m, src, parts, title):
             if dest not in names[want]:
                 m.report(sline, 'walkthrough-stop-unknown', '{} "{}" is not in this map'.format(kind, sm[2].strip()))
             stop_body = body[st['end']:stops[j + 1]['start'] if j + 1 < len(stops) else len(body)]
-            _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram'], lambda msg: m.report(sline, 'walkthrough-options', msg))
+            _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to'], lambda msg: m.report(sline, 'walkthrough-options', msg))
             if opts is not None:
                 owner = next((x for x in owners if dest in x['names'][want] and ('diagram' not in opts or x['title'] == opts['diagram'])), None)
                 if not owner or any(nid not in owner['notes'] for nid in opts.get('notes', [])):
                     m.report(sline, 'walkthrough-reference', 'Diagram/Notes must resolve in the destination owning diagram')
+                elif 'point to' in opts:
+                    focus = owner['part'].get('perspective_focus', {}).get(dest) if want == 'view' else None
+                    tree = owner['part'].get('query_parts', {}).get(focus)
+                    if tree is None or not part_exists(tree, opts['point to']):
+                        m.report(sline, 'walkthrough-reference', 'Point to "{}" must name a part of the query box its perspective focuses on'.format(opts['point to']))
 
 
 def check(path):

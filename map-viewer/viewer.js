@@ -155,6 +155,7 @@ export function mount(element, options = {}) {
     play: null,   // a sequence playing: {seq, step, playing} (player.js)
     // a picture for an export (setState): the nodes lit (the rest idle), the node a crop keeps
     highlight: null, crop: null,
+    point: null,   // the part of a query a walkthrough stop points at: it is lit, and fits fit it
   };
   const saved = readPrefs();
   const link = options.prefs || {};
@@ -243,6 +244,7 @@ export function mount(element, options = {}) {
     // every label in full when exporting, and in a thumbnail (drawn small, like an export)
     detailZoom: () => (S.exporting || S.thumb ? 1 : S.view.k),
     size: () => ({ w: root.clientWidth, h: root.clientHeight }),
+    fitInset: () => panelInset(),
     symbols: symbolTable($.defs, uid),
     nodeGeom: (n) => painter.nodeGeom(n),
     withExporting(fn) {
@@ -280,7 +282,7 @@ export function mount(element, options = {}) {
   const stage = createStage(v, {
     onLod: () => painter.lod(),
     onClick: canvasClick,
-    onUserMove: () => player.userMoved(),
+    onUserMove: () => { clearPoint(); player.userMoved(); },
   });
   const exporter = createExporter(v);
   const page = createPage(v, {
@@ -2027,6 +2029,7 @@ export function mount(element, options = {}) {
   $.zoomOut.addEventListener('click', () => stage.zoomCentre(0.8));
   $.zoomFit.addEventListener('click', fitOrCenter);
   function fitOrCenter() {
+    clearPoint();
     const n = S.selected && S.map?.byId[S.selected];
     if (n && S.layout?.pos.has(n)) stage.centerOn(n); else stage.fitView(false);
   }
@@ -2262,6 +2265,7 @@ export function mount(element, options = {}) {
       applyPerspectiveDefaults();
       if (st.focus && S.map.byId[st.focus]) drill(st.focus); else render('levels');
       if (pictureState(st)) render(S.expand === 'all' ? 'all' : 'levels');
+      if (st.point) pointAt(st.point);
       // a thumbnail marks the node where the fit put it (no camera move)
       if (st.node && S.map.byId[st.node]) { if (S.thumb) { S.selected = st.node; root.classList.add('is-spot'); render('all'); } else jumpTo(st.node); }
       if (st.page && S.map.byId[st.page]) { S.selected = st.page; page.open(st.page, { instant: true }); }
@@ -2318,6 +2322,7 @@ export function mount(element, options = {}) {
       S.iconFilter.clear();
       S.highlight = null;
       S.crop = null;
+      S.point = null;
       if (sInput.value) { sInput.value = ''; $.search.classList.remove('has-value'); $.searchCount.textContent = ''; }
       hideNote();
     } else {
@@ -2342,6 +2347,9 @@ export function mount(element, options = {}) {
     S.walkthrough = name;
     S.stop = i;
     S.offPath = false;
+    clearPoint();
+    // the panel first: a fit frames the picture around it
+    renderWalkthrough();
     // the stop's place is set in steps; the reader is not following until it is there
     openingStop = true;
     try { if (st.state) setState(st.state); } finally { openingStop = false; }
@@ -2373,8 +2381,40 @@ export function mount(element, options = {}) {
     S.walkthrough = null;
     S.stop = null;
     S.offPath = false;
+    clearPoint();
     renderWalkthrough();
+    refitForPanel();
     emitState();
+  }
+  // Open a part of the query a stop points at, light it and fit it. Reading the picture
+  // (a move, a click) lifts this; Return to the stop brings it back.
+  function pointAt(id) {
+    const n = S.map?.byId[id];
+    if (!n) return;
+    S.point = id;
+    S.highlight = new Set([id]);
+    for (let a = n; a; a = a.parent) S.collapsed.delete(a.id);
+    painter.clearSizes();
+    updateExpandBtn();
+    render('all');
+  }
+  $.canvas.addEventListener('pointerdown', () => clearPoint());
+  function clearPoint() {
+    if (!S.point) return;
+    S.point = null;
+    S.highlight = null;
+    root.classList.remove('is-highlighting');
+    for (const el of root.querySelectorAll('[data-mmv=viewport] .is-idle')) el.classList.remove('is-idle');
+  }
+  // How much of the canvas's left the walkthrough panel covers. Nothing where the panel
+  // would leave too little to draw in (a phone): there the reader minimises it.
+  function panelInset() {
+    if (!S.walkthrough || S.stopMin || S.thumb || $.stopPanel.hidden) return 0;
+    const inset = $.stopPanel.getBoundingClientRect().right - root.getBoundingClientRect().left;
+    return inset > 0 && v.size().w - inset >= 360 ? inset : 0;
+  }
+  function refitForPanel() {
+    if (S.layout && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
   }
   function renderWalkthrough() {
     const w = S.walkthrough && walkthroughs().find((x) => x.name === S.walkthrough);
@@ -2416,8 +2456,8 @@ export function mount(element, options = {}) {
       button.title = 'Export walkthrough';
     }
   });
-  $.stopMin.addEventListener('click', () => { S.stopMin = true; renderWalkthrough(); });
-  $.stopTab.addEventListener('click', () => { S.stopMin = false; renderWalkthrough(); });
+  $.stopMin.addEventListener('click', () => { S.stopMin = true; renderWalkthrough(); refitForPanel(); });
+  $.stopTab.addEventListener('click', () => { S.stopMin = false; renderWalkthrough(); refitForPanel(); });
 
   // A call sets its keys one by one (the diagram, then its perspective, ...); a
   // walkthrough follows the reader only where the whole call lands, never in between
@@ -2429,6 +2469,7 @@ export function mount(element, options = {}) {
     try { out = applyState(partial); } finally { stateDepth--; }
     if (!stateDepth && S.walkthrough) {
       followStop();
+      if (S.offPath) clearPoint();
       if (`${S.stop}|${S.offPath}` !== before) emitState();
     }
     return out;
@@ -2471,6 +2512,7 @@ export function mount(element, options = {}) {
       if (partial.page == null) page.close();
       else if (S.map.byId[partial.page] && partial.page !== page.id) openPage(partial.page);
     }
+    if (partial.point) pointAt(partial.point);
     emitState();
   }
 
@@ -2584,7 +2626,7 @@ export function mount(element, options = {}) {
     const entries = items();
     return list.map((w) => ({ name: w.name, intro: w.intro, stops: w.stops.map((st) => {
       const hit = st.known && !st.invalidReference && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name && (!st.options?.diagram || (e.diagram || (e.part ? S.file.parts.get(e.part)?.title : S.file.title)) === st.options.diagram));
-      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, state: hit ? hit.state : null };
+      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, state: hit ? (st.point ? { ...hit.state, point: st.point } : hit.state) : null };
     }) }));
   }
   // the walkthroughs come first (the menu's Walks), then the items

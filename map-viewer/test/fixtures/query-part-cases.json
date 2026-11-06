@@ -1,0 +1,85 @@
+{
+ "about": "The parts a walkthrough stop can Point to, by the reader's words: map-viewer/test/query.js and scripts/test_query.py hold the viewer and the checker to these names.",
+ "cases": [
+  {
+   "name": "plain",
+   "sql": "SELECT o.id FROM orders o",
+   "parts": [
+    "from",
+    "output"
+   ]
+  },
+  {
+   "name": "joins and clauses",
+   "sql": "SELECT o.id, COUNT(*) AS n FROM orders o JOIN customers c ON c.id = o.customer_id LEFT JOIN payments p ON p.order_id = o.id WHERE o.id > 1 GROUP BY o.id HAVING COUNT(*) > 1 ORDER BY o.id",
+   "parts": [
+    "from",
+    "group by",
+    "having",
+    "join 1",
+    "join 2",
+    "order by",
+    "output",
+    "where"
+   ]
+  },
+  {
+   "name": "union inputs",
+   "sql": "SELECT o.id FROM orders o WHERE o.id > 1 UNION ALL SELECT c.id FROM customers c JOIN payments p ON p.order_id = c.id ORDER BY id",
+   "parts": [
+    "input 1",
+    "input 1 / from",
+    "input 1 / output",
+    "input 1 / where",
+    "input 2",
+    "input 2 / from",
+    "input 2 / join 1",
+    "input 2 / output",
+    "order by",
+    "output",
+    "union all"
+   ]
+  },
+  {
+   "name": "subqueries numbered select, then joins, then clauses",
+   "sql": "SELECT o.id, (SELECT MAX(p.id) FROM payments p) AS top FROM orders o JOIN customers c ON c.id = o.customer_id AND EXISTS (SELECT 1 FROM payments q WHERE q.order_id = o.id) WHERE NOT EXISTS (SELECT 1 FROM payments r JOIN customers s ON s.id = r.id)",
+   "parts": [
+    "from",
+    "join 1",
+    "output",
+    "subquery 1",
+    "subquery 1 / from",
+    "subquery 1 / output",
+    "subquery 2",
+    "subquery 2 / from",
+    "subquery 2 / output",
+    "subquery 2 / where",
+    "subquery 3",
+    "subquery 3 / from",
+    "subquery 3 / join 1",
+    "subquery 3 / output",
+    "where"
+   ]
+  },
+  {
+   "name": "derived table",
+   "sql": "SELECT d.id FROM (SELECT o.id FROM orders o WHERE o.id > 1) d LEFT JOIN customers c ON c.id = d.id",
+   "parts": [
+    "from",
+    "join 1",
+    "output",
+    "subquery d",
+    "subquery d / from",
+    "subquery d / output",
+    "subquery d / where"
+   ]
+  },
+  {
+   "name": "no FROM",
+   "sql": "SELECT 1 AS one",
+   "parts": [
+    "output"
+   ]
+  }
+ ]
+}

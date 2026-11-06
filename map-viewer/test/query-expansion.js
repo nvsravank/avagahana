@@ -262,6 +262,26 @@ export async function testQueryExpansion(check) {
   v.setState(inside.state); await wait();
   check('a perspective lands inside a query box, with its joins and generated lines', v.state.focus === 'enriched' && [...host.querySelectorAll('.mmv-query-card')].some(c => c.textContent.includes('LEFT JOIN')) && host.querySelectorAll('path[data-id]').length > 0, v.state.focus);
   v.setState({ focus: null, view: null });
+  // a stop can point at one part of a query; a fit frames around the walkthrough panel
+  const pointed = (await fetch('../../examples/maps/query-revenue-report.md').then(r => r.text()));
+  await v.load(pointed, 'pointed.md'); v.setState({ mode: 'boxes' }); await wait();
+  const walk = v.contents().find(x => x.kind === 'walkthrough');
+  v.setState({ walkthrough: walk.label, stop: walk.stopList.findIndex(s => s.label === 'Inside net_by_order') + 1 }); await wait();
+  const panelRight = host.querySelector('.mmv-stop-panel').getBoundingClientRect().right;
+  const joinCard = [...host.querySelectorAll('.mmv-query-card')].find(c => !c.classList.contains('is-idle') && c.textContent.includes('LEFT JOIN'));
+  const joinBox = joinCard?.getBoundingClientRect();
+  check('Point to: the part is lit and the rest dimmed', !!joinCard && !!host.querySelector('.is-highlighting') && host.querySelectorAll('.is-idle').length > 0);
+  check('Point to: the part fits in the canvas beside the panel', !!joinBox && joinBox.left >= panelRight - 1 && joinBox.right <= host.getBoundingClientRect().right + 1, `${joinBox?.left} ${panelRight}`);
+  check('Point to: the part is large enough to read', !!joinBox && joinBox.width > 300, joinBox?.width);
+  host.querySelector('[data-mmv=canvas], svg').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 2 }));
+  check('Point to: reading the picture lifts the dimming', !host.querySelector('.is-idle'));
+  v.setState({ walkthrough: walk.label, stop: walk.stopList.findIndex(s => s.label === 'Inside net_by_order') + 1 }); await wait();
+  check('Point to: returning to the stop brings it back', host.querySelectorAll('.is-idle').length > 0);
+  const readingDoc = new DOMParser().parseFromString(await v.reading(walk.label), 'text/html');
+  const pictures = Object.fromEntries([...readingDoc.querySelectorAll('figure img')].map(i => [i.alt, { width: +i.getAttribute('width'), svg: atob(i.src.split(',')[1]) }]));
+  check('Point to: the reading document shows the part, opened inside its input', pictures['Inside sales diagram'].svg.includes('period_start') && pictures['Inside sales diagram'].width > 200 && pictures['Inside net_by_order diagram'].width < 900, JSON.stringify(Object.values(pictures).map(p => p.width)));
+  v.setState({ walkthrough: null }); await wait();
+  check('Point to: closing the walkthrough lifts it', !host.querySelector('.is-idle') && !host.querySelector('.mmv-stop-panel:not([hidden])'));
   await v.load(warehouseText, 'warehouse.md'); v.setState({ mode: 'boxes', part: stock.anchor, focus: 'stock_report' }); await wait();
   const primarySource = Object.values(stock.byId).find(n => n.queryRole === 'source' && n.schemaRef);
   host.querySelector(`[data-query-schema="${primarySource.id}"]`).dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await wait();

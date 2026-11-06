@@ -579,17 +579,17 @@ def read_tokens(ts, depth, options):
             if c and c[0] not in SELECT_ONLY:  # WHERE and the like belong to the last input
                 end = j
             d += 1 if op(t, '(') else -1 if op(t, ')') else 0
-        read_clauses(body, end)
+        tail = read_clauses(body, end)
         low = [c for c in cuts if not c[2].startswith('INTERSECT')]
         cut = (low or cuts)[-1]
-        return {'ctes': ctes, 'branches': [read_tokens(body[:cut[0]], depth + 1, options), read_tokens(body[cut[1]:end], depth + 1, options)]}
+        return {'ctes': ctes, 'branches': [read_tokens(body[:cut[0]], depth + 1, options), read_tokens(body[cut[1]:end], depth + 1, options)], 'operators': [cut[2]], 'set_clauses': tail}
     if op(body[0], '('):
         close = close_of(body, 0)
         inner = read_tokens(body[1:close - 1], depth + 1, options)
         if close == len(body):
             return dict(inner, ctes=ctes + inner['ctes'])
-        read_clauses(body, close)
-        return {'ctes': ctes, 'branches': [inner]}
+        tail = read_clauses(body, close)
+        return {'ctes': ctes, 'branches': [inner], 'operators': [], 'set_clauses': tail}
     if word(body[0]) != 'SELECT':
         raise QueryError('Expected SELECT')
     q = Select(body, depth, options).parse()
@@ -888,6 +888,51 @@ class Scope:
         return output
 
 
+def clause_title(name):
+    return name + ' BY' if name in ('GROUP', 'ORDER') else name
+
+
+def query_parts(q, options=None, depth=0):
+    """The parts a stop can Point to, by the reader's words: {lower name: its own parts}.
+    Mirrors what query/flow.js registers while it draws."""
+    options = options or {}
+    parts = {}
+    if 'branches' in q:
+        for i, branch in enumerate(q['branches']):
+            parts['input {}'.format(i + 1)] = query_parts(branch, options, depth + 1)
+        for operator in q['operators'][:1]:
+            parts[operator.lower()] = {}
+        for name in q['set_clauses']:
+            parts[clause_title(name).lower()] = {}
+        parts['output'] = {}
+        return parts
+    for s in q['sources']:
+        if s.get('query'):
+            parts['subquery ' + s['alias'].lower()] = query_parts(s['query'], options, depth + 1)
+    if q['sources']:
+        parts['from'] = {}
+    for j in q['joins']:
+        parts['join {}'.format(j['number'])] = {}
+    for name in q['clauses']:
+        parts[clause_title(name).lower()] = {}
+    number = 0
+    expressions = [output_expression(ts, options.get('dialect'))[1] for ts in q['select']] + [j['on'] for j in q['joins']] + list(q['clauses'].values())
+    for ts in expressions:
+        for sub in nested_queries(ts, options, depth):
+            number += 1
+            parts['subquery {}'.format(number)] = query_parts(sub, options, depth + 1)
+    parts['output'] = {}
+    return parts
+
+
+def part_exists(parts, path):
+    """Does a Point to path ('JOIN 2', 'Input 1 / WHERE') name a part?"""
+    node = parts
+    for name in path.split('/'):
+        node = node.get(name.strip().lower()) if node is not None else None
+    return node is not None
+
+
 def compile_query(q, tables, options=None):
     return Scope(tables, options or {}).compile(q)
 
@@ -966,6 +1011,10 @@ def check_flow(m, part, parsed, anchors):
     compile_query(q, tables, settings)
     held.update(scopes.get(c['name'].lower(), c['name']) for c in q['ctes'])
     held.add(options['into'])
+    parts = part.setdefault('query_parts', {})
+    for c in q['ctes']:
+        parts[scopes.get(c['name'].lower(), c['name'])] = query_parts(c['query'], settings)
+    parts[options['into']] = query_parts(q, settings)
 
 
 def legacy_message(name):

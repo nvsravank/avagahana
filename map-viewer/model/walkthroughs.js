@@ -27,7 +27,7 @@ export function readStops(text, warnings = []) {
   for (const [i, h] of hs.entries()) {
     const head = h.title;
     const body = text.slice(h.end, hs[i + 1]?.start ?? text.length).trim();
-    const parsed = optionsSection(body, 'Stop options', ['title', 'label', 'notes', 'diagram'], 'walkthrough-options', warnings);
+    const parsed = optionsSection(body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to'], 'walkthrough-options', warnings);
     const m = head.match(/^([A-Za-z]+)\s*:\s*(.+)$/);
     const kind = m ? m[1].toLowerCase() : null;
     stops.push({ kind, name: m ? m[2].trim() : head, text: parsed.text, options: parsed.options, invalidReference: !!parsed.invalid, known: !!(kind && STOP_KINDS[kind]) });

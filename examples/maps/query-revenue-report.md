@@ -234,18 +234,27 @@ are rolled up by region before the report ranks them.
 
 ### Perspective: Inside sales
 
-Two SELECTs joined by UNION ALL. Open Input 1: NOT EXISTS leaves out orders on a fraud
-hold, and the parameters feed both date filters.
+Two SELECTs joined by UNION ALL. In the first, NOT EXISTS leaves out orders on a fraud
+hold. Parameters feed the date filters of both.
+
+#### Stop options
+- Point to: Input 1 / WHERE
 
 ### Perspective: Inside refund_totals
 
 GROUP BY makes one row per payment, and only settled refunds count. This is what makes
 the next join safe.
 
+#### Stop options
+- Point to: GROUP BY
+
 ### Perspective: Inside net_by_order
 
 The LEFT JOIN keeps sales with no refund, and COALESCE turns their empty total into 0.
 Because refund_totals has one row per payment, no sale is counted twice.
+
+#### Stop options
+- Point to: JOIN 1
 
 ### Diagram: Revenue by quarter
 

@@ -37,6 +37,18 @@ class QueryCases(unittest.TestCase):
                 if got == 'ok':
                     self.assertEqual(outputs, case['outputs'])
 
+    def test_shared_part_names(self):
+        from check_query import query_parts, read_query
+        def flat(parts, prefix=''):
+            out = []
+            for name, inner in parts.items():
+                out.append(prefix + name)
+                out.extend(flat(inner, prefix + name + ' / '))
+            return out
+        for case in json.loads((FIXTURES / 'query-part-cases.json').read_text(encoding='utf-8'))['cases']:
+            with self.subTest(case=case['name']):
+                self.assertEqual(sorted(flat(query_parts(read_query(case['sql'], {})))), sorted(case['parts']))
+
     def test_shared_markdown_cases(self):
         for case in MARKDOWN['cases']:
             with self.subTest(case=case['name']), tempfile.TemporaryDirectory() as folder:

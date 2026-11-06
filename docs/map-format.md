@@ -1012,7 +1012,18 @@ diagrams; unqualified old files keep their first-match resolution. An invalid ex
 qualifier never falls back to another diagram. Field/subsection names are case-insensitive;
 duplicate, empty or unknown fields are `walkthrough-options`; invalid Diagram/Notes
 references are `walkthrough-reference`. Invalid stop metadata leaves that stop
-unavailable, rather than opening a different destination. The next heading of level
+unavailable, rather than opening a different destination.
+
+`Point to` names one part of a query for a perspective stop whose `Focus` is a query box: `FROM`,
+`JOIN 2`, `WHERE`, `GROUP BY` and the query's other clauses, `Subquery 1` (a query inside an
+expression, numbered through the SELECT list, then the joins, then the clauses), `Subquery d` (the
+derived table `d`), `Output`, and for a set operation `Input 1` and its operator (`UNION ALL`). A path
+reaches further in: `Input 1 / WHERE`. Case does not matter. The stop opens that part, fits it and dims
+the rest; moving or clicking in the picture lifts this, and returning to the stop brings it back. The
+reading document shows that part. A name the query does not have is `walkthrough-reference`.
+
+While the walkthrough panel is showing, a fit frames the picture in the uncovered part of the
+canvas, unless that would leave too little to draw in. The next heading of level
 four or shallower (or enclosing section end) ends options. Blank lines do not end them;
 fenced headings stay literal. Optional metadata never appears in the explanation.
 

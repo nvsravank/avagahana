@@ -84,7 +84,9 @@ erDiagram
   closed, so the overview shows readable names.
 - **Walkthrough stops inside a CTE:** add a perspective with `#### Perspective options` and
   `- Focus: <CTE box>`, then a `### Perspective: <name>` stop. See
-  `examples/maps/query-revenue-report.md`.
+  `examples/maps/query-revenue-report.md`. To point at one part of that CTE, add `#### Stop options`
+  with `- Point to: JOIN 2` (also `FROM`, `WHERE`, `GROUP BY`, `Subquery 1`, `Output`,
+  `Input 1 / WHERE`). Say in the stop's text what to see there; the checker proves the part exists.
 - **New SQL only:** put JOIN, ON and each further AND/OR on its own line. The viewer lays out
   supplied SQL for display without changing it.
 

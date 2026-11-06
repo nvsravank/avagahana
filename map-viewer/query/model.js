@@ -51,6 +51,13 @@ function showFailure(owner, parsed, section, error) {
   n.note = { heading: n.note?.heading || `Query: ${section.name}`, body: `${n.note ? `${n.note.body}\n\n` : ''}This query could not be drawn: ${error}\n\nThe SQL as written:\n\n${fenced(parsed.sql)}` };
 }
 
+// A part of a query box by its path of reader's words ('JOIN 2', 'Input 1 / WHERE'), or null.
+export function queryPart(scope, path) {
+  let n = scope;
+  for (const name of String(path).split('/').map((x) => x.trim().toLowerCase())) n = n?.queryParts?.[name] ?? null;
+  return n === scope ? null : n;
+}
+
 export function addQueries(main) {
   for (const owner of [main, ...main.parts.values()]) {
     const seen = new Set();

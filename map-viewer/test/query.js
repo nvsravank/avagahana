@@ -37,6 +37,14 @@ try {
     check(`Markdown leaves objects alone: ${c.name}`, !Object.keys(Object.prototype).length, Object.keys(Object.prototype));
   }
 
+  const partCases = await fetch('./fixtures/query-part-cases.json').then((r) => r.json());
+  const flatParts = (n, prefix = '') => Object.entries(n.queryParts || {}).flatMap(([name, inner]) => [prefix + name, ...flatParts(inner, `${prefix}${name} / `)]);
+  for (const c of partCases.cases) {
+    const m = parseMap(caseMap(sqlCases.tables, c.sql), 'parts.md');
+    const got = flatParts(m.byId.res).sort().join();
+    check(`Part names: ${c.name}`, got === [...c.parts].sort().join(), got);
+  }
+
   const failing = parseMap(caseMap(sqlCases.tables, 'WITH RECURSIVE t AS (SELECT o.id FROM orders o) SELECT t.id FROM t'), 'x.md');
   check('a query that cannot be drawn leaves its SQL readable on the Into box', failing.byId.res.note?.body.includes('WITH RECURSIVE t') && failing.byId.res.note.body.includes('could not be drawn'), failing.byId.res.note?.body);
   check('it publishes no partial picture', !failing.queryFlow && !Object.values(failing.byId).some((n) => n.queryCard));
