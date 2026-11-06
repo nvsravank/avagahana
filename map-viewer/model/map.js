@@ -94,6 +94,8 @@ export function parseMap(text, fileName) {
     }
   }
   addQueries(main);
+  // after the queries: a query fills the boxes it names, and a perspective may open them
+  for (const m of [main, ...main.parts.values()]) for (const view of m.views || []) if (view.options) view.options = perspectiveOptions(view.options, m.type, m.byId, m.warnings);
   addScenarios(main, fileName);
   // walkthroughs belong to the file: each diagram's sections count (model/walkthroughs.js)
   main.walkthroughs = readWalkthroughs([main, ...main.parts.values()].flatMap((p) => p.walkthroughs || []), main.warnings);
@@ -205,7 +207,6 @@ function parsePart(text, fileName, shared) {
   const infra = raw.flatMap((d) => infraOf(d, byId).map((n) => ({ n, d })));
   for (const { n } of infra) own.set(n, classOf(n, classes, styleOnly));
   const views = diagram.parseViews ? diagram.parseViews(sections, byId, warnings, read.relations || []) : parseViews(sections.relations, byId, warnings, read.relations || null);
-  for (const view of views) if (view.options) view.options = perspectiveOptions(view.options, diagram.type, byId, warnings);
   for (const section of sections.joins) warnings.push(problem('joins-retired', `Joins: ${section.name} is retired. Put query joins in a Query section with SQL; keep model relationships in Relations/Perspective. Migrate from the actual SQL or confirmed intent, without guessing join types or outputs.`));
   // ## Renames: columns renamed since an earlier version, used when comparing (model/compare.js)
   const renames = sections.renames == null ? null : diagram.parseRenames ? diagram.parseRenames(sections.renames, byId, warnings) : null;

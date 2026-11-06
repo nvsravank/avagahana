@@ -544,11 +544,12 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     ids, eids = read["ids"], read["eids"]
     secs = sections_of(part["after"], part["after_line"])
     perspective_bodies = {}
+    perspective_options = []   # checked after the queries: a query fills the boxes it names
     for title, body, hl in secs:
         if re.match(r'^perspective\s*:', title, re.I):
             report = lambda msg, line=hl: m.report(line, 'perspective-options', msg)
             clean, opts = options_section(body, 'Perspective options', ['open', 'focus', 'columns'], report)
-            check_perspective(opts, kind, ids, report)
+            perspective_options.append((opts, report))
             perspective_bodies[hl] = clean
     seen = {}
     for title, _, hl in secs:
@@ -718,6 +719,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     part["view_rels"] = view_rels
     check_scenarios(m, part, secs)
     check_queries(m, part, secs, anchors)
+    for opts, report in perspective_options:
+        check_perspective(opts, kind, ids, report, part.get('query_scopes', ()))
 
     # a sequence's Plays over lines (checked against the other diagrams in check())
     part["plays_over"] = []

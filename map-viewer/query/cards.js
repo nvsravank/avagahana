@@ -117,10 +117,15 @@ export function paintQueryCard(g, s, { svgEl }) {
   }
 }
 
+// A box the author drew around query boxes: closed at first too, so a query map opens on
+// readable names rather than names too small to draw.
+const holdsQuery = n => n.children.some(c => (c.queryScope && !c.queryGenerated) || holdsQuery(c));
+
 export function queryDefaults(root) {
   const closed = new Set();
   const walk = n => {
     if (n !== root && n.queryScope) closed.add(n.id);
+    if (n !== root && !n.queryScope && !n.queryGenerated && holdsQuery(n)) closed.add(n.id);
     // Output mappings start visible. Source columns are the next detail level in
     // both the overview expansion and focus; the circle/toolbar reveals them.
     if (n !== root && n.queryCard && n.queryRole !== 'output' && n.children.length && !root.queryPivot && !root.queryUnpivot) closed.add(n.id);

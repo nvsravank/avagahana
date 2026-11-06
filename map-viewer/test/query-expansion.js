@@ -252,6 +252,16 @@ export async function testQueryExpansion(check) {
   const warehouseText = await fetch('../../examples/maps/sales-warehouse.md').then(r => r.text());
   const warehouse = parseMap(warehouseText, 'warehouse.md'), stock = warehouse.parts.get('sales-against-stock-query');
   check('expansion: migrated queries can reuse an existing primary ER schema without duplication', !warehouse.problems.length && warehouse.type === 'er' && stock.queryFlow && Object.values(stock.byId).filter(n => n.schemaRef).every(n => n.schemaRef.primary));
+  // a perspective lands inside a query box; a box drawn around query boxes starts closed
+  const staged = text.replace('base["order_base"]', 'subgraph upstream [Upstream build-up]\n    base["order_base"]\n  end').replace(/^## Query:/m, '## Perspective: Inside enriched\n- base --> enriched\n\n#### Perspective options\n- Focus: enriched\n\n## Query:');
+  await v.load(staged, 'staged.md'); v.setState({ mode: 'boxes' }); await wait();
+  check('stage boxes: a box around query boxes starts closed', host.querySelector('[data-dot="upstream"]') && !host.querySelector('[data-dot="base"]'));
+  v.setState({ expand: 'all' }); await wait();
+  check('stage boxes: the expand control still opens them', !!host.querySelector('[data-dot="base"]') || !!host.querySelector('[data-id="base"]'));
+  const inside = v.contents().find(x => x.kind === 'view' && x.label === 'Inside enriched');
+  v.setState(inside.state); await wait();
+  check('a perspective lands inside a query box, with its joins and generated lines', v.state.focus === 'enriched' && [...host.querySelectorAll('.mmv-query-card')].some(c => c.textContent.includes('LEFT JOIN')) && host.querySelectorAll('path[data-id]').length > 0, v.state.focus);
+  v.setState({ focus: null, view: null });
   await v.load(warehouseText, 'warehouse.md'); v.setState({ mode: 'boxes', part: stock.anchor, focus: 'stock_report' }); await wait();
   const primarySource = Object.values(stock.byId).find(n => n.queryRole === 'source' && n.schemaRef);
   host.querySelector(`[data-query-schema="${primarySource.id}"]`).dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await wait();

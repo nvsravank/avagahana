@@ -6,6 +6,10 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): a perspective's `Focus` and `Open` accept a box a query fills
+  (a CTE's box or the `Into` box), so a walkthrough stop can land inside a CTE. In the
+  viewer and the checker alike.
+- A box drawn around query boxes starts closed, so a query map opens on readable names.
 - **Contract** (map format): notes read a documented wider Markdown subset: `####` to
   `######` as three styled heading levels, strikethrough, nested lists, ordered lists, `+`
   bullets, display-only task lists, nested quotes, horizontal rules and aligned tables.

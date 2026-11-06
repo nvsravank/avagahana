@@ -80,6 +80,11 @@ erDiagram
   definitions-only catalogue out of navigation; its table definitions still open.
 - **Parts:** any order. Option headings are level 4. Only `- name: value` lines go under
   them. Prose can go directly under `## Query:`.
+- **Stages:** a large query reads better with its CTEs grouped in subgraphs. These start
+  closed, so the overview shows readable names.
+- **Walkthrough stops inside a CTE:** add a perspective with `#### Perspective options` and
+  `- Focus: <CTE box>`, then a `### Perspective: <name>` stop. See
+  `examples/maps/query-revenue-report.md`.
 - **New SQL only:** put JOIN, ON and each further AND/OR on its own line. The viewer lays out
   supplied SQL for display without changing it.
 

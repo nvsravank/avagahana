@@ -325,6 +325,11 @@ A named flowchart perspective may include one optional subsection after its arro
 - Focus: platform
 ```
 
+`Open` and `Focus` may also name a box a query fills: a CTE's box (by its id or its
+`#### Scopes` target) or the query's `Into` box, so a perspective, and a walkthrough stop
+through it, can land inside a CTE. The boxes the viewer generates inside a query, and the
+`Sources` and `Binds` boxes, are not valid targets; a query that cannot be drawn fills nothing.
+
 `Open` is a comma-separated list of container/subgraph IDs. Begin with containers
 closed, keep the effective root open, then open those containers and their ancestors.
 Descendants are not automatically opened; the perspective's arrows still determine
@@ -1324,6 +1329,10 @@ a unique key. A window function's note says it keeps the row count. The Into box
 holds the query exactly as written. Generated node IDs come from where a node sits
 (`enriched--inputs--c-customers`), so they survive changes to the reader. See
 `examples/maps/query-expansion.md` for a complete public example.
+
+A box the author draws around query boxes (a stage holding CTEs, say) starts closed with
+them, so a query map opens on readable names. A perspective's `Focus` and `Open` still decide
+its own picture.
 
 #### The section's Markdown
 

@@ -105,7 +105,12 @@ export function perspectiveOptions(options, type, byId, warnings) {
   }
   let valid = type === 'flowchart' && !options.columns;
   const ids = [...(options.open || []), ...(options.focus ? [options.focus] : [])];
-  for (const id of ids) if (!byId[id]?.children.length) valid = false;
+  // a container the author can name: one with authored boxes, or one a query fills with
+  // its own SELECT (the boxes for sources and parameters hold no query to read)
+  for (const id of ids) {
+    const n = Object.hasOwn(byId, id) ? byId[id] : null;
+    if (!n || n.queryGenerated || n.queryColorRole || !(n.queryScope || n.children.some((c) => !c.queryGenerated))) valid = false;
+  }
   if (options.focus) for (const id of options.open || []) {
     let n = byId[id];
     while (n && n.id !== options.focus) n = n.parent;

@@ -7,6 +7,11 @@ jobs:
       matrix:
         python: ['3.9', '3.15']
         os: [ubuntu-latest, windows-latest]
+        exclude:
+          - { python: '3.9', os: ubuntu-latest }
+        include:
+          # ubuntu-latest (26.04) offers no Python 3.9, the oldest version the project supports
+          - { python: '3.9', os: ubuntu-24.04 }
     runs-on: ${{ matrix.os }}
     env:
       PYTHONUTF8: '1'

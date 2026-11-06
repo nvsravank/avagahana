@@ -299,6 +299,61 @@
 "name": "HTML in SQL text",
 "text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT '<img src=x onerror=alert(1)>' AS \"<b>x</b>\" FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
 "codes": []
+},
+{
+"name": "Focus on a CTE box",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: c\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "Focus on a CTE box named by Scopes",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: other\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n#### Scopes\n- w: other\n\n```sql\nWITH w AS (SELECT o.id FROM orders o) SELECT w.id FROM w\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "Focus on the final query box",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: res\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "Focus on a stage, Open a CTE inside it",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: stage\n- Open: c\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "Open a CTE box with no Focus",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Open: c\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "Open a CTE outside Focus",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: res\n- Open: c\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": ["perspective-options"]
+},
+{
+"name": "Focus on an empty box the query does not fill",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: other\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": ["perspective-options"]
+},
+{
+"name": "Focus on the sources box",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: src\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": ["perspective-options"]
+},
+{
+"name": "Focus on an unknown box",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: nope\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": ["perspective-options"]
+},
+{
+"name": "Focus on a generated box id",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: res--joins\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": ["perspective-options"]
+},
+{
+"name": "Focus on a CTE of a query that cannot be drawn",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  subgraph stage [\"Stage\"]\n    c[\"c\"]\n    other[\"Other\"]\n  end\n  res[\"Result\"]\n  src --> c\n  c --> res\n  other --> res\n```\n\n## Perspective: Step\n- src --> c\n\n#### Perspective options\n- Focus: c\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH RECURSIVE c AS (SELECT o.id FROM orders o) SELECT c.id FROM c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": ["perspective-options", "query-unsupported"]
 }
 ]
 }

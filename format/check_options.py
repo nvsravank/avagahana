@@ -96,7 +96,7 @@ def options_section(text, name, fields, report):
     return clean, None if bad else options
 
 
-def check_perspective(options, kind, ids, report):
+def check_perspective(options, kind, ids, report, query_boxes=()):
     if options is None:
         return
     if kind == 'er':
@@ -109,7 +109,7 @@ def check_perspective(options, kind, ids, report):
         return
     valid = kind == 'flowchart' and 'columns' not in options
     for nid in options.get('open', []) + ([options['focus']] if 'focus' in options else []):
-        if nid not in ids or not ids[nid].get('children'):
+        if nid not in ids or not (ids[nid].get('children') or nid in query_boxes):
             valid = False
     if 'focus' in options:
         for nid in options.get('open', []):

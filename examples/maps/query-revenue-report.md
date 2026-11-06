@@ -91,6 +91,26 @@ FROM region_totals t
 ORDER BY revenue_rank
 ```
 
+## Perspective: Inside sales
+- sources --> sales
+- params --> sales
+
+#### Perspective options
+- Focus: sales
+
+## Perspective: Inside refund_totals
+- sources --> refund_totals
+
+#### Perspective options
+- Focus: refund_totals
+
+## Perspective: Inside net_by_order
+- sales --> net_by_order
+- refund_totals --> net_by_order
+
+#### Perspective options
+- Focus: net_by_order
+
 ## Details
 
 ### <a id="sources"></a>Source tables
@@ -212,9 +232,20 @@ erDiagram
 Start with the shape: sales and refunds come in separately, meet in net_by_order, and
 are rolled up by region before the report ranks them.
 
-Open sales: two SELECTs joined by UNION ALL, and NOT EXISTS leaves out orders on a fraud
-hold. Parameters feed both date filters. Then open refund_totals and see GROUP BY make one
-row per payment, which is why net_by_order can join it safely.
+### Perspective: Inside sales
+
+Two SELECTs joined by UNION ALL. Open Input 1: NOT EXISTS leaves out orders on a fraud
+hold, and the parameters feed both date filters.
+
+### Perspective: Inside refund_totals
+
+GROUP BY makes one row per payment, and only settled refunds count. This is what makes
+the next join safe.
+
+### Perspective: Inside net_by_order
+
+The LEFT JOIN keeps sales with no refund, and COALESCE turns their empty total into 0.
+Because refund_totals has one row per payment, no sale is counted twice.
 
 ### Diagram: Revenue by quarter
 

@@ -83,7 +83,7 @@ export function addFlowQuery(main, original, section, { sql, dialect, options, s
     const base = `${parent === owner.root ? 'query' : parent.id}--${slug(title)}`;
     let id = base;
     for (let n = 2; Object.hasOwn(owner.byId, id); n++) id = `${base}-${n}`;
-    const n = { id, label: title, plain: title, shape: 'default', icons: [], children: [], note: null, cls: null, ...extra, parent };
+    const n = { id, label: title, plain: title, shape: 'default', icons: [], children: [], note: null, cls: null, queryGenerated: true, ...extra, parent };
     labelToRuns(n, []); parent.children.push(n); owner.byId[id] = n; return n;
   };
   const prepare = (n) => { n.container = true; n.queryScope = true; n.dir = 'LR'; scopeNodes.add(n.id); };
