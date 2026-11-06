@@ -137,6 +137,7 @@ function joinAt(ts, i) {
 }
 
 const SET_WORDS = ['UNION', 'INTERSECT', 'EXCEPT', 'MINUS'];
+const SELECT_ONLY = ['WHERE', 'GROUP', 'HAVING', 'QUALIFY', 'START WITH', 'CONNECT BY', 'WINDOW'];   // a clause of one SELECT, never of a whole set operation
 const OTHER_STATEMENTS = ['INSERT', 'UPDATE', 'DELETE', 'MERGE', 'CREATE', 'ALTER', 'DROP', 'TRUNCATE', 'EXEC', 'EXECUTE', 'CALL', 'DECLARE', 'BEGIN', 'SET', 'VALUES', 'TABLE', 'SHOW', 'EXPLAIN'];
 const ALIAS_STOPS = new Set(['JOIN', 'INNER', 'LEFT', 'RIGHT', 'FULL', 'CROSS', 'OUTER', 'NATURAL', 'SEMI', 'ANTI', 'STRAIGHT_JOIN', 'APPLY', 'LATERAL', 'ON', 'USING', 'PIVOT', 'UNPIVOT', 'WITH',
   'UNION', 'INTERSECT', 'EXCEPT', 'MINUS', 'WHERE', 'GROUP', 'HAVING', 'ORDER', 'LIMIT', 'OFFSET', 'FETCH', 'QUALIFY', 'WINDOW', 'OPTION', 'FOR', 'START', 'CONNECT', 'TABLESAMPLE', 'SAMPLE', 'PARTITION', 'AS', 'OF', 'INTO']);
@@ -401,10 +402,11 @@ function readTokens(tokens, depth, options) {
   });
   if (cuts.length) {
     // ORDER/LIMIT after a set operation applies to the combined output, not the last
-    // input. INTERSECT binds more tightly; the rest associate from the left.
+    // input; WHERE, GROUP BY and the like belong to the last input. INTERSECT binds more
+    // tightly; the rest associate from the left.
     let end = body.length, d = 0;
     body.forEach((t, j) => {
-      if (!d && j > cuts.at(-1).end && clauseAt(body, j) && end === body.length) end = j;
+      if (!d && j > cuts.at(-1).end && end === body.length && !SELECT_ONLY.includes(clauseAt(body, j)?.[0]) && clauseAt(body, j)) end = j;
       if (op(t, '(')) d++;
       if (op(t, ')')) d--;
     });

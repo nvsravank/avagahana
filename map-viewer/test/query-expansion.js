@@ -108,6 +108,8 @@ export async function testQueryExpansion(check) {
   check('expansion: nested alias shadowing does not attribute inner columns to the outer table', !shadow.problems.length, shadow.warnings);
   const sets = readQuery('SELECT o.id FROM orders o UNION ALL SELECT c.id FROM customers c INTERSECT SELECT c.id FROM customers c ORDER BY id');
   check('expansion: set precedence and final ordering stay outside the last input', sets.operators[0] === 'UNION ALL' && sets.branches[1].operators[0] === 'INTERSECT' && sets.setClauses.ORDER && !sets.branches[1].setClauses.ORDER);
+  const lastInput = readQuery('SELECT o.id FROM orders o UNION ALL SELECT c.id FROM customers c WHERE c.id > 1 ORDER BY id');
+  check('expansion: a WHERE after the last UNION input belongs to that input, ORDER BY to the whole', !lastInput.setClauses.WHERE && lastInput.setClauses.ORDER && !!lastInput.branches[1].clauses.WHERE);
   const ast = readQuery("SELECT a.id FROM orders a LEFT JOIN (SELECT c.id FROM customers c) b ON b.id = a.id WHERE a.id > :minimum");
   check('expansion: derived-table JOIN text preserves its actual SELECT', ast.joins[0].sql === 'LEFT JOIN (SELECT c.id FROM customers c) b ON b.id = a.id');
   const derived = parseMap(variant('SELECT b.id FROM (SELECT o.id FROM orders o WHERE o.amount > :minimum) b'), 'derived.md');

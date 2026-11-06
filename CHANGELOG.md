@@ -6,6 +6,9 @@ marked **Contract**.
 
 ## Unreleased
 
+- Queries: a WHERE, GROUP BY or HAVING after the last input of a set operation now belongs
+  to that input. It was drawn as a filter on the combined rows, and its names went unchecked.
+- New example `query-revenue-report.md`, for the gallery.
 - **Contract** (map format): ER-attached Query sections are retired, in the viewer as
   well as the checker. The ER diagram still opens and `query-legacy-format` says how to
   migrate; no query picture is drawn. `Join` walkthrough stops and `join` contents entries

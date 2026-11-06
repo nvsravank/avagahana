@@ -27,6 +27,7 @@ TOKEN = re.compile(
 IDENT = re.compile(r'^(?:#{1,2})?' + ID + r'$')
 NOT_AFTER_BRACKET = set('SELECT FROM JOIN ON BY AS WHERE AND OR NOT WHEN THEN ELSE CASE IN HAVING USING DISTINCT ALL INTO'.split())
 SET_WORDS = ('UNION', 'INTERSECT', 'EXCEPT', 'MINUS')
+SELECT_ONLY = ('WHERE', 'GROUP', 'HAVING', 'QUALIFY', 'START WITH', 'CONNECT BY', 'WINDOW')  # a clause of one SELECT, never of a whole set operation
 OTHER_STATEMENTS = set('INSERT UPDATE DELETE MERGE CREATE ALTER DROP TRUNCATE EXEC EXECUTE CALL DECLARE BEGIN SET VALUES TABLE SHOW EXPLAIN'.split())
 ALIAS_STOPS = set('JOIN INNER LEFT RIGHT FULL CROSS OUTER NATURAL SEMI ANTI STRAIGHT_JOIN APPLY LATERAL ON USING PIVOT UNPIVOT WITH UNION INTERSECT EXCEPT MINUS WHERE GROUP HAVING ORDER LIMIT OFFSET FETCH QUALIFY WINDOW OPTION FOR START CONNECT TABLESAMPLE SAMPLE PARTITION AS OF INTO'.split())
 NO_JOIN_NEEDED = {'CROSS JOIN', 'CROSS APPLY', 'OUTER APPLY', 'IMPLICIT JOIN'}
@@ -574,7 +575,8 @@ def read_tokens(ts, depth, options):
     if cuts:
         end, d = len(body), 0
         for j, t in enumerate(body):
-            if not d and j > cuts[-1][1] and clause_at(body, j) and end == len(body):
+            c = clause_at(body, j) if not d and j > cuts[-1][1] and end == len(body) else None
+            if c and c[0] not in SELECT_ONLY:  # WHERE and the like belong to the last input
                 end = j
             d += 1 if op(t, '(') else -1 if op(t, ')') else 0
         read_clauses(body, end)

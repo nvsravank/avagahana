@@ -14,6 +14,9 @@
 - `maps/shop-layers.md`: a six-stop payment walkthrough with a focused payment
   perspective, authored container defaults, native sequence, retry scenario, ER join
   and included notes. Open Walks, then use Export walkthrough to read it offline.
+- `maps/query-revenue-report.md`: the gallery's query example, a monthly report whose
+  SQL opens in place: CTEs, a UNION ALL, NOT EXISTS, parameters, a window function and a
+  second query with a PIVOT, over one shared schema.
 - `two-viewers.html`: two viewers side by side. Left: built-in theme and every host
   callback (logged). Right: built-in theme hidden, a host theme passed as an object
   with its font as bytes (only one face, so the viewer reports what it borrowed).
