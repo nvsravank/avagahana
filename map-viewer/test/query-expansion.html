@@ -1,0 +1,13 @@
+<!doctype html><meta charset="utf-8"><title>Expandable query checks</title>
+<div id="out">Running…</div>
+<script type="module">
+import { testQueryExpansion } from './query-expansion.js';
+const results = [];
+const check = (name, ok, detail = '') => results.push({ name, ok: !!ok, detail: String(detail) });
+try { await testQueryExpansion(check); }
+catch (e) { check('expansion checks finished', false, e.stack || e); }
+window.testResults = results;
+const out = document.getElementById('out'), passed = results.filter(r => r.ok).length;
+out.textContent = `${passed} / ${results.length} passed`;
+for (const r of results) out.appendChild(Object.assign(document.createElement('div'), { className: r.ok ? 'pass' : 'fail', textContent: `${r.ok ? 'PASS' : 'FAIL'} ${r.name} ${r.detail}` }));
+</script>

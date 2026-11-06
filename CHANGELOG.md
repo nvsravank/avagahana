@@ -6,6 +6,89 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): ER-attached Query sections are retired, in the viewer as
+  well as the checker. The ER diagram still opens and `query-legacy-format` says how to
+  migrate; no query picture is drawn. `Join` walkthrough stops and `join` contents entries
+  are gone. This removes the second query path and its second pair of SQL parsers.
+- **Contract** (map format): new warning `query-unsupported` for valid SQL the reader
+  does not explain yet. The map passes and opens, with the SQL as written on the Into box.
+  Mistakes stay `query-syntax`.
+- **Contract** (map format): queries now read `MINUS`; `UNION` in FROM subqueries and
+  parenthesized branches; `FETCH`, `OFFSET`, `QUALIFY`, `WINDOW`, `FOR`, `TOP`, `DISTINCT ON`,
+  `START WITH`, `CONNECT BY`; `CROSS/OUTER APPLY`, `LATERAL`, `NATURAL`, `SEMI`, `ANTI`, comma
+  joins and `(+)`; table functions, `VALUES`, `@table`, `@dblink`, `dual` and no FROM; optional
+  derived aliases and derived column lists; `MATERIALIZED`; Oracle PIVOT value aliases, several
+  aggregates, any aggregate; `UNPIVOT INCLUDE NULLS`; `@name`, `?`, `$1` parameters; all operators;
+  non-ASCII names; `alias = expression` under `sql sqlserver`.
+- **Contract** (map format): stricter references. Unknown or ambiguous unqualified columns,
+  an ON clause naming a later table, two schema-qualified names sharing one ER definition
+  and two queries in one Into box are errors. Unterminated strings are errors. `o.id + x` is
+  no longer read as `o.id +` named `x`.
+- **Contract** (map format): one Markdown reader for Query sections and option sections. Parts
+  may come in any order; bullets may be indented, use `+`, and space before the colon; fences
+  may use tildes, longer runs, indentation and any case; `plsql`, `tsql`, `pgsql` and any dialect
+  word are accepted. `Schema` requires `#`. Closing `##` on a heading is ignored. Anchors keep
+  non-ASCII letters, in the viewer as in the checker. A Mermaid block quoted inside a longer fence
+  is not a diagram, `## Sources` and `###` notes inside fences are literal in both.
+- Generated query node IDs come from where a node sits, not a counter, so links survive.
+- Map text can no longer reach inherited object properties through Query option names, Scopes,
+  CTE names or note anchors, and nothing in a Query section can stop the rest of a map opening.
+  SQL nesting is limited to 200 parentheses and 24 scopes while parsing.
+- Query reading: each output says how many rows it leaves; JOIN blocks say what they do to row
+  counts where ER keys prove it; window function notes say they keep rows; the Into box's note
+  holds the SQL as written; controls have tooltips; the icon index explains query colours and
+  marks; opening a query box refits it; repeated output names each open their own row.
+
+- **Contract** (authoring checker): ER-attached Query sections now fail with
+  `query-legacy-format` and explicit migration guidance. The viewer still opens
+  them, including existing walkthroughs and saved destinations. Public examples
+  use expandable flowcharts with unchanged SQL; legacy coverage stays in fixtures.
+
+- Explicit Oracle SELECT hint comments and SQL Server table/query hints remain
+  visible as scoped optimizer metadata. Ordinary comments and commented-out SQL
+  stay out of generated clauses and expressions; literal strings remain unchanged.
+
+- **Contract** (query interaction): PIVOT/UNPIVOT occurrences have independent
+  top-left column toggles and top-right circles for inline transformation expansion.
+  Double-click retains isolated focus. Focus context uses compact table boundaries
+  with working column toggles, ordered binds/sources/CTEs; original overview
+  containers and their internal graphs are omitted. In query views,
+  physical sources consistently use theme blue and binds theme green.
+
+- **Contract** (map format): expandable queries accept fixed single-value SQL
+  Server-style UNPIVOT. Its isolated focus shows carried-through inputs, source
+  column names and non-NULL values becoming rows, with output lineage and export.
+  A quarterly sales example complements the pivot example.
+
+- **Contract** (map format): expandable queries accept fixed-list PIVOT with an
+  isolated input/operation/output focus view and explicit implicit grouping keys.
+  A quarterly sales example demonstrates the same expansion and focus controls.
+- Query clauses flow LR in Boxes and TB in Layers. JOIN/ON/AND/OR have a narrow
+  stacked keyword column, Boolean groups indent, and output mappings restore ƒ
+  markers for calculated columns. Joins start with a visible solid `0 · FROM`
+  source card; bind cards have no empty body strip, including when stretched.
+
+- Query inputs group binds, physical tables, then CTE/derived references, preserving
+  SQL source order within each group and JOIN order in the clause blocks. Inputs
+  share widths in Boxes and heights in Layers. Outside source cards expose the
+  full defined schema; local Inputs show only columns used by this query. Binds
+  enter each scope once. Joins, WHERE filters and other clauses have distinct
+  sections, with nested queries beside their consumers and readable predicate lines.
+- Layers transposes query containers through focused CTEs as well as the overview.
+  Query Flat/Zebra looks stripe table rows and clause bodies; headers now use the theme's existing
+  contrast-selected ink. The automatic contrast algorithm is unchanged.
+
+- **Contract** (map format): flowchart Query sections expand CTEs in place using
+  shared ER definitions, distinct alias occurrences and individual bind inputs.
+  Existing circles, expansion levels and focus/breadcrumbs reveal relevant columns,
+  visible JOIN/WHERE clauses and source-to-output mappings. Sources expands to its
+  scoped occurrences; schema definitions may be hidden from navigation.
+- Original set operations, scalar/correlated subqueries and collection-bind filters
+  are retained instead of rewritten into joins. Query cards use flowchart ports and
+  routing; old per-join navigation is hidden while saved API/walkthrough states work.
+- SQL authoring guidance requires source fidelity and visual checks of expansion,
+  focus, conditions and outputs, beyond merely passing the format checker.
+
 - **Contract** (map format, intentional removal): authored `## Joins:` equality
   views are retired, including their former drawings. `joins-retired` directs authors
   to actual SQL under Query, or to Perspectives for genuine model relationships.

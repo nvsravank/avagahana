@@ -1,0 +1,304 @@
+{
+"about": "One Markdown reading contract for Query sections and the structure they share: map-viewer/test/query.js and scripts/test_query.py hold the viewer and the checker to these codes.",
+"cases": [
+{
+"name": "plain",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "SQL after Physical names",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n#### Physical names\n- sales.orders: orders\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "SQL before options",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n```sql\nSELECT o.id FROM orders o\n```\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "SQL after an empty Scopes heading",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n#### Scopes\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "prose before options",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\nWhat it does.\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "prose under options",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\nWhat it does.\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "prose under Physical names",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n#### Physical names\nThese map.\n- orders: orders\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "space before the colon",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema : #definitions\n- Into : res\n- Sources : src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "star bullets",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n* Schema: #definitions\n* Into: res\n* Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "plus bullets",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n+ Schema: #definitions\n+ Into: res\n+ Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "indented bullets",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n  - Schema: #definitions\n  - Into: res\n  - Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "heading and names in capitals",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### QUERY OPTIONS\n- SCHEMA: #definitions\n- INTO: res\n- SOURCES: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "level 3 options",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "Schema without the hash",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "unknown option",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n- Colour: red\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "closing hashes on a section",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T ##\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "closing hashes on options",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options ####\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "closing hashes on Details",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Details ##\n\n### <a id=\"res\"></a>Result\nText\n",
+"codes": []
+},
+{
+"name": "tilde fence",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n~~~sql\nSELECT o.id FROM orders o\n~~~\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "longer fence",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n````sql\nSELECT o.id FROM orders o\n````\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "indented fence",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n  ```sql\n  SELECT o.id FROM orders o\n  ```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "SQL in capitals",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```SQL\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "sql with a dialect label",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql oracle\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "plsql fence",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```plsql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "two sql blocks",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "empty sql block",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "an unclosed sql block",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "comment naming a heading",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\n-- #### Query options\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "fence text inside a string",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT '```' AS x FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "CRLF",
+"text": "# Q\r\n\r\n```mermaid\r\nflowchart LR\r\n  src[\"Sources\"]\r\n  res[\"Result\"]\r\n  src --> res\r\n```\r\n\r\n## Query: T\r\n\r\n#### Query options\r\n- Schema: #definitions\r\n- Into: res\r\n- Sources: src\r\n\r\n```sql\r\nSELECT o.id FROM orders o\r\n```\r\n\r\n## Definitions\r\n\r\n```mermaid\r\nerDiagram\r\n  orders {\r\n    int id PK\r\n    varchar status\r\n  }\r\n  customers {\r\n    int id PK\r\n  }\r\n```\r\n",
+"codes": []
+},
+{
+"name": "byte order mark",
+"text": "﻿# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "accented primary schema",
+"text": "# Café map\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n\n## Overview\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #café-map\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n",
+"codes": []
+},
+{
+"name": "accented schema heading",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #données\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Données\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "accented diagram link",
+"text": "# T\n\n```mermaid\nflowchart LR\n a --> b\n click a \"#données\"\n```\n\n## Données\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n",
+"codes": []
+},
+{
+"name": "punctuated schema heading",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #data--model-v2\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Data & model v2\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "a Mermaid example inside a longer fence",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n````\n```mermaid\nflowchart LR\n a-->b\n```\n````\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "note with a fenced heading",
+"text": "# T\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Details\n\n### <a id=\"res\"></a>Result\nText\n\n```\n### not a heading\n```\n",
+"codes": []
+},
+{
+"name": "Sources heading inside a fence",
+"text": "# T\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Details\n\n### <a id=\"res\"></a>Result\n\n```\n## Sources\n### Bad: x\n```\n",
+"codes": []
+},
+{
+"name": "note naming __proto__",
+"text": "# T\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Details\n\n### <a id=\"__proto__\"></a>Odd\nText\n",
+"codes": [
+"note-unknown-id"
+]
+},
+{
+"name": "Two queries in one box",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: A\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Query: B\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "Query on a sequence",
+"text": "# Q\n\n```mermaid\nsequenceDiagram\n a->>b: x\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "Into is __proto__",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: __proto__\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "Sources is __proto__",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: __proto__\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "Binds is constructor",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n- Binds: constructor\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "Into is toString",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: toString\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "Scope is __proto__",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n#### Scopes\n- x: __proto__\n\n```sql\nWITH x AS (SELECT o.id FROM orders o) SELECT x.id FROM x\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "CTE named constructor",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH constructor AS (SELECT o.id FROM orders o) SELECT c.id FROM constructor c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "CTE named __proto__",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH __proto__ AS (SELECT o.id FROM orders o) SELECT c.id FROM __proto__ c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "CTE named toString",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nWITH toString AS (SELECT o.id FROM orders o) SELECT c.id FROM toString c\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "alias __proto__",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT __proto__.id FROM orders __proto__\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "physical name __proto__",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n#### Physical names\n- __proto__: orders\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+},
+{
+"name": "Schema is __proto__",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #__proto__\n- Into: res\n- Sources: src\n\n```sql\nSELECT o.id FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": [
+"query-syntax"
+]
+},
+{
+"name": "HTML in SQL text",
+"text": "# Q\n\n```mermaid\nflowchart LR\n  src[\"Sources\"]\n  res[\"Result\"]\n  src --> res\n```\n\n## Query: T\n\n#### Query options\n- Schema: #definitions\n- Into: res\n- Sources: src\n\n```sql\nSELECT '<img src=x onerror=alert(1)>' AS \"<b>x</b>\" FROM orders o\n```\n\n## Definitions\n\n```mermaid\nerDiagram\n  orders {\n    int id PK\n    varchar status\n  }\n  customers {\n    int id PK\n  }\n```\n",
+"codes": []
+}
+]
+}

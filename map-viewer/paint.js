@@ -216,7 +216,7 @@ export function createPainter(v) {
     if (s.top) g.dataset.top = s.top;
     if (s.hover) g.dataset.hover = s.id;   // Poster: hovering the node shows its details (WO-38)
     if (s.grow > 1) g.setAttribute('transform', `translate(${s.x},${s.y}) scale(${s.grow}) translate(${-s.w / 2},${-s.h / 2})`);
-    g.setAttribute('role', s.rows?.some((r)=>r.columnNote) || s.inners?.length ? 'group' : 'img');
+    g.setAttribute('role', s.rows?.some((r)=>r.columnNote) || s.inners?.length || s.custom === 'query' ? 'group' : 'img');
     g.setAttribute('aria-label', planName(s));
     if (s.bar) {
       g.dataset.bar = '1';
@@ -363,6 +363,7 @@ export function createPainter(v) {
 
   // an open box: a framed area with a title strip; its contents are drawn over it
   function paintFrame(s, parent) {
+    if (s.custom) { paintNode(s, parent); return; }
     const g = svgEl('g', { class: s.cls, 'data-id': s.id, 'data-plan': s.plan || null, transform: `translate(${s.x - s.w / 2},${s.y - s.h / 2})`, role: 'img', 'aria-label': planName(s) }, parent);
     nameOf(g, s);
     // a Poster box (WO-38): square corners, an AWS icon's colour, its title strip opens

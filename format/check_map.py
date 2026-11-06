@@ -39,7 +39,7 @@ if sys.version_info < (3, 9):
 
 # the checker's modules sit beside it (also under `python3 -I`, which leaves this folder off the path)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_options import headings, options_section, check_perspective
+from check_options import headings, options_section, check_perspective, fence_blocks, mask_fences
 from check_common import Map, check_label, MAX_LINE, MAX_LABEL, EMOJI, PROBLEMS  # noqa: E402
 from check_state import read_state  # noqa: E402
 from check_er import read_er  # noqa: E402
@@ -739,7 +739,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if title.lower() not in ("details", "notes"):
             continue
         part["note_links"] |= set(re.findall(r"\]\(#([\w-]+)\)", body))
-        for hm in re.finditer(r"^###\s+(.*)$", body, re.M):
+        for hm in re.finditer(r"^###\s+(.*)$", mask_fences(body), re.M):
             ln = hl + body.count("\n", 0, hm.start())
             am = re.search(r'<a\s+id="([^"]+)"\s*></a>', hm.group(1), re.I)
             if not am:
@@ -1117,6 +1117,9 @@ def check_links(m, parts, anchors):
         for a in p.get("note_links", set()):
             if a in anchors:
                 nxt[id(p)].add(id(anchors[a]))
+        for a in p.get('query_schema_links', set()):
+            if a in anchors:
+                nxt[id(p)].add(id(anchors[a]))
         for anchor, _, _ in p.get("plays_over", []):
             t = by_anchor(anchor)
             if t:
@@ -1138,13 +1141,13 @@ def check_links(m, parts, anchors):
 
 # walkthroughs: `## Walkthrough: <name>` sections, each stop a `### <Kind>: <name>` heading
 # that must name an item of the map (model/walkthroughs.js reads the same)
-WALK_KINDS = {"diagram": "diagram", "perspective": "view", "join": "join", "deployment": "deployment",
+WALK_KINDS = {"diagram": "diagram", "perspective": "view", "deployment": "deployment",
               "scenario": "scenario", "sequence": "sequence"}
 
 
 def check_walkthroughs(m, src, parts, title):
     """Every walkthrough: a name used once, at least one stop, each stop a known kind
-    naming an item the map has (a diagram's heading or title, a perspective, a join, a
+    naming an item the map has (a diagram's heading or title, a perspective, a
     deployment environment, a scenario, a sequence diagram)."""
     names = {k: set() for k in set(WALK_KINDS.values())}
     owners = []
@@ -1173,25 +1176,6 @@ def check_walkthroughs(m, src, parts, title):
         for key in names:
             names[key].update(own['names'][key])
         owners.append(own)
-    def query_owner(q, title):
-        own = {'title':title, 'names':{k:set() for k in names}, 'notes':set()}
-        own['names']['diagram'].add(title.lower())
-        for j in q['joins']:
-            own['names']['join'].add(('{} · {}'.format(j['number'],j['type'])).lower())
-        for k in names:
-            names[k].update(own['names'][k])
-        owners.append(own)
-        for c in q['ctes']:
-            query_owner(c['query'], title+' / '+c['name'])
-        for s in q['sources']:
-            if 'query' in s:
-                query_owner(s['query'],title+' / '+s['alias'])
-            if 'pivot' in s:
-                pivot = {'ctes':[], 'sources':[s['pivot']['input']], 'joins':[]}
-                query_owner(pivot,title+' / Pivot '+s['alias'])
-    for part in parts:
-        for name,q in part.get('queries',[]):
-            query_owner(q,'Query: '+name)
     heads = [h for h in headings(src) if h['level'] == 2]
     seen = {}
     for i, h in enumerate(heads):
@@ -1212,7 +1196,7 @@ def check_walkthroughs(m, src, parts, title):
             sm = re.fullmatch(r'([A-Za-z]+)\s*:\s*(.+)', st['title'])
             kind = sm[1].lower() if sm else None
             if kind not in WALK_KINDS:
-                m.report(sline, 'walkthrough-stop-kind', 'stop "{}" must start with Diagram, Perspective, Deployment, Scenario, Join or Sequence'.format(st['title']))
+                m.report(sline, 'walkthrough-stop-kind', 'stop "{}" must start with Diagram, Perspective, Deployment, Scenario or Sequence'.format(st['title']))
                 continue
             want, dest = WALK_KINDS[kind], sm[2].strip().lower()
             if dest not in names[want]:
@@ -1227,13 +1211,15 @@ def check_walkthroughs(m, src, parts, title):
 
 def check(path):
     path = Path(path)
-    m = Map(path, path.read_text(encoding="utf-8"))
+    m = Map(path, path.read_text(encoding="utf-8").lstrip("\ufeff"))
     src = m.text
     if path.suffix.lower() == ".mmd":
         read_block(m, src, 0)
         return m.problems
-    opens = [x.start() for x in re.finditer(r"^```mermaid[^\n]*$", src, re.M)]
-    fences = list(re.finditer(r"^```mermaid[^\n]*\n([\s\S]*?)\n```", src, re.M))
+    # a block quoted inside a longer fence is an example, not a diagram
+    shown = {b["start"] for b in fence_blocks(src)}
+    opens = [x.start() for x in re.finditer(r"^```mermaid[^\n]*$", src, re.M) if x.start() in shown]
+    fences = [x for x in re.finditer(r"^```mermaid[^\n]*\n([\s\S]*?)\n```", src, re.M) if x.start() in shown]
     if not fences:
         m.report(1, "no-diagram", "no ```mermaid block")
         return m.problems
@@ -1286,6 +1272,9 @@ def check(path):
             if d["read"]:
                 p["infra"] |= {k for k in d["read"]["ids"] if k not in (p["read"] or {}).get("ids", {})}
     anchors = {}
+    tm = re.search(r"^# (.+)$", src[:fences[0].start()], re.M)
+    m.primary_diagram = parts[0] if parts else None
+    m.primary_anchor = anchor_of(tm.group(1)) if tm else None
     for p in parts[1:]:
         if p["anchor"] in anchors:
             m.report(p["line"], "diagram-heading-twice", f'two diagrams are headed "{p["heading"]}"')

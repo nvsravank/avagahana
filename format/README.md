@@ -21,6 +21,12 @@ that relations link to). Valid Mermaid that the viewer ignores is a warning
 an arrow's `id@{ ... }` settings, a mind map node with no id. The map still passes.
 Run it on a map before showing it.
 
+ER-attached `## Query:` sections fail with `query-legacy-format`, whose message gives
+the flowchart/shared-schema migration recipe. SQL the reader does not explain yet is the
+warning `query-unsupported`: the map passes, and the SQL stays readable in the viewer.
+`check_query.py` mirrors `map-viewer/query/sql.js`; `scripts/test_query.py` and
+`map-viewer/test/query.js` hold both to the same fixtures in `map-viewer/test/fixtures/`.
+
 Every problem has a code in `problems.json`, with its level (an error fails, a warning
 passes) and who reports it: `both`, `checker` (Mermaid validity the viewer draws anyway,
 or another file) or `viewer`. The viewer reports the same codes as `map-<code>`.

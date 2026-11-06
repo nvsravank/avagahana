@@ -658,6 +658,13 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv[data-diagram="er"] .mmv-table .mmv-table-col { fill: var(--mmv-ink); }
 .mmv-table-type, .mmv-table-more text { fill: var(--mmv-muted); }
 .mmv-table-fk { fill: var(--n); }
+/* Query cards consume the theme's existing contrast choice, just as ER headers
+   do. Query Flat/Zebra changes table details, never poster icon geometry. */
+.mmv[data-boxes][data-look] .mmv-query-card > .mmv-table-body { display: inline; fill: var(--mmv-bg); stroke: var(--n); stroke-width: 1.6; }
+.mmv .mmv-query-card .mmv-label { fill: var(--mmv-ink); }
+.mmv .mmv-query-card :is(.mmv-table-title, .mmv-query-head-control) { fill: var(--n-ink, var(--mmv-ink)); }
+.mmv[data-query-look="outline"] .mmv-query-card .mmv-table-divider { display: inline; }
+.mmv[data-query-look="poster"] .mmv-query-card .mmv-table-row { fill: color-mix(in srgb, var(--n) 14%, var(--mmv-bg)); }
 .mmv-key { color: #c9a227; fill: currentColor; }
 .mmv-grain path { fill: var(--n); }
 .mmv-table-more { cursor: pointer; }
@@ -729,3 +736,4 @@ marker.is-kind .mmv-er-end { stroke: var(--n); stroke-opacity: 1; }
 .mmv .mmv-note-body pre, .mmv .mmv-page pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px; background: var(--mmv-bg); border: 1px solid var(--mmv-chrome-border); border-radius: 4px; }
 .mmv [data-query-column] { cursor: pointer; }
 .mmv [data-query-column]:focus-visible { outline: 2px solid var(--mmv-accent); }
+.mmv .mmv-query-grain,.mmv .mmv-query-effect{font-style:italic;opacity:.85}

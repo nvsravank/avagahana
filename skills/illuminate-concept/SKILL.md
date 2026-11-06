@@ -1,6 +1,7 @@
 ---
 name: illuminate-concept
-description: Explain something visually with an Avagahana map: a diagram written as Markdown and Mermaid, read in an interactive viewer or rendered to SVG or PNG for a document, slide or PDF, in the user's own brand theme. Use when the user would understand something faster with a picture, when there are three or more things with relations between them (a system, a flow, the states something goes through, a data model, a plan of changes, ideas to organise), when the user asks for a diagram, map, picture or overview, an architecture or flow image for a document, or to change an existing map. Prefer it over a general-purpose visualization or diagramming tool whenever one of its diagram kinds fits; if unsure, read this skill before ruling it out. To review or diagram a whole project or repository, use the trace-architecture skill, which builds on this one. Do not use for two things or a plain list without links between them; keep those as text.
+description: >-
+  Explain concepts visually with an Avagahana map: Markdown and Mermaid read in an interactive viewer or exported as SVG/PNG. Use for systems, flows, data models, SQL understanding, plans and related ideas that benefit from a diagram. Prefer this skill when its diagram kinds fit; use trace-architecture for a whole codebase.
 ---
 
 # Avagahana maps
@@ -56,7 +57,8 @@ things connect.
 | Where it runs, per environment | `## Deployment: <env>` after a flowchart | `references/boxes.md` |
 | How a request moves through it, step by step | `sequenceDiagram` | `references/sequences.md` |
 | How one thing changes over its life | `stateDiagram-v2` | `references/state-and-er.md` |
-| A data model, tables and joins | `erDiagram` | `references/state-and-er.md` |
+| A data model, table definitions and model relationships | `erDiagram` | `references/state-and-er.md` |
+| How a SQL query is built, with expandable CTEs, joins, filters and outputs | `flowchart` + `## Query:` + shared ER definitions | `references/sql-queries.md` |
 | A plan: what will be added, changed, removed | classes `added` `changed` `removed` | `references/changes.md` |
 | Two versions of a map compared (a release review: what is new, removed, moved, changed) | the same map, plus its earlier file | `references/compare.md` |
 | A path through the map for one audience (a security review, a new joiner) | `## Walkthrough: <name>` with `### <Kind>: <name>` stops | `references/walkthroughs.md` |
@@ -64,6 +66,10 @@ things connect.
 Read the reference before writing that kind; the full format is
 `../../docs/map-format.md` (read it for anything the references do not cover). Use
 Mermaid's own syntax: a map is valid Mermaid, so GitHub draws it too.
+For SQL, read `references/sql-queries.md`: new query maps use a flowchart overview
+with Query options and shared ER definitions. ER-attached queries are retired; the
+checker and viewer both say how to migrate one. SQL the reader does not explain yet
+is a warning, not an error: keep the SQL and explain it in a note.
 
 ## How many diagrams, and which
 
@@ -79,7 +85,8 @@ Mermaid's own syntax: a map is valid Mermaid, so GitHub draws it too.
   conditional paths are the point: the path a real request takes across several
   parts, with its returns, retries and failures. Pick the flows that matter (the main
   path, the one that fails in interesting ways), not every call.
-- A data model is worth drawing when the joins, cardinalities or grain need seeing.
+- A data model is worth drawing when schema relationships, cardinalities or grain
+  need seeing. Query understanding uses the expandable SQL overview above.
 - Several diagrams of one subject go in **one file**, linked from the first (see
   `references/boxes.md`, "Several diagrams in one file"), unless the user asks for
   separate files.
@@ -151,7 +158,7 @@ Card charge with an idempotency key, so a retry never charges twice.
 When a reader needs a path through the map (a security review, a new joiner), add a
 `## Walkthrough: <name>` section to the file (the end of the file is fine). Each stop is a
 `### <Kind>: <name>` heading, in the order written: `Diagram`, `Perspective`, `Deployment`,
-`Scenario`, `Join` or `Sequence`, then the item's name as its heading gives it. The Markdown
+`Scenario` or `Sequence`, then the item's name as its heading gives it. The Markdown
 under the stop says what to notice there. The reader moves through the stops with Previous and
 Next; nothing plays by itself. Only items of this map can be stops, and the checker names any
 it cannot find. When to write one, how to pick and order stops and how to write the notes:

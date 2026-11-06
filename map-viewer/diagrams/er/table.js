@@ -30,7 +30,7 @@ export function tableGeometry(n, rel, font, measure) {
   const type = typeFor(1);
   const titleLines = wrapRuns(n.runs || [[{ text: n.plain || n.id, bold: false, italic: false }]], type, font, MAX_LINE, measure);
   const trustW = (n.icons || []).filter((c) => TRUST.has(c)).length * 22;
-  const title = Math.max(...titleLines.map((l) => l.w), 0) + (n.inners?.length || 0) * 24 + trustW + (trustW && n.note ? 22 : 0);
+  const title = Math.max(...titleLines.map((l) => l.w), 0) + trustW + (trustW && n.note ? 22 : 0);
   const lh = Math.round(type.size * 1.25);
   // a group (subgraph): closed, a box with its name; lines meet it at its middle
   if (!n.attrs) {

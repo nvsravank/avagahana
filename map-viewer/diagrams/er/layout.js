@@ -31,7 +31,6 @@ const GROUP_PAD = 28;    // a group's frame round its tables (and their line cha
 const GROUP_TITLE = 40;  // the frame's title strip
 
 export function layoutTables(root, size, input) {
-  if (root.queryLayout || root.parent?.queryLayout) return layoutQuery(root.parent?.queryLayout ? root.parent : root, size, input);
   // A table drilled into (the viewer's focus) has nothing inside it: it shows itself and
   // the tables its relationships in this view reach, laid out as the diagram is.
   const table = root.attrs && !root.synthetic ? root : null;
@@ -535,25 +534,3 @@ function bounds(at, dims) {
 
 // Query dependencies determine columns. Peer occurrences retain SQL source order;
 // a result table is present even when no join connects it to an input.
-function layoutQuery(root, size, input) {
-  const nodes = root.children, pos = new Map(), columns = new Map();
-  for (const n of nodes) {
-    const rank = n.queryRank || 0;
-    if (!columns.has(rank)) columns.set(rank, []);
-    columns.get(rank).push(n);
-  }
-  const room = connectionSpace(input.relations, input.byId);
-  const gap = Math.max(180, ...[...room.values()].map((s) => s.gap));
-  let x = 0;
-  for (const [, group] of [...columns].sort((a,b) => a[0]-b[0])) {
-    const width = Math.max(...group.map((n) => size(n).w));
-    let y = 0;
-    for (const n of group) {
-      const geo = size(n), h = input.collapsed.has(n.id) ? geo.h : geo.hOpen;
-      pos.set(n, { x:x+width/2, y:y+h/2, w:width, h }); y += h+70;
-    }
-    x += width+gap;
-  }
-  const connections = connectionPaths(input.relations, pos, input.byId, size);
-  return { pos, edges:[], groups:[], connections, labels:connectionLabels(connections,pos,input.byId) };
-}

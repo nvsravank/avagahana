@@ -278,12 +278,16 @@ viewer compares the two by id, in each diagram, view and deployment:
 atlas bar, the website gallery), built from the viewer's model, never from headings.
 Each viewer has its own list. Entries, in file order:
 
+An ER catalogue explicitly hidden by a flowchart Query's `Schema visibility: hidden`
+is omitted from this navigation list; its `part` and table-definition links still
+open it. Expandable query scopes are nodes of their flowchart, not separate contents
+entries.
+
 | `kind` | One per | `state` (what `setState` takes to open it) |
 |---|---|---|
 | `diagram` | box, mind map, state or ER diagram | `{seq: null, part, view: null}` |
 | `sequence` | sequence diagram | `{seq: part or 'main', step: 1}` (plays from step 1) |
 | `view` | relation view of a diagram with more than one, the default first (label "Overview") | `{seq: null, part, view: name or null}` |
-| `join` | Generated SQL join item (number/type within a Query diagram) | as `view` |
 | `deployment` | environment | `{seq: null, part, env}` |
 | `scenario` | scenario of a state or ER diagram | `{seq: anchor, step: 1}` |
 | `walkthrough` | a walkthrough of the file (`## Walkthrough: <name>`), listed first; `stops` is its number of stops, `stopList` each stop's `{kind, label}` in order | `{walkthrough: name, stop: 1}` (opens its first stop) |

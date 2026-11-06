@@ -1,6 +1,6 @@
 // Authored provenance is Markdown outside Mermaid. No Git access or remote fetching.
 import { problem } from './problem.js';
-import { headings } from './options.js';
+import { headings, maskFences } from './options.js';
 export const TRUST = new Set(['verified', 'inferred', 'hypothesis', 'unsourced']);
 const ID = /^[a-z][a-z0-9-]*$/;
 const uncode = (s) => s.trim().replace(/^`(.*)`$/, '$1');
@@ -20,7 +20,7 @@ export function parseSources(text, warnings = []) {
     if (!target || target[key] != null) { fail('Source fields need a repository/revision heading and may occur only once.'); return; }
     target[key] = uncode(value);
   };
-  for (const block of text.matchAll(/^##\s+Sources\s*\n([\s\S]*?)(?=^##\s|$(?![\s\S]))/gmi)) {
+  for (const block of maskFences(text).matchAll(/^##\s+Sources\s*\n([\s\S]*?)(?=^##\s|$(?![\s\S]))/gmi)) {
     for (const line of block[1].split('\n')) {
       if (!line.trim()) continue;
       const h = line.match(/^(###|####)\s+(Repository|Revision):\s*(.*?)\s*$/i);

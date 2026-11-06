@@ -921,7 +921,7 @@ gets stuck, how a query joins its tables. Played over the diagram like a sequenc
   selections are checker errors (`scenario-not-step`), never a first-match fallback.
   Use `## Scenario: <name> | <view name>` to scenario a named model perspective;
   otherwise the default Relations view is used. The viewer skips invalid steps and
-  reports problems. SQL join walkthrough items belong to generated query diagrams.
+  reports problems.
 - The viewer offers each scenario on the play button. Playing greys the diagram and lights
   each step's states or tables and its line in turn (a numbered step, the transition's
   event or the relationship's label), with the step's words in the side panel. A step
@@ -945,7 +945,6 @@ Each stop is a `### <Kind>: <name>` heading, with its note as Markdown underneat
 - `Perspective` a relation view, `## Perspective: <name>`.
 - `Deployment` an environment, `## Deployment: <env>`.
 - `Scenario` a scenario, `## Scenario: <name>`.
-- `Join` a generated numbered SQL join item in a `Query: <name>` diagram.
 - `Sequence` a sequence diagram, by its heading.
 
 ```markdown
@@ -1122,91 +1121,218 @@ printed URLs. Use HTML or the source Markdown to retain the complete evidence.
 
 ## SQL query pictures: `## Query: <name>`
 
-A query section belongs to the preceding ER diagram. It explains SQL without
-executing it or accessing a database. One section holds one fenced `sql` block;
-optional `sql postgres` or `sql sqlserver` labels identify the source syntax. The
-same explanation grammar applies to both. Unsupported structure or unresolved
-references reports `query-syntax`; the viewer keeps the model and other valid
-queries but does not create a partial picture of the failed query.
+A Query section after a **flowchart** expands the overview's existing boxes. One
+fenced SQL block holds the original query; expressions, ON conditions, WHERE
+filters, bind parameters and set operations are not rewritten to fit a diagram.
+The agent authors the overview and schema/mappings; SQL structural parsing and
+generation of internal query scopes remain in the viewer.
+Declare physical tables/columns once in a further ER diagram, referenced by anchor.
+The overview and schema remain valid Mermaid; the expansion metadata is Markdown.
 
 ````markdown
-## Query: Refunds
+# Order report
+
+```mermaid
+flowchart LR
+  source["Sources"]
+  parameters["Parameters"]
+  base["order_base"]
+  report["Report"]
+  source --> base
+  parameters --> base
+  base --> report
+```
+
+## Query: Orders
+
+#### Query options
+- Schema: #definitions
+- Schema visibility: hidden
+- Into: report
+- Sources: source
+- Binds: parameters
+
+#### Scopes
+- order_base: base
 
 ```sql
-WITH orders AS (SELECT id, customer_id FROM ORDER)
-SELECT o.id, c.name AS customer
-FROM orders o
-LEFT JOIN CUSTOMER c ON o.customer_id = c.id
+WITH order_base AS (
+  SELECT o.id, o.amount FROM orders o WHERE o.amount >= :minimum
+)
+SELECT b.id, b.amount FROM order_base b
 ```
 
 #### Physical names
-- sales.orders: ORDER
+- orders: ORDERS
+
+## Definitions
+
+```mermaid
+erDiagram
+  ORDERS {
+    int id PK
+    decimal amount
+    varchar internal_note
+  }
+```
 ````
 
-Table IDs and column names resolve case-insensitively. SQL aliases identify distinct
-occurrences, even when they share a physical table or CTE definition. A qualified
-physical table name needs an explicit mapping under `#### Physical names` (inside
-that query section). Do not guess schema equivalence. A derived FROM table needs
-an alias. Output names must be unique; calculated expressions need output aliases.
-`_map` and `_result` are reserved occurrence IDs.
+`Schema`, `Into` and `Sources` are required. `Binds` is an optional overview node
+holding **individual** parameter inputs. Without it, parameters live with Sources.
+`Schema visibility` is `visible` (default) or `hidden`: hidden definitions are omitted
+from navigation but remain reachable by each occurrence's ER control. Physical-name
+mappings resolve to IDs inside that schema. `Scopes` maps SQL CTE names to overview
+node IDs; a matching CTE/node ID needs no bullet. Unmapped CTEs get overview boxes.
+All references and option names are checked; failed queries publish no partial graph.
+An existing primary ER diagram can also be the shared schema: reference its title
+anchor in Schema and keep it visible. Its ER controls return to that primary
+diagram. Use a separate ER section when the catalogue should be hidden.
 
-The picture is a generated ER diagram named `Query: <name>`. Its anchor is
-`<owning-diagram-anchor>-query-<query-name-slug>`. It is listed in contents and accepts
-existing `part` navigation, links, render/export and walkthrough Diagram stops.
-CTE and FROM-subquery occurrences have an Open diagram control in their header.
-A shared definition can be opened from each occurrence. The query shows only used
-columns initially, including ON/filter/group/order/expression inputs; expand a table
-to inspect its remaining declared columns. The Result lists selected outputs.
+The circle opens/closes a CTE in place; double-click uses existing focus and
+breadcrumbs. The expansion toolbar operates on this same hierarchy within the
+current focus. Each CTE contains its source occurrences, visible SQL operation
+blocks and its named output. Query inputs/output connections use flowchart routing,
+ports and channels, with no crow's-foot encoding or per-join navigation. The original
+overview dependencies remain while boxes are closed; opening them exposes exact
+source/output endpoints. Focusing fits the CTE itself, not its outside neighbours.
+Focused query context uses only table-style boundary cards and individual binds,
+without the authored overview containers or their internal graphs. On entry,
+outside tables and CTE outputs start with columns closed, even if previously
+expanded. Their +/− controls reveal only columns; double-clicking a CTE boundary
+focuses its definition. Incoming context is one column ordered binds, physical
+tables, then CTE outputs in Boxes; Layers transposes it to a row above the focus.
 
-Joins connect table headers, never column rows. Each connection is labelled with
-the join number and type. Every earlier occurrence referenced by ON has a connection
-to the new occurrence; these connections share one join identity. Select any line
-to highlight the entire join and read its complete ON clause. There is no primary
-predicate and no secondary line style. The join applies to the accumulated left
-input, not separately to each displayed dependency. A per-join view, such as
-`4 · LEFT JOIN`, is a single Join walkthrough target; qualify it with Stop options
-`Diagram: Query: <name>` where names repeat.
+Local source occurrences have distinct aliases and query contexts, reference the same ER
+definition, and expose only relevant columns through their circle. Relevant includes
+SELECT, ON/USING, filters, grouping, ordering and expression dependencies. Full schema
+columns remain available in the ER definition. Outside physical-source cards and
+the Sources catalogue expose all columns in that definition; outside CTE cards
+expose all outputs of that CTE. Local Inputs show only fields used by the current
+query, so they are a projection rather than another full source listing. Sources
+expands into occurrences grouped by consuming scope. Each bind is separate; an IN
+collection input is never represented as a CROSS JOIN or a synthetic parameter table.
+Physical source cards and their source groups consistently use the theme's blue
+swatch; bind parameters and their group use its green swatch. These come from
+`appearances.*.icons.blue/green` (including their defaults), with the existing
+contrast selection for header ink. CTE inputs/outputs retain their scope colors.
 
-The main input starts in the first column. Each joined occurrence goes one column
-beyond the rightmost earlier occurrence referenced by ON; peers stack in SQL order.
-A CROSS JOIN or constant condition goes after the rightmost prior input and connects
-to the earlier inputs, since it depends on the accumulated left input. Parenthesized
-join trees are not supported in this grammar; parentheses in FROM introduce a SELECT.
+The Joins section begins with a solid scope-colored `0 · FROM` card naming the
+first source and its alias. Every join then has one visible, numbered SQL block
+containing its actual JOIN and condition. Bind cards use a solid theme-green fill
+through their full height, with no empty body strip. WHERE, GROUP BY, HAVING and
+ORDER BY have their own visible blocks;
+ON and WHERE are never combined. Operations show composition, not an optimizer's
+physical execution order. Output mappings start expanded and show the source
+expression and output name, with a narrow ƒ column identifying calculations. Simple
+column aliases do not get the marker; inherited calculated columns retain it.
+Long calculations show a preview; selecting a row opens
+the exact SQL and source-column links. Unnamed complex expressions are labelled as
+unnamed, rather than pretending the SQL supplied an alias.
 
-Crow's-foot endpoints describe matching cardinality, independently of row
-preservation named by INNER/LEFT/RIGHT/FULL OUTER JOIN. Exact conjunctive equality
-pairs can use PK/UK uniqueness and explicitly mapped model relationships. Unknown
-ends have no marker. Minimum matching counts are conservative: a mandatory model match is
-shown only for an exact mapped equality to a physical input from a nonnullable
-occurrence. Extra conditions and derived/nullable inputs do not imply mandatory
-matches. Counts describe matching inputs before later WHERE/HAVING filters. OR/NOT/CASE predicates do not infer cardinality. An unrelated comparison
-does not invent a model relationship. No fan-out or correctness verdict is claimed.
+Optimizer hints have a separate visible metadata card in their query scope.
+Recognized comment hints are Oracle `/*+ ... */` and `--+ ...` immediately after
+SELECT; misplaced hint-looking comments and ordinary comments are not promoted.
+Explicit SQL Server `WITH (...)` table hints and final `OPTION (...)` query hints
+are also retained, with set-level OPTION kept outside the last UNION input.
+Hints are displayed literally, without claiming the database honored them or
+treating index/hint names as column dependencies. Ordinary comments and commented
+SQL lines are excluded from generated clause/expression displays; quoted strings
+and identifiers retain their literal contents. The original fenced SQL is unchanged.
 
-A calculated column bears `ƒ`. Selecting it opens a note with its exact expression
-and links to input columns. A derived column can open its definition in the inner
-scope. CASE, arithmetic, function calls, aggregates and window expressions stay in
-column notes rather than becoming boxes. Result notes expose WHERE, GROUP BY,
-HAVING, ORDER BY, LIMIT/OFFSET and DISTINCT, with a grouping/row-grain explanation.
-Aggregates without GROUP BY have a single aggregate row; a window expression does
-not itself collapse input rows. Function names/signatures and full scalar expression
-syntax are not validated by this structural reader.
+Inputs are ordered with local binds first, physical tables next, then CTE/derived
+inputs, preserving SQL source order within each group. Boxes input cards share
+one width; Layers input cards share one height. Numbered JOIN blocks retain SQL
+join order. Each parameter crosses into a scope once and fans out locally. Clauses
+are grouped as Joins, Filter (WHERE), and Other clauses (GROUP BY/HAVING/ORDER BY).
+Nested SELECTs are positioned with their consuming clause or result. Display-only
+predicate line breaks retain the original SQL tokens and BETWEEN bounds. JOIN,
+ON and Boolean connectors occupy a separate narrow column; multiword keywords
+such as LEFT JOIN stack vertically. Explicit Boolean parentheses indent their
+contents, without splitting function arguments, CASE expressions or BETWEEN bounds.
 
-Fixed-column SQL Server-style `PIVOT (aggregate FOR column IN (...)) alias` is
-supported with SUM/COUNT/AVG/MIN/MAX. The outer query sees the pivot's exposed
-columns. Its header opens an isolated diagram containing only the pivot input and
-result, with its row keys, pivot column, aggregation and named output columns.
-Other outer-query joins and calculations remain outside. A nested definition may
-be opened from the input. Dynamic pivot columns are not inferred or executed.
+In Boxes, CTE composition and clause sections run LR and Inputs stack TB.
+In Layers, clause sections flow TB. Layers transposes the
+query's LR/TB container directions, including within focused CTEs: Inputs becomes
+an LR band above the clauses/result, with external source/bind context above.
+Query looks are Flat and Zebra, using the existing outline/poster preference values;
+the latter stripes table rows and clause bodies (one stripe per wrapped logical
+line) rather than using icon-poster geometry. Header ink
+consumes the theme's contrast choice. Ordinary flowchart looks remain unchanged.
 
-Supported structure: SELECT/DISTINCT, FROM, nested nonrecursive CTEs (including
-explicit CTE output names), FROM subqueries, aliases, INNER/LEFT/RIGHT/FULL OUTER and
-CROSS JOIN, ON/USING, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT/OFFSET, qualified or
-unambiguous unqualified columns, SELECT wildcards, scalar/aggregate/window
-expressions and fixed PIVOT. Unsupported: recursive CTEs, UNION/EXCEPT/INTERSECT,
-scalar/correlated subqueries, lateral sources, parenthesized join trees, NATURAL
-JOIN, QUALIFY/named WINDOW clauses, dynamic pivots and multiple statements.
-USING needs an unambiguous left occurrence; write ON explicitly otherwise.
-Queries are explanations, not database execution plans or SQL correctness proofs.
+#### What the reader understands
+
+The grammar is structural: expressions stay literal text, and this is not execution
+or a claim to validate a dialect. `map-viewer/test/fixtures/query-cases.json` is the
+contract: viewer and checker are both held to its results.
+
+| Area | Read |
+|---|---|
+| Composition | `WITH` (including `MATERIALIZED`), nested CTEs, FROM subqueries with or without an alias, derived column lists, `UNION`, `INTERSECT`, `EXCEPT`, `MINUS` at any level, parenthesized branches |
+| Joins | `INNER`, `LEFT`, `RIGHT`, `FULL OUTER`, `CROSS`, `NATURAL`, `SEMI`, `ANTI`, comma joins, Oracle `(+)`, `CROSS APPLY`, `OUTER APPLY`, `LATERAL`, `ON`, `USING` |
+| Sources | Tables with schema and `@dblink`, CTEs, table functions, `TABLE(:x)`, `UNNEST`, `VALUES` with a column list, `@table` variables, `dual`, no `FROM` |
+| Clauses | `WHERE`, `START WITH`, `CONNECT BY`, `GROUP BY` (with `ROLLUP`, `CUBE`, `GROUPING SETS`), `HAVING`, `QUALIFY`, `WINDOW`, `ORDER BY`, `LIMIT`, `OFFSET`, `FETCH`, `FOR`, `TOP`, `DISTINCT ON` |
+| Expressions | Scalar, correlated, `EXISTS` and `IN` subqueries; `CASE`; window functions; every operator; any function |
+| Parameters | `:name`, `@name`, `$1`, and `?`, numbered by position |
+| Names | Quoted names in every style, including ones that are keywords; non-ASCII names; `sql sqlserver` also reads `alias = expression` |
+
+Not read yet, and reported as `query-unsupported`: recursive CTEs, parenthesized join
+trees, dynamic or XML PIVOT, UNPIVOT with several value columns, `SELECT INTO`,
+`TABLESAMPLE`, Oracle `SAMPLE`, `PARTITION (...)` on a table, flashback `AS OF`, and
+statements other than SELECT. This is a warning: the map still passes and opens, the
+overview stays, and the SQL as written is on the Into box's note. Keep the SQL as it
+is and explain the query in a note. `query-syntax` is a mistake to fix: a misplaced
+part of the section, unbalanced SQL, or a reference that resolves to nothing.
+
+References are checked against the ER definition and CTE outputs, in the scope SQL
+gives them. An unknown or ambiguous column is an error, and so is an ON clause naming
+a table joined later. Inside a function's arguments an unknown bare word is left alone,
+as it may be a keyword of that function (`DATEADD(day, 1, x)`). Two schema-qualified
+names that would share one ER definition must each be mapped under Physical names. A
+table function has no declared columns: it takes the ones the query names.
+
+Each output card says in words how many rows it leaves. A JOIN block says what it does
+to row counts only where the ER keys prove it: equality on the whole primary key or on
+a unique key. A window function's note says it keeps the row count. The Into box's note
+holds the query exactly as written. Generated node IDs come from where a node sits
+(`enriched--inputs--c-customers`), so they survive changes to the reader. See
+`examples/maps/query-expansion.md` for a complete public example.
+
+#### The section's Markdown
+
+The parts may come in any order. Options use level 4 headings; each is `- name: value`
+bullets, and fenced code inside is skipped. Any other line there is an error. The SQL
+is the one fenced block labelled `sql`, `plsql`, `tsql` or `pgsql` (any case), with
+backticks or tildes, optionally followed by a dialect word such as `oracle`. Prose
+directly under `## Query:` is ignored. `Schema` takes `#<anchor>`. Each query needs its
+own Into box. These rules are shared with the format's other option sections and are
+held in `map-viewer/test/fixtures/query-markdown-cases.json`.
+
+Fixed-column `PIVOT (aggregate FOR column IN (...))` is supported with any aggregate
+call, with `value AS name` values, with several named aggregates (each output is
+`<value>_<aggregate name>`) and with or without an alias. The surrounding query sees a table occurrence
+with the pivot's exposed columns. On PIVOT and UNPIVOT occurrences, the top-left
++/− control shows/hides columns; the independent top-right circle expands/collapses
+the transformation in place, including from an expanded overview. Its internals
+start closed. Double-click that occurrence to focus on an
+isolated pivot view: its input, aggregate/FOR/IN operation and output mappings,
+without outside context. Input columns other than the aggregate dependencies and
+pivot column are the implicit grouping keys. Pivot outputs carry ƒ and exact
+aggregate notes. Nested pivots need a named CTE between them; dynamic columns are
+not inferred or executed. See `examples/maps/query-pivot.md`.
+
+Queries also accept fixed, single-value
+`UNPIVOT [INCLUDE|EXCLUDE NULLS] (value_column FOR name_column IN (source_column, ...))`. The listed
+input columns become one value column and one column-name column; other input
+columns carry through to every generated row. Source columns and exposed output
+names must be unique and resolve unambiguously. NULL-valued source cells produce
+no rows unless INCLUDE NULLS asks for them, while zero values remain. No aggregation is performed and an earlier
+pivot's aggregation is not undone. Double-click the UNPIVOT occurrence for the
+same isolated input/operation/output focus; input definitions, output lineage,
+Boxes/Layers, expansion and export remain available. Multi-value tuples and
+dynamic column lists are not supported. See `examples/maps/query-unpivot.md`.
+
+A Query section after an ER diagram is retired and reports `query-legacy-format`,
+with the steps to migrate it. The ER diagram still opens; no query picture is drawn.
 
 ### ER perspective column selection
 
@@ -1237,8 +1363,8 @@ create its former view. This is an intentional format change, not an automatic
 compatibility translation.
 
 When updating a map, inspect any old Joins section. If it explains a query, replace
-it with `## Query: <name>` and the actual SQL, then update its links and walkthrough
-stops to the generated query/join items. Equality pairs alone do not specify INNER
+it with `## Query: <name>` after a flowchart, with the actual SQL, then update its links
+and walkthrough stops to that flowchart. Equality pairs alone do not specify INNER
 versus LEFT/RIGHT/FULL, selected outputs, filters or grouping: recover these from
 source SQL or confirmed intent. Ask for the missing intent instead of inventing it.
 

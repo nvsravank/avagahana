@@ -13,8 +13,8 @@ Focus when the explanation needs particular subgraphs open. See `boxes.md`.
 Filtering arrows alone does not guarantee a readable picture: inspect the result.
 
 Each stop names one existing destination with `### Diagram: <heading>`,
-`### Perspective: <name>`, `### Deployment: <env>`, `### Scenario: <name>`,
-`### Join: <name>` or `### Sequence: <heading>`. Use the heading's exact name; the first
+`### Perspective: <name>`, `### Deployment: <env>`, `### Scenario: <name>` or
+`### Sequence: <heading>`. Use the heading's exact name; the first
 diagram uses its `# Title`. Start with the boundary, then the relevant behavior and
 data or deployment. Let the explanation determine the number of stops. Walks stay
 inside one map.

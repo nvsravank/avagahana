@@ -45,11 +45,11 @@ function galleryJumps(text) {
 }
 // The same four lists from viewer.contents()
 function fromContents(list) {
-  const viewParts = new Set(list.filter((x) => x.kind === 'view' || x.kind === 'join').map((x) => x.part));
+  const viewParts = new Set(list.filter((x) => x.kind === 'view').map((x) => x.part));
   const named = (x) => (viewParts.size > 1 ? `${x.diagram} · ${x.label}` : x.label);
   return {
     diagrams: list.filter((x) => x.kind === 'diagram' || x.kind === 'sequence').map((x) => ({ label: x.label, seq: x.kind === 'sequence' ? x.state.seq : null })),
-    views: list.filter((x) => x.kind === 'view' || x.kind === 'join').map((x) => ({ label: named(x), view: x.state.view })),
+    views: list.filter((x) => x.kind === 'view').map((x) => ({ label: named(x), view: x.state.view })),
     deployments: list.filter((x) => x.kind === 'deployment').map((x) => ({ label: x.label, env: x.state.env })),
     scenarios: list.filter((x) => x.kind === 'scenario').map((x) => ({ label: x.label, seq: x.state.seq })),
   };
@@ -71,15 +71,14 @@ export async function testContents(check) {
     await v.load(text, `${name}.md`);
     const want = galleryJumps(text);
     // The historical gallery extractor knows authored model items only; generated
-    // SQL items are exercised below and in query.js, not invented by that extractor.
-    const have = fromContents(v.contents().filter(x=>!x.part?.includes('-query-')));
+    const have = fromContents(v.contents());
     for (const k of Object.keys(want)) check(`contents: ${name} ${k} match the gallery's`, JSON.stringify(have[k]) === JSON.stringify(want[k]), `${JSON.stringify(have[k])} vs ${JSON.stringify(want[k])}`);
   }
-  await v.load(await fetch('./fixtures/legacy-shop-walkthrough.txt').then((r) => r.text()), 'shop-layers.md');
+  await v.load(await fetch('./fixtures/shop-walkthrough.txt').then((r) => r.text()), 'shop-layers.md');
   const list = v.contents();
   check('contents: the first diagram is marked first, and only it', list.filter((x) => x.first).length === 1 && list.find((x) => x.kind !== 'walkthrough').first && list.find((x) => x.kind !== 'walkthrough').part === null);
   check('contents: each entry has kind, label, part and state', list.every((x) => typeof x.kind === 'string' && typeof x.label === 'string' && 'part' in x && x.state && typeof x.state === 'object'));
-  check('contents: join views are kind join', list.some((x) => x.kind === 'join' && x.diagram === 'Query: Paid amount per line'), JSON.stringify(list.filter((x) => x.kind === 'join')));
+  check('contents: individual joins are not contents items', !list.some((x) => x.kind === 'join'));
   check('contents: a copy each call', v.contents() !== v.contents() && JSON.stringify(v.contents()) === JSON.stringify(list));
   check('contents: the event fired for each map', got.length === EXAMPLES.length + 1, got.length);
 
@@ -88,15 +87,15 @@ export async function testContents(check) {
   const lifecycle = shop.find((x) => x.kind === 'diagram' && x.label === 'Order lifecycle');
   v.setState(lifecycle.state);
   check('contents: a diagram\'s state opens it', v.state.part === lifecycle.part, JSON.stringify(v.state));
-  const join = shop.find((x) => x.kind === 'join');
-  v.setState(join.state);
-  check('contents: a join view\'s state opens it', v.state.part === join.part && v.state.view === join.state.view, JSON.stringify(v.state));
+  const named = shop.find((x) => x.kind === 'view' && x.state.view);
+  v.setState(named.state);
+  check('contents: a perspective\'s state opens it', v.state.part === named.part && v.state.view === named.state.view, JSON.stringify(v.state));
   const scenario = shop.find((x) => x.kind === 'scenario');
   v.setState(scenario.state);
   check('contents: a scenario\'s state plays it from step 1', v.state.seq === scenario.state.seq && v.state.step === 1, JSON.stringify(v.state));
-  const overview = shop.find((x) => x.kind === 'view' && x.part === join.part && x.state.view === null);
+  const overview = shop.find((x) => x.kind === 'view' && x.part === named.part && x.state.view === null);
   v.setState(overview.state);
-  check('contents: the default view\'s state stops the play and opens it', !v.state.seq && v.state.part === join.part && v.state.view === null, JSON.stringify(v.state));
+  check('contents: the default view\'s state stops the play and opens it', !v.state.seq && v.state.part === named.part && v.state.view === null, JSON.stringify(v.state));
 
   // ---- walkthroughs: listed first; a stop opens its item; the side panel moves with it ----
   const walk = v.contents().find((x) => x.kind === 'walkthrough');
@@ -150,7 +149,7 @@ export async function testContents(check) {
   v.setState({ walkthrough: null });
 
   // ---- live reload: the event only when the list changes ----
-  const shopText = await fetch('./fixtures/legacy-shop-walkthrough.txt').then((r) => r.text());
+  const shopText = await fetch('./fixtures/shop-walkthrough.txt').then((r) => r.text());
   const n = got.length;
   await v.load(shopText, 'shop-layers.md');
   check('contents: a reload with the same list fires no event', got.length === n);

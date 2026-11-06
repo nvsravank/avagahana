@@ -152,25 +152,12 @@ are ambiguous: the checker rejects ambiguous, missing or out-of-view selections.
 
 ## Explain SQL
 
-Use `## Query: <name>` with one fenced `sql` block after the ER model. See
-`docs/map-format.md` for the supported grammar and limitations. This is a query
-picture, not execution or automatic correctness review. Declare the real tables
-and columns first; map schema-qualified physical names with `#### Physical names`
-inside the query section. Keep output aliases unique and name calculated outputs.
-
-The viewer makes alias occurrences, table-level labelled joins, relevant-column
-visibility, CTE/FROM-subquery drill-through, calculated-column notes and isolated
-fixed-pivot explanations. Do not hand-write duplicate diagrams for those. A compound
-ON join may have several lines but remains one numbered join/walkthrough item.
-Use `### Diagram: Query: <name>` and `### Join: 4 · LEFT JOIN`, qualified with
-`#### Stop options` / `- Diagram: Query: <name>` when needed. No automatic playback
-is required. Use a normal scenario when there is no SQL to explain.
-
-For a manual ER perspective, `#### Perspective options` / `- Columns: TABLE.column,
-OTHER.column` limits initially visible fields, including on small tables. Omitted
-fields remain expandable. Never hide a query's join/filter/grouping inputs merely
-because they are absent from SELECT. Unsupported query structure must be rewritten
-into supported scopes or explained in prose, not presented as fully understood.
+Use an expandable flowchart Query with this ER model as its shared definition
+catalogue. Read [SQL queries](sql-queries.md) before authoring or migrating a query
+map. Preserve the original SQL; never rewrite unsupported constructs or omit
+predicates to make a diagram render. ER-attached queries remain a compatibility
+format, not the preferred query explanation. Manual ER column perspectives remain
+available independently through Perspective options / Columns.
 
 ### Updating maps with retired Joins sections
 

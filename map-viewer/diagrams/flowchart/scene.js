@@ -12,6 +12,8 @@ import { TRUST } from '../../model/provenance.js';
 import { nodeShaper, nodeName, typeFor, planClass, passesFilter } from '../../geometry.js';
 import { strokeStyle } from '../../model/classes.js';
 import { labelLines, SIGN_W } from '../../connection-labels.js';
+import { queryScene, queryTone } from '../../query/cards.js';
+import { queryRelations } from '../../query/visibility.js';
 
 const TITLE_X = 12;
 const TITLE_Y = 18;
@@ -24,11 +26,13 @@ const titleLines = (lines) => (lines.length > 1 ? { lines: lines.map((l) => l.ru
 // input: as the mind map's (diagrams/mindmap/scene.js), layout.pos holding frame: true
 // for open boxes
 export function buildScene(input) {
+  input = { ...input, relations: queryRelations(input) };
   const { layout: L, root } = input;
   const shaper = nodeShaper({ ...input, fixedGeometry: true, relCount: () => 0 });   // arrows are always on: no related-links dot
   const frames = [];
   const nodes = [];
   for (const [n, p] of L.pos) {
+    if (n.queryCard) { (p.frame ? frames : nodes).push(queryScene(n, p, input)); continue; }
     if (p.frame) {
       const rel = input.relDepth(n);
       const type = typeFor(Math.max(1, rel));
@@ -43,7 +47,7 @@ export function buildScene(input) {
         const main = n.main ? iconOf(n.main, POSTER_CORNER, 0, 0, true) : null;
         frames.push({
           kind: 'frame', id: n.id, x: p.x, y: p.y, w: p.w, h: p.h,
-          cls: `mmv-frame is-poster ${shaper.tone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
+          cls: `mmv-frame is-poster ${shaper.tone(n)}${queryTone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
           ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
           ...(main?.src && input.tintOf?.(main.src) ? { tint: input.tintOf(main.src) } : {}),
           name: `${nodeName(n, rel, false)}, a box`,
@@ -68,7 +72,7 @@ export function buildScene(input) {
       const main = n.main ? iconOf(n.main, 22, right - 22, 4) : null;
       frames.push({
         kind: 'frame', id: n.id, x: p.x, y: p.y, w: p.w, h: p.h,
-        cls: `mmv-frame ${shaper.tone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
+        cls: `mmv-frame ${shaper.tone(n)}${queryTone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
         ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
         name: `${nodeName(n, rel, false)}, a box`,
         title: { text: n.plain, ...titleLines(input.geom(n).lines), x: titleX, y: TITLE_Y, size: Math.min(type.size, 15), weight: 600 },
@@ -78,16 +82,17 @@ export function buildScene(input) {
         ...(n.plan ? { plan: n.plan } : {}),
         note: n.note ? { x: p.w - 30 - trustW, y: 6, size: 16 } : null,
         // a frame round a drilled-in box's neighbour: faded, no dot (drill out to open)
-        dot: n !== root && !L.context?.has(n) ? { x: p.w - 1, y: 1, closed: false, count: null } : null,
+        dot: n !== root && !L.context?.has(n) && n.parent?.queryTransform !== n.id ? { x: p.w - 1, y: 1, closed: false, count: null } : null,
       });
       continue;
     }
     const s = shaper.node(n, p);
+    s.cls += queryTone(n);
     // a neighbour round a drilled-in box (layout.context): faded, no dot (drill out to open)
     if (L.context?.has(n)) { s.cls += ' is-context'; nodes.push(s); continue; }
     if (!s.bar && n.container && n.children.length) {
       const closed = input.collapsed.has(n.id);
-      s.dot = { x: p.w - 1, y: 1, closed, count: closed ? input.countDesc(n) : null };
+      s.dot = { x: p.w - 1, y: 1, closed, count: closed ? n.queryScope ? n.children.length : input.countDesc(n) : null };
     }
     nodes.push(s);
   }

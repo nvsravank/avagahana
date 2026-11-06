@@ -227,6 +227,8 @@ function themeCss(t) {
       ...app.roles,
       'plan-added': app.plan.added, 'plan-changed': app.plan.changed, 'plan-removed': app.plan.removed,
       ...Object.fromEntries(SWATCHES.map((k) => [`icon-${k}`, app.icons[k]])),
+      'query-source': app.icons.blue, 'query-source-ink': betterInk(app.icons.blue, app),
+      'query-bind': app.icons.green, 'query-bind-ink': betterInk(app.icons.green, app),
     };
     app.category.forEach((c, i) => { v[`cat-${i + 1}`] = c.fill; v[`cat-${i + 1}-ink`] = c.ink; });
     app.level.forEach((c, i) => { v[`lvl-${i + 1}`] = c.fill; v[`lvl-${i + 1}-ink`] = c.ink; });
@@ -279,6 +281,7 @@ function themeCss(t) {
       const c = Math.min(l + 1, nl);
       out.push(`${at}[data-colour-by="level"] .mmv-l${l}{--n:var(--mmv-lvl-${c});--n-ink:var(--mmv-lvl-${c}-ink)}`);
     }
+    for (const role of ['source', 'bind']) out.push(`${at}[data-diagram="flowchart"] .mmv-query-${role}{--n:var(--mmv-query-${role});--n-ink:var(--mmv-query-${role}-ink)}`);
   }
   const fallback = `var(--mmv-font-fallback, ${FALLBACK_FONT})`;
   const family = t.font ? `"${familyName(t.id)}", ${fallback}` : fallback;

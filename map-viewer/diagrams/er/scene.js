@@ -33,7 +33,7 @@ export function buildScene(input) {
     const rows = [];
     let y = geo.head;
     for (const r of open ? order : order.slice(0, geo.shownCount)) {
-      rows.push({ y, h: r.h, size: r.size, weight: r.weight, name: r.a.name, type: r.a.type, ...(r.a.expression ? {calculated:true} : {}), ...(r.a.note ? {columnNote:true} : {}), mark: r.a.keys.has('PK') ? 'pk' : r.a.grain ? 'grain' : null, fk: r.a.keys.has('FK'), bar: far(r.size), ...(r.a.plan ? { plan: r.a.plan, planWhat: r.a.planWhat } : {}) });
+      rows.push({ y, h: r.h, size: r.size, weight: r.weight, name: r.a.name, type: r.a.type, mark: r.a.keys.has('PK') ? 'pk' : r.a.grain ? 'grain' : null, fk: r.a.keys.has('FK'), bar: far(r.size), ...(r.a.plan ? { plan: r.a.plan, planWhat: r.a.planWhat } : {}) });
       y += r.h;
     }
     const s = {
@@ -47,7 +47,7 @@ export function buildScene(input) {
       title: { text: n.plain, size: geo.type.size, weight: geo.type.weight, bar: far(geo.type.size),
         ...(geo.titleLines.length > 1 || geo.titleLines.some((l) => l.runs.some((r) => r.bold || r.italic)) ? { lines: geo.titleLines.map((l) => l.runs), lh: geo.lh } : {}) },
       ...(geo.head !== HEAD ? { head: geo.head } : {}), ...(geo.signW ? { signW: geo.signW } : {}),
-      rows, ...(n.inners?.length ? {inners:n.inners} : {}),
+      rows,
       more: geo.hidden ? { y, h: p.h - y, open, text: open ? 'Fewer columns' : `+ ${geo.hidden} column${geo.hidden > 1 ? 's' : ''}`, bar: far(12),
         // closed: the compared columns behind it lend it their sign, as a lifted line
         // carries the marks of the lines it stands for (one kind, else changed)
@@ -104,8 +104,7 @@ export function relationShapes(input) {
   const r2 = (v) => Math.round(v * 100) / 100;
   for (const [key, { r, pair, points }] of paths) {
     const d = points.map((pt, i) => `${i ? 'L' : 'M'}${r2(pt[0])},${r2(pt[1])}`).join(' ');
-    const activeJoin = input.root?.queryJoin;
-    const lit = activeJoin ? r.queryJoin === activeJoin : input.selected === r.from || input.selected === r.to;
+    const lit = input.selected === r.from || input.selected === r.to;
     const dim = input.iconFilter?.size > 0 && !passesFilter(r, input.iconFilter);
     // Use layout-owned label positions, with the same baseline as flowcharts.
     const a = points[Math.floor((points.length - 1) / 2)], b = points[Math.ceil((points.length - 1) / 2)];
@@ -122,7 +121,7 @@ export function relationShapes(input) {
     out.push({
       // a second line with the same ends gets an id of its own
       kind: 'rel', id: key, d,
-      cls: `mmv-flow mmv-er-line${r.line === 'dotted' ? ' is-dotted' : ''}${lit ? ' is-lit' : ''}${activeJoin && !lit ? ' is-dim' : ''} ${planClass(r.plan)}${dim ? ' is-dim' : ''}`,
+      cls: `mmv-flow mmv-er-line${r.line === 'dotted' ? ' is-dotted' : ''}${lit ? ' is-lit' : ''} ${planClass(r.plan)}${dim ? ' is-dim' : ''}`,
       ...(r.plan ? { plan: r.plan } : {}), ...(r.stroke ? { style: strokeStyle(r.stroke) } : {}),
       head: r.head, tail: r.tail,
       hint: cardinalityWords(r, input.byId),

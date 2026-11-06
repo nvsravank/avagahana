@@ -5,6 +5,8 @@
 import { parseFlowchart } from './parse.js';
 import { layoutBoxes } from './layout.js';
 import { buildScene, relationShapes } from './scene.js';
+import { queryGeometry, paintQueryCard, queryDefaults } from '../../query/cards.js';
+import { queryRelations } from '../../query/visibility.js';
 
 export const type = 'flowchart';
 export const label = 'Flowchart';
@@ -31,12 +33,20 @@ export const stableColours = true;
 // Looks (WO-38): Outline draws as the box diagrams' one style (data-look fade); Poster
 // draws each node as its main icon with the name under it, the rest on hover
 export const looks = [['outline', 'Outline', 'fade'], ['poster', 'Poster', 'poster']];
+export const queryLooks = [['outline', 'Flat', 'fade'], ['poster', 'Zebra', 'fade']];
 export const defaultLook = 'outline';
 
 export const branchOrder = (kids) => kids;
-export const defaultCollapsed = () => new Set();
+export const defaultCollapsed = queryDefaults;
+export const nodeGeometry = queryGeometry;
+export const paintNode = paintQueryCard;
 // switching view lays the diagram out again (the view's arrows place the boxes)
 export const layoutByView = true;
 
-export const layout = (mode, root, kids, size, input) => layoutBoxes(root, kids, size, { ...input, layers: mode === 'layers' });
+export const layout = (mode, root, kids, size, input) => root.queryCard && !(root.queryTransform && !input.collapsed.has(root.queryTransform)) ? {
+  pos: new Map([[root, { x: 0, y: 0, w: size(root).w, h: input.collapsed.has(root.id) ? size(root).h : size(root).hOpen }]]), edges: [], routes: new Map(),
+} : layoutBoxes(root, kids, n => {
+  const g = size(n);
+  return n.queryCard ? { ...g, h: input.collapsed.has(n.id) ? g.h : g.hOpen } : g;
+}, { ...input, root, relations: queryRelations({ ...input, root }), layers: mode === 'layers' });
 export { buildScene, relationShapes };

@@ -21,8 +21,6 @@ const WORDS = { 'zero-one': 'zero or one', one: 'exactly one', 'zero-many': 'zer
 // A relationship both ways, in words: "Each Customer places zero or more Order.
 // Each Order goes with exactly one Customer."
 export function cardinalityWords(r, byId) {
-  if (r.queryJoin) return `${r.label}. Matching cardinality: ${r.fromCard ? WORDS[r.fromCard] : 'unknown'} on ${r.from}; ${r.toCard ? WORDS[r.toCard] : 'unknown'} on ${r.to}. See the complete ON condition; all connections with this join number belong together.`;
-  if (r.transform === 'pivot') return 'The pivot reshapes its input into the displayed result columns.';
   const a = byId[r.from]?.plain || r.from;
   const b = byId[r.to]?.plain || r.to;
   return `Each ${a} ${r.label || 'has'} ${WORDS[r.toCard]} ${b}. Each ${b} goes with ${WORDS[r.fromCard]} ${a}.`;

@@ -9,7 +9,7 @@
 // what it hides) for the sparkles since the reader looked, drawn after its words
 // (paint.js): clear of the key marks and of the lines at the table's sides.
 // h: {svgEl, href(ph)}
-import { PLAN_GLYPH, PLAN_WORD, UI } from '../../chrome.js';
+import { PLAN_GLYPH, PLAN_WORD } from '../../chrome.js';
 
 const PAD_X = 10;
 const SIGN_K = 0.7;   // a row's sign: the node's ringed sign, smaller
@@ -46,9 +46,7 @@ export function paintTable(g, s, h) {
       return;
     }
     const cy = r.y + r.h / 2;
-    if (r.calculated) {
-      svgEl('text', {class:'mmv-label',x:PAD_X,y:cy+4,'font-size':14},g).textContent = 'ƒ';
-    } else if (r.mark === 'pk') {
+    if (r.mark === 'pk') {
       const ig = svgEl('g', { class: 'mmv-key', transform: `translate(${PAD_X - 2},${cy - 8})` }, g);
       svgEl('use', { href: h.href('ph key'), width: 16, height: 16 }, ig);
       svgEl('title', {}, ig).textContent = 'Primary key';
@@ -65,10 +63,6 @@ export function paintTable(g, s, h) {
     svgEl('text', { class: 'mmv-label mmv-table-col', 'data-col': r.name, x, y: cy + r.size * 0.35, 'font-size': r.size, 'font-weight': r.weight }, g).textContent = r.name;
     svgEl('text', { class: 'mmv-table-type', 'data-col': r.name, x: s.w - PAD_X - (s.signW || 0), y: cy + 4, 'text-anchor': 'end', 'font-size': 11 }, g).textContent = r.type;
     svgEl('g', { class: 'mmv-row-at', 'data-col': r.name, transform: `translate(0,${cy})` }, g);
-    if (r.columnNote) {
-      const hit = svgEl('g', {'data-query-column':r.name,'data-query-table':s.id,role:'button',tabindex:0,'aria-label':`Explain column ${r.name}`},g);
-      svgEl('rect',{class:'mmv-hit',x:0,y:r.y,width:s.w,height:r.h},hit);
-    }
     if (r.plan) rowSign(g, svgEl, r.plan, signX, cy, r.planWhat);
   });
   if (s.more) {
@@ -78,13 +72,6 @@ export function paintTable(g, s, h) {
     else svgEl('text', { x: PAD_X, y: s.more.y + s.more.h / 2 + 4, 'font-size': 11 }, mg).textContent = s.more.text;
     if (!s.more.bar && !s.more.open) svgEl('g', { class: 'mmv-row-at', 'data-cols': s.more.hiddenCols.join(' '), transform: `translate(0,${s.more.y + s.more.h / 2})` }, g);
     if (s.more.plan && !s.more.bar) rowSign(g, svgEl, s.more.plan, signX, s.more.y + s.more.h / 2, [`${s.more.planCols.join(', ')} (hidden)`]);
-  }
-  for (const [i, inner] of (s.inners || []).entries()) {
-    const x = s.w - 22 - i * 24 - (s.note ? 24 : 0);
-    const ig = svgEl('g',{class:'mmv-inner-ic','data-inner':s.id,'data-anchor':inner.anchor,role:'button',tabindex:0,'aria-label':`Open ${inner.title}`,transform:`translate(${x},7)`},g);
-    svgEl('rect',{class:'mmv-hit',x:-4,y:-4,width:24,height:24},ig);
-    svgEl('g',{transform:'scale(0.6667)'},ig).innerHTML = UI.tables;
-    svgEl('title',{},ig).textContent = `Open ${inner.title}`;
   }
   if (s.caption) {
     const cg = svgEl('g', { class: 'mmv-table-caption' }, g);

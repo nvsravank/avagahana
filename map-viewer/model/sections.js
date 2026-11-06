@@ -50,18 +50,18 @@ export function splitSections(after) {
 // Each note is keyed by its node's id: ### <a id="n12"></a>Label, or by an arrow's id
 // (`a e1@--> b`): the note goes on every relation with that id, in any view.
 export function attachNotes(text, byId, warnings, relations = []) {
-  const parts = text.split(/^###\s+/m).slice(1);
+  const hs = headings(text).filter((h) => h.level === 3);
+  const parts = hs.map((h, i) => ({ head: h.title.trim(), noteBody: text.slice(h.end, hs[i + 1]?.start ?? text.length).trim() }));
   for (const part of parts) {
-    const nl = part.indexOf('\n');
-    let head = (nl < 0 ? part : part.slice(0, nl)).trim();
-    const noteBody = (nl < 0 ? '' : part.slice(nl + 1)).trim();
+    let { head } = part;
+    const { noteBody } = part;
     let anchor = null;
     const a = head.match(/<a\s+id="([^"]+)"\s*><\/a>/i);
     if (a) {
       anchor = a[1];
       head = head.replace(a[0], '').trim();
     }
-    const target = anchor && byId[anchor];
+    const target = anchor && Object.hasOwn(byId, anchor) ? byId[anchor] : null;
     const rels = target || !anchor ? [] : relations.filter((r) => r.eid === anchor);
     if (!target && !rels.length) {
       warnings.push(anchor ? problem('note-unknown-id', `Note "${head}" names node or arrow ${anchor}, which does not exist.`) : problem('note-no-anchor', `Note "${head}" has no node id anchor.`));

@@ -70,11 +70,12 @@ const SIDES = {
 
 export function layoutBoxes(root, kids, size, input) {
   const shown = shownBy(root, input);
+  const inline = n => n.queryTransform && !input.collapsed?.has(n.queryTransform);
   // a neighbour opens only on the way to the ends its arrows reach (path)
   const isContext = (n) => neighbours.includes(n) || path.has(n);
   const open = (n) => n === around || (isContext(n) ? n.children.some((c) => path.has(c))
-    : n.container && shown.kidsOf(n).length > 0 && kids(n).length > 0);
-  const childrenOf = (n) => (n === around ? around.children : !open(n) ? [] : isContext(n) ? n.children.filter((c) => path.has(c)) : kids(n).filter((c) => shown.has(c)));
+    : n.queryCard ? inline(n) : n.container && shown.kidsOf(n).length > 0 && kids(n).length > 0);
+  const childrenOf = (n) => (n === around ? around.children : !open(n) ? [] : isContext(n) ? n.children.filter((c) => path.has(c)) : n.queryTransform ? [input.byId[n.queryTransform]] : kids(n).filter((c) => shown.has(c)));
   const isMap = root.id === '_map';
   // Drilled into a box: the outside ends of the view's arrows into it are drawn round
   // it, faded, as they are (a C3 diagram's neighbours): each inside its outer boxes, up
@@ -83,9 +84,10 @@ export function layoutBoxes(root, kids, size, input) {
   // (around), laid out along the drilled box's parent's line; their arrows cross its
   // border. Arrows between two outside things are not drawn.
   const neighbours = [];
+  const incoming = new Set();
   const path = new Set();   // inside the neighbours: the ends, and the boxes on the way
   const inRoot = (n) => { for (; n; n = n.parent) if (n === root) return true; return false; };
-  if (!isMap) {
+  if (!isMap && !root.queryPivot && !root.queryUnpivot) {
     const holds = new Set();
     for (let n = root.parent; n; n = n.parent) holds.add(n);
     for (const r of input.relations) {
@@ -96,9 +98,10 @@ export function layoutBoxes(root, kids, size, input) {
       const end = inRoot(a) ? z : a;
       if (holds.has(end)) continue;   // an arrow to a box round the drilled one
       let o = end;
-      while (o.parent && !holds.has(o.parent)) o = o.parent;
+      if (!input.queryFlow || !end.queryCard && !end.queryBind) while (o.parent && !holds.has(o.parent)) o = o.parent;
       if (!neighbours.includes(o)) neighbours.push(o);
-      for (let n = end; n !== o; n = n.parent) path.add(n);
+      if (!inRoot(a)) incoming.add(o);
+      if (!input.queryFlow) for (let n = end; n !== o; n = n.parent) path.add(n);
     }
   }
   const around = neighbours.length ? { id: '_around', children: [root, ...neighbours], parent: null, container: true, synthetic: true } : null;
@@ -111,15 +114,19 @@ export function layoutBoxes(root, kids, size, input) {
   // Layers (input.layers, the map's top only): the top level stacks top to bottom as
   // bands, ranked by their arrows (bands with none between them share a row), every row
   // as wide as the widest; each band runs left to right, and inside it turns as usual.
-  const layers = !!input.layers && root.id === '_map';
-  const dirOf = (n) => (n === around ? (root.parent ? dirOf(root.parent) : input.direction || 'TB') : layers && !n.parent ? 'TB' : layers && !n.parent.parent ? n.dir || 'LR'
+  const queryLayers = !!input.layers && !!input.queryFlow;
+  const layers = !!input.layers && (root.id === '_map' || root.queryScope || queryLayers);
+  const layerBand = b => (layers && b === top) || (input.layers && b.queryScope);
+  const boxDir = n => n === around ? (root.parent ? boxDir(root.parent) : input.direction || 'TB')
+    : n.dir || (!n.parent ? input.direction || 'TB' : !n.parent.parent ? 'LR' : TURN[boxDir(n.parent)]);
+  const dirOf = (n) => (input.queryFlow && n === around ? queryLayers ? 'TB' : 'LR' : queryLayers ? TURN[boxDir(n)] : n === around ? (root.parent ? dirOf(root.parent) : input.direction || 'TB') : layers && !n.parent ? 'TB' : layers && !n.parent.parent ? n.dir || 'LR'
     : n.dir || (!n.parent ? input.direction || 'TB' : !n.parent.parent ? 'LR' : TURN[dirOf(n.parent)]));
   // the room a box's title takes along its top (open, its main icon sits at the right,
   // or in Poster at the left)
   // A title is drawn semibold (scene.js); a box below the first level is measured as a
   // regular label, so its widest line gets the difference (about 8%).
   const titleZone = (b) => size(b).w + (size(b).type?.weight < 600 ? Math.ceil((size(b).textW || 0) * 0.08) : 0) + (b.main ? 26 + 4 : 0);
-  const titleH = (b) => TITLE + (b.synthetic || !b.runs ? 0 : Math.max(0, (size(b).lines?.length || 1) - 1) * TITLE_LINE);
+  const titleH = (b) => b.queryTransform ? (input.collapsed?.has(b.id) ? size(b).head : size(b).hOpen) : TITLE + (b.synthetic || !b.runs ? 0 : Math.max(0, (size(b).lines?.length || 1) - 1) * TITLE_LINE);
 
   // ---- what is drawn, and the arrows between drawn things (one per pair of ends) ----
   const placed = new Set(isMap ? [] : [root, ...neighbours]);
@@ -183,10 +190,20 @@ export function layoutBoxes(root, kids, size, input) {
       edges.push([a, z]);
     }
     const linked = items.filter((c) => edges.some(([a, z]) => a === c || z === c));
-    const loose = items.filter((c) => !linked.includes(c));
+    const queryContext = input.queryFlow && b === around;
+    const loose = b.queryInputs || queryContext ? [] : items.filter((c) => !linked.includes(c));
     const ranks = rankOf(linked, edges);
     const byRank = [];
-    for (const c of linked) (byRank[ranks.get(c)] ||= []).push(c);
+    const priority = n => n.queryBind ? 0 : n.schemaRef ? 1 : 2;
+    if (queryContext) {
+      const before = items.filter(n => n !== root && incoming.has(n)).sort((a, z) => priority(a) - priority(z));
+      const after = items.filter(n => n !== root && !incoming.has(n));
+      if (before.length) byRank.push(before);
+      byRank.push([root]);
+      if (after.length) byRank.push(after);
+    } else if (b.queryInputs) {
+      for (const c of [...items].sort((a, z) => priority(a) - priority(z) || a.queryInputOrder - z.queryInputOrder)) byRank.push([c]);
+    } else for (const c of linked) (byRank[ranks.get(c)] ||= []).push(c);
     // children with no arrows between them line up across the way their box's own
     // arrows travel (its parent's flow), so each has a clear side towards them: when
     // the box runs the parent's way, they share a rank (LOOSE_RUN to a rank); when it
@@ -201,7 +218,7 @@ export function layoutBoxes(root, kids, size, input) {
       const run = Math.min(loose.length, LOOSE_RUN);
       for (let r = 0; r < run; r++) looseRanks.push(loose.filter((c, i) => i % run === r));
     }
-    info.set(b, { dir: dirOf(b), items, edges, byRank: byRank.filter(Boolean), looseRanks, legs: [] });
+    info.set(b, { dir: dirOf(b), items, edges, byRank: byRank.filter(Boolean), looseRanks, legs: [], fixedOrder: queryContext });
     for (const c of items) if (open(c)) prepare(c);
   }
   prepare(top);
@@ -267,7 +284,7 @@ export function layoutBoxes(root, kids, size, input) {
       }
       if (prev && leg.to.c) edges.push(leg.sgn > 0 ? [prev, leg.to.c] : [leg.to.c, prev]);
     }
-    order(byRank, edges);
+    if (!I.fixedOrder) order(byRank, edges);
     // children with a leg across the flow go to that end of their rank
     const pull = new Map();
     for (const leg of legs) {
@@ -276,7 +293,7 @@ export function layoutBoxes(root, kids, size, input) {
       const side = leg.out ? leg.to.border : leg.from.border;
       pull.set(c, (pull.get(c) || 0) + (side === S.low ? -1 : 1));
     }
-    if (pull.size) for (const rank of byRank) rank.sort((p, q) => Math.sign(pull.get(p) || 0) - Math.sign(pull.get(q) || 0));
+    if (pull.size && !I.fixedOrder) for (const rank of byRank) rank.sort((p, q) => Math.sign(pull.get(p) || 0) - Math.sign(pull.get(q) || 0));
     for (const leg of legs) {
       if (leg.kind !== 'cross') continue;
       const inner = leg.out ? leg.from : leg.to;
@@ -326,7 +343,7 @@ export function layoutBoxes(root, kids, size, input) {
     const need = (n, spread) => (n ? 2 * PORT_MARGIN + (n - 1) * (spread || SPREAD) : 0);
     const needOn = (p, a, b) => Math.max(need(p[a] || 0, p[`${a}text`]), need(p[b] || 0, p[`${b}text`]));
     // (Poster, WO-38: every node keeps its own size, as figures do)
-    const plain = (c) => !input.poster && !c.figure && !OWN_SHAPE.has(c.shape);
+    const plain = (c) => !input.poster && !c.queryCard && !c.figure && !OWN_SHAPE.has(c.shape);
     let common = 0;
     for (const c of placed) {
       if (info.has(c) || !plain(c)) continue;
@@ -354,7 +371,12 @@ export function layoutBoxes(root, kids, size, input) {
     const cross = (s) => (across ? s.h : s.w);
     const sizes = new Map();
     for (const c of I.items) sizes.set(c, info.has(c) ? lay(c) : leafSize.get(c) || size(c));
-    if (layers && b === top) {
+    if (b.queryInputs) {
+      const dim = across ? 'h' : 'w';
+      const extent = Math.max(0, ...I.items.map(c => sizes.get(c)[dim]));
+      for (const c of I.items) sizes.set(c, info.has(c) ? lay(c, across ? 0 : extent, across ? extent : 0) : { ...sizes.get(c), [dim]: extent });
+    }
+    if (layerBand(b)) {
       // every row of bands as wide as the widest row; a row's bands share the extra
       const real = (rank) => rank.filter((c) => !c.dummy);
       const span = (rank) => real(rank).reduce((t, c) => t + sizes.get(c).w, 0) + GAP * (real(rank).length - 1);
@@ -390,7 +412,7 @@ export function layoutBoxes(root, kids, size, input) {
     let crossMax = 0;
     const spans = ranks.map((rank) => rank.reduce((s, c) => s + cross(sizeOf(c)), 0) + GAP * (rank.length - 1));
     crossMax = Math.max(0, ...spans);
-    if (layers && b === top) {
+    if (layerBand(b)) {
       // layers: every row of bands on one line, the lanes of passing arrows beside the
       // row (those ordered in its first half to its left, the rest to its right)
       const side = (rank) => {

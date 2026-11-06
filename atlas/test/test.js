@@ -279,7 +279,6 @@ try {
     { kind: 'view', label: 'Data flow', part: null, diagram: 'Shop', state: { seq: null, part: null, view: 'Data flow' } },
     { kind: 'deployment', label: 'Production', part: null, diagram: 'Shop', state: { seq: null, part: null, env: 'Production' } },
     { kind: 'diagram', label: 'Orders', part: 'orders', state: { seq: null, part: 'orders', view: null } },
-    { kind: 'join', label: 'Lines', part: 'orders', diagram: 'Orders', state: { seq: null, part: 'orders', view: 'Lines' } },
     { kind: 'scenario', label: 'Pay then ship', part: 'orders', diagram: 'Orders', state: { seq: 'orders-scenario-pay-then-ship', step: 1 } },
     { kind: 'sequence', label: 'Checkout', part: 'checkout', unlinked: true, state: { seq: 'checkout', step: 1 } },
     { kind: 'walkthrough', label: 'Security', part: null, stops: 2, stopList: [{ kind: 'diagram', label: 'Shop' }, { kind: 'view', label: 'Data flow' }], state: { walkthrough: 'Security', stop: 1 } },
@@ -299,7 +298,7 @@ try {
   bar.setState({ part: null, view: null });
   check('bar: the diagram shown is marked', current() === 'Overview', current());
   bar.setState({ part: 'orders', view: 'Lines' });
-  check('bar: a join of a further diagram marks that diagram', current() === 'Orders', current());
+  check('bar: a view of a further diagram marks that diagram', current() === 'Orders', current());
   bar.setState({ part: null, seq: 'orders-scenario-pay-then-ship', step: 3 });
   check('bar: a scenario playing marks its diagram', current() === 'Orders', current());
   bar.setState({ part: null, view: 'Data flow', walkthrough: 'Security', stop: 2 });
@@ -317,7 +316,7 @@ try {
   check('bar: a stop opens the walkthrough there', show(picks.at(-1)) === show({ walkthrough: 'Security', stop: 1 }), show(picks.at(-1)));
   const n = picks.length;
   tap(item('Orders'));
-  check('bar: a tap opens the popup and goes nowhere; the diagram itself is its first perspective', !pop.hidden && picks.length === n && show(col('atlas-grp-label')) === show(['Perspectives', 'Joins', 'Scenarios']) && show(col('atlas-entry')) === show(['Overview']), show([col('atlas-grp-label'), col('atlas-entry')]));
+  check('bar: a tap opens perspectives/scenarios without individual join navigation', !pop.hidden && picks.length === n && show(col('atlas-grp-label')) === show(['Perspectives', 'Scenarios']) && show(col('atlas-entry')) === show(['Overview']), show([col('atlas-grp-label'), col('atlas-entry')]));
   barEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   check('bar: Escape closes it', pop.hidden);
   // Exercise both input capabilities explicitly. Headless Windows/Linux can

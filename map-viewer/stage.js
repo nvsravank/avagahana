@@ -53,6 +53,14 @@ export function createStage(v, handlers) {
     if (!S.layout) return;
     let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
     for (const [n, p] of S.layout.pos) {
+      // A focused query fits its own content. Faded outside dependencies still
+      // exist around it, but must not shrink its SQL to make every neighbour fit.
+      const focus = v.viewRoot();
+      if (S.map.queryFlow && focus.queryScope) {
+        let ancestor = n;
+        while (ancestor && ancestor !== focus) ancestor = ancestor.parent;
+        if (!ancestor) continue;
+      }
       if (levelsOnly && v.relDepth(n) > 2) continue;
       x0 = Math.min(x0, p.x - p.w / 2); x1 = Math.max(x1, p.x + p.w / 2);
       y0 = Math.min(y0, p.y - p.h / 2); y1 = Math.max(y1, p.y + p.h / 2);

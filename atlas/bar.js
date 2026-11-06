@@ -2,7 +2,7 @@
 // only, never a control), then a scroller with the word mark and one plain item per
 // place to go (viewer.contents()): Walks (the map's walkthroughs) when it has any, then
 // each diagram, the first called "Overview". An item with more under it opens a popup of
-// two columns: its groups (a diagram's Perspectives, Joins, Deployments and Scenarios; for
+// two columns: its groups (a diagram's Perspectives, Deployments and Scenarios; for
 // Walks, the walkthroughs) and the entries of the group picked (for a walkthrough, its
 // stops in order). The popup opens on hover with a mouse, on a tap, and with Enter or
 // Space; Escape, a pick or a tap elsewhere closes it. When the viewer's toolbar is
@@ -13,7 +13,6 @@ import { applyTheme, changeMarkSvg } from '../map-viewer/index.js';
 // a diagram's groups in its popup, and the contents kinds in each
 const GROUPS = [
   ['Perspectives', ['view']],
-  ['Joins', ['join']],
   ['Deployments', ['deployment']],
   ['Scenarios', ['scenario']],
 ];

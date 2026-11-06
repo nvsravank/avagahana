@@ -114,21 +114,9 @@ erDiagram
 - PRODUCT_TAG.product_key tag-product@}o--|| PRODUCT.product_key : tagged by
 - PRODUCT_TAG.tag_key tag-tag@}o--|| TAG.tag_key : tags
 
-## Query: Sales against stock
-
-This query intentionally compares each order line with stock rows for the same
-product and day. Different warehouses remain separate result rows; this is not a
-model foreign-key relationship between the fact tables.
-
-```sql
-SELECT l.order_line_key, l.date_key, l.product_key, l.net_amount,
-       s.warehouse_key, s.on_hand
-FROM ORDER_LINE l
-JOIN STOCK_LEVEL s ON l.date_key = s.date_key
-                 AND l.product_key = s.product_key
-```
-
 ## Details
+
+Compare lines with stock in the [SQL query](#sales-against-stock-query).
 
 ### <a id="ORDER_LINE"></a>Order line
 
@@ -150,3 +138,31 @@ product or customer.
 
 - ORDER_LINE --> PRODUCT : Each order line joins its product on product_key.
 - PRODUCT --> PRODUCT_TAG : A product has several tags, so a sum over this join counts each line once per tag.
+
+## Sales against stock query
+
+```mermaid
+flowchart LR
+  query_sources["Source tables"]
+  stock_report["Query output"]
+  query_sources --> stock_report
+```
+
+## Query: Sales against stock
+
+This query intentionally compares each order line with stock rows for the same
+product and day. Different warehouses remain separate result rows; this is not a
+model foreign-key relationship between the fact tables.
+
+#### Query options
+- Schema: #sales-warehouse
+- Sources: query_sources
+- Into: stock_report
+
+```sql
+SELECT l.order_line_key, l.date_key, l.product_key, l.net_amount,
+       s.warehouse_key, s.on_hand
+FROM ORDER_LINE l
+JOIN STOCK_LEVEL s ON l.date_key = s.date_key
+                 AND l.product_key = s.product_key
+```

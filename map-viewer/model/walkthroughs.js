@@ -18,7 +18,7 @@ import { problem } from './problem.js';
 import { headings, optionsSection } from './options.js';
 
 // a stop's kind -> the contents entry kind it opens (viewer.js contents())
-export const STOP_KINDS = { diagram: 'diagram', perspective: 'view', join: 'join', deployment: 'deployment', scenario: 'scenario', sequence: 'sequence' };
+export const STOP_KINDS = { diagram: 'diagram', perspective: 'view', deployment: 'deployment', scenario: 'scenario', sequence: 'sequence' };
 
 // -> [{kind, name, text, known}] in the order written
 export function readStops(text, warnings = []) {
@@ -45,7 +45,7 @@ export function readWalkthroughs(sections, warnings) {
     seen.add(key);
     const stops = readStops(s.text, warnings);
     if (!stops.length) warnings.push(problem('walkthrough-empty', `Walkthrough "${s.name}" has no stops.`));
-    for (const st of stops) if (!st.known) warnings.push(problem('walkthrough-stop-kind', `Walkthrough "${s.name}": stop "${st.name}" must start with Diagram, Perspective, Deployment, Scenario, Join or Sequence.`));
+    for (const st of stops) if (!st.known) warnings.push(problem('walkthrough-stop-kind', `Walkthrough "${s.name}": stop "${st.name}" must start with Diagram, Perspective, Deployment, Scenario or Sequence.`));
     const first = headings(s.text).find((h) => h.level === 3);
     out.push({ name: s.name, intro: s.text.slice(0, first?.start ?? s.text.length).trim(), stops });
   }

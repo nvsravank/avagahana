@@ -5,6 +5,7 @@ import { TRUST } from './model/provenance.js';
 import { uiSvg, sparkleSvg, planSignSvg, PLAN_WORD } from './chrome.js';
 import { toneClass, passesFilter } from './geometry.js';
 import { diagramOf } from './diagrams/index.js';
+import { queryTone } from './query/cards.js';
 
 // List mode: the outline's rows, in order.
 // input: {root, relDepth(n), categoryOf(n), kids(n), collapsed, selected, hits,
@@ -25,7 +26,7 @@ export function buildListScene(input) {
     if (skip && n === input.root) { input.kids(n).forEach(walk); return; }
     rows.push({
       kind: 'row', id: n.id, depth: rel - skip,
-      cls: `mmv-lrow ${toneClass(input.categoryOf(n), rel, input.levelOf ? input.levelOf(n) : rel, n.kindSlot, n.plan)}` + (input.selected === n.id ? ' is-selected' : '') + (hitSet.has(n.id) ? ' is-hit' : '')
+      cls: `mmv-lrow ${toneClass(input.categoryOf(n), rel, input.levelOf ? input.levelOf(n) : rel, n.kindSlot, n.plan)}${queryTone(n)}` + (input.selected === n.id ? ' is-selected' : '') + (hitSet.has(n.id) ? ' is-hit' : '')
         + (filterOn && !passesFilter(n, input.iconFilter) ? ' is-dim' : ''),
       toggle: n.children.length && n !== input.root ? { closed } : null,
       closed,

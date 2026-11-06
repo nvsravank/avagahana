@@ -9,6 +9,7 @@ import { parseMap } from './model/map.js';
 import { isCloudCode } from './model/main-icon.js';
 import { placeIn } from './model/deployments.js';
 import { categoryOf as branchCategory } from './model/tree.js';
+import { queryTone } from './query/cards.js';
 import { diagramOf, DIAGRAMS } from './diagrams/index.js';
 import { renderList } from './list.js';
 import { createPainter } from './paint.js';
@@ -195,7 +196,7 @@ export function mount(element, options = {}) {
   // The diagram type's looks, [[value, label, drawn as]] (WO-38): each type keeps its own,
   // and a type with one look has no Look row. The look shown: set here (the reader or
   // setPrefs), a link's, the map's ## Look: line, the reader's saved one, the type's default.
-  const looksOf = (d = diagram()) => d.looks || [['fade', 'Fade'], ['outline', 'Outline']];
+  const looksOf = (d = diagram()) => (S.map?.queryFlow && d.queryLooks) || d.looks || [['fade', 'Fade'], ['outline', 'Outline']];
   function lookOf() {
     const d = diagram(), ls = looksOf(d);
     const ok = (x) => x != null && ls.some(([id]) => id === x);
@@ -598,9 +599,19 @@ export function mount(element, options = {}) {
   }
 
   // ---------- rendering ----------
+  let queryContextRoot = null;
   function layout() {
+    const top = viewRoot();
+    if (S.map.queryFlow && top !== queryContextRoot) {
+      queryContextRoot = top;
+      if (top !== S.map.root) for (const n of Object.values(S.map.byId)) {
+        if (!n.queryCard) continue;
+        let p = n; while (p && p !== top) p = p.parent;
+        if (!p) S.collapsed.add(n.id);
+      }
+    }
     const size = (n) => painter.nodeGeom(n);
-    S.layout = diagram().layout(S.mode, viewRoot(), kids, size, { poster: posterNow(), relations: S.map.relations, byId: S.map.byId, direction: S.map.direction, selected: S.selected, collapsed: S.collapsed, all: !!viewNamed(S.relView)?.deploy, sequence: S.map.sequence,
+    S.layout = diagram().layout(S.mode, viewRoot(), kids, size, { poster: posterNow(), queryFlow: !!S.map.queryFlow, relations: S.map.relations, byId: S.map.byId, direction: S.map.direction, selected: S.selected, collapsed: S.collapsed, all: !!viewNamed(S.relView)?.deploy, sequence: S.map.sequence,
       // a sequence played over the view: its arrows make room for the messages' labels
       playLabel: player.onMap() ? player.labelOf : null });
   }
@@ -641,6 +652,12 @@ export function mount(element, options = {}) {
   };
   function canvasClick(target) {
     if (target.closest('[data-trust], [data-query-column]')) return;
+    const schema = target.closest('[data-query-schema]');
+    if (schema) {
+      const n = S.map.byId[schema.dataset.querySchema], ref = n?.schemaRef;
+      if (ref) { if (ref.primary) goPart(null); else enterPart(ref.anchor, n.id); jumpTo(ref.table, true); }
+      return;
+    }
     const dot = target.closest('[data-dot]');
     if (dot) { if (once(`dot:${dot.dataset.dot}`)) toggle(dot.dataset.dot); return; }
     const rel = target.closest('[data-rel]');
@@ -664,7 +681,9 @@ export function mount(element, options = {}) {
       lastClick = { id: null, t: 0 };
       const n = S.map.byId[id];
       // double-click a node that only opens diagrams opens its page; the centre goes back up one level
-      if (n?.inners?.length && !n.children.length) openPage(id);
+      if (S.map.queryFlow && S.layout.context?.has(n) && n.queryOwner) drill(n.queryOwner);
+      else if (n?.queryDefinition) drill(n.queryDefinition);
+      else if (n?.inners?.length && !n.children.length) openPage(id);
       else if (n === viewRoot() && n.parent) drill(n.parent.id); else drill(id);
       return;
     }
@@ -734,7 +753,8 @@ export function mount(element, options = {}) {
     S.expand = states.find((st) => sameSet(sets[st], closedIn(viewRoot()))) || S.expand;
     updateExpandBtn(states);
     painter.animateNext();
-    render(false);
+    // A query box opens much larger than it was: refit so its two ends stay on screen.
+    render(S.map?.queryFlow && !S.collapsed.has(id) && S.map.byId[id]?.queryScope ? 'levels' : false);
   }
   function drill(id) {
     verification.close();
@@ -938,6 +958,11 @@ export function mount(element, options = {}) {
   function jumpTo(id, keepNote) {
     const n = S.map.byId[id];
     if (!n) return;
+    // A derived-table definition lives under its occurrence card, whose circle
+    // controls columns. Following a column link into that SQL uses focus.
+    if (S.map.queryFlow) for (let c = n.parent; c; c = c.parent) {
+      if (c.queryScope && c.parent?.queryCard) { S.focus = c.id; painter.clearSizes(); break; }
+    }
     if (!inView(n)) { S.focus = null; painter.clearSizes(); }
     for (let c = n.parent; c; c = c.parent) S.collapsed.delete(c.id);
     S.selected = id;
@@ -948,28 +973,26 @@ export function mount(element, options = {}) {
   }
 
   // ---------- notes (one at a time) ----------
-  function openColumn(table, column, anchorEl) {
-    const n = S.map?.byId[table], a = n?.attrs?.find((a) => a.name === column);
+  function openColumn(table, column, anchorEl, index = null) {
+    const n = S.map?.byId[table], a = (index != null && n?.attrs?.[index]?.name === column ? n.attrs[index] : null) || n?.attrs?.find((x) => x.name === column);
     if (!a?.note) return;
     hideNote();
     $.noteTitle.textContent = `${n.plain} · ${a.name}`;
     $.noteBody.replaceChildren();
-    if (a.definition) {
-      const b = Object.assign(document.createElement('button'), {className:'mmv-relrow',textContent:'Open column definition'});
-      b.addEventListener('click', () => { const d=a.definition; goPart(d.part); openColumn(d.table,d.column,$.canvas); });
-      $.noteBody.appendChild(b);
-    } else verification.renderNote(a.note, $.noteBody);
+    verification.renderNote(a.note, $.noteBody);
     $.note.hidden=false; S.noteOpen=true; S.noteSticky=true; placeNote(anchorEl || $.canvas);
   }
   root.addEventListener('click', (e) => {
     const el=e.target.closest('[data-query-column]');
-    if (el) openColumn(el.dataset.queryTable,el.dataset.queryColumn,el);
+    if (el) openColumn(el.dataset.queryTable,el.dataset.queryColumn,el,el.dataset.queryIndex == null ? null : +el.dataset.queryIndex);
   });
   root.addEventListener('keydown', (e) => {
+    const control = e.target.closest('[data-query-schema], .mmv-query-card [data-dot]');
+    if (control && ['Enter',' '].includes(e.key)) {e.preventDefault(); e.stopPropagation(); canvasClick(control); return;}
     const inner=e.target.closest('g[data-inner]');
     if (inner && ['Enter',' '].includes(e.key)) {e.preventDefault(); e.stopPropagation(); canvasClick(inner); return;}
     const el=e.target.closest('g[data-query-column]');
-    if (el && ['Enter',' '].includes(e.key)) { e.preventDefault(); e.stopPropagation(); openColumn(el.dataset.queryTable,el.dataset.queryColumn,el); }
+    if (el && ['Enter',' '].includes(e.key)) { e.preventDefault(); e.stopPropagation(); openColumn(el.dataset.queryTable,el.dataset.queryColumn,el,el.dataset.queryIndex == null ? null : +el.dataset.queryIndex); }
   });
   function wireLink(a) {
     const column = a.getAttribute('href')?.match(/^#column:([^:]+):(.+)$/);
@@ -1137,8 +1160,6 @@ export function mount(element, options = {}) {
   // Clicking one opens the boxes round both its ends and selects where it starts. A
   // single relation's note comes first (a merged arrow shows no notes).
   function showArrow(id, anchorEl) {
-    const join = S.map.query && S.map.relations.find((r) => r.eid === id)?.queryJoin;
-    if (join && S.map.root.queryJoin !== join) { setView(S.map.views.find((v) => v.queryJoin === join).name); anchorEl = $.canvas; }
     const a = painter.arrow(id);
     if (!a) return;
     const name = (nid) => S.map.byId[nid]?.plain || nid;
@@ -1414,6 +1435,7 @@ export function mount(element, options = {}) {
       if (diagram().boxes) root.dataset.boxes = ''; else delete root.dataset.boxes;
     }
     root.dataset.look = cssLook();
+    if (S.map?.queryFlow) root.dataset.queryLook = lookOf(); else delete root.dataset.queryLook;
     $.modes.querySelectorAll('button').forEach((b) => b.classList.toggle('is-on', b.dataset.mode === S.mode));
     $.relBtn.hidden = !!diagram().layoutByView || !!diagram().noRelations;   // a box diagram always shows its arrows; a sequence has none
     $.relBtn.classList.toggle('is-active', S.rels === '1');
@@ -1682,7 +1704,6 @@ export function mount(element, options = {}) {
   function useView(name) {
     const view = viewNamed(name) || S.map.views[0] || null;
     S.relView = view && view !== S.map.views[0] ? view.name : null;
-    if (S.map.query) S.map.root.queryJoin = view?.queryJoin || null;
     S.map.relations = view ? view.relations : [];
     const before = S.map.root;
     S.map.root = view?.deploy ? view.deploy.root : S.map.base.root;
@@ -1692,7 +1713,7 @@ export function mount(element, options = {}) {
     if (S.map.type === 'er') {
       S.map.root.columnTables = view?.options?.columns ? new Set(view.options.columns.map((ref)=>ref.split('.')[0])) : null;
       for (const n of Object.values(S.map.byId)) if (n.attrs) {
-        n.visibleColumns = view?.options?.columns ? new Set(view.options.columns.filter((x) => x.startsWith(`${n.id}.`)).map((x) => x.slice(n.id.length + 1))) : n.queryColumns || null;
+        n.visibleColumns = view?.options?.columns ? new Set(view.options.columns.filter((x) => x.startsWith(`${n.id}.`)).map((x) => x.slice(n.id.length + 1))) : null;
       }
       painter.clearSizes();
     } else if (S.map.root !== before) painter.clearSizes();
@@ -1720,7 +1741,7 @@ export function mount(element, options = {}) {
   }
   // The picker: the whole map, as the atlas lists it. Walks (the walkthroughs and their
   // stops) first, then every diagram, linked from the first or not, each with its
-  // perspectives, joins, deployments and scenarios nested under it. Rows open and close;
+  // perspectives, deployments and scenarios nested under it. Rows open and close;
   // the diagram shown starts open. viewPicker 'wide': none on a narrow toolbar (a phone,
   // where the host's own list is the way round).
   // A row is open when the reader opened it, or it is the diagram shown and the reader has
@@ -1728,8 +1749,8 @@ export function mount(element, options = {}) {
   const pickerOpen = new Set();     // keys of the rows the reader opened
   const pickerClosed = new Set();   // keys of the rows the reader closed
   let pickerFor;                    // the diagram shown when the picker was last built
-  const KIND_WORD = { view: 'perspective', join: 'join', deployment: 'deployment', scenario: 'scenario' };
-  const KIND_ORDER = ['view', 'join', 'deployment', 'scenario'];
+  const KIND_WORD = { view: 'perspective', deployment: 'deployment', scenario: 'scenario' };
+  const KIND_ORDER = ['view', 'deployment', 'scenario'];
   // what is shown: a stop of the walkthrough open; the scenario or sequence playing; else in
   // the diagram shown, its deployment or perspective (null: the default), or the diagram
   function isShown(x) {
@@ -1890,6 +1911,13 @@ export function mount(element, options = {}) {
     const nodes = [];
     if (S.map?.root) (function walk(n) { nodes.push(n); n.children.forEach(walk); })(S.map.root);
     const rows = [];
+    if (S.map?.queryFlow) {
+      const swatch = (colour) => `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3" style="fill:var(${colour})"/></svg>`;
+      const letter = (text) => `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><text x="12" y="17" text-anchor="middle" font-size="${text.length > 1 ? 12 : 16}" font-weight="600" style="fill:var(--mmv-ink)">${text}</text></svg>`;
+      rows.push({ label: 'Source table', svg: swatch('--mmv-query-source') }, { label: 'Query parameter', svg: swatch('--mmv-query-bind') },
+        { label: 'Calculated column: click the row for its SQL', svg: letter('ƒ') }, { label: 'Open the table definition', svg: letter('ER') },
+        { label: 'Double-click a box to focus on it', svg: letter('⇲') });
+    }
     if (nodes.some((n) => n.children.length && n !== S.map.root)) {
       rows.push({ label: 'Branch is open: click to collapse', svg: sw('<circle r="5" style="fill:var(--mmv-bg);stroke:var(--n);stroke-width:2"/>') });
       rows.push({ label: 'Number of hidden nodes', svg: sw('<circle r="9" style="fill:var(--n)"/><text text-anchor="middle" y="3.5" font-size="10" font-weight="700" style="fill:var(--n-ink)">12</text>') });
@@ -1937,7 +1965,7 @@ export function mount(element, options = {}) {
     // colour key for a box diagram coloured by its top-level boxes
     if (S.colourBy === 'category' && diagram().stableColours && S.map?.root?.children.length) {
       section('colours', 'Colours');
-      for (const n of S.map.root.children.filter((x) => !x.mark)) row(swatchOf(`mmv-k${categoryOf(n)}`), n.plain, null);
+      for (const n of S.map.root.children.filter((x) => !x.mark)) row(swatchOf(`mmv-k${categoryOf(n)}${queryTone(n)}`), n.plain, null);
     }
     // colour key: what each class's colour means, when colouring by class, with the
     // class's icon; "No class" only for plain boxes without one (not the boxes that hold
@@ -2520,7 +2548,7 @@ export function mount(element, options = {}) {
   // ---------- contents ----------
   // Everything a reader can open in the file, in file order: each diagram (a sequence
   // as kind sequence), then its relation views when it has more than one (the default
-  // first, under its label "Overview"; an ER join view as kind join), its deployments
+  // first, under its label "Overview"), its deployments
   // and its scenarios. type: the diagram's type (mindmap, flowchart, sequence, ...).
   // steps: a sequence's or scenario's number of steps.
   // state: what setState takes to open it (a sequence or scenario opens
@@ -2532,7 +2560,7 @@ export function mount(element, options = {}) {
     if (!f?.root || options.thumbnail) return [];
     const out = [];
     const unlinked = new Set(f.unlinked || []);
-    for (const m of [f, ...[...f.parts.values()].filter((p) => !p.scenario)]) {
+    for (const m of [f, ...[...f.parts.values()].filter((p) => !p.scenario && !p.catalogueOnly)]) {
       if (!m.root) continue;
       const part = m === f ? null : m.anchor;
       const mark = { ...(m === f ? { first: true } : {}), ...(part && unlinked.has(part) ? { unlinked: true } : {}) };
@@ -2542,7 +2570,7 @@ export function mount(element, options = {}) {
       const own = { part, type: m.type, diagram: m.title };
       const viewChanged = (x) => !!marked()?.viewMarked(part || '', x.name);
       const views = (m.views || []).filter((x) => !x.deploy);
-      if (views.length > 1) for (const x of views) out.push({ kind: x.join ? 'join' : 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name }, changed: viewChanged(x) });
+      if (views.length > 1) for (const x of views) out.push({ kind: 'view', label: labelOf(x), ...own, state: { seq: null, part, view: x === m.views[0] ? null : x.name }, changed: viewChanged(x) });
       for (const x of m.views || []) if (x.deploy) out.push({ kind: 'deployment', label: x.name, ...own, state: { seq: null, part, env: x.name }, changed: viewChanged(x) });
       for (const w of f.parts.values()) if (w.scenario && w.scenarioOf === part) out.push({ kind: 'scenario', label: w.scenarioName, ...own, state: { seq: w.anchor, step: 1 }, steps: w.sequence?.steps.length || 0, changed: !!marked()?.partMarked(w.anchor) });
     }

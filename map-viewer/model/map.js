@@ -15,14 +15,14 @@ import { readDeployment, infraOf, buildDeployment, syncWarnings } from './deploy
 import { SCENARIO_TYPES, readScenario, scenarioText } from './scenarios.js';
 import { parseSources, evidenceOf, checkVerificationPairs } from './provenance.js';
 import { readWalkthroughs } from './walkthroughs.js';
-import { perspectiveOptions, noteTargets } from './options.js';
+import { perspectiveOptions, noteTargets, anchorOf, fenceBlocks } from './options.js';
 
 // A big map is drawn in full, with a warning that drawing may be slow.
 export const LARGE_MAP = 5000;
 
 // A heading's anchor, as GitHub makes it: lower case, punctuation dropped, spaces to
 // hyphens. `click <id> "#<anchor>"` in a flowchart points at a diagram's heading.
-export const anchorOf = (heading) => heading.toLowerCase().trim().replace(/[^\w\- ]/g, '').replace(/ /g, '-');
+export { anchorOf };
 
 // A map file may hold several Mermaid blocks, each valid Mermaid on its own. The first
 // is the map; each further one is a diagram of its own, named by the heading right
@@ -38,9 +38,12 @@ export const anchorOf = (heading) => heading.toLowerCase().trim().replace(/[^\w\
 // -> the first diagram's map, with `parts: Map(anchor -> map)` (each with anchor, title),
 //    `unlinked: [anchor]`; a box diagram gets `sequences: [{anchor, view}]` (anchor
 //    null: the first diagram), a sequence `playsOver: [{anchor, view, viewLabel}]` (the valid ones)
+const fenceStarts = (src) => new Set(fenceBlocks(src).map((b) => b.start));
 export function parseMap(text, fileName) {
   const src = text.replace(/\r\n?/g, '\n');
-  const fences = [...src.matchAll(/^```mermaid[^\n]*\n[\s\S]*?\n```/gm)];
+  // A block quoted inside a longer fence is an example, not a diagram.
+  const shown = fenceStarts(src);
+  const fences = [...src.matchAll(/^```mermaid[^\n]*\n[\s\S]*?\n```/gm)].filter((f) => shown.has(f.index));
   const cuts = [];   // [{start, heading}] where each further diagram's text begins
   const lost = [];
   for (const f of fences.slice(1)) {
@@ -100,7 +103,7 @@ export function parseMap(text, fileName) {
     const candidates = maps.filter((p) => !p.scenario && (!stop.options.diagram || p.title === stop.options.diagram));
     const owner = candidates.find((p) => stop.kind === 'diagram' || stop.kind === 'sequence' ? p.title === stop.name && (stop.kind !== 'sequence' || p.type === 'sequence')
       : stop.kind === 'scenario' ? maps.some((x) => x.scenarioName === stop.name && x.scenarioOf === (p === main ? null : p.anchor))
-        : (p.views || []).some((v) => (v.label || v.name) === stop.name && (stop.kind === 'deployment' ? v.deploy : stop.kind === 'join' ? v.join : !v.deploy && !v.join)));
+        : (p.views || []).some((v) => (v.label || v.name) === stop.name && (stop.kind === 'deployment' ? v.deploy : !v.deploy)));
     if (!owner || (stop.options.notes || []).some((id) => !noteTargets(owner).has(id))) {
       main.warnings.push(problem('walkthrough-reference', `Stop "${stop.name}": Diagram/Notes must resolve in the destination's owning diagram.`));
       // Invalid options must not partially redirect or mislabel the narrative.

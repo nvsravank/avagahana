@@ -48,7 +48,8 @@ this usually means some of:
 - sequences for the flows that carry the system's behaviour, played over the box view
   they cross;
 - state diagrams for lifecycles the code really enforces;
-- an ER diagram where the data model's joins matter;
+- an ER diagram where the data model's relationships matter;
+- an expandable SQL query map for the queries that carry real logic (`../illuminate-concept/references/sql-queries.md`);
 - deployments when environments differ.
 
 Skip a kind the project does not have. Prefer several kinds, each for its purpose,

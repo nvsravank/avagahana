@@ -361,35 +361,10 @@ erDiagram
 - order-shipping
 - order-billing
 
-## Query: Paid amount per line
+## Notes
 
-This deliberately keeps every payment attempt. Joining lines and attempts through
-an order repeats each line once per attempt; choose the payment outcome and the
-aggregation according to the business question.
-
-```sql
-SELECT l.id AS line_id, o.id AS order_id, p.id AS payment_id,
-       p.amount AS payment_amount, p.outcome
-FROM ORDER_LINE l
-JOIN ORDER o ON l.order_id = o.id
-JOIN PAYMENT p ON p.order_id = o.id
-```
-
-## Query: Fulfilment
-
-This example explicitly matches payment attempts and shipments on order_id.
-Neither identifies the other; several attempts and shipments can multiply rows.
-The address aliases are separate occurrences of the same physical table.
-
-```sql
-SELECT p.id AS payment_id, s.id AS shipment_id, o.id AS order_id,
-       billing.id AS billing_address, shipping.id AS shipping_address
-FROM PAYMENT p
-JOIN SHIPMENT s ON p.order_id = s.order_id
-JOIN ORDER o ON p.order_id = o.id
-LEFT JOIN ADDRESS billing ON o.billing_address_id = billing.id
-LEFT JOIN ADDRESS shipping ON o.shipping_address_id = shipping.id
-```
+Read the [paid amount per line report](#paid-amount-per-line-report) or the
+[fulfilment report](#fulfilment-report) as expandable SQL queries.
 
 ## Scenario: Paid amount per line
 
@@ -557,7 +532,7 @@ retrying returns to Charging instead of creating another order.
 - Title: Follow one retry from beginning to end
 - Label: Retry
 
-### Diagram: Query: Paid amount per line
+### Diagram: Paid amount per line report
 
 Each order line belongs to an order; each payment attempt also belongs to that
 order. Joining through order_id repeats an order's lines across its payment attempts.
@@ -568,3 +543,62 @@ aggregation still depends on the question being answered.
 
 - Title: Keep payment attempts distinct from order lines
 - Label: Data
+
+## Paid amount per line report
+
+```mermaid
+flowchart LR
+  paid_sources["Source tables"]
+  paid_report["Query output"]
+  paid_sources --> paid_report
+```
+
+## Query: Paid amount per line
+
+This deliberately keeps every payment attempt. Joining lines and attempts through
+an order repeats each line once per attempt; choose the payment outcome and the
+aggregation according to the business question.
+
+#### Query options
+- Schema: #orders-data
+- Sources: paid_sources
+- Into: paid_report
+
+```sql
+SELECT l.id AS line_id, o.id AS order_id, p.id AS payment_id,
+       p.amount AS payment_amount, p.outcome
+FROM ORDER_LINE l
+JOIN ORDER o ON l.order_id = o.id
+JOIN PAYMENT p ON p.order_id = o.id
+```
+
+
+## Fulfilment report
+
+```mermaid
+flowchart LR
+  fulfilment_sources["Source tables"]
+  fulfilment_report["Query output"]
+  fulfilment_sources --> fulfilment_report
+```
+
+## Query: Fulfilment
+
+This example explicitly matches payment attempts and shipments on order_id.
+Neither identifies the other; several attempts and shipments can multiply rows.
+The address aliases are separate occurrences of the same physical table.
+
+#### Query options
+- Schema: #orders-data
+- Sources: fulfilment_sources
+- Into: fulfilment_report
+
+```sql
+SELECT p.id AS payment_id, s.id AS shipment_id, o.id AS order_id,
+       billing.id AS billing_address, shipping.id AS shipping_address
+FROM PAYMENT p
+JOIN SHIPMENT s ON p.order_id = s.order_id
+JOIN ORDER o ON p.order_id = o.id
+LEFT JOIN ADDRESS billing ON o.billing_address_id = billing.id
+LEFT JOIN ADDRESS shipping ON o.shipping_address_id = shipping.id
+```
