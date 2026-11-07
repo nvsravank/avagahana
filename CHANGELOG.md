@@ -6,6 +6,18 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): a sequence's `+`, `-`, `activate` and `deactivate`, read and ignored
+  until now, draw activation bars. So does a call with a matching reply; a call with no reply and a
+  one-way `-)` get none, and replies stay optional. Played over a view, the caller of an open call
+  shows a bar on its box's edge.
+- Lifelines: the participants' names stay along the top once their heads scroll away, panning stops
+  at the diagram's edges with a small margin, and zooming in stops while one line still fits. Playing
+  them, the camera starts close and pulls back only when a step's line, names or note would not fit;
+  a zoom the reader chose stays until the fit button or the next play.
+- A walkthrough's panel and a sequence's step bar no longer overlap: the bar and the play's camera
+  keep to the room beside the panel.
+- Sequences: a long note wraps at about 360 units or the width of the lines it is over, on screen and
+  in exports. Its own line breaks now show too.
 - **Contract** (map format): a walkthrough stop can `Point to` one part of a query (`JOIN 2`,
   `WHERE`, `Subquery 1`, `Input 1 / WHERE`). It opens that part, fits it and dims the rest, and the
   reading document shows the same part.

@@ -6,6 +6,8 @@ import { parseSequence } from './parse.js';
 import { layoutLifelines } from './layout.js';
 import { buildScene, relationShapes } from './scene.js';
 import { renderSequenceList } from './list.js';
+import { limitView, maxZoom } from './limits.js';
+import { paintPins } from './pins.js';
 
 export const type = 'sequence';
 export const label = 'Sequence';
@@ -28,6 +30,6 @@ export const defaultCollapsed = () => new Set();
 export const noRelations = true;
 
 export const layout = (mode, root, kids, size, input) => layoutLifelines(root, size, input.sequence);
-export { buildScene, relationShapes };
+export { buildScene, relationShapes, limitView, maxZoom, paintPins };
 // List mode: the numbered steps, not the participants' outline
 export const renderList = renderSequenceList;

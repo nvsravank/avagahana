@@ -120,6 +120,18 @@
 .mmv :is(.mmv-node, .mmv-frame).is-idle :is(.mmv-label, .mmv-frame-title) { fill: var(--mmv-muted); }
 .mmv :is(.mmv-node, .mmv-seq-msg, .mmv-seq-badge, .mmv-flow-label, .mmv-seq-life, .mmv-seq-note).is-past { opacity: 0.6; }
 .mmv-seq-life.is-idle { stroke: var(--mmv-idleLine); }
+/* who is in a call (WO-52): a bar on the lifeline; while it plays, lit while the call is open */
+.mmv-seq-bar { fill: none; stroke: var(--n); stroke-opacity: 0.75; }
+.mmv-seq-bar.is-now { stroke-opacity: 1; }
+.mmv-seq-bar.is-past { opacity: 0.6; }
+.mmv-seq-bar.is-idle { stroke: var(--mmv-idleLine); }
+/* played over a view: a caller waiting on its answer keeps its full colour, with a bar on its edge */
+.mmv :is(.mmv-node, .mmv-frame).is-waiting.is-past { opacity: 1; }
+.mmv-wait { fill: var(--mmv-call); stroke: none; }
+/* the names along the top once the heads have scrolled away */
+.mmv-pins-band { fill: var(--mmv-bg); fill-opacity: 0.9; pointer-events: none; }
+.mmv-pin { cursor: pointer; }
+.mmv-pin .mmv-label { text-anchor: middle; font-size: 12px; dominant-baseline: central; }
 .mmv-flow-label.is-idle { fill: var(--mmv-muted); }
 /* a highlight (a picture for an export): what is not lit takes the same idle colours */
 .mmv.is-highlighting .mmv-rels :is(.mmv-flow, .mmv-rel).is-idle { stroke: var(--mmv-idleLine); stroke-opacity: 1; }
@@ -575,10 +587,15 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 @media (prefers-reduced-motion: reduce) { .mmv-play-msg.is-pulse .mmv-play-path { animation: none; } }
 
 /* the step bar: a timeline over the controls, bottom centre (above the crumbs) */
-.mmv-stepbar { left: 50%; bottom: 14px; transform: translateX(-50%); flex-direction: column; align-items: stretch; gap: 6px;
-  padding: 8px 10px; width: min(560px, calc(100cqw - 132px)); background: var(--mmv-chrome-bg); border: 1px solid var(--mmv-chrome-border);
+.mmv-stepbar { left: calc(50% + var(--mmv-left-inset, 0px) / 2); bottom: 14px; transform: translateX(-50%); flex-direction: column; align-items: stretch; gap: 6px;
+  padding: 8px 10px; width: min(560px, calc(100cqw - 132px - var(--mmv-left-inset, 0px))); background: var(--mmv-chrome-bg); border: 1px solid var(--mmv-chrome-border);
   border-radius: 12px; box-shadow: var(--mmv-shadow); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .mmv-crumbs:not([hidden]) ~ .mmv-stepbar { bottom: 58px; }
+/* beside a walkthrough panel the bar has less room: its controls as on a narrow screen */
+.mmv.is-tight-bar .mmv-step-row .mmv-pill span, .mmv.is-tight-bar :is(.mmv-speed svg, .mmv-count-long) { display: none; }
+.mmv.is-tight-bar .mmv-step-row { gap: 6px; }
+.mmv.is-tight-bar .mmv-count-short { display: inline; }
+.mmv.is-tight-bar .mmv-speed input { width: 52px; }
 .mmv-step-row { display: flex; align-items: center; gap: 10px; }
 .mmv-step-row .mmv-seg { box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .mmv-step-row .mmv-seg button:disabled { opacity: 0.35; cursor: default; background: transparent; }

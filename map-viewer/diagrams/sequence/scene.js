@@ -29,6 +29,24 @@ export function playState(seq, s) {
   return { msg, who };
 }
 
+// Each activation's state at step s (open: in its call now; past: answered; idle: not
+// reached), and who is waiting: the callers of the open ones.
+export function openCalls(seq, s) {
+  const stepOf = new Map();
+  seq.steps.forEach((step, k) => { if (!step.repeat) for (const m of step.msgs) if (!stepOf.has(m)) stepOf.set(m, k); });
+  const state = new Map();
+  const waiting = new Set();
+  for (const a of seq.activations || []) {
+    const from = stepOf.get(a.from);
+    const to = a.to ? stepOf.get(a.to) : Infinity;
+    if (from == null) continue;
+    const open = s >= from && s < to;
+    state.set(a, open ? 'is-now' : s < from ? 'is-idle' : 'is-past');
+    if (open && a.call) waiting.add(a.call.from);
+  }
+  return { state, waiting };
+}
+
 export function buildScene(input) {
   const { layout: L } = input;
   const play = playState(L.seq, input.play?.step);
@@ -52,7 +70,11 @@ export function buildScene(input) {
       frames.push({
         kind: 'frame', id: n.id, x: p.x, y: p.y, w: p.w, h: p.h,
         cls: `mmv-frame mmv-seq-note${st}`, name: 'note',
-        title: { text: p.noteOf.note.text.replace(/\n/g, ' '), x: 8, y: p.h / 2 + 4, size: 12, weight: 400 },
+        title: {
+          text: p.noteOf.note.text.replace(/\n/g, ' '),
+          ...(p.noteOf.lines.length > 1 ? { lines: p.noteOf.lines } : {}),
+          x: 8, y: 19, size: 12, weight: 400,
+        },
         icons: [], marks: {}, note: null, dot: null,
       });
       continue;
@@ -77,6 +99,16 @@ export function buildScene(input) {
     cls: `mmv-seq-life ${shaper.tone(l.n)}${play ? ` ${play.who.get(l.n.id) || 'is-idle'}` : ''}`,
     width: 1.5,
   }));
+  // a thumbnail is drawn too small for bars
+  if (!input.thumb) {
+    const calls = play && openCalls(L.seq, input.play.step);
+    (L.bars || []).forEach((b, k) => edges.push({
+      id: `${b.n.id}~bar${k}`, title: `${b.n.plain || b.n.label}: in a call`,
+      d: `M${b.x},${b.y0} V${b.y1}`,
+      cls: `mmv-seq-bar ${shaper.tone(b.n)}${calls ? ` ${calls.state.get(b.a) || 'is-idle'}` : ''}`,
+      width: 8,
+    }));
+  }
   return { frames, edges, nodes, rels: relationShapes(input, play) };
 }
 

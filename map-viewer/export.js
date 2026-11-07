@@ -261,7 +261,7 @@ export function createExporter(v) {
       const clone = $.canvas.cloneNode(true);
       out1.forEach((el) => el.removeAttribute('data-crop-out'));
       resolve($.canvas, clone);
-      clone.querySelectorAll('[data-crop-out]').forEach((el) => el.remove());
+      clone.querySelectorAll('[data-crop-out], [data-mmv=pins]').forEach((el) => el.remove());
       out = clone;
       if (opts.report) facts = collectFacts(v);
     });

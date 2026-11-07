@@ -14,6 +14,7 @@ import { diagramOf, DIAGRAMS } from './diagrams/index.js';
 import { renderList } from './list.js';
 import { createPainter } from './paint.js';
 import { createStage } from './stage.js';
+import { PAN_MARGIN } from './diagrams/sequence/limits.js';
 import { createExporter, embeddedFontCss } from './export.js';
 import { renderWith } from './render-map.js';
 import { buildReading } from './reading.js';
@@ -283,7 +284,23 @@ export function mount(element, options = {}) {
     onLod: () => painter.lod(),
     onClick: canvasClick,
     onUserMove: () => { clearPoint(); player.userMoved(); },
+    limit: (vw) => { if (limited()) diagram().limitView(S.layout, vw, limitArea()); },
+    maxZoom: () => (limited() ? diagram().maxZoom(S.layout, limitArea()) : Infinity),
+    onView: () => paintPins(),
   });
+  // Lifelines keep a line and its name on screen (WO-52); a map pans freely
+  const limited = () => !!S.layout?.lifelines && !S.thumb && !S.exporting && S.mode !== 'list';
+  function limitArea() {
+    const { w, h } = v.size();
+    const { top, right, bottom } = player.clearArea();
+    const left = panelInset();
+    return { left: left + PAN_MARGIN, right: w - right - PAN_MARGIN, top, bottom: h - bottom };
+  }
+  function paintPins() {
+    if (!$.pins) return;
+    if (!limited()) { $.pins.replaceChildren(); return; }
+    diagram().paintPins($.pins, S.layout, S.view, v.size().w, (id) => $.nodes.querySelector(`[data-id="${CSS.escape(id)}"]`));
+  }
   const exporter = createExporter(v);
   const page = createPage(v, {
     wireLink: (a) => wireLink(a),
@@ -653,6 +670,8 @@ export function mount(element, options = {}) {
     return !again;
   };
   function canvasClick(target) {
+    const pin = target.closest('[data-pin]');
+    if (pin) { clickNode(pin.dataset.pin); return; }
     if (target.closest('[data-trust], [data-query-column]')) return;
     const schema = target.closest('[data-query-schema]');
     if (schema) {
@@ -2123,6 +2142,7 @@ export function mount(element, options = {}) {
     fitTop();
     page.resize();
     if (S.noteOpen) placeNote();
+    barRoom();
     if (S.layout && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
   });
   ro.observe(root);
@@ -2413,6 +2433,12 @@ export function mount(element, options = {}) {
     const inset = $.stopPanel.getBoundingClientRect().right - root.getBoundingClientRect().left;
     return inset > 0 && v.size().w - inset >= 360 ? inset : 0;
   }
+  // the step bar keeps clear of the panel
+  function barRoom() {
+    const inset = panelInset();
+    root.style.setProperty('--mmv-left-inset', `${inset}px`);
+    root.classList.toggle('is-tight-bar', inset > 0 && v.size().w - inset < 640);
+  }
   function refitForPanel() {
     if (S.layout && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
   }
@@ -2420,6 +2446,7 @@ export function mount(element, options = {}) {
     const w = S.walkthrough && walkthroughs().find((x) => x.name === S.walkthrough);
     $.stopPanel.hidden = !w || S.stopMin;
     $.stopTab.hidden = !w || !S.stopMin;
+    barRoom();
     if (!w) return;
     const st = w.stops[S.stop - 1];
     const kind = st.kind.charAt(0).toUpperCase() + st.kind.slice(1);

@@ -11,7 +11,9 @@
 // receiver; the camera frames the step's boxes. A reader's pan or zoom pauses the play;
 // play or a step goes on and the camera follows again. Closed boxes a step needs open
 // (and stay open). As lifelines the scene marks the rows (diagrams/sequence/scene.js)
-// and the camera follows the row.
+// and the camera follows the row: it starts close and pulls back only when a step's line
+// would not fit (limits.js), and moves only when the step would leave the view. A zoom the
+// reader chose stays, until the fit button or the next play.
 //
 // The step bar: a timeline (a tick per step, a bracket per block: loop, alt, opt, par),
 // back, play / pause, forward, stop (closes), the count, and a switch between the view
@@ -23,12 +25,14 @@
 // speed control on the step bar; options.sequenceStepSeconds is where it starts).
 import { uiSvg, putNumber, RETURN_W } from './chrome.js';
 import { svgEl } from './paint.js';
-import { playState } from './diagrams/sequence/scene.js';
+import { playState, openCalls } from './diagrams/sequence/scene.js';
+import { stepZoom, stepSpan } from './diagrams/sequence/limits.js';
 import { CAPTION } from './diagrams/sequence/parse.js';
 import { measure } from './measure.js';
 
 const DOT_MS = 650;     // the dot's run
 const CAM_MS = 480;     // the camera's move
+const WAIT_W = 6;       // the bar on a waiting box's edge
 const LINE = 20;        // between the centres of an arrow's two label lines (the layout's two lines)
 
 export function createPlayer(v, h) {
@@ -53,6 +57,7 @@ export function createPlayer(v, h) {
     S.play = { seq: key, step: Math.max(0, Math.min(step, m.sequence.steps.length - 1)), playing: false };
     v.root.classList.add('is-playing');
     follow = true;
+    S.readerZoom = false;
     buildTimeline();
     $.stepBar.hidden = false;
     $.seqPanel.hidden = false;
@@ -74,7 +79,7 @@ export function createPlayer(v, h) {
     $.seqPanel.hidden = true;
     $.play.replaceChildren();
     $.playDots.replaceChildren();
-    for (const g of marked()) g.classList.remove('is-idle', 'is-past', 'is-now');
+    for (const g of marked()) g.classList.remove('is-idle', 'is-past', 'is-now', 'is-waiting');
     if (redraw) { if (was) h.relayout(); else h.redraw(); }   // the view's own labels come back
     h.changed();
   }
@@ -140,6 +145,13 @@ export function createPlayer(v, h) {
     for (const g of marked()) {
       g.classList.remove('is-idle', 'is-past', 'is-now');
       g.classList.add(st.who.get(g.dataset.id) || 'is-idle');
+    }
+    // who is waiting on an unanswered call (WO-52): a bar on the box's left edge
+    const { waiting } = openCalls(seq(), S.play.step);
+    for (const g of marked()) g.classList.toggle('is-waiting', waiting.has(g.dataset.id));
+    for (const id of waiting) {
+      const p = h.posOf(id);
+      if (p) svgEl('rect', { class: 'mmv-wait', x: p.x - p.w / 2, y: p.y - p.h / 2 + 3, width: Math.max(WAIT_W, 4 / S.view.k), height: p.h - 6, 'data-for': id }, $.play);
     }
     // the messages played so far, then the step's: over the view's arrows; each arrow's
     // label lines hold the latest call and the latest return along it
@@ -343,37 +355,55 @@ export function createPlayer(v, h) {
   function camera(animate) {
     if (!follow || !S.layout) return;
     const steps = seq().steps;
-    let box;
+    const { w, h: H } = v.size();
+    const { top: under, right, bottom } = clearArea();
+    const left = v.fitInset?.() || 0;   // a walkthrough's panel
+    // as lifelines the names pinned along the top take room too
+    const top = onMap() ? under : under + 34;
+    const cw = w - right - left;
+    const ch = Math.max(120, H - top - bottom);
+    let to;
     if (onMap()) {
       const ids = steps[S.play.step].msgs.flatMap((m) => [m.from, m.to]);
       const ps = ids.map((id) => h.posOf(id)).filter(Boolean);
       if (!ps.length) return;
-      box = bounds(ps);
-    } else {
-      // lifelines: the step's rows, across the whole width
-      const L = S.layout;
-      const all = bounds([...L.pos.values()]);
-      const y0 = L.stepY[S.play.step] - 30;
-      const next = L.stepY[S.play.step + 1] ?? L.bottom;
-      box = { x0: all.x0, x1: all.x1, y0, y1: Math.max(y0 + 60, next) };
-    }
-    const { w, h: H } = v.size();
-    // the clear area: under the top controls, left of the side panel (wide) or above it
-    // and the step bar (narrow)
+      const box = bounds(ps);
+      const pad = Math.min(60, cw / 8);
+      const fitAll = fitK(bounds([...S.layout.pos.values()]), cw, ch, 20);
+      const want = fitK(box, cw, ch, pad);
+      // no further in than needed, never past easy reading, never further out than all
+      const k = Math.max(Math.min(want, 1.15), Math.min(fitAll, 1.15));
+      to = { k, x: left + cw / 2 - ((box.x0 + box.x1) / 2) * k, y: top + ch / 2 - ((box.y0 + box.y1) / 2) * k };
+    } else to = lifelinesView(steps, left, cw, top, ch);
+    glideTo(to, animate && !reduceMotion());
+  }
+  // lifelines: the reader's zoom or the growing one; the view stays put while the step's
+  // rows and lines are in it, else centres on them
+  function lifelinesView(steps, left, cw, top, ch) {
+    const L = S.layout;
+    const pad = Math.min(20, cw / 16);
+    const k = S.readerZoom ? S.view.k : stepZoom(L, steps, S.play.step, cw - pad * 2);
+    const span = stepSpan(L, steps, S.play.step) || { x0: (left - S.view.x) / k, x1: (left + cw - S.view.x) / k };   // nothing drawn: stay
+    const y0 = L.stepY[S.play.step] - 30;
+    const y1 = Math.max(y0 + 60, L.stepY[S.play.step + 1] ?? L.bottom);
+    const same = Math.abs(S.view.k - k) < 0.001;
+    const inX = same && span.x0 * k + S.view.x >= left + pad && span.x1 * k + S.view.x <= left + cw - pad;
+    const inY = same && y0 * k + S.view.y >= top && y1 * k + S.view.y <= top + ch;
+    return {
+      k,
+      x: inX ? S.view.x : left + cw / 2 - ((span.x0 + span.x1) / 2) * k,
+      y: inY ? S.view.y : top + ch / 2 - ((y0 + y1) / 2) * k,
+    };
+  }
+  // the clear area: under the top controls, left of the side panel (wide) or above it
+  // and the step bar (narrow)
+  function clearArea() {
     const top = 56;
+    if (!S.play) return { top, right: 0, bottom: 24 };
+    const H = v.size().h;
     const right = wide() && !$.seqPanel.hidden ? $.seqPanel.offsetWidth + 14 : 0;
     const bottom = wide() ? $.stepBar.offsetHeight + 24 : H - ($.seqPanel.hidden ? $.stepBar.offsetTop : $.seqPanel.offsetTop) + 8;
-    const cw = w - right;
-    const ch = Math.max(120, H - top - bottom);
-    const pad = Math.min(60, cw / 8);
-    const fitAll = fitK(bounds([...S.layout.pos.values()]), cw, ch, 20);
-    const want = fitK(box, cw, ch, pad);
-    // no further in than needed, never past easy reading, never further out than all
-    const k = Math.max(Math.min(want, 1.15), Math.min(fitAll, 1.15));
-    const cx = (box.x0 + box.x1) / 2;
-    const cy = (box.y0 + box.y1) / 2;
-    const to = { k, x: cw / 2 - cx * k, y: top + ch / 2 - cy * k };
-    glideTo(to, animate && !reduceMotion());
+    return { top, right, bottom };
   }
   const wide = () => v.size().w >= 720;
   const bounds = (ps) => ps.reduce((b, p) => ({
@@ -565,7 +595,7 @@ export function createPlayer(v, h) {
   }
 
   return {
-    open, close, go, start, pause, key, userMoved, decorate, labelOf,
+    open, close, go, start, pause, key, userMoved, decorate, labelOf, clearArea,
     isOn: () => !!S.play,
     onMap,
     // the state out: seq ('main' for the first diagram) and step from 1

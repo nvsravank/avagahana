@@ -46,7 +46,7 @@ export function createPainter(v) {
   // everything the scene needs, read from the viewer's state
   function sceneInput(L) {
     return {
-      layout: L, root: v.viewRoot(), mode: S.mode,
+      layout: L, root: v.viewRoot(), mode: S.mode, thumb: S.thumb,
       relDepth: v.relDepth, categoryOf: v.categoryOf, levelOf: v.levelOf, geom: nodeGeom, zoom: v.detailZoom(),
       collapsed: S.collapsed, selected: S.selected, hits: S.hits, iconFilter: S.iconFilter,
       rels: S.rels === '1', relNode: S.relNode, relations: S.map.relations, byId: S.map.byId,

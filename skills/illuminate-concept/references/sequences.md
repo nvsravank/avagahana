@@ -42,6 +42,10 @@ The basket id and the delivery slot, with an idempotency key.
 - Messages: `->>` a call, `-->>` a reply, `-)` async; a label after `:`. Blocks `loop`,
   `alt`/`else`, `opt`, `par`/`and`, `critical`, `break`. `Note over a: text` captions
   the step before it.
+- Replies are optional. A reply draws a bar on the called lifeline until it comes, so the reader
+  sees which calls are still open; a drop-into-a-queue message told as `-)` or left unanswered is a
+  fair way to tell the story and gets none. `+` and `-`, or `activate` and `deactivate`, draw a bar
+  where there is no reply to draw it from.
 - `%% id: <id>` on the line before a message names it, so `## Details` can hold its
   note.
 - `## Plays over`: one line per view, `- #<diagram anchor> : <view name>` (the first

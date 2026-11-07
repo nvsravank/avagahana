@@ -8,7 +8,8 @@ const MAX_ZOOM = 4;
 // level-of-detail key: changes only when some label size crosses the bar threshold
 const lodKey = (k, sizes) => sizes.map((size) => (size * k >= MIN_LABEL_PX ? 1 : Math.round(k * 20) / 20)).join(',');
 
-// v: viewer internals. handlers: {onLod(), onClick(target, event), onBackground()}
+// v: viewer internals. handlers: {onLod(), onClick(target, event), onBackground(), onView(),
+// limit(view) and maxZoom(): a diagram that keeps its camera in bounds}
 export function createStage(v, handlers) {
   const { S, $ } = v;
   const svg = $.canvas;
@@ -17,9 +18,11 @@ export function createStage(v, handlers) {
 
   // drawn: the drawing was just made at this zoom, so no redraw for its level of detail
   function applyView(drawn = false) {
+    handlers.limit?.(S.view);
     const vw = S.view;
     $.viewport.setAttribute('transform', `translate(${vw.x},${vw.y}) scale(${vw.k})`);
     const key = lodKey(vw.k, v.diagram().detailSizes || [20, 16, 14]);
+    handlers.onView?.();
     if (drawn) S.lodKey = key;
     if (key !== S.lodKey) {
       const first = S.lodKey == null;
@@ -71,6 +74,7 @@ export function createStage(v, handlers) {
     }
     S.lastFit = levelsOnly ? 'levels' : 'all';
     S.userMoved = false;
+    S.readerZoom = false;
     const { w: full, h: H } = v.size();
     if (full < 120 || H < 120) return;   // not laid out yet; the resize observer refits
     // what a panel covers is not there to fit into
@@ -87,9 +91,10 @@ export function createStage(v, handlers) {
   }
   function zoomAt(factor, cx, cy) {
     S.userMoved = true;
+    S.readerZoom = true;   // a play keeps it (player.js), until a fit
     handlers.onUserMove?.();
     const vw = S.view;
-    const k = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, vw.k * factor));
+    const k = Math.min(handlers.maxZoom?.() ?? Infinity, Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, vw.k * factor)));
     const f = k / vw.k;
     S.view = { k, x: cx - (cx - vw.x) * f, y: cy - (cy - vw.y) * f };
     applyView();

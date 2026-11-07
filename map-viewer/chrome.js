@@ -119,6 +119,7 @@ export function chromeHtml(uid) {
     </marker>
   </defs>
   <g data-mmv="viewport"><g data-mmv="frames"></g><g data-mmv="edges" aria-hidden="true"></g><g data-mmv="nodes"></g><g class="mmv-rels" data-mmv="rels" aria-hidden="true"></g><g class="mmv-play" data-mmv="play" aria-hidden="true"></g><g data-mmv="playDots" aria-hidden="true"></g></g>
+  <g data-mmv="pins" aria-hidden="true"></g>
 </svg>
 <div class="mmv-list" data-mmv="list" hidden></div>
 <div class="mmv-empty" data-mmv="empty" hidden>No map to show.</div>

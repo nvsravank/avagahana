@@ -5,7 +5,7 @@
 //
 // -> {pos: Map(node -> {x, y, w, h, frame?}), edges: [], rows: Map(message -> {y, x1, x2}),
 //     lifelines: [{n, x, y0, y1}], groups: [{g, x, y, w, h, depth}], notes: [{note, step,
-//     x, y, w, h}], stepY: [y of each step's first row]}
+//     x, y, w, h}], stepY: [y of each step's first row], bars: [{a, n, x, y0, y1}]}
 // The groups and notes are also in pos (as plain objects), so fitting sees them.
 
 import { arrowLines } from '../../model/labels.js';
@@ -16,12 +16,28 @@ const ROW = 40;          // a message's row
 const SELF_H = 18;       // a message to itself drops this far
 const SELF_W = 30;       // and reaches this far right of its line
 const NOTE_H = 30;
+const NOTE_W = 360;      // a longer note wraps at this, or at the width of the lines it is over
+const NOTE_LINE = 18;
 const GROUP_TOP = 40;    // room for a block's title, above the first row's label
 const GROUP_BOTTOM = 12;
 const GROUP_PAD = 64;    // a block reaches this far past its outermost lines
+const BAR_STEP = 5;      // a bar inside another sits this far to the right
 const CHAR_W = 6.6;      // a label character at 12px (near enough to keep labels apart)
 
 export const labelWidth = (text) => (text ? text.length * CHAR_W + 16 : 0);
+// a note's lines in `width`: its own line breaks, then at words (a word too long stays whole)
+export function noteLines(text, width) {
+  const fit = Math.max(1, Math.floor((width - 16) / CHAR_W));
+  const lines = [];
+  for (const hard of text.split('\n')) {
+    let line = '';
+    for (const word of hard.split(/\s+/).filter(Boolean)) {
+      if (line && line.length + 1 + word.length > fit) { lines.push(line); line = word; } else line = line ? `${line} ${word}` : word;
+    }
+    lines.push(line);
+  }
+  return lines;
+}
 // a message's label as drawn (WO-41): its widest line, and its lines (two at most); a
 // second line takes a line more of the row, above the arrow
 export function drawnLabel(m) {
@@ -83,9 +99,12 @@ export function layoutLifelines(root, size, seq) {
       const ks = cols(note.over);
       const lo = Math.min(...ks);
       const hi = Math.max(...ks);
-      const w = Math.max(labelWidth(note.text.split('\n').sort((p, q) => q.length - p.length)[0]) + 8, x[hi] - x[lo] + 40);
-      notes.push({ note, step: s, x: (x[lo] + x[hi]) / 2, y: y - 8 + NOTE_H / 2, w, h: NOTE_H });
-      y += NOTE_H + 4;
+      const over = x[hi] - x[lo] + 40;
+      const lines = noteLines(note.text, Math.max(over, NOTE_W));
+      const w = Math.max(over, ...lines.map((line) => labelWidth(line) + 8));
+      const h = NOTE_H + (lines.length - 1) * NOTE_LINE;
+      notes.push({ note, step: s, lines, x: (x[lo] + x[hi]) / 2, y: y - 8 + h / 2, w, h });
+      y += h + 4;
     };
     for (const a of ends(s)) {
       for (const note of later.filter((n) => (n.depth || 0) > a.depth)) { noteRow(note); later.splice(later.indexOf(note), 1); }
@@ -107,6 +126,13 @@ export function layoutLifelines(root, size, seq) {
     Object.assign(a, { x: (x0 + x1) / 2, y: (a.y0 + a.y1) / 2, w: x1 - x0, h: a.y1 - a.y0 });
   }
   const lifelines = heads.map((n, k) => ({ n, x: x[k], y0: headH, y1: bottom }));
+  // who is in a call: a bar on the called lifeline, from the call's row to its reply's
+  const bars = (seq.activations || []).flatMap((a) => {
+    const k = col.get(a.who);
+    const y0 = rows.get(a.from)?.y;
+    if (k == null || y0 == null) return [];
+    return [{ a, n: heads[k], x: x[k] + a.depth * BAR_STEP, y0, y1: Math.max(y0 + 8, rows.get(a.to)?.y ?? bottom) }];
+  });
   for (const b of boxes) {
     const ks = b.children.map((c) => col.get(c.id));
     const lo = Math.min(...ks);
@@ -117,5 +143,5 @@ export function layoutLifelines(root, size, seq) {
   }
   for (const a of groups) pos.set({ id: `_g${seq.groups.indexOf(a.g)}`, depth: 1, children: [] }, { x: a.x, y: a.y, w: a.w, h: a.h, group: a });
   for (const [k, n] of notes.entries()) pos.set({ id: `_n${k}`, depth: 1, children: [] }, { x: n.x, y: n.y, w: n.w, h: n.h, noteOf: n });
-  return { pos, edges: [], rows, lifelines, groups, notes, stepY, bottom, seq };
+  return { pos, edges: [], rows, lifelines, bars, groups, notes, stepY, bottom, seq };
 }

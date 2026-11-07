@@ -686,8 +686,12 @@ The basket id and the delivery slot, with an idempotency key.
   the theme).
 - **Messages**: `->>` (a call), `-->>` (a reply), `->` and `-->` (no arrow head), `-x`
   and `--x` (a cross), `-)` and `--)` (async), `<<->>` and `<<-->>` (both ways); a label
-  after `:` (bold, italic and two lines, as an arrow's label). A dotted message is a reply. `+` / `-` activations, `activate`,
-  `deactivate`, `autonumber`, `title` and `destroy` are read and ignored.
+  after `:` (bold, italic and two lines, as an arrow's label). A dotted message is a reply. `autonumber`, `title` and `destroy` are read and ignored.
+- **Activations**: a bar on the called lifeline for a call with a matching reply, or from
+  a `+` on a message (`a->>+b`) or an `activate b` line until a `-` from that lifeline
+  (`b-->>-a`) or a `deactivate b` line; one never closed runs to the end. A call with no
+  reply and no mark, and a one-way `-)`, get no bar: replies stay optional. Played over a
+  view, the caller of an open call shows a bar on its box's edge.
 - **Numbers**: calls are numbered in order; a reply takes the number of the call it
   answers (the nearest earlier call the other way between the same two that no reply
   has taken), shown `3↩`. A reply that answers nothing gets a number of its own.

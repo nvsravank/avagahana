@@ -71,6 +71,7 @@ export function parseSequence(lines, start, title, warnings) {
   const stack = [];
   const here = () => (stack.length ? stack[stack.length - 1].branches.at(-1) : top);
   const messages = [];
+  const marks = [];   // activate and deactivate lines
   const ids = new Map();
   let pendingId = null;
   for (let k = start + 1; k < lines.length; k++) {
@@ -90,7 +91,7 @@ export function parseSequence(lines, start, title, warnings) {
       if (pendingId) { warnings.push(problem('message-id-no-message', `Message id ${pendingId} is followed by no message.`)); pendingId = null; }
     }
     if (msg) {
-      const [, from, op, , to, text] = msg;
+      const [, from, op, mark, to, text] = msg;
       participant(from);
       participant(to);
       const m = {
@@ -98,6 +99,7 @@ export function parseSequence(lines, start, title, warnings) {
         line: op.includes('--') ? 'dotted' : 'solid',
         head: op.endsWith('x') ? 'cross' : op.endsWith(')') ? 'async' : op.endsWith('>>') ? 'arrow' : 'open',
         both: op.startsWith('<<'), self: from === to,
+        mark,
       };
       m.reply = m.line === 'dotted' && !m.self;
       if (pendingId) {
@@ -144,7 +146,11 @@ export function parseSequence(lines, start, title, warnings) {
       warnings.push(problem('sequence-line-syntax', 'An "end" with no block or box to close.'));
       continue;
     }
-    if (/^(autonumber|title\b|activate\s|deactivate\s|destroy\s|links?\s|properties\s|details\s)/.test(t)) continue;
+    if ((p = t.match(new RegExp(`^(activate|deactivate)\\s+(${ID})\\s*$`)))) {
+      marks.push({ on: p[1] === 'activate', who: p[2], after: messages.length - 1 });
+      continue;
+    }
+    if (/^(autonumber|title\b|destroy\s|links?\s|properties\s|details\s)/.test(t)) continue;
     warnings.push(problem('sequence-line-syntax', `Sequence line not understood: "${t}".`));
   }
   if (pendingId) warnings.push(problem('message-id-no-message', `Message id ${pendingId} is followed by no message.`));
@@ -155,12 +161,13 @@ export function parseSequence(lines, start, title, warnings) {
   }
 
   numberMessages(messages);
+  const activations = activationsOf(messages, marks);
   const groups = [];
   const steps = flatten(top.items, [], groups);
   const ordered = [...root.children];
   return {
     root: root.children.length ? root : null, byId, shortened,
-    extra: { sequence: { messages, steps, groups, participants: ordered } },
+    extra: { sequence: { messages, steps, groups, participants: ordered, activations } },
   };
 }
 
@@ -175,6 +182,8 @@ function numberMessages(messages) {
       if (k >= 0) {
         m.num = open[k].num;
         m.back = true;
+        m.answers = open[k];
+        open[k].answeredBy = m;
         open.splice(k, 1);
         continue;
       }
@@ -182,6 +191,48 @@ function numberMessages(messages) {
     m.num = ++n;
     if (!m.reply && !m.self) open.push(m);
   }
+}
+
+// Who is in a call, from when until when (WO-52): a bar on the called lifeline. A call with
+// a matching reply (a one-way `-)` never counts as answered), a `+` on a message, or an
+// `activate` line opens one; its reply, a `-` from that lifeline, or a `deactivate` line
+// closes it. An unanswered, unmarked message has none. A bar never closed runs to the end.
+// -> [{who, from: message, to: message | null, call: message | null, depth}]. call: the
+// message that made the call, whose sender is waiting on it.
+function activationsOf(messages, marks) {
+  const out = [];
+  const stack = new Map();   // who -> their open bars, innermost last
+  const byCall = new Map();
+  const open = (who, m, call) => {
+    const list = stack.get(who) || [];
+    const a = { who, from: m, to: null, call, depth: list.length };
+    list.push(a);
+    stack.set(who, list);
+    out.push(a);
+    return a;
+  };
+  const close = (a, m) => {
+    a.to = m;
+    const list = stack.get(a.who);
+    list.splice(list.indexOf(a), 1);
+  };
+  const line = (x, m) => {
+    const top = stack.get(x.who)?.at(-1);
+    if (!x.on) { if (top) close(top, m); return; }
+    if (top?.from !== m) open(x.who, m, m.to === x.who && !m.self ? m : null);   // the call that line follows, drawn once
+  };
+  marks.filter((x) => x.after < 0 && messages[0]).forEach((x) => line(x, messages[0]));
+  messages.forEach((m, i) => {
+    const answering = m.answers && byCall.get(m.answers);
+    if (answering) close(answering, m);
+    if (m.mark === '-' && answering?.who !== m.from) {
+      const top = stack.get(m.from)?.at(-1);
+      if (top) close(top, m);
+    }
+    if (m.mark === '+' || (m.answeredBy && m.head !== 'async' && !m.self)) byCall.set(m, open(m.to, m, m.self ? null : m));
+    marks.filter((x) => x.after === i).forEach((x) => line(x, m));
+  });
+  return out;
 }
 
 // what a reader sees for a block's Mermaid keyword (captions, the timeline, the lifelines)
