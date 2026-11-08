@@ -20,6 +20,8 @@ problems as a fallback.
 ## Shape of a file
 
 ````markdown
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # <Title>
 
 ```mermaid
@@ -51,6 +53,10 @@ mindmap
 - n4 --> Topic/Other map.md#n12 : see also
 ````
 
+- **Marker**: the first line, an HTML comment that starts `<!-- Avagahana map`, tells an
+  agent opening the file that it is a map, so it changes it with the skill and checks it.
+  Write it when you create a map and add it when you change one without it. The viewer,
+  the checker and GitHub skip it; a map without it still reads.
 - **Title**: the first `# ` heading. Without one, the file name is the title.
 - Sections after the diagram are found by their `## ` heading and may come in any order.
 
@@ -177,7 +183,7 @@ family so they read as one set:
 Trust marks keep their existing icon assignments. In the drawing, they occupy the
 final position on the right, after the note icon, separate from identity icons.
 Their space is reserved even when the map opens with marks hidden, so showing or
-hiding them does not move labels or notes. The Verification button beside
+hiding them does not move labels or notes. The Evidence button beside
 Info holds their legend and a Show / Hide control, independently of other icons.
 Click/tap a node or arrow mark to open that claim's Evidence section. Keyboard focus
 alone and hover do not open it; Enter/Space activates it. Repeating the click,

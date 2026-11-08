@@ -22,15 +22,14 @@ It prints:
 
 ## What is in the picture
 
-A named flowchart perspective's Perspective options apply before explicit render
-flags. Caller-supplied focus/expand/close override them; omit incidental overrides to
-render the authored picture. Walkthrough reading HTML uses authored destinations,
-not the live camera; its authoring and export guidance is in `walkthroughs.md`.
+A perspective's options (which boxes start open, its focus) apply first; `--focus`,
+`--expand` and `--close` override them, so leave those out to draw the perspective as
+written. A walkthrough's exported reading page is described in `walkthroughs.md`.
 
 The same flags as `show.py`, plus the picture's own:
 
 - `--part <anchor>`, `--view <name>`, `--env <name>`, `--focus <id>`, `--mode <mode>`,
-  `--colour-by changes` (a plan).
+  `--colour-by changes` (a map with change marks).
 - `--expand N` levels below the top (`--expand all` everything); `--close a,b` boxes
   shown closed.
 - `--highlight a,b` these nodes in colour, everything else grey: the part the text
@@ -43,7 +42,7 @@ The same flags as `show.py`, plus the picture's own:
   and − marks of what differs; `--edition before` draws the earlier file instead
   (removed things marked), `after` (the default) the map (added things marked). With
   `--report` the report's `changes` lists what changed, in the view drawn and in each view
-  and deployment: the findings of a review, as data. See `compare.md`.
+  and deployment: the findings of a comparison, as data. See `compare.md`.
 - `--draft <file>` draws that file in the map's place, on the reader's page but out of
   sight: try a change on a temp file (outside the maps folder) before making it. The
   map path still names the map. For many tries, import `draft_report` from `render.py`
@@ -54,7 +53,7 @@ The same flags as `show.py`, plus the picture's own:
   `.png` (or `--format png` with `--steps`) for PNG. A PNG past the browser's limits
   (16,000 px a side) is scaled down.
 
-The reader's "since you looked" marks and selection are never drawn; planned changes
+The reader's "since you looked" marks and selection are never drawn; change marks
 and an earlier version's marks are.
 
 ## Check it: `--report`

@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.1",
+  "name": "sequence-oauth",
+  "tags": [
+    "pick"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Explain how the OAuth authorization code flow works. Save what you create in output/.",
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?sequenceDiagram"
+    },
+    {
+      "name": "marker",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?<!-- Avagahana map"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "criteria": "PASS if the agent made an Avagahana map (a Markdown file with a mermaid block) written under output/ with a sequence diagram of the authorization code flow: the client, the user's browser, the authorization server and the resource server, the redirect with the code, and the code exchanged for a token. Evidence is not expected: nothing was read. Naming the specification in the text (RFC 6749) is fine. FAIL if it answered only in text, used another kind of diagram, or gave a claim a '#### Evidence' section or a 'verified' mark citing a source it never opened.",
+      "focus": "trace"
+    }
+  ]
+}

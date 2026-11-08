@@ -6,24 +6,24 @@ several pictures. Full rules: `../../../docs/map-format.md`, "Walkthrough".
 
 ## Choose the picture before writing the explanation
 
-Prefer named perspectives that select the relationships needed for the takeaway.
-Reuse a diagram through several purposeful perspectives rather than duplicating it.
-For flowcharts, use `#### Perspective options` with Open container IDs and optional
-Focus when the explanation needs particular subgraphs open. See `boxes.md`.
-Filtering arrows alone does not guarantee a readable picture: inspect the result.
+Every stop on a box or ER diagram is its own perspective, made for that stop: only the
+arrows its point needs. The exception is an opening stop that shows the whole picture;
+sequence, scenario and deployment stops already show one thing. Make several perspectives
+of one diagram rather than copying the diagram. When the point needs certain boxes open,
+list them under the perspective's `#### Perspective options` (`- Open: services`;
+`boxes.md`). Fewer arrows do not always make a readable picture: look at each stop.
 
-Each stop names one existing destination with `### Diagram: <heading>`,
+Each stop names one destination of this map with `### Diagram: <heading>`,
 `### Perspective: <name>`, `### Deployment: <env>`, `### Scenario: <name>` or
-`### Sequence: <heading>`. Use the heading's exact name; the first
-diagram uses its `# Title`. Start with the boundary, then the relevant behavior and
-data or deployment. Let the explanation determine the number of stops. Walks stay
-inside one map.
+`### Sequence: <heading>`, using the heading's exact name (the first diagram's is its
+`# Title`). Start with the boundary, then the behaviour and data or deployment that
+matter. Let the explanation set the number of stops.
 
-## Write one explanation for live and reading forms
+## Write the explanation
 
-An optional introduction states the audience and purpose. Each stop explains what
-to notice and why it matters, using visible box/arrow labels. Write enough to stand
-alone when read by scrolling. Add optional Stop options after the explanation:
+An optional introduction says who the walk is for and why. Each stop says what to notice
+and why it matters, using the labels the reader sees on the boxes and arrows, and stands on
+its own when read by scrolling. Optional Stop options go after the explanation:
 
 ````markdown
 ## Walkthrough: Payments for the security team
@@ -55,46 +55,29 @@ The retry reuses the idempotency key, so a repeated request does not create anot
 charge. Follow both attempts through to confirmation.
 ````
 
-These IDs/destinations are in `examples/maps/shop-layers.md`. Title defaults to the
-destination name; Label defaults to Title/name. The reading eyebrow repeats Label
-before the diagram kind, matching its navigation. Notes explicitly includes existing
-note-bearing node, arrow or sequence-message IDs from the owning diagram, including
-their evidence. Do not rely on the reader clicking a tiny note or trust icon. Diagram
-qualifies a name reused across diagrams; prefer it when names are ambiguous.
-All fields are optional; old walkthroughs still work. No JSON blocks or new delimiters.
-Subsection/field names are case-insensitive. Blank lines do not end options: the next
-same-level or shallower heading does. Put explanation before Stop options.
+(These ids are in `examples/maps/shop-layers.md`.)
 
-## Reader behavior
+- **Title** is the stop's heading in the panel; it defaults to the destination's name.
+- **Label** is the short name in the stop list; it defaults to the Title.
+- **Notes** lists the notes the stop relies on (node, arrow or sequence-message ids of that
+  diagram). They and their evidence show with the stop, so the reader need not click a
+  small note or confidence mark to find them.
+- **Diagram** says which diagram a name belongs to when two diagrams use the same name.
 
-The walkthrough panel shows the stop, explanation, Previous and Next, and minimises
-to a tab. Previous/Next/Return open the authored destination, applying its perspective
-defaults. Exploring inside it (opening boxes, drilling, notes, another mode) stays on
-track. Another stop's destination moves to that stop; unrelated destinations show
-"You are off the path" and Return. No expansion mismatch tracker or extra reset button.
+All options are optional; field names are case-insensitive. Blank lines do not end the
+options: the next heading at the same level or above does.
 
-The panel's Export walkthrough icon makes a complete offline HTML reading document.
-The current camera/expanded boxes do not affect it. The selected theme and effective
-light/dark appearance are frozen; diagrams/fonts are embedded. A horizontal section
-strip sticks after the intro scrolls away; the branded footer stays visible. Reading
-requires only scrolling. Zoom/pan/Fit are optional, and wheel/touch scrolling normally
-moves the document until Pan is explicitly enabled on an enlarged diagram.
+## What the reader gets
 
-A Sequence stop uses full native lifelines, even when live playback runs over a
-perspective. Keep its native version readable too. A Scenario uses a static highlighted
-path plus every derived step and ER fan-out warning. Keep branching semantics in
-native sequences; do not invent one execution order for alternatives/parallelism.
-Included notes and evidence are visible inline. Essential explanation belongs here,
-not in a separate export narrative or in a link the reader must open.
+A panel with the stop, its explanation, and Previous and Next. Each stop opens its
+destination as written, with its perspective's open boxes; the reader may explore from
+there and Return. The panel's Export walkthrough button makes one offline reading page of
+every stop. A sequence stop draws full lifelines there, and a scenario its highlighted path
+with every step. So keep branching in sequences (`alt`, `par`) rather than inventing one
+order, and put the essential explanation in the stop, not in a link.
 
-## Check the authored story and output
+## Verify the walk
 
-Run the checker; fix walkthrough-empty/twice/stop-kind/stop-unknown and new
-walkthrough-options/reference or perspective-options errors. Then inspect the real
-walk: first entry, Previous/Next, and Return after another diagram should restore the
-same authored picture. Exploration stays on track.
-
-When browser capability is available, inspect the exported reading HTML too: every
-stop, full sequences/scenarios, notes/evidence, theme, narrow layout, fixed footer and
-sticky strip. Fix crowding with useful perspectives and source explanations. If you
-cannot inspect output, say it is unverified; do not present a mockup as a tested export.
+Run the checker and fix every walkthrough error (an empty or repeated stop, an unknown kind
+or destination, bad options). Then verify each stop's picture as SKILL.md says ("Verify the
+picture"): `render.py --report` on each stop's perspective.

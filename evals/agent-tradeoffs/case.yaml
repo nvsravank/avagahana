@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.1",
+  "name": "agent-tradeoffs",
+  "tags": [
+    "communicate"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Today our Orders service calls Payments directly to charge the card, then calls Stock to reserve the items. We are thinking of having Orders publish an OrderPlaced event that Payments and Stock consume instead. What are the trade-offs? Save what you create in output/.",
+    "max_turns": 40,
+    "timeout_seconds": 900,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?(?:(?:flowchart|graph) (?:LR|RL|TB|TD|BT)|sequenceDiagram|mindmap)"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "focus": "trace",
+      "criteria": "PASS if the agent gave the trade-offs in text and also made an Avagahana map (a Markdown file with a mermaid block) under output/ that lays out the two designs: the direct calls and the event flow as two box or sequence diagrams, one diagram with change marks (class ... added / removed / changed) on the parts that change, or a mind map of each design's pros and cons. FAIL if it answered only in text."
+    }
+  ]
+}

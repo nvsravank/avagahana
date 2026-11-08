@@ -1,0 +1,31 @@
+# Staging: everything on one VM (staging-vm-1), started with docker compose, all on one network.
+# nginx stands in for the load balancer, RabbitMQ for SQS, stripe-mock for Stripe.
+services:
+  nginx:
+    image: nginx:1.27
+    ports: ["443:443"]
+    volumes: ["./nginx.conf:/etc/nginx/nginx.conf:ro"]
+    depends_on: [orders, payments]
+  orders:
+    image: registry.example.com/shop/orders:1.1
+    environment:
+      DATABASE_URL: postgres://shop@postgres:5432/shop
+      REDIS_URL: redis://redis:6379
+      ORDER_EVENTS_QUEUE: amqp://rabbitmq:5672/order-events
+  payments:
+    image: registry.example.com/shop/payments:1.1
+    environment:
+      DATABASE_URL: postgres://shop@postgres:5432/shop
+      ORDER_EVENTS_QUEUE: amqp://rabbitmq:5672/order-events
+      STRIPE_API_BASE: http://stripe-mock:12111
+      STRIPE_MODE: test
+  postgres:
+    image: postgres:16
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+  redis:
+    image: redis:7
+  rabbitmq:
+    image: rabbitmq:3.13
+  stripe-mock:
+    image: stripe/stripe-mock:0.188.0
+volumes: {pgdata: {}}

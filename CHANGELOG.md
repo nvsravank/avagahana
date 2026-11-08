@@ -6,6 +6,28 @@ marked **Contract**.
 
 ## Unreleased
 
+- **Contract** (map format): a map's first line is a marker, `<!-- Avagahana map: change it
+  with the illuminate-concept skill -->`, so an agent opening the file knows it is a map. The
+  skills write it on every map they create or change; the viewer and checker skip it, and a
+  map without it still reads. Every example map has it.
+- **Contract** (viewer): the button beside Info that opens the confidence key and the source
+  list is named **Evidence** (was Verification), and so are its panel and a claim's evidence
+  popup. Its `data-mmv="verificationBtn"` hook and CSS classes are unchanged. Checker and
+  viewer messages say "confidence mark" for the `verified`, `inferred`, `hypothesis` and
+  `unsourced` marks; problem codes are unchanged.
+- Skills: illuminate-concept names pull requests, branches, proposals and comparing two
+  versions in its description and picks diagrams from a table of example requests; its loop
+  is write, verify the text, show, verify the picture (the layout report for each diagram and
+  perspective, a screenshot only when in doubt). Evidence is required for every change mark and
+  every traced map, where available for maps of something real, and not for one's own
+  thinking. trace-architecture starts from the kind of request (a repository, a pull request
+  or branch, a release with one map file per release, a security review) and hands a single
+  pull request to illuminate-concept. `references/verification.md` is now
+  `references/evidence.md`.
+- Skill evals: `evals/` holds 20 requests (18 that should pick a skill and picture, 2 that
+  should not), run with `scripts/eval_skills.sh` (`claude plugin eval`, Haiku by default).
+  Not part of `check.sh`: runs cost model time and need a login.
+
 - **Contract** (map format): a sequence's `+`, `-`, `activate` and `deactivate`, read and ignored
   until now, draw activation bars. So does a call with a matching reply; a call with no reply and a
   one-way `-)` get none, and replies stay optional. Played over a view, the caller of an open call

@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Quarterly sales with an unpivot
 
 Expand quarterly_rows, then use the top-right circle on **u · unpivot** to expand

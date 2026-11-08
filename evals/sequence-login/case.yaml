@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.1",
+  "name": "sequence-login",
+  "tags": [
+    "pick"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Explain how our login works: the browser posts the password to the Auth service, which checks it against the Users DB, then asks the Token store for a session token and returns it to the browser. A wrong password gets a 401. Save what you create in output/.",
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?sequenceDiagram"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "criteria": "PASS if the agent made an Avagahana map (a Markdown file with a mermaid block, checked by its checker) written under output/ with a sequence diagram of the login (alone, or played over a box diagram of the same parts) across browser, Auth service, Users DB and Token store (the order of hand-offs is the point). FAIL if it made no such map, or the map has no sequence diagram.",
+      "focus": "trace"
+    }
+  ]
+}

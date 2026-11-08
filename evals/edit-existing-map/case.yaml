@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.1",
+  "name": "edit-existing-map",
+  "tags": [
+    "route"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Our architecture document is maps/Shop/Shop platform.md. We are adding a Reviews service: shoppers post product reviews through the gateway, Reviews keeps them in its own database, and Catalogue reads the average rating from it. Update the document.",
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(illuminate-concept|trace-architecture)\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "checked",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "check_map\\.py"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "focus": {
+        "source": "file",
+        "path": "maps/Shop/Shop platform.md"
+      },
+      "criteria": "This is the architecture map after the agent's edit. PASS if its first diagram now has a Reviews box with arrows from the gateway to Reviews, from Reviews to its own database, and from Catalogue to Reviews; the existing boxes, ids, perspectives and notes are kept, and the first line is still the '<!-- Avagahana map' marker; and Reviews has a note under ## Details saying what it does. FAIL if Reviews is missing or added only as prose, if the new parts are not in a mermaid block, or if existing ids or sections were renamed or removed."
+    }
+  ]
+}

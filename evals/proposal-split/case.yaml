@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.1",
+  "name": "proposal-split",
+  "tags": [
+    "route",
+    "changes",
+    "evidence"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "We plan to add refunds. The plan: when an order is cancelled, Orders asks Payments to refund the order total, and Payments records each refund in a new refunds table before calling Stripe. Nothing is built yet; the code is in the git repository in the shop folder (main). Show the proposal. Save what you create in output/.",
+    "max_turns": 60,
+    "timeout_seconds": 1200,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "marks",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?class [\\w,-]+ added"
+    },
+    {
+      "name": "evidence",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence"
+    },
+    {
+      "name": "reply",
+      "type": "llm",
+      "focus": "last_message",
+      "criteria": "PASS if the reply explains the refund proposal (what is added, what changes in Orders and Payments) and points to a map it saved under output/. FAIL if it makes no map."
+    }
+  ]
+}

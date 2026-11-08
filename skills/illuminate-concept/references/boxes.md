@@ -81,10 +81,11 @@ def score(text):
     return out
 ```
 
-Score every mode and view, not only the one the person reads (an ER diagram's views
-are model perspectives; SQL queries have generated numbered join items). The reader can switch
-between Boxes and Layers, and a view lays out the first block's nodes in the first
-block's order, so a reorder that helps the default view can tangle a view. `view=`
+Score every mode and perspective, not only the one the person reads (an ER diagram's
+perspectives list its relationships; SQL queries have generated numbered join items). The
+reader can switch between Boxes and Layers, and a perspective lays out the first block's
+nodes in the first block's order, so a reorder that helps the default view can tangle a
+perspective. `view=`
 takes the name after `## Perspective: `; `part=` a further diagram's heading anchor. Keep
 an attempt only when nothing gets worse anywhere; when the modes want opposite orders
 and neither can gain without the other losing, the picture is at its best: leave it.
@@ -112,46 +113,49 @@ agent may be using.)
 - Built-in classes: `person` and `external` draw as figures (a large icon, the label
   under it), `database` as a database: `class psp external`.
 
-## Views: what each picture shows
+## Perspectives: what each picture shows
 
 - The arrows inside the block are the default view ("Relations"); it is not "all".
-  Each `## Perspective: <name>` section is another view, and shows only the boxes its
-  arrows use (and the boxes round them), laid out again.
-- Use views to keep pictures small and to hide whole layers: synchronous calls in the
-  block, events only in `## Perspective: Events` (the messaging boxes then appear only
-  there). There is no "All" view, by design.
-- View lines: `- from --> to : label`, with Mermaid's arrow operators.
+- A **perspective** is a filtered view: a `## Perspective: <name>` section listing some of
+  the diagram's arrows. It shows only the boxes those arrows use (and the boxes round
+  them), laid out again.
+- Use a perspective when the diagram has more arrows than one point needs, or to show one
+  concern: synchronous calls in the block, events only in `## Perspective: Events` (the
+  messaging boxes then appear only there). There is no "All" view, by design.
+- Perspective lines: `- from --> to : label`, with Mermaid's arrow operators.
+- Every walkthrough stop on a box diagram is its own perspective, made for that stop,
+  except an opening stop that shows the whole picture.
 
-Prefer purposeful perspectives for explanation, especially walkthrough stops. A named
-flowchart perspective may own its opening detail after the relationship list:
+A perspective can also say which boxes start open, after its arrow list:
 
 ```markdown
 #### Perspective options
 - Open: services, outside
+- Focus: platform
 ```
 
-Open names containers/subgraphs by ID, starts other containers closed and opens only
-those IDs and their ancestor paths. Descendants stay closed unless named. The arrows
-still filter participation. Optional `- Focus: platform` drills to that container;
-Open targets must be inside it. Focus alone uses normal defaults there. Omitted Focus
-restores the whole diagram. These defaults restore on explicit entry, including
-walkthrough Previous/Next/Return; ordinary expansion and drilling remain exploration.
-Without options, existing behavior is unchanged. Use actual container IDs, not levels
-or new stop-level expansion settings. Inspect the rendered picture.
+- `Open` names boxes (subgraph ids). They and the boxes round them start open; every other
+  box starts closed, and so do boxes inside an open one unless named.
+- `Focus` drills into one box first; `Open` boxes must then be inside it. Leave Focus out to
+  show the whole diagram.
+- These apply each time the reader enters the perspective, including a walkthrough's
+  Previous, Next and Return; opening boxes by hand afterwards is the reader's own.
+- Fewer arrows do not always make a readable picture: verify each perspective
+  (SKILL.md, "Verify the picture").
 
 ## Arrows and labels
 
 - Operators carry meaning: `-->` a call, `-.->` asynchronous or an event, `==>` the main
   path, `--o` / `--x` other ends, `<-->` both ways. Labels: `-->|label|` in the block,
-  `: label` in a view line. Keep labels short; they take room in the gaps. `<br>` gives
+  `: label` in a perspective line. Keep labels short; they take room in the gaps. `<br>` gives
   a second line (a protocol under the verb: `reads<br>JDBC`); only two are drawn.
-- A note on an arrow: give it an id (`orders e1@-->|charges| payments`, or on a view
-  line `- retry e3@-.-> notify : resend`) and key a `## Details` entry by it. One id per
+- A note on an arrow: give it an id (`orders e1@-->|charges| payments`, or on a
+  perspective line `- retry e3@-.-> notify : resend`) and key a `## Details` entry by it. One id per
   arrow, never the same as a node's.
 - Several arrows between one pair of drawn boxes merge into "N links" and show no
   notes, so note the arrows that stay single.
 - Colour a line only where colour means something: `class e1 money`, or `:::money` at
-  the end of a view line, and give the class a meaning in `## Classes`
+  the end of a perspective line, and give the class a meaning in `## Classes`
   (`- money : - : Money moves`) so the key lists it under "Lines".
 
 ## Classes and looks
@@ -177,7 +181,7 @@ or new stop-level expansion settings. Inspect the rendered picture.
   the node in Poster); a class's cloud icon counts too (`- ec2 : aws ec2 : Virtual
   machines`). Put the product first; further cloud icons become small tags. A node with
   no cloud icon may mark one Phosphor icon main: `- sched : main ph clock` (`main` only
-  in `## Node icons` and `## Classes`, never before a cloud icon or a trust mark, one per
+  in `## Node icons` and `## Classes`, never before a cloud icon or a confidence mark, one per
   node, and not on a node whose class brings a cloud icon). Leave it off where no icon
   stands for the node.
 - For a box (a VPC, a subnet, an account), use the vendor's group icon where there is
@@ -235,9 +239,11 @@ or new stop-level expansion settings. Inspect the rendered picture.
 
 ## Pitfalls
 
-- Everything in the default view makes a dense picture: split it into views.
-- Long labels and many labelled arrows in one gap widen the picture.
+- Everything in the default view makes a dense picture: split it into perspectives.
+- An arrow label wraps at 40 characters, two lines at most (the rest is cut with …). In a
+  left-to-right picture the longest label in a gap sets its width; top to bottom, each
+  labelled arrow in a gap can add a row. Keep labels to a verb or two.
 - A whole big map at fit shows names as bars too small to read: give the reader a
-  named view, or point at a box with `--focus`.
-- A node's page already draws its arrows, views and environments: a note is for what
+  perspective, or move their page to a box with `--focus`.
+- A node's page already draws its arrows, perspectives and environments: a note is for what
   the pictures cannot say.

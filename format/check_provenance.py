@@ -136,7 +136,7 @@ def check_provenance(m):
                 elif re.match(r'\s*[-*]\s+(Source|File|Lines|Supports|URL|SHA-256):', line, re.I):
                     fail('evidence-syntax', ln, 'Evidence uses Source links and indented File, Lines, Supports, URL or SHA-256 fields.')
             if not sections[0].group(1).strip():
-                fail('evidence-syntax', ln, 'Evidence must contain verification text or source references.')
+                fail('evidence-syntax', ln, 'Evidence must contain an explanation or source references.')
             for ref in entries:
                 entry = refs.get(ref['source'])
                 if not entry or (entry[0].get('version control', 'git') == 'git' and entry[1] is None):
@@ -192,4 +192,4 @@ def check_verification_pairs(m, part, sections, own_icons, class_trust, classes)
     for nid in sorted(marked | set(evidence)):
         if (nid in marked and not evidence.get(nid)) or (nid not in marked and nid in evidence):
             m.report(lines.get(nid, read['ids'].get(nid, {}).get('line', part['line'])), 'verification-pair',
-                     f'{nid}: trust marks and a nonempty Evidence section must be supplied together')
+                     f'{nid}: a confidence mark and a nonempty Evidence section must be supplied together')

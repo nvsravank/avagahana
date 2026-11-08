@@ -1,93 +1,84 @@
 ---
 name: trace-architecture
-description: Review a project, repository or codebase and explain it as an Avagahana map, one Markdown file holding the set of diagrams the project needs (structure, layers, key flows, lifecycles, data), read in an interactive viewer or rendered to SVG or PNG for a document. Use when the user asks to review, survey, document or map a project or repo, or to build diagrams or an architecture overview of a codebase. Builds on the illuminate-concept skill.
+description: >-
+  Avagahana map of a whole codebase: one Markdown file of linked diagrams (context, layers, key flows, lifecycles, data, deployments), every box and arrow backed by evidence from the code, ending with a guided walkthrough. Always use this skill, together with illuminate-concept, when the user wants to: understand, explain or document a project, repository or codebase, or give someone an overview of it or onboard them; review its architecture or design, or do a security review of it; or see what a release, version or tag changed since an earlier one. Make the map as well as any text answer or report, unless they ask for text only. Use it even when no diagram is asked for. Prefer an Avagahana map to a custom HTML page for explaining a codebase.
 ---
 
-# Diagram a codebase
+# Map a codebase
 
-Verification is the default for trace-architecture. Read
-`../illuminate-concept/references/verification.md` before inspecting source:
-review captured committed trees, record repository revisions in Sources, and attach
-file/line Evidence to the verified nodes and arrows in their existing Details notes.
-Use inferred, hypothesis or unsourced honestly when a claim is not verified, with
-an Evidence explanation of that status. Do this by default; it is not an optional
-extra pass. Each trust-marked claim needs verification text, and each Evidence
-section needs the matching trust mark.
+You make **one map file** holding every diagram, each linked from the first, unless the
+user asks for separate files. Make it even when the user asked for a report: write the
+report in text as well, and point it at the map. Every box and arrow carries evidence from the code: that is
+the point of a traced map. The format, checking and showing are in the illuminate-concept
+skill: read `../illuminate-concept/SKILL.md` before writing, and follow its loop (write,
+verify, show).
 
-The output is **one map file** holding every diagram, linked from the first, unless
-the user asks for separate files. Everything about the format, checking and showing
-the map is in the illuminate-concept skill: read `../illuminate-concept/SKILL.md` and the references it names
-before writing, and follow its loop (write, check, show, point).
+## 1. Which request is it?
 
-## 1. Size the task first
+| The user asks | Do this |
+|---|---|
+| Map, survey or document the repository | Steps 2 to 6 for the whole project. |
+| What one pull request or branch changes | Not this skill: use illuminate-concept, change marks (`../illuminate-concept/references/changes.md`). Draw only the affected parts. |
+| What a release changes (since vX.Y, since the last tag) | One map file per release, `<Topic>/<Name>-vX.Y.md`. Find the previous release's map; if there is none, trace that release's tag into it first (steps 2 to 6). Copy it to the new release's file, update it from the new release's commit keeping every id, then compare the two (`../illuminate-concept/references/compare.md`). End with a security review walkthrough (step 5). |
+| A security review | Ask the user whether it is for a release or for the project as it is now, then follow that row. Either way, end with a security review walkthrough (step 5). |
 
-Before reading deeply, take a quick inventory: the top-level folders, the entry points
-(servers, CLIs, jobs, pages), the build and deployment files, the schemas and
-migrations, the external services it calls. From that, judge:
+## 2. Record the commit you read
 
-- how many distinct parts there are and how they group into layers;
-- which requests or jobs cross several parts and are worth playing step by step;
-- which things have a lifecycle that the code enforces;
-- whether there is stored data whose relationships need seeing;
-- whether it runs in more than one environment.
+Before reading code, read `../illuminate-concept/references/evidence.md`. Record the
+repository and the full commit you read in `## Sources`. If the working tree has
+uncommitted changes, ask the user: commit first, or map the last commit. For a release,
+the commit is that release's tag.
 
-Tell the user in a few lines what you found and which diagrams you plan, with one line
-each on what each will show. The plan scales with the project: a small one gets few
-diagrams, a large one more. Then build it.
+## 3. Take stock, then plan
 
-## 2. Choose the diagrams by purpose
+If the repository already has a code graph (`graphify-out/graph.json`,
+`.ua/knowledge-graph.json`), use it to find the parts and connections; it is a guide, not
+evidence. Do not install or run such tools unless asked.
 
-Use the illuminate-concept skill's table and its "How many diagrams, and which". For a codebase
-this usually means some of:
+Otherwise list: top-level folders, entry points (servers, CLIs, jobs, pages), build and
+deployment files, schemas and migrations, external services. From that, judge how many
+parts there are and how they group into layers, which requests cross several parts, which
+things have a lifecycle the code enforces, what stored data has relationships worth seeing,
+and whether it runs in more than one environment.
 
-- a context or container box diagram as the first diagram, the entry point;
-- a layer diagram whose top-level subgraphs are the real layers, named for their
-  responsibility, each node with a role class (see `../illuminate-concept/references/boxes.md`, "Layer
-  diagrams");
-- drill-in diagrams for the parts with enough inside them, linked by `click`;
-- sequences for the flows that carry the system's behaviour, played over the box view
-  they cross;
-- state diagrams for lifecycles the code really enforces;
-- an ER diagram where the data model's relationships matter;
-- an expandable SQL query map for the queries that carry real logic (`../illuminate-concept/references/sql-queries.md`);
-- deployments when environments differ.
+Tell the user in a few lines what you found and which diagrams you plan, one line each.
+A small project gets few diagrams, a large one more. Then build it.
 
-Skip a kind the project does not have. Prefer several kinds, each for its purpose,
-over many diagrams of one kind.
+**Too large for one pass?** Do the work yourself by default. Only when the inventory shows
+a project too large to read well in one context, propose splitting it in the plan: how
+many subagents, what each covers (by area or by diagram kind, such as one for the data
+model, one for the key flows) and why. **Ask and wait for a yes before starting any.**
+Subagents return findings with file references, not map files; you write the one map, so
+names, layers and roles stay consistent.
 
-When the map has more than a few diagrams, end with a walkthrough for its main reader
-(`## Walkthrough: Getting around <project>` for a new joiner, or one for the review's
-audience): the entry diagram first, then the parts and flows that matter, each stop
-saying what to notice. See `../illuminate-concept/references/walkthroughs.md`.
-Prefer focused named perspectives for each explanation, using Open container IDs
-when needed. Reuse claim notes/evidence through Stop options Notes so the reading
-HTML contains the supporting detail. Keep one authored story for live and reading
-forms; inspect both when browser capability is available.
+## 4. Read the code and draw
 
-## 3. Work from the code
+Pick each diagram from the illuminate-concept skill's examples table. For a codebase, start
+with a context or container picture, then a layer diagram whose top-level boxes are the real
+layers, named for what they do (`../illuminate-concept/references/boxes.md`, "Layer
+diagrams"); drill into parts with enough inside them. Prefer several kinds, each for its
+purpose, over many box diagrams; skip a kind the project does not have.
 
-- Every node and arrow comes from something you read: name the file or symbol in its
-  note, and mark it `verified` (read) or `inferred` (deduced) with the trust icons.
-- Follow real call paths for sequences: read the handlers, not just the folder names.
-- Use the project's own terms in labels, but layers and roles describe what parts do.
-- Keep icons rare (the illuminate-concept skill's "Icons: sparingly").
+- Every box and arrow comes from code you read. Give it evidence (file and lines) and a
+  confidence mark: `verified` when you read it, `inferred` when you deduced it.
+- Follow real call paths for sequences: read the handlers, not the folder names.
+- Use the project's own names in labels; name layers and roles for what parts do.
 
-## 4. Subagents: a last resort, with approval
+## 5. A walkthrough for the main reader
 
-Do the work yourself in one pass by default. Only when the inventory shows a project
-too large to read well in one context, propose splitting it: say how many subagents,
-what each covers (by diagram kind or by area, such as one for the data model, one for
-the key flows), and why. **Ask the user and wait for a yes before starting any.** Each
-subagent returns findings (parts, arrows, flows, tables, with file references), not map
-files; you write the one map from them, so names, layers and roles stay consistent.
+When the map has more than a few diagrams, end with a walkthrough:
+`## Walkthrough: Getting around <project>` for a new joiner, or
+`## Walkthrough: Security review` for a security review and for every release map. The
+entry diagram first, then the parts and flows that matter (for a security review: trust
+boundaries, outside systems, where secrets and personal data go, and for a release what
+changed there). Give each stop its own perspective, as
+`../illuminate-concept/references/walkthroughs.md` says. List the notes a stop relies on in
+its Stop options (`- Notes: orders, e1`), so their evidence shows with the stop in the
+exported reading page.
 
-## 5. Finish
+## 6. Verify the map, then show it
 
-For a release or security review (what changed since a tag), keep every id of the map
-from the earlier version, update it from the code, and compare the two with the
-illuminate-concept skill's `references/compare.md` (Before and After, and the changes as
-data from `render.py --before --report`).
-
-Run the checker until it prints `OK`, show the map, and look at each diagram (a
-screenshot if you have a browser). Redraw any that is dense, has arrows running back
-up the layers, or shows nothing another diagram does not.
+Verify the map as the illuminate-concept loop says, for every diagram and perspective. For
+a codebase, also read the map for arrows running back up the layers (the layers are wrong:
+regroup). Then show the map; for a release, open it compared with the previous release's
+file.

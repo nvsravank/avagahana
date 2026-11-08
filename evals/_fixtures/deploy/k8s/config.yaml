@@ -1,0 +1,10 @@
+# Production settings: the database, cache and queue are AWS services outside the cluster
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: shop-config, namespace: shop}
+data:
+  DATABASE_URL: postgres://shop@shop-prod.abc123.eu-west-1.rds.amazonaws.com:5432/shop
+  REPORTS_DATABASE_URL: postgres://reports@shop-prod-replica.abc123.eu-west-1.rds.amazonaws.com:5432/shop
+  REDIS_URL: redis://shop-cache.abc123.euw1.cache.amazonaws.com:6379
+  ORDER_EVENTS_QUEUE: https://sqs.eu-west-1.amazonaws.com/123456789012/order-events
+  STRIPE_MODE: live

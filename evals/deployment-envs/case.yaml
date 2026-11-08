@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.1",
+  "name": "deployment-envs",
+  "tags": [
+    "pick"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "How is production set up compared with staging, and how does a request reach Payments in each? The deployment files are in the deploy folder. Save what you create in output/.",
+    "max_turns": 40,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?## Deployment:"
+    },
+    {
+      "name": "evidence",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence[^\\n]*(docker-compose\\.yml|nginx\\.conf|[\\w-]+\\.yaml)"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "focus": "trace",
+      "criteria": "PASS if the agent read the files in deploy/ and made an Avagahana map (a Markdown file with a mermaid block) under output/ with a box diagram of the parts and one '## Deployment:' section per environment that places them: production with the load balancer (ingress), Orders and Payments in separate namespaces on the Kubernetes cluster, and RDS (with its read replica), ElastiCache Redis, SQS and Stripe outside it; staging with nginx, Orders, Payments, Postgres, Redis, RabbitMQ and stripe-mock as containers on one VM. The map or the reply must show how a request reaches Payments in each: in production Payments is reached through the queue (OrderPlaced from Orders) and by Stripe's webhook through the load balancer, behind a network policy; in staging the same through RabbitMQ and nginx. The map cites the deploy files as evidence. FAIL if it answered only in text or a table, or the map leaves out the queue or the load balancer."
+    }
+  ]
+}

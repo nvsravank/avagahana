@@ -186,7 +186,9 @@ class RelayTests(unittest.TestCase):
     def test_map(self):
         status, res, data = self.s.request("GET", "/api/map?p=garden.md")
         self.assertEqual(status, 200)
-        self.assertTrue(data.decode("utf-8").startswith("# Community garden"))
+        text = data.decode("utf-8")
+        self.assertTrue(text.startswith("<!-- Avagahana map"))
+        self.assertIn("\n# Community garden\n", text)
         self.assertEqual(res.getheader("Cache-Control"), "no-store")
         status, _, _ = self.s.request("GET", "/api/map?p=Topic/Deep%20map.md")
         self.assertEqual(status, 200)

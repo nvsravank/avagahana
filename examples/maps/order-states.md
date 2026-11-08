@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Order lifecycle
 
 How an order moves from placed to delivered, and where a payment that keeps failing

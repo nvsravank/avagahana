@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.1",
+  "name": "repo-map",
+  "tags": [
+    "route"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Give me an architecture overview of the code in the shop folder. Save what you create in output/.",
+    "max_turns": 60,
+    "timeout_seconds": 1200,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?trace-architecture\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "sources",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?Commit: [0-9a-f]{40}"
+    },
+    {
+      "name": "evidence",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence"
+    },
+    {
+      "name": "reply",
+      "type": "llm",
+      "focus": "last_message",
+      "criteria": "PASS if the reply gives an overview of the shop code (Orders, Payments, the store, the card provider and how they connect) and points to a map it saved under output/. FAIL if it makes no map."
+    }
+  ]
+}

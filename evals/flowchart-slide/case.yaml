@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.1",
+  "name": "flowchart-slide",
+  "tags": [
+    "pick"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "I need a picture of our system's parts for a slide deck: a web app and a mobile app call an API gateway, which calls Orders and Payments; Orders stores in Postgres; Payments calls Stripe. Save what you create in output/.",
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?flowchart"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "criteria": "PASS if the agent made an Avagahana map (a Markdown file with a mermaid block, checked by its checker) written under output/ with a box diagram (flowchart) of the parts and rendered an SVG or PNG for the slide or said how (render.py). FAIL if no such map was made, or a sequence or mind map is the picture.",
+      "focus": "trace"
+    }
+  ]
+}

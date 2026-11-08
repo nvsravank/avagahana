@@ -1,15 +1,18 @@
 ---
 name: illuminate-concept
 description: >-
-  Explain concepts visually with an Avagahana map: Markdown and Mermaid read in an interactive viewer or exported as SVG/PNG. Use for systems, flows, data models, SQL understanding, plans and related ideas that benefit from a diagram. Prefer this skill when its diagram kinds fit; use trace-architecture for a whole codebase.
+  Avagahana map: Helps your user with understanding your answers. Always use this skill when describing: how something works, analysis, a plan, options and trade-offs, a proposal, changes in a pull request, changes in a branch, ideas or priorities they are thinking through. Load this skill and make a map as well as answering in text, unless they ask for text only. Always use this skill if the user asks for: mindmaps, systems diagrams (component, C4, deployment etc.), flows (flowcharts, sequence diagrams etc.), lifecycles (state diagrams, etc.), data models and schemas (ER diagrams), SQL queries, plans and ideas, reviews (security, design, architecture etc.). Capabilities include change marks, before and after comparison, guided walkthroughs, and SVG and PNG pictures or a one-file snapshot to send, with or without a custom theme. Use it even when no diagram is asked for. If you plan to write Mermaid, HTML or SVG to explain or export a diagram, use this skill. Always use it to change a file marked Avagahana map.
 ---
 
 # Avagahana maps
 
-A map is one Markdown file: a title, a Mermaid block, and optional sections (notes,
-icons, relation views, further diagrams). The user reads it in a viewer that redraws
-as the file changes. Text in, a picture out: prefer a map to a long explanation of how
-things connect.
+A map is one Markdown file: a marker line, a title, a Mermaid block, and optional
+sections (notes, icons, perspectives, further diagrams). The user reads it in a viewer
+that redraws as the file changes. A map is how you help the user understand you: whenever you
+explain something they need to understand (how something works, what you found, what
+you plan or changed, the options and their trade-offs), or the explanation would take
+more than about 10 lines of text, make a map as well as answering in text, unless they
+ask for text only. The text answers; the map shows it.
 
 ## Locate the plugin and maps
 
@@ -21,8 +24,10 @@ things connect.
   shell code. If neither is configured, ask the user for an existing maps folder and
   save its absolute path in that file for future sessions. Expand `~` if supplied.
   Confirm the folder exists; do not create or move the user's maps folder.
-- Put each map in `<maps folder>/<Topic>/<Name>.md`. Paths passed to the relay are
-  relative to the maps folder, with forward slashes. Read existing maps before editing.
+- Put each map in `<maps folder>/<Topic>/<Name>.md`. `<Topic>` is the system, project
+  or subject area the map belongs to (`Shop`, `OAuth`); reuse an existing one when it
+  fits. Paths passed to the relay are relative to the maps folder, with forward slashes.
+  Read existing maps before editing.
 - In commands below, replace `<plugin root>` and `<maps folder>` with the resolved
   absolute paths. They are notation, not environment variables or client substitutions.
   Quote each path as a single argument. Commands need Python 3.9 or later (`python3`), tested on 3.9 and 3.15.
@@ -30,46 +35,78 @@ things connect.
 
 ## The loop, every time you write a map
 
-1. **Write** the file (rules below; the detail for each kind is in `references/`).
-2. **Check** it: `python3 "<plugin root>/format/check_map.py" "<maps folder>/<Topic>/<Name>.md"`.
+1. **Read the reference** for each kind you will draw, before writing anything: the table
+   below names it (`references/<file>.md`, beside this file). The rules for each kind are
+   there, not here; a map written without them misses parts the reader needs.
+2. **Write** the file, with each kind's must-haves from the table. Its first line is the
+   marker `<!-- Avagahana map: change it with the illuminate-concept skill -->`, then the
+   `# Title`. When you change a map that has no marker, add it.
+3. **Verify the text**: `python3 "<plugin root>/format/check_map.py" "<maps folder>/<Topic>/<Name>.md"`.
    It prints `OK` or one line per problem and exits 1 on any. It is strict: fix every
    problem and run it again. Warnings pass, but read them (an unknown id is usually a
    renamed node).
-3. **Show** it: `python3 "<plugin root>/relay-server/serve_maps.py" --maps-dir "<maps folder>" --map "<Topic>/<Name>.md"`.
+4. **Show** it: `python3 "<plugin root>/relay-server/serve_maps.py" --maps-dir "<maps folder>" --map "<Topic>/<Name>.md"`.
    It starts the server, or reuses a running one, and prints one line:
    `STATUS=started|reused URL=<link>`. Give the user the link (and open it with `open`
    on macOS, `xdg-open` on Linux, `start` on Windows). An open page redraws by itself
-   when the file changes, so after an edit go straight to step 4. `ERROR=...`: tell the
-   user what it says (for example the maps folder does not exist; check `AVAGAHANA_MAP_DIR` or
-   `~/.config/avagahana/maps-dir`).
-4. **Point** at what you are talking about (below), then, if you have a browser tool,
-   take a screenshot of the page and look at it: crossing arrows, cramped labels or a
-   picture too dense to read mean the map needs another view or fewer labels.
-   For a walkthrough, prefer focused named perspectives and inspect its authored
-   entry/return pictures and reading HTML too; see `references/walkthroughs.md`.
+   when the file changes. `ERROR=...`: tell the user what it says (for example the maps
+   folder does not exist; check `AVAGAHANA_MAP_DIR` or `~/.config/avagahana/maps-dir`).
+5. **Verify the picture**: run `render.py ... --report` (`references/render.md`, "Check
+   it") for each diagram and each perspective, and fix what it reports: cut labels,
+   overlaps, avoidable crossings, touching lines, text too small. Then read the map for
+   what a report cannot measure: a diagram that shows nothing another does not (fold it
+   into a note), or one that answers a different question than the user asked. Take a
+   screenshot only when the report leaves a doubt or the user says something looks wrong.
+
+After an edit, go straight back to step 3; the open page redraws.
+
+## Evidence
+
+Evidence is a cornerstone of Avagahana maps: required in many cases and recommended in
+most. It backs a claim about something that exists: a code citation (repository, commit,
+file, lines) for anything read in a codebase, or another citation (a specification, a
+document, a log, a test run) for anything else. It goes **in the map**: each backed box or
+arrow gets a **confidence mark** (`verified`, `inferred`, `hypothesis`, `unsourced`) in
+`## Node icons` (`- e1 : verified`; `::icon(...)` in a mind map) and a `#### Evidence`
+section in its note. The checker rejects either without the other. A source named only in
+your reply is lost to the reader of the map. How to record them: `references/evidence.md`.
+
+- **Required**: every map made with trace-architecture; every map of something real that
+  you read, such as the user's code, schema or configuration, or a specification you
+  opened: cite what you read; and every change mark on something that exists: a pull
+  request's marks cite its commits, a proposal's `changed` and `removed` parts cite the
+  current code. Mark a claim with nothing to cite `unsourced` or `hypothesis`, and say why
+  in its evidence.
+- **Not evidence**: a plan, ticket or design document says what is intended, not what
+  exists. A proposal's `added` parts link it in their note, with no confidence mark.
+- **None**: the user's own thinking, such as a brainstorm or a set of options; a general
+  explanation from what you already know, with nothing read (never cite a source you did
+  not open). SQL the user pasted is its own source.
 
 ## Pick the diagram
 
-| The user needs to see | Write | Reference |
-|---|---|---|
-| A tree of ideas, a breakdown, options | `mindmap` | `references/mind-maps.md` |
-| A system: parts inside parts, and what calls what | `flowchart` | `references/boxes.md` |
-| Where it runs, per environment | `## Deployment: <env>` after a flowchart | `references/boxes.md` |
-| How a request moves through it, step by step | `sequenceDiagram` | `references/sequences.md` |
-| How one thing changes over its life | `stateDiagram-v2` | `references/state-and-er.md` |
-| A data model, table definitions and model relationships | `erDiagram` | `references/state-and-er.md` |
-| How a SQL query is built, with expandable CTEs, joins, filters and outputs | `flowchart` + `## Query:` + shared ER definitions | `references/sql-queries.md` |
-| A plan: what will be added, changed, removed | classes `added` `changed` `removed` | `references/changes.md` |
-| Two versions of a map compared (a release review: what is new, removed, moved, changed) | the same map, plus its earlier file | `references/compare.md` |
-| A path through the map for one audience (a security review, a new joiner) | `## Walkthrough: <name>` with `### <Kind>: <name>` stops | `references/walkthroughs.md` |
+Pick the row by what the reader must see, not by the words of the request. The examples
+are a guide; most subjects need more than one row.
+
+| Examples of what the user needs to see | Draw | Must have | MUST read first |
+|---|---|---|---|
+| Options for X; a breakdown of a topic; my thoughts on X | `mindmap` | one centre; main branches in bold; detail in notes, not in labels | `references/mind-maps.md` |
+| The parts of our system and what calls what; a picture of our services for a slide | `flowchart` | parts inside `subgraph` boxes; a short verb on each arrow; a class for each role (`person`, `external`, `database`) | `references/boxes.md` |
+| Where each service runs in staging and in production; how production is set up compared with staging; what runs on which cluster, VM or cloud service | `## Deployment: <env>` after a flowchart | one box diagram for every environment, never a diagram per environment; one section per environment, naming the diagram's ids bare; infrastructure as boxes around them | `references/boxes.md`, "Deployments" |
+| How login works end to end; what happens when a payment fails; how a job retries when the queue is down; how OAuth works | `sequenceDiagram`, played over the box diagram it crosses | participants named by the box diagram's ids; `alt`, `loop`, `par` for branches, retries and parallel steps; `## Plays over` | `references/sequences.md` |
+| The states a support ticket goes through; an order's lifecycle | `stateDiagram-v2` | `[*]` start and ends; a label on each transition; `<<choice>>` for decisions | `references/state-and-er.md` |
+| Explain the tables in our schema and how they relate; Explain the data warehouse schema | `erDiagram` | every table with its columns and keys (`PK`, `FK`); a class per table; one `## Relations` line per relationship, column to column | `references/state-and-er.md` |
+| Help me understand this SQL query; How can I answer questions from the database? | `flowchart` + `## Query:` + shared ER definitions | the SQL unchanged in a `sql` block; `#### Query options` with Schema, Into and Sources | `references/sql-queries.md` |
+| What this pull request or branch changes; the proposal to split payments out; how you would build or change something | the affected parts only, with change marks | `class … added`, `changed`, `removed` on each affected node and arrow | `references/changes.md` |
+| What changed since vX.Y; this version of the map against the last | the map, compared with its earlier file | the same ids in both versions | `references/compare.md` |
+| A guided reading for the security team; a tour for a new joiner | `## Walkthrough: <name>` | each stop a `### Perspective:`, `### Diagram:`, `### Sequence:`, `### Scenario:` or `### Deployment:` heading naming an item of the map, with what to notice | `references/walkthroughs.md` |
 
 Read the reference before writing that kind; the full format is
 `../../docs/map-format.md` (read it for anything the references do not cover). Use
 Mermaid's own syntax: a map is valid Mermaid, so GitHub draws it too.
-For SQL, read `references/sql-queries.md`: new query maps use a flowchart overview
-with Query options and shared ER definitions. ER-attached queries are retired; the
-checker and viewer both say how to migrate one. SQL the reader does not explain yet
-is a warning, not an error: keep the SQL and explain it in a note.
+For a whole codebase, or what a release changes across it, use the trace-architecture
+skill. SQL the reader does not explain yet is a warning, not an error: keep the SQL and
+explain it in a note.
 
 ## How many diagrams, and which
 
@@ -86,26 +123,19 @@ is a warning, not an error: keep the SQL and explain it in a note.
   parts, with its returns, retries and failures. Pick the flows that matter (the main
   path, the one that fails in interesting ways), not every call.
 - A data model is worth drawing when schema relationships, cardinalities or grain
-  need seeing. Query understanding uses the expandable SQL overview above.
+  need seeing. To explain a query, use the SQL query map, not the data model.
+- A **perspective** is a filtered view: a `## Perspective: <name>` section listing some
+  of a diagram's arrows. Use one when the diagram has more arrows than one point needs,
+  or to show one concern such as events (`references/boxes.md`, "Perspectives").
 - Several diagrams of one subject go in **one file**, linked from the first (see
   `references/boxes.md`, "Several diagrams in one file"), unless the user asks for
   separate files.
-
-## Source evidence
-
-For general diagrams, verification is optional: use it when it helps the reader
-assess the explanation. When useful, read
-`references/verification.md`: capture the inspected commits, record Sources and
-connect each checked claim to file/line Evidence in its existing note. Keep all
-metadata outside Mermaid. Display visibility is a runtime preference, never map text. Trust marks and nonempty
-Evidence must be authored together; the checker rejects either alone. The viewer
-warns and continues displaying such a file.
 
 ## Icons: sparingly
 
 Labels, shapes and classes carry most meaning; icons are for the few nodes where a
 picture tells the reader something faster than the label (a person, a database, a
-queue, an outside system, a trust mark). Most nodes have none. Never give every node
+queue, an outside system, a confidence mark). Most nodes have none. Never give every node
 an icon, never decorate a label that already says the same thing, and never use icons
 to tell siblings apart. Shapes (`[("…")]`, `[["…"]]`) and the built-in classes
 (`person`, `external`, `database`) come first.
@@ -150,11 +180,8 @@ Card charge with an idempotency key, so a retry never charges twice.
   bold, italics, `~~strikethrough~~`, code, links, nested and numbered lists, `- [ ]` tasks,
   `>` quotes, `---` rules, pipe tables and code fences. Headings inside a note are `####` to
   `######` only: `###` starts the next note. No HTML or images.
-- Mark how sure you are with the trust icons `verified`, `inferred`, `hypothesis`,
-  `unsourced` (`## Node icons` for boxes and arrow ids: `- e1 : verified`; `::icon(...)`
-  in a mind map), and put the evidence in the note.
-- No item limits: a big system is fine, but split it into views and diagrams so each
-  picture stays readable.
+- No item limits: a big system is fine, but split it into perspectives and diagrams so
+  each picture stays readable.
 
 ## Walkthroughs: a story for one audience
 
@@ -162,27 +189,28 @@ When a reader needs a path through the map (a security review, a new joiner), ad
 `## Walkthrough: <name>` section to the file (the end of the file is fine). Each stop is a
 `### <Kind>: <name>` heading, in the order written: `Diagram`, `Perspective`, `Deployment`,
 `Scenario` or `Sequence`, then the item's name as its heading gives it. The Markdown
-under the stop says what to notice there. The reader moves through the stops with Previous and
-Next; nothing plays by itself. Only items of this map can be stops, and the checker names any
-it cannot find. When to write one, how to pick and order stops and how to write the notes:
-`references/walkthroughs.md`.
+under the stop says what to notice there. Every stop on a box or ER diagram is its own
+perspective, made for that stop, except an opening stop that shows the whole picture.
+The reader moves through the stops with Previous and Next; nothing plays by itself. Only
+items of this map can be stops, and the checker names any it cannot find. How to pick and
+order stops and write the notes: `references/walkthroughs.md`.
 
-## Point the reader
+## Move the reader's page
 
 `python3 "<plugin root>/relay-server/show.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" [options]`
 moves every open page to that place while you explain it:
 
 - `--node <id>` point at a node; `--focus <id>` drill into a box first; `--page <id>`
-  open the node's page (its note, arrows, views and linked diagrams).
+  open the node's page (its note, arrows, perspectives and linked diagrams).
 - `--part <heading anchor>` one of the file's further diagrams (`## Orders service` is
-  `orders-service`); `--view <name>` a relation view; `--env <name>` a deployment;
+  `orders-service`); `--view <name>` a perspective; `--env <name>` a deployment;
   `--mode mindmap|org|list|boxes|layers|lifelines`.
 - `--seq <anchor> --step N` play a sequence or a scenario at step N (see the references);
-  `--colour-by changes` open a plan in its Changes colouring.
+  `--colour-by changes` open a map with change marks in its Changes colouring.
 - `--before <file>` compare with an earlier version of the map (`references/compare.md`).
 
 It prints `STATUS=shown` (done), `STATUS=none URL=...` (no page is open: give the user
-the link and open it), `STATUS=not_running` (run step 3 first) or `STATUS=failed
+the link and open it), `STATUS=not_running` (run step 4 first) or `STATUS=failed
 ERROR=...` (a bad map path, node id or option).
 
 The viewer remembers what each reader has seen and marks what changed since: never add

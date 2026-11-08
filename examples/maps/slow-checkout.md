@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Why checkout is slow
 
 ```mermaid

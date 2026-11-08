@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Order query
 
 The overview shows how the refund report is built. Expand order_base or the report

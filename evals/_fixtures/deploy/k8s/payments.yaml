@@ -1,0 +1,26 @@
+# Production: Payments reads OrderPlaced from SQS, charges the card at Stripe, and takes Stripe's webhooks
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: payments, namespace: payments}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: payments}}
+  template:
+    metadata: {labels: {app: payments}}
+    spec:
+      serviceAccountName: payments   # IAM role: sqs:ReceiveMessage, sqs:DeleteMessage on order-events
+      containers:
+        - name: payments
+          image: registry.example.com/shop/payments:1.1
+          ports: [{containerPort: 8080}]
+          envFrom: [{configMapRef: {name: shop-config}}]
+          env:
+            - name: STRIPE_API_KEY
+              valueFrom: {secretKeyRef: {name: stripe, key: api-key}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: payments, namespace: payments}
+spec:
+  selector: {app: payments}
+  ports: [{port: 80, targetPort: 8080}]

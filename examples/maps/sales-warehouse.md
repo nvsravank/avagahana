@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Sales warehouse
 
 Three fact tables, order lines, returns and stock levels, share the date and product

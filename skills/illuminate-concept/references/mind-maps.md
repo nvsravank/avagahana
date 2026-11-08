@@ -37,7 +37,7 @@ Need six hours of sun.
   Longer text, links and detail go in the node's note under `## Details`. A node with a
   link in its note should carry `::icon(link)`.
 - `::icon(code code)` on the line under a node: named codes (`idea`, `done`, `warning`,
-  `question`, `star`, `priority-1`, `status-green`, `person`, `money`, …, and the trust
+  `question`, `star`, `priority-1`, `status-green`, `person`, `money`, …, and the confidence
   marks), any `ph <name>`, or a name from the map's `## Icons` legend.
 - `:::right` / `:::left` under a main branch pins its side.
 - Mermaid's mind map has no arrows: links across the tree go in `## Relations`
@@ -45,7 +45,7 @@ Need six hours of sun.
 - A class on a node: `:::external` on the line under it.
 
 Namespaced icons use two words, for example `::icon(ph database)` or
-`::icon(ph cloud verified)`. The old hyphen after `ph` is unsupported. Use the same
+`::icon(ph cloud verified)`. Use the same
 spelling in classes, node icons, and legend definitions. Cloud icons (`aws`, `azure`,
 `gcp`) work in a mind map too. `main` (a box diagram's main icon) is not for mind maps:
 the checker rejects it in `::icon(...)`.

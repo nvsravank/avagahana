@@ -98,15 +98,14 @@ Explain composition, not an assumed optimizer execution sequence.
 |---|---|---|
 | `query-syntax` | A mistake: a misplaced part, unbalanced SQL, a column or alias that resolves to nothing | Fix the map or schema. If the SQL itself was supplied that way, tell the user |
 | `query-unsupported` | Valid SQL the reader does not explain yet (recursive CTEs, parenthesized join trees, dynamic PIVOT, TABLESAMPLE, non-SELECT statements) | A warning, so the map passes. Keep the SQL as written. Tell the user this part has no generated picture, and explain the query in the overview's boxes and notes |
-| `query-legacy-format` | An old Query section after an ER diagram | Move it to a flowchart as above, with the SQL unchanged. Keep the physical definitions once |
 
-Do not change SQL to clear either SQL code.
+Do not change SQL to clear either code.
 
 ## Check that the picture explains the query
 
 The checker proves references and structure resolve. It does not prove the picture explains
-anything, and it cannot read inside function arguments or check business logic. Open the
-map, take screenshots, and check:
+anything, and it cannot read inside function arguments or check business logic. Verify the
+picture (SKILL.md: `render.py --report` on the overview and on a focused CTE), then check:
 
 - The overview makes the construction clear without showing every column.
 - A representative box opens in place, focus isolates it, and breadcrumbs return.

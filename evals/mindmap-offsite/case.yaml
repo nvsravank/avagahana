@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.1",
+  "name": "mindmap-offsite",
+  "tags": [
+    "pick",
+    "evidence"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Brainstorm options for our team offsite: where to go, what to do, food, and budget. Save what you create in output/.",
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?mindmap"
+    },
+    {
+      "name": "no-evidence",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence",
+      "match": "not_contains"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "criteria": "PASS if the agent made an Avagahana map (a Markdown file with a mermaid block, checked by its checker) written under output/ with a mind map of options and no evidence or confidence marks, since these are the team's own ideas. FAIL otherwise.",
+      "focus": "trace"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# Production: the shop EKS cluster (eu-west-1) has two namespaces of ours
+apiVersion: v1
+kind: Namespace
+metadata: {name: shop}
+---
+apiVersion: v1
+kind: Namespace
+metadata: {name: payments}

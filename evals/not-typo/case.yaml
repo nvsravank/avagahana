@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.1",
+  "name": "not-typo",
+  "tags": [
+    "negative"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Fix the typo 'recieve' in shop/README.md if there is one, else say so.",
+    "max_turns": 20,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "no-map",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "\"name\":\"(?:Write|Edit|MultiEdit|Bash)\",\"input\":\\{[^\\n]*?\\.md[^\\n]*?```mermaid",
+      "match": "not_contains"
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "criteria": "PASS if the agent dealt with the typo and made no diagram. FAIL if it made a map.",
+      "focus": "trace"
+    }
+  ]
+}

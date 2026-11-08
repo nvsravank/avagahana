@@ -1,0 +1,29 @@
+# Production: the one way in from the internet, through the AWS load balancer controller
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shop
+  namespace: shop
+  annotations: {alb.ingress.kubernetes.io/scheme: internet-facing}
+spec:
+  ingressClassName: alb
+  rules:
+    - host: shop.example.com
+      http:
+        paths:
+          - {path: /api/orders, pathType: Prefix, backend: {service: {name: orders, port: {number: 80}}}}
+---
+# Stripe calls back here when a payment settles
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: payments-webhooks
+  namespace: payments
+  annotations: {alb.ingress.kubernetes.io/scheme: internet-facing, alb.ingress.kubernetes.io/group.name: shop}
+spec:
+  ingressClassName: alb
+  rules:
+    - host: shop.example.com
+      http:
+        paths:
+          - {path: /webhooks/stripe, pathType: Prefix, backend: {service: {name: payments, port: {number: 80}}}}

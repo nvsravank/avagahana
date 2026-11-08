@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Net revenue report
 
 How a monthly report gets from raw orders to one line per region. Each box is a step

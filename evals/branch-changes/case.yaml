@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.1",
+  "name": "branch-changes",
+  "tags": [
+    "route",
+    "changes"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "What does the branch order-events change? The git repository is in the shop folder. Save what you create in output/.",
+    "max_turns": 60,
+    "timeout_seconds": 1200,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "marks",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?class [\\w,-]+ added"
+    },
+    {
+      "name": "evidence",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence"
+    },
+    {
+      "name": "reply",
+      "type": "llm",
+      "focus": "last_message",
+      "criteria": "PASS if the reply explains how order-events changes the way the parts talk (a direct Orders-to-Payments call becomes events on a bus, consumed by Payments, order status and a new Notifications service) and points to a map it saved under output/. FAIL if it answers only in text with no map."
+    }
+  ]
+}

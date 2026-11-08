@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.1",
+  "name": "pr-draw",
+  "tags": [
+    "route",
+    "changes"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Draw what the branch order-events changes in the git repository in the shop folder; it is a pull request against main. Save what you create in output/.",
+    "max_turns": 60,
+    "timeout_seconds": 1200,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "marks",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?class [\\w,-]+ added"
+    },
+    {
+      "name": "evidence",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence"
+    },
+    {
+      "name": "two-commits",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Revision:[^\\n]*#### Revision:"
+    },
+    {
+      "name": "reply",
+      "type": "llm",
+      "focus": "last_message",
+      "criteria": "PASS if the reply explains what the order-events branch changes (Orders publishes order.placed instead of calling Payments; Payments, order status and a new Notifications service consume events; an event bus is added) and points to the map it saved under output/. FAIL if it only lists files, or makes no map."
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.1",
+  "name": "release-compare",
+  "tags": [
+    "route"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "What changed in our architecture in release v1.1 compared with v1.0? The git repository is in the shop folder. Save what you create in output/.",
+    "max_turns": 60,
+    "timeout_seconds": 1200,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?trace-architecture\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "old-release",
+      "type": "file_exists",
+      "path": "output/**/*1.0*.md"
+    },
+    {
+      "name": "new-release",
+      "type": "file_exists",
+      "path": "output/**/*1.1*.md"
+    },
+    {
+      "name": "compared",
+      "type": "regex",
+      "pattern": "before|compare",
+      "flags": "i"
+    },
+    {
+      "name": "reply",
+      "type": "llm",
+      "focus": "last_message",
+      "criteria": "PASS if the reply says what changed between v1.0 and v1.1 (card charging moved from Orders into a new Payments service) and points to the two release maps it saved under output/. FAIL if it makes no maps."
+    }
+  ]
+}

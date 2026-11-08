@@ -20,7 +20,7 @@ export function createVerification(v, h) {
   const { S, $, root } = v;
   const panel = $.verificationPanel;
   const popup = el('div', 'mmv-panel mmv-evidence-popup'); popup.hidden = true;
-  popup.id = `${v.uid}-evidence`; popup.setAttribute('role', 'region'); popup.setAttribute('aria-label', 'Verification evidence'); root.append(popup);
+  popup.id = `${v.uid}-evidence`; popup.setAttribute('role', 'region'); popup.setAttribute('aria-label', 'Claim evidence'); root.append(popup);
   let trigger = null;
   const folds = new Set();
   function fitSources() {
@@ -50,7 +50,7 @@ export function createVerification(v, h) {
     const scroll = panel.querySelector('.mmv-source-list')?.scrollTop || 0;
     const focused = panel.contains(document.activeElement) ? document.activeElement.dataset.mmv : null;
     panel.replaceChildren();
-    const title = el('div', 'mmv-verification-title', 'Verification'); panel.append(title);
+    const title = el('div', 'mmv-verification-title', 'Evidence'); panel.append(title);
     panel.append(visibilityControl('Trust marks', S.trustMarks !== '0', h.setVisible, 'trustMarks'));
     const used = verificationUsage(S.file || S.map);
     const key = used.codes.size ? section('Trust marks', 'legend', panel) : el('div');

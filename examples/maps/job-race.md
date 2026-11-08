@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Job queue race
 
 Two workers pick up the same job: both read it as pending before either marks it

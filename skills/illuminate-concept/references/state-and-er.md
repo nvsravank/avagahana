@@ -96,7 +96,7 @@ erDiagram
   move the picture (tables with as many relationships as each other are placed in the
   order they are written). When the lines tangle, try table orders as for box diagrams
   (`boxes.md`, "Crossing arrows": when, and the draft script), with the mode `tables`
-  and each model perspective. SQL query layouts follow dependency columns instead.
+  and each perspective. SQL query layouts follow dependency columns instead.
 
 ## Scenario: `## Scenario: <name>`
 
@@ -121,9 +121,12 @@ joins its tables. After the diagram's block, a step per line:
   above: `order-states-scenario-payment-fails-twice`):
   `show.py "<map>" --seq order-states-scenario-payment-fails-twice --step 1`.
 
-## Column relationships and model perspectives
+## Column relationships and perspectives
 
-Keep Mermaid valid. Put column connections outside its block:
+When the columns are known (the user gave them, or you read the schema), always say which
+column joins which: the relationship lines in the Mermaid block connect tables only, so
+without `## Relations` the reader cannot see the join. Keep Mermaid valid: put column
+connections outside its block, one line per relationship of the block.
 
 ```markdown
 ## Relations
@@ -139,32 +142,27 @@ Keep Mermaid valid. Put column connections outside its block:
 - ORDER order-customer@--> CUSTOMER : Find the customer.
 ```
 
-Declare all tables and columns in Mermaid. `TABLE.(a,b)` pairs with `TABLE.(x,y)`
-by position. Relationship operators carry actual model cardinality; SQL query joins belong
-inside Query sections. IDs are unique per diagram; reuse one as
-`- id` in another model perspective. Notes use existing `### <a id="id"></a>Title` anchors.
-No query-only equality belongs in this model perspective.
+- Declare every table and column in Mermaid. `TABLE.(a,b)` pairs with `TABLE.(x,y)` by
+  position. The operators carry the model's real cardinality.
+- A perspective of an ER diagram lists relationship ids from `## Relations` (`- id`), each
+  id unique in the diagram. It holds only relationships the model really has, never a join
+  one query happens to use: a query's joins belong in its `## Query:` section
+  (`sql-queries.md`). Never invent a relationship to show a join.
+- A perspective can choose the columns it starts with, even hiding keys; the rest stay a
+  click away. It may then list tables alone, with no relationships:
 
-Up to 15 columns all show with no expand control. Above 15, PK, grain, FK and connected
-columns always show. Every mapped endpoint aligns with its column, including separate
-relationships between the same tables. Give scenario steps explicit IDs when table pairs
-are ambiguous: the checker rejects ambiguous, missing or out-of-view selections.
+  ```markdown
+  #### Perspective options
+  - Columns: ORDER.customer_id, CUSTOMER.id, CUSTOMER.name
+  ```
+- Notes use the usual `### <a id="id"></a>Title` anchors.
+- A table of up to 15 columns shows them all. Above 15, primary keys, grain, foreign keys
+  and connected columns always show; every connection meets its own column.
+- Give scenario steps explicit ids when two relationships join the same tables: the checker
+  rejects an ambiguous, missing or out-of-perspective step.
 
 ## Explain SQL
 
-Use an expandable flowchart Query with this ER model as its shared definition
-catalogue. Read [SQL queries](sql-queries.md) before authoring or migrating a query
-map. Preserve the original SQL; never rewrite unsupported constructs or omit
-predicates to make a diagram render. ER-attached queries remain a compatibility
-format, not the preferred query explanation. Manual ER column perspectives remain
-available independently through Perspective options / Columns.
-
-### Updating maps with retired Joins sections
-
-When updating an existing map, look for authored `## Joins:` sections. They no longer
-draw a view: `joins-retired` requires migration. Move query intent into `## Query:`
-using its actual SQL, and update walkthrough/link destinations. Do not infer join
-types, selected outputs, filters or grain from equality pairs alone; find the SQL
-or ask for missing intent. If the section only selects real model relationships,
-make it a Perspective referencing their IDs. Never invent a model relationship
-just to retain a query equality. Model relationship scenarios remain supported.
+Explain a query with a flowchart `## Query:` that uses this ER diagram as its table
+definitions: read `sql-queries.md`. Keep the original SQL; never rewrite it or drop a
+predicate to make it draw.

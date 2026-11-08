@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Checkout platform, release 1.4
 
 ```mermaid

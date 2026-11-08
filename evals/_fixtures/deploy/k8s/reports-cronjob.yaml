@@ -1,0 +1,16 @@
+# Production: the nightly sales report reads the RDS read replica, never the primary
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: nightly-report, namespace: shop}
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: report
+              image: registry.example.com/shop/reports:1.1
+              envFrom: [{configMapRef: {name: shop-config}}]
+              args: ["--database-env", "REPORTS_DATABASE_URL"]

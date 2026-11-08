@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.1",
+  "name": "not-pr-bug-review",
+  "tags": [
+    "negative"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Review the branch order-events in the shop folder for bugs and tell me what to fix.",
+    "max_turns": 20,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "no-map",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "\"name\":\"(?:Write|Edit|MultiEdit|Bash)\",\"input\":\\{[^\\n]*?\\.md[^\\n]*?```mermaid",
+      "match": "not_contains"
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "criteria": "PASS if the agent reviewed the code for bugs and made no diagram or map. FAIL if it made an Avagahana map as the answer.",
+      "focus": "trace"
+    }
+  ]
+}

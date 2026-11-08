@@ -138,7 +138,7 @@ export function checkVerificationPairs(part, warnings) {
   for (const c of claims.values()) {
     const marked = c.icons?.some((code) => TRUST.has(code));
     const evidence = c.note?.evidence;
-    if ((marked && !evidence?.text) || (!marked && evidence)) warnings.push(problem('verification-pair', `${c.claim}: trust marks and a nonempty Evidence section must be supplied together.`));
+    if ((marked && !evidence?.text) || (!marked && evidence)) warnings.push(problem('verification-pair', `${c.claim}: a confidence mark and a nonempty Evidence section must be supplied together.`));
   }
 }
 export function verificationUsage(file) {

@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.1",
+  "name": "sql-query",
+  "tags": [
+    "pick",
+    "evidence"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Help me understand this query:\n\nWITH recent AS (SELECT * FROM orders WHERE created_at > :since) SELECT c.name, sum(r.total) FROM recent r JOIN customers c ON c.id = r.customer_id GROUP BY c.name Save what you create in output/.",
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?## Query:"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "criteria": "PASS if the agent made an Avagahana map (a Markdown file with a mermaid block, checked by its checker) written under output/: a flowchart overview with a ## Query: section holding the SQL exactly as given, and ER table definitions, treating the pasted SQL as its own source (no invented citations). FAIL if an ER diagram alone is the picture, the SQL was changed, or no map was made.",
+      "focus": "trace"
+    }
+  ]
+}

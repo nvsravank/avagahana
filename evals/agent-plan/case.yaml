@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.1",
+  "name": "agent-plan",
+  "tags": [
+    "communicate",
+    "changes"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "I want cancelled orders to be refunded automatically. Look at the code in the shop folder and tell me how you would do it. Don't change any code yet. Save what you create in output/.",
+    "max_turns": 40,
+    "timeout_seconds": 900,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "marks",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?class [\\w,-]+ (added|changed)"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "focus": "trace",
+      "criteria": "PASS if the agent explained its plan in text and also made an Avagahana map (a Markdown file with a mermaid block) under output/ showing the plan with change marks (added for new parts, changed for parts it would modify), with evidence from the current code for changed parts. FAIL if it answered only in text or changed the code."
+    }
+  ]
+}

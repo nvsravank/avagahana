@@ -1,0 +1,23 @@
+# Production: Orders takes orders, caches baskets in Redis, and publishes OrderPlaced to SQS
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: orders, namespace: shop}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: orders}}
+  template:
+    metadata: {labels: {app: orders}}
+    spec:
+      serviceAccountName: orders   # IAM role: sqs:SendMessage on order-events
+      containers:
+        - name: orders
+          image: registry.example.com/shop/orders:1.1
+          ports: [{containerPort: 8080}]
+          envFrom: [{configMapRef: {name: shop-config}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: orders, namespace: shop}
+spec:
+  selector: {app: orders}
+  ports: [{port: 80, targetPort: 8080}]

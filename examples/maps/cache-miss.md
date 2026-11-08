@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Product cache
 
 A product page reads through a cache. Most reads are hits and never reach the

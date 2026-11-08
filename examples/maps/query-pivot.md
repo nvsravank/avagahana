@@ -1,3 +1,5 @@
+<!-- Avagahana map: change it with the illuminate-concept skill -->
+
 # Quarterly sales with a pivot
 
 Start with the overview. Expand quarter_totals using its circle. On **p · pivot**,

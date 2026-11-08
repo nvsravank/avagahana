@@ -17,7 +17,7 @@ export function renderEvidence(note, parent, { codes = [], fold = false, legend 
       const icon = el('span', 'mmv-evidence-mark'); icon.title = iconDef(code, legend).label;
       icon.innerHTML = iconHtml(code, legend, 'mmv-inline-ic', 'var(--mmv-ink)'); head.append(icon);
     }
-    head.append(el('span', '', marks.length === 1 ? iconDef(marks[0], legend).label : 'Verification'));
+    head.append(el('span', '', marks.length === 1 ? iconDef(marks[0], legend).label : 'Evidence'));
     box.append(head);
     if (!data?.text) box.append(el('p', 'mmv-muted', 'No evidence recorded for this claim.'));
     if (data?.prose) renderNoteBody(data.prose, box, wireLink);

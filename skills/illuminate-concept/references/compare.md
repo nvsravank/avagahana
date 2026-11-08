@@ -1,18 +1,17 @@
-# Comparing two versions of a map
+# Compare two versions of a map
 
-Read this only when asked to compare: a release or security review, "what changed since
-v1.4", before and after a migration.
+Read this to compare two versions of one map: what a release changes (a map file per
+release, `<Topic>/<Name>-vX.Y.md`), what changed since an earlier version, or before and
+after a migration. A map made for a pull request uses change marks instead
+(`changes.md`).
 
 ## What the reader gets
 
-Given the map and its earlier version, the viewer offers **Before** and **After** (a
-switch of two icons beside the view picker: a rough stone for Before, a cut diamond for
-After; the one on screen is pressed). Switching keeps the view and selection; what moved slides
-from its old place to its new one, what went fades out, what came fades in. Both are
-marked with the ringed +, ~ and − signs. A changes button beside the info button lists
-what changed in the view shown: Removed, Added, Moved (`Orders service: EKS on Fargate →
-Orders hosts, EC2 (Production)`), Changed (`Payments service: note`). The reader goes
-view by view, deployment by deployment.
+Given the map and its earlier version, the viewer offers **Before** and **After**.
+Switching keeps the view and selection; what moved slides to its new place, what went fades
+out, what came fades in, and each is marked with a ringed +, ~ or −. The reader's changes
+list names what was removed, added, moved and changed in the view shown, view by view and
+deployment by deployment.
 
 ## Your part: keep ids stable
 
@@ -25,8 +24,8 @@ version:
   giving it a new id.
 - Give arrows that matter an id (`a e7@--> b`) so a changed label or end reads as a change
   of that arrow.
-- Do not add `added` / `changed` / `removed` classes for a comparison: a map with its own
-  planned changes shows those instead.
+- Do not add change marks (`added`, `changed`, `removed`) for a comparison: a map with its
+  own change marks shows those instead.
 
 ### ER diagrams: columns and renames
 
@@ -49,24 +48,28 @@ just this: the current schema as the earlier version, the proposed one as the ma
 
 ## Commands
 
-The earlier version can be any file, often from git:
+The earlier version is any map file. For releases it is the previous release's file in the
+maps folder:
 
 ```bash
-git show v1.4:"<Topic>/<Name>.md" > /tmp/name-v1.4.md
-python3 "<plugin root>/relay-server/show.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" --before /tmp/name-v1.4.md [--env Production]
+python3 "<plugin root>/relay-server/show.py" "<Topic>/<Name>-vX.Y.md" --maps-dir "<maps folder>" --before "<maps folder>/<Topic>/<Name>-vX.W.md" [--env Production]
 ```
+
+An earlier version that exists only in git: write it to a temporary folder of your own
+(`mktemp -d`), never a fixed name another agent may be using:
+`git show <tag>:"<Topic>/<Name>.md" > "$tmp/<Name>.md"`.
 
 The server keeps it in memory for that map (a reload keeps it; a restart drops it);
 `--before none` forgets it. `--edition before` opens the earlier version.
 
-For a document: `render.py ... --before /tmp/name-v1.4.md [--edition before|after]`
-draws a marked picture. Plain pictures of each version need nothing new: render each file.
+For a document: `render.py ... --before <file> [--edition before|after]` draws a marked
+picture. Plain pictures of each version need nothing new: render each file.
 
 ## The changes as data
 
-`render.py ... --before /tmp/name-v1.4.md --report --out /tmp/x.svg` writes
-`/tmp/x.svg.report.json`; its `changes` holds what the reader's changes list shows:
+`render.py ... --before <file> --report --out <file>.svg` writes `<file>.svg.report.json`;
+its `changes` holds what the reader's changes list shows:
 `{edition, diagram, view, groups, views, diagramsAdded, diagramsRemoved}`, where
 `groups` is `[{state: removed|added|moved|changed, lines: [text]}]` for the view drawn and
-`views` the same for each view and deployment of that diagram (`--part` for another
+`views` the same for each perspective and deployment of that diagram (`--part` for another
 diagram). Base a written review on it, then check each finding in the source.
