@@ -7,6 +7,14 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.1.1 (2026-11-08)
+
+- Walkthrough reading file: evidence starts folded behind its trust mark, with one
+  show/hide-all switch; a stop's notes are numbered and its picture marked to match; a
+  note already shown points back to it; one Sources list; wide pictures use the page
+  width; the footer saves the map file itself.
+- The walkthrough panel has buttons that open the stop's chosen notes.
+
 ## 0.1.0 (2026-11-07)
 
 The first versioned release. Your coding agent writes a map in plain Markdown; you read

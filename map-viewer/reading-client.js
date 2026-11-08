@@ -41,5 +41,15 @@ export function readingClient() {
     controls.addEventListener('keydown',e=>{if(!pan||scale<=1||!e.key.startsWith('Arrow'))return;if(e.key==='ArrowLeft')x+=30;if(e.key==='ArrowRight')x-=30;if(e.key==='ArrowUp')y+=30;if(e.key==='ArrowDown')y-=30;e.preventDefault();apply();});
     new ResizeObserver(apply).observe(board);apply();
   });
+    // Evidence starts folded; one switch opens or closes all of it, and printing opens it.
+  const folds=[...root.querySelectorAll('details.mmv-evidence-fold')],all=root.querySelector('.reading-evidence-all');
+  if(all&&folds.length){all.hidden=false;const words=all.querySelector('span');
+    const sync=()=>{const open=folds.every(d=>d.open);all.setAttribute('aria-pressed',String(open));words.textContent=open?'Hide all evidence':'Show all evidence';};
+    all.addEventListener('click',()=>{const open=all.getAttribute('aria-pressed')!=='true';folds.forEach(d=>{d.open=open;});sync();});
+    folds.forEach(d=>d.addEventListener('toggle',sync));
+    let before=null;addEventListener('beforeprint',()=>{before=folds.map(d=>d.open);folds.forEach(d=>{d.open=true;});});
+    addEventListener('afterprint',()=>{if(before)folds.forEach((d,i)=>{d.open=before[i];});before=null;sync();});sync();}
+  // A pointer to a note shown earlier lands below the sticky bar, as section links do.
+  root.querySelectorAll('.reading-note-again a[href^="#stop-"]').forEach(a=>a.addEventListener('click',e=>{const to=root.querySelector(a.getAttribute('href'));if(!to)return;e.preventDefault();pane.scrollTo({top:pane.scrollTop+to.getBoundingClientRect().top-pane.getBoundingClientRect().top-sectionOffset(),behavior:behavior()});}));
   geometry();
 }

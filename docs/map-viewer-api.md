@@ -550,7 +550,8 @@ viewer, camera, marks or storage. All SVGs, fonts and the footer mark are embedd
 the file makes no network requests and works from disk. A small hashed local script
 supports sticky section navigation and optional diagram zoom/pan/Fit. Content remains
 visible without scripts. Native full sequences and complete scenario explanations
-replace live playback. Notes/evidence selected by Stop options are expanded inline.
+replace live playback. Notes selected by Stop options appear with their stop, and the
+file carries the exported map text as a download link.
 The walkthrough panel has its own Export walkthrough icon; the general Export menu
 is unchanged. Reading export also works inside current interactive snapshots (`assets`).
 

@@ -28,6 +28,7 @@ import { createVerification, visibilityControl } from './verification.js';
 import { TRUST } from './model/provenance.js';
 import { renderNoteBody } from './notes.js';
 import { STOP_KINDS } from './model/walkthroughs.js';
+import { noteTargets } from './model/options.js';
 import { problemList, mapProblems } from './problems.js';
 import { checkTheme, acquire, release, loadFont, familyName, fontFaces } from './themes/theme.js';
 import { clearMeasureCache } from './measure.js';
@@ -1228,7 +1229,10 @@ export function mount(element, options = {}) {
     }
   }
   function hideNote() { $.note.hidden = true; S.noteOpen = false; S.noteSticky = false; }
-  function placeNote(anchorEl) {
+  // a resize re-places the open note beside the same anchor, while it is still shown
+  let noteAnchor = null;
+  function placeNote(anchorEl = noteAnchor?.isConnected ? noteAnchor : null) {
+    noteAnchor = anchorEl;
     const box = $.note;
     box.style.left = box.style.top = '';
     const rr = root.getBoundingClientRect();
@@ -2456,12 +2460,37 @@ export function mount(element, options = {}) {
     $.stopTitle.textContent = st.state ? st.title : `${st.name} (not in this map)`;
     $.stopNote.replaceChildren();
     if (st.text) renderNoteBody(st.text, $.stopNote, wireLink);
+    // the stop's chosen notes (Notes:), each opened from here, never marked on the picture
+    $.stopNotes.replaceChildren();
+    const targets = st.state && !S.offPath && S.map ? noteTargets(S.map) : new Map();
+    for (const id of st.notes) {
+      const note = targets.get(id);
+      if (!note) continue;
+      const b = Object.assign(document.createElement('button'), { className: 'mmv-pill mmv-stop-notebtn', type: 'button', textContent: note.heading || S.map.byId[id]?.plain || id });
+      b.dataset.note = id;
+      b.addEventListener('click', () => showStopNote(id, b));
+      $.stopNotes.append(b);
+    }
+    $.stopNotes.hidden = !$.stopNotes.childElementCount;
     // no Previous on the first stop, no Next on the last
     $.stopPrev.hidden = S.stop <= 1;
     $.stopNext.hidden = S.stop >= w.stops.length;
     $.stopOff.hidden = !S.offPath;
     $.stopBack.textContent = `Return to stop ${S.stop}`;
     $.stopPanel.classList.toggle('is-off', !!S.offPath);
+  }
+  function showStopNote(id, anchorEl) {
+    const note = S.map && noteTargets(S.map).get(id);
+    if (!note) return;
+    hideNote();
+    $.noteTitle.textContent = note.heading || S.map.byId[id]?.plain || id;
+    $.noteBody.replaceChildren();
+    verification.renderNote(note, $.noteBody);
+    $.note.hidden = false;
+    S.noteOpen = true;
+    S.noteSticky = true;
+    // beside the panel, level with the control, so the stop's words stay readable
+    placeNote({ get isConnected() { return anchorEl.isConnected && !$.stopPanel.hidden; }, getBoundingClientRect: () => { const p = $.stopPanel.getBoundingClientRect(), b = anchorEl.getBoundingClientRect(); return { left: p.left, right: p.right, top: b.top, bottom: b.bottom }; } });
   }
   $.stopBack.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop));
   $.stopPrev.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop - 1));

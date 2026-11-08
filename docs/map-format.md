@@ -1016,7 +1016,7 @@ one optional subsection supplies narrative metadata:
 Title is the section/panel title (default: destination name). Label is the short
 reading-document navigation and section-eyebrow label (default: Title/name). Notes lists existing
 note-bearing node, arrow or message IDs from the destination's owning diagram; these
-notes and their evidence appear visibly in the reading document. Repeated IDs are
+notes are offered with the stop in the walkthrough panel and the reading document. Repeated IDs are
 included once. Diagram optionally qualifies a destination name that occurs in several
 diagrams; unqualified old files keep their first-match resolution. An invalid explicit
 qualifier never falls back to another diagram. Field/subsection names are case-insensitive;

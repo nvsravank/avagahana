@@ -43,6 +43,16 @@ Explain the call.
 ### Diagram: Test system
 An overview.
 `;
+// the switch opens and closes every fold in the generated document, under its own script
+async function testEvidenceSwitch(html, check) {
+  const frame=document.createElement('iframe');frame.style.cssText='position:fixed;left:0;top:0;width:1000px;height:800px;border:0';
+  const loaded=new Promise(r=>frame.onload=r);frame.srcdoc=html;document.body.append(frame);
+  try{await loaded;const doc=frame.contentDocument,all=doc.querySelector('.reading-evidence-all'),folds=[...doc.querySelectorAll('details.mmv-evidence-fold')];
+    const start=!all.hidden&&folds.every(d=>!d.open);all.click();const opened=folds.every(d=>d.open)&&all.getAttribute('aria-pressed')==='true'&&all.textContent.includes('Hide');
+    all.click();const closed=folds.every(d=>!d.open)&&all.textContent.includes('Show');
+    check('reading HTML: the evidence switch shows and hides all evidence', start&&opened&&closed, JSON.stringify({start,opened,closed}));
+  }finally{frame.remove();}
+}
 const nodes = async (v) => new DOMParser().parseFromString((await v.export({format:'svg'})).data, 'image/svg+xml');
 export async function testReadingOptions(check) {
   const model = parseMap(READING_EXAMPLE, 'reading.md');
@@ -64,6 +74,10 @@ export async function testReadingOptions(check) {
     v.setState({walkthrough:'Read',stop:1});
     let svg=await nodes(v);
     check('perspective defaults: Open reveals ancestor paths and only named containers', !!svg.querySelector('[data-id="a"]') && !!svg.querySelector('[data-id="b"]') && !svg.querySelector('[data-id="db"]'));
+    const noteButtons=[...host.querySelectorAll('[data-mmv=stopNotes] button')];
+    check('walkthrough panel: the stop\'s notes are controls, not marks on the picture', !host.querySelector('[data-mmv=stopNotes]').hidden && noteButtons.map(b=>b.textContent).join()==='The A service' && !host.querySelector('.reading-badges'));
+    noteButtons[0]?.click();
+    check('walkthrough panel: a note control opens that note and stays on the path', !host.querySelector('[data-mmv=note]').hidden && host.querySelector('[data-mmv=noteTitle]').textContent==='The A service' && host.querySelector('[data-mmv=noteBody]').textContent.includes('A note.') && host.querySelector('[data-mmv=stopOff]').hidden);
     check('walkthrough options: display title, explanation with no metadata', host.querySelector('[data-mmv=stopTitle]').textContent === 'Follow the call' && host.querySelector('[data-mmv=stopNote]').textContent === 'Explain the call.');
     v.setState({expand:'all'});svg=await nodes(v);
     check('perspective defaults: expansion remains exploration, no new Return', !!svg.querySelector('[data-id="db"]') && host.querySelector('[data-mmv=stopOff]').hidden);
@@ -107,13 +121,28 @@ export async function testReadingOptions(check) {
     check('reading HTML: deployment destination renders independently', deploy.querySelectorAll('.reading-board img').length===1 && deploy.querySelector('figcaption').textContent==='Production');
     const evidence=await (await fetch('../../format/samples/good-verification-prose.md')).text();
     await v.load(READING_EXAMPLE,'reading.md');
-    const richDoc=new DOMParser().parseFromString(await v.reading('Read'),'text/html');
+    const richText=READING_EXAMPLE.replace('An overview.','An overview.\n#### Stop options\n- Notes: a');
+    await v.load(richText,'reading.md');
+    const richHtml=await v.reading('Read'),richDoc=new DOMParser().parseFromString(richHtml,'text/html');
     const included=richDoc.querySelector('.reading-note');
-    check('reading HTML: an included note keeps its authored heading', included?.querySelector('h3')?.textContent==='The A service',included?.innerHTML);
+    check('reading HTML: an included note keeps its authored heading, numbered', included?.querySelector('h3')?.textContent==='1The A service' && included.querySelector('h3 .reading-num')?.textContent==='1',included?.innerHTML);
+    const again=richDoc.querySelectorAll('.reading-note')[1];
+    check('reading HTML: a note shown in full earlier is pointed at, not repeated', again?.classList.contains('reading-note-again') && again.querySelector('a')?.getAttribute('href')==='#'+included.id && !again.textContent.includes('A note.'), again?.outerHTML);
+    const badged=new DOMParser().parseFromString(atob(richDoc.querySelector('.reading-board img').src.split(',')[1]),'image/svg+xml');
+    const badge=badged.querySelector('.reading-badges circle');
+    check('reading HTML: the picture numbers its noted box in the theme accent', badge && badge.getAttribute('fill')===richDoc.documentElement.style.getPropertyValue('--accent').trim() && badged.querySelector('.reading-badges text').textContent==='1', badged.querySelector('.reading-badges')?.outerHTML);
+    const save=richDoc.querySelector('.reading-footer a.reading-save');
+    check('reading HTML: the footer saves the map file itself', save?.getAttribute('download')==='reading.md' && decodeURIComponent(save.getAttribute('href').replace(/^data:text\/markdown;charset=utf-8,/,''))===richText, save?.outerHTML.slice(0,200));
     check('reading HTML: note lists, tasks and aligned tables survive the document, styled', included?.querySelector('ol li ul input[checked][disabled]') && included.querySelector('.mmv-md-table td.mmv-md-right')?.textContent==='1' && richDoc.querySelector('style').textContent.includes('.mmv-md-table'),included?.innerHTML);
     await v.load(evidence+'\n## Walkthrough: Claims\n### Diagram: Reasoned design\nRead <script>alert(1)</script> as text.\n#### Stop options\n- Notes: cache, tentative\n', 'claims.md');
     const claims=new DOMParser().parseFromString(await v.reading('Claims'),'text/html');
-    check('reading HTML: evidence visible inline and hostile prose remains text', claims.querySelectorAll('.mmv-evidence').length===2 && claims.body.textContent.includes('<script>alert(1)</script>') && claims.querySelectorAll('script').length===1);
+    const folds=[...claims.querySelectorAll('details.mmv-evidence-fold')];
+    check('reading HTML: evidence starts folded behind its trust mark, with a show-all switch', folds.length===2 && folds.every(d=>!d.open && d.querySelector('summary svg')) && claims.querySelector('.reading-nav .reading-evidence-all')?.hidden===true, folds.map(d=>d.querySelector('summary')?.textContent).join(' / '));
+    await v.load(await (await fetch('../../format/samples/good-evidence-azure-url.md')).text()+'\n## Walkthrough: Sourced\n### Diagram: Pinned Azure Repos evidence link\nText.\n#### Stop options\n- Notes: app\n','sourced.md');
+    const sourced=new DOMParser().parseFromString(await v.reading('Sourced'),'text/html');
+    check('reading HTML: a sourced claim counts its references; one Sources list names the revision once', sourced.querySelector('details.mmv-evidence-fold summary')?.textContent.includes('1 reference') && sourced.querySelectorAll('.reading-sources li').length===1 && sourced.querySelector('.reading-sources li').textContent.includes('main · 12345678') && sourced.querySelectorAll('.reading-section').length===1 && !sourced.querySelector('.mmv-evidence-nolink'), sourced.querySelector('.reading-sources')?.textContent);
+    await testEvidenceSwitch(await (async()=>{await v.load(evidence+'\n## Walkthrough: Claims\n### Diagram: Reasoned design\nText.\n#### Stop options\n- Notes: cache, tentative\n','claims.md');return v.reading('Claims');})(), check);
+    check('reading HTML: evidence folded and hostile prose remains text', claims.querySelectorAll('.mmv-evidence').length===2 && claims.body.textContent.includes('<script>alert(1)</script>') && claims.querySelectorAll('script').length===1);
     const broken=READING_EXAMPLE.replace('Notes: a','Notes: missing\n- Diagram: Test system');
     await v.load(broken,'broken.md');
     v.setState({walkthrough:'Read'});

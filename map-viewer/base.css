@@ -633,6 +633,10 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-stop-title { font-size: 16px; font-weight: 600; margin: 0; }
 .mmv-stop-note { flex: 1; min-height: 0; overflow: auto; }
 .mmv-stop-note .mmv-note-body { padding: 4px 0; }
+.mmv-stop-notes { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 6px; }
+.mmv-stop-notes[hidden] { display: none; }
+.mmv-stop-notes::before { content: 'Notes'; flex-basis: 100%; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--mmv-muted); }
+.mmv-stop-notebtn { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
 .mmv-stop-off { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--mmv-highlight) 14%, var(--mmv-bg)); }
 .mmv-stop-off[hidden] { display: none; }
 .mmv-stop-panel.is-off :is(.mmv-stop-kind, .mmv-stop-title, .mmv-stop-note) { opacity: .6; }
