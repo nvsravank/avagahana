@@ -159,6 +159,14 @@ for name in ("illuminate-concept", "trace-architecture"):
 assert (root / "docs/map-format.md").is_file(), "missing format reference"
 print("plugin layout: OK")
 PYPLUGIN
+
+# ---- 5a. one version ----
+# The plugin's version is how Claude Code and Codex notice an update: the same string in
+# both plugin.json files and map-viewer/version.js, none in a marketplace entry (plugin.json
+# wins there), and the CHANGELOG's latest version heading names it.
+# check_version.py <root>; --self-test plants a mismatch in a copy and expects a failure.
+python3 -I "$ROOT/scripts/check_version.py" "$ROOT" || fail=1
+python3 -I "$ROOT/scripts/check_version.py" --self-test "$ROOT" >/dev/null || { echo "version: self-test failed"; fail=1; }
 if command -v claude >/dev/null 2>&1; then
   out="$(claude plugin validate "$ROOT" 2>&1)" || { echo "$out"; fail=1; }
 else

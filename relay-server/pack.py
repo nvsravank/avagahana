@@ -40,7 +40,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 VIEWER = ROOT / "map-viewer"
 sys.path.insert(0, str(HERE))
-from serve_maps import COLOUR_BY, build_version, MAP_DIR_ENV, THEMES_DIR, read_themes, theme_file, resolve_maps_dir, safe_join, status_line  # noqa: E402
+from serve_maps import COLOUR_BY, VERSION, build_version, MAP_DIR_ENV, THEMES_DIR, read_themes, theme_file, resolve_maps_dir, safe_join, status_line  # noqa: E402
 
 # a module's relative import: from './x.js', import('./x.js'), import './x.js'
 IMPORT = re.compile(r"""(\bfrom\s*|\bimport\s*\(\s*|^\s*import\s+)(['"])(\.{1,2}/[^'"]+)\2""", re.M)
@@ -195,8 +195,8 @@ def pack(map_text, map_path, theme, fonts, options, saved=None, now=None):
     policy = (f"default-src 'none'; script-src 'sha256-{digest}' blob:; connect-src 'none'; "
               "style-src 'unsafe-inline'; img-src data: blob:; font-src data: blob:; "
               "base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'")
-    fields = {"policy": policy, "generator": html.escape(f"Avagahana pack.py {v}" if v else "Avagahana pack.py"),
-              "title": html.escape(title), "mark": MARK, "map_title": html.escape(title),
+    fields = {"policy": policy, "generator": html.escape(f"Avagahana {VERSION} pack.py {v}" if v else f"Avagahana {VERSION} pack.py"),
+              "title": html.escape(title), "mark": MARK, "version": html.escape(VERSION), "map_title": html.escape(title),
               "when": "as of" if saved else "exported", "iso": when.isoformat(timespec="seconds"),
               "shown": html.escape(f"{when.day} {when.strftime('%b %Y, %H:%M')}"), "data": payload, "start": START}
     return FIELD.sub(lambda m: fields[m.group(1)], TEMPLATE)

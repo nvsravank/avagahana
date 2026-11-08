@@ -10,6 +10,10 @@ Changes to this file are contract changes: note them in `CHANGELOG.md`.
 
 ## Entry
 
+`VERSION` (added in WO-48): Avagahana's version, the plugin's, as text (`'0.1.0'`). The
+packed files' footers and generator tags carry it; a host may show it (the atlas: on hover
+over its mark).
+
 ```js
 import { mount, applyTheme, checkTheme } from './map-viewer/index.js';
 
@@ -40,7 +44,7 @@ const viewer = mount(element, {
   assets: null,         // (path) => Promise<text>: the viewer's own files from the host (below)
   crossMapNote: null,   // without host.openMap: said beside a link to another map
   asOf: null,           // when the first map was saved (Date, ISO text or ms): the export's footer
-  version: null,        // the code's version, for the export's generator tag only
+  version: null,        // the code's build (a commit), for the export's generator tag only
 });
 ```
 
@@ -571,11 +575,12 @@ reader is:
   (with `sinceLabel`), and then every reader of the file sees the same marks, hidden
   until they show them.
 
-Its footer always reads "Built with Avagahana" with the mark, linking to the Avagahana
-page (no option or theme hides it), and on the right the map's title and "as of
-<time>" when the host gave `asOf` (the atlas gives each map's saved time), else
-"exported <time>", shown in the reader's own time zone. `version` goes only in the
-page's `<meta name="generator">` tag, never on screen.
+Its footer always reads "Built with Avagahana <VERSION>" (e.g. "Built with Avagahana
+0.1.0") with the mark, linking to the Avagahana page (no option or theme hides it), and on
+the right the map's title and "as of <time>" when the host gave `asOf` (the atlas gives each
+map's saved time), else "exported <time>", shown in the reader's own time zone. The page's
+`<meta name="generator">` tag reads `Avagahana <VERSION> pack.js <version>`; the host's
+`version` (a build commit) goes only there, never on screen (changed in WO-48).
 
 Not offered with `assets` (inside a snapshot): an interactive file needs the viewer's
 own files beside it, and `snapshot()` rejects. The source file and the pictures stay. The

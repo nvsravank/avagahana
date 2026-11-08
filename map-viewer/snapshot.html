@@ -6,7 +6,7 @@ viewer's Export menu, "Interactive HTML"). This comment, everything before the
 doctype, is left out of the file.
 
   {{name}}   filled in once, left to right, never searched again: policy, generator,
-             title, mark, map_title, when, iso, shown, data, start (HTML-escaped but
+             title, mark, version, map_title, when, iso, shown, data, start (HTML-escaped but
              policy, mark, data and start)
 
 What goes in data (JSON, every "<" written as < so nothing in it can end a tag):
@@ -20,9 +20,10 @@ What goes in data (JSON, every "<" written as < so nothing in it can end a tag):
                   face's bytes as base64
   options         text, path, marks (only with since), since, sinceLabel, before, state, prefs
 start: map-viewer/snapshot.js, the only script the policy allows (by its SHA-256 hash).
-The footer always says "Built with Avagahana" with the mark, linking home; no theme or
+The footer always says "Built with Avagahana <version>" with the mark, linking home; no theme or
 setting hides or replaces it (user, 2026-10-31: "I am not looking for a white label
-solution"). The version is only in the generator tag, never shown.
+solution"). The version (map-viewer/version.js) follows "Built with Avagahana"; the generator tag holds
+it and the build commit when known (user, 2026-11-07).
 -->
 <!doctype html>
 <html lang="en"><head>
@@ -39,7 +40,7 @@ footer a{display:inline-flex;align-items:center;gap:5px;color:inherit;text-decor
 @media (prefers-color-scheme:dark){body{color:#aaa;background:#111}footer{border-color:#333}}</style>
 </head><body>
 <div id="avagahana-map"></div>
-<footer><a class="av-brand" href="https://sravannerella.com/avagahana/" target="_blank" rel="noopener noreferrer">{{mark}}Built with Avagahana</a><span class="av-about">{{map_title}} · {{when}} <time datetime="{{iso}}">{{shown}}</time></span></footer>
+<footer><a class="av-brand" href="https://sravannerella.com/avagahana/" target="_blank" rel="noopener noreferrer">{{mark}}Built with Avagahana {{version}}</a><span class="av-about">{{map_title}} · {{when}} <time datetime="{{iso}}">{{shown}}</time></span></footer>
 <script type="application/json" id="avagahana-data">{{data}}</script>
 <script type="module">{{start}}</script>
 </body></html>

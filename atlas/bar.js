@@ -8,7 +8,7 @@
 // Space; Escape, a pick or a tap elsewhere closes it. When the viewer's toolbar is
 // narrow, the map's name (beside the logo, not scrolling) opens the map list and the word
 // mark goes. No scroll bar: a soft fade and a small arrow on an edge say there is more.
-import { applyTheme, changeMarkSvg } from '../map-viewer/index.js';
+import { applyTheme, changeMarkSvg, VERSION } from '../map-viewer/index.js';
 
 // a diagram's groups in its popup, and the contents kinds in each
 const GROUPS = [
@@ -63,9 +63,10 @@ export function contentsBar(mount, { onName, onPick, logo = true }) {
   mount.setAttribute('role', 'navigation');
   mount.setAttribute('aria-label', 'Map contents');
 
-  // the website's mark: a picture, not a control
+  // the website's mark: a picture, not a control; hovering it shows Avagahana's version
   const logoBtn = el('span', 'atlas-logo');
   logoBtn.setAttribute('aria-hidden', 'true');
+  logoBtn.title = `Avagahana ${VERSION}`;
   logoBtn.appendChild(brandMark());
 
   const wrap = el('div', 'atlas-scroll-wrap');

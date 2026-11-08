@@ -62,7 +62,7 @@ async function mountViewer() {
     // viewer shows no picker of its own; an exported snapshot, with no bar, keeps it
     viewPicker: false,
     prefs: first?.prefs,
-    // the export's generator tag: the relay's commit
+    // the export's generator tag: the relay's commit (the viewer adds Avagahana's version)
     ...(info?.build ? { version: info.build } : {}),
     themes: themeSet?.themes || [],
     defaultTheme: themeSet?.settings.builtIn !== false,

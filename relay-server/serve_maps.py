@@ -60,14 +60,27 @@ import safe_files
 from theme_style import normalize_theme
 from urllib.parse import parse_qs, quote, unquote, urlencode, urlsplit
 
-VERSION = "0.1.0"
+
+
+def plugin_version():
+    """Avagahana's version: the plugin's, from .claude-plugin/plugin.json (scripts/check.sh
+    keeps the Codex manifest and map-viewer/version.js equal to it); "unknown" without it."""
+    try:
+        found = json.loads((Path(__file__).resolve().parent.parent / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")).get("version")
+    except (OSError, ValueError):
+        found = None
+    return found if isinstance(found, str) and found else "unknown"
+
+
+VERSION = plugin_version()
 APP_ID = "avagahana-relay"
 _build = []
 
 
 def build_version():
-    """The commit this code is: git when it is a checkout, else the plugin folder's name
-    (an installed plugin's folder is its commit); None when neither. Read once."""
+    """The commit this code is: git when it is a checkout, else the plugin folder's name when
+    it is a commit (an installed plugin pinned to a version is named after the version, so
+    VERSION identifies it); None when neither. Read once."""
     if not _build:
         root, found = Path(__file__).resolve().parent.parent, None
         try:

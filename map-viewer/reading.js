@@ -9,6 +9,7 @@ import { renderClaimNote } from './evidence.js';
 import { READING_CSS } from './reading-style.js';
 import { readingClient } from './reading-client.js';
 import { sha256 } from './sha256.js';
+import { VERSION } from './version.js';
 
 const el = (tag, cls, text) => Object.assign(document.createElement(tag), { className: cls || '', ...(text != null ? { textContent: text } : {}) });
 const b64 = (bytes) => { let s=''; for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192)); return btoa(s); };
@@ -99,7 +100,7 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
     }
   }
   const footer=el('footer','reading-footer');root.append(footer);
-  const brand=el('a');brand.href='https://sravannerella.com/avagahana/';brand.target='_blank';brand.rel='noopener noreferrer';const logo=el('img');logo.src=dataImage(mark);logo.alt='';brand.append(logo,document.createTextNode('Built with Avagahana'));footer.append(brand);
+  const brand=el('a');brand.href='https://sravannerella.com/avagahana/';brand.target='_blank';brand.rel='noopener noreferrer';const logo=el('img');logo.src=dataImage(mark);logo.alt='';brand.append(logo,document.createTextNode(`Built with Avagahana ${VERSION}`));footer.append(brand);
   const saved=asOf==null||asOf===''?null:new Date(asOf),valid=saved&&!Number.isNaN(saved.getTime()),at=valid?saved:now;
   const about=el('span','',`${file.title} · ${valid?'as of':'exported'} `),time=el('time','',at.toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}));time.dateTime=at.toISOString();about.append(time);footer.append(about);
   const js=el('script');js.textContent=script;doc.body.append(js);

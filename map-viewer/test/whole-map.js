@@ -1,7 +1,7 @@
 // The whole map's export (WO-35): the Export menu's Whole map group, viewer.snapshot()
 // and its packer (pack.js). scripts/browser_tests.py also packs maps with both packers
 // and compares them, and opens the viewer's files from file://.
-import { mount } from '../index.js';
+import { mount, VERSION } from '../index.js';
 import { sha256 } from '../pack.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -71,8 +71,8 @@ export async function testWholeMap(check) {
       check('snapshot: a required asset failure rejects instead of producing a partial file', refused.includes('model/sections.js') && refused.includes('snapshot asset unavailable'), refused);
     } finally { window.fetch = realFetch; }
     const html = await v.snapshot();
-    check('snapshot: the version only in the generator tag', html.includes('<meta name="generator" content="Avagahana pack.js test-v">') && !/<footer>[^]*test-v/.test(html));
-    check('snapshot: footer always Built with Avagahana, linking home', /<footer><a class="av-brand" href="https:\/\/sravannerella.com\/avagahana\/"[^>]*><svg class="av-mark"[^]*Built with Avagahana<\/a>/.test(html));
+    check('snapshot: version and build in the generator tag, the build not in the footer', html.includes(`<meta name="generator" content="Avagahana ${VERSION} pack.js test-v">`) && !/<footer>[^]*test-v/.test(html));
+    check('snapshot: footer always Built with Avagahana and its version, linking home', /<footer><a class="av-brand" href="https:\/\/sravannerella.com\/avagahana\/"[^>]*><svg class="av-mark"[^]*Built with Avagahana [^<]+<\/a>/.test(html) && html.includes(`Built with Avagahana ${VERSION}</a>`));
     check('snapshot: with no saved time it says exported', /Community garden · exported <time datetime="\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d">/.test(html), /<span class="av-about">[^<]*/.exec(html)?.[0]);
     check('snapshot: the policy allows only the start-up script', /script-src 'sha256-[A-Za-z0-9+/]+=*' blob:; connect-src 'none'/.test(html));
 

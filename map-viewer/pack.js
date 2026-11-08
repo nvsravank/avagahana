@@ -1,5 +1,6 @@
 import { checkTheme } from './themes/theme.js';
 import { sha256 } from './sha256.js';
+import { VERSION } from './version.js';
 export { sha256 } from './sha256.js';
 // pack.js — the viewer's own packer (WO-35): the whole map in one HTML file, a snapshot
 // as relay-server/pack.py makes it, for the Export menu's "Interactive HTML" and
@@ -189,7 +190,8 @@ function mapTitle(text, path) {
 // built-in's own object, or a host's with font faces whose data() gives the bytes);
 // options: {marks, since, sinceLabel, before, state, prefs} for the snapshot's viewer;
 // asOf: when the map was saved (a Date, ISO text or milliseconds), shown "as of", else
-// the pack time, shown "exported"; version: for the generator tag only.
+// the pack time, shown "exported"; version: the code's build (a commit), for the generator
+// tag only (Avagahana's own VERSION is in the tag and the footer).
 export async function packSnapshot({ text, path = null, theme = null, options = {}, asOf = null, version = null, now = new Date() }) {
   const [{ modules, order }, template, start, mark, { theme: themeOut, fonts }] = await Promise.all([
     viewerModules(), readText('snapshot.html'), readText('snapshot.js'), readText('mark.svg'), themeData(theme),
@@ -203,7 +205,8 @@ export async function packSnapshot({ text, path = null, theme = null, options = 
   const data = { order, modules, files, theme: themeOut, fonts, options: { ...options, text, path } };
   const fields = {
     policy: POLICY(await digestOf(start)),
-    generator: escape(version ? `Avagahana pack.js ${version}` : 'Avagahana pack.js'),
+    generator: escape(`Avagahana ${VERSION} pack.js${version ? ` ${version}` : ''}`),
+    version: escape(VERSION),
     title: escape(title),
     mark: mark.trim().replace(/<title>[\s\S]*?<\/title>/g, '').replace('<svg ', '<svg class="av-mark" aria-hidden="true" focusable="false" '),
     map_title: escape(title),

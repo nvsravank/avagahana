@@ -19,7 +19,24 @@ at your own pace. Avagahana (Telugu: అవగాహన) means understanding.
 [Gallery](https://sravannerella.com/avagahana/gallery/) ·
 [Install](#install) ·
 [Map format](docs/map-format.md) ·
-[Viewer API](docs/map-viewer-api.md)
+[Viewer API](docs/map-viewer-api.md) ·
+[Changelog](CHANGELOG.md)
+
+## What you can do with it
+
+- **Map a codebase** with your coding agent: one linked map of how the system works.
+- **Explain and revise in conversation**: the agent draws a concept and redraws as you talk.
+- **Explore an architecture** from context to containers to components.
+- **Follow a request** across components, played over the structure it runs on.
+- **Walk a lifecycle** through its states and transitions.
+- **Explain database grain, cardinality and joins**, and how a SQL query is built.
+- **Review a release, migration or pull request** as a picture of what was added, changed
+  or removed.
+- **Keep a personal visual reference** that shows what changed since you last looked.
+- **Deliver a narrative explainer** as a walkthrough for an audience.
+- **Send an explorable file**: one HTML file that opens offline.
+- **Put a branded figure in a document** as SVG or PNG in your own theme.
+- **Keep it all on your machine**: maps are local files.
 
 ## Let the agent draw
 
@@ -129,6 +146,10 @@ Python 3.9+ is required; a maintained, patched Python is recommended. Tested on 
 and 3.15. Standard library only: no virtual environment or package installation.
 The relay listens on `127.0.0.1` for local single-user use. See
 [local operation and data boundaries](docs/security.md) for platform and file-access details.
+
+The plugin carries its version (`version` in `.claude-plugin/plugin.json` and
+`.codex-plugin/plugin.json`; see the [changelog](CHANGELOG.md)). Claude Code and Codex
+notice an update when it changes; each version is also a git tag `vX.Y.Z`.
 
 ### Claude Code
 

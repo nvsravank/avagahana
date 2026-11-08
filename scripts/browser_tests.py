@@ -362,7 +362,10 @@ def viewer_pack_tests(browser, base, tmp, check):
     (tmp / "seq.html").write_text(made or "", encoding="utf-8")
     _, step, errors = open_snapshot(browser, tmp / "seq.html", lambda ev, _c: ev("document.querySelector('#avagahana-map .mmv-count-long')?.textContent"))
     check("the viewer's file: a sequence opens at step 1", (step or "").startswith("Step 1 of") and not errors, f"{step!r}; {errors[:3]}")
-    check("the viewer's file: the version only in the generator tag", made and '<meta name="generator" content="Avagahana pack.js abc123">' in made and "abc123" not in made.split("<footer>")[1].split("</footer>")[0])
+    version = re.search(r"export const VERSION = '([^']*)'", (ROOT / "map-viewer/version.js").read_text(encoding="utf-8")).group(1)
+    foot = made.split("<footer>")[1].split("</footer>")[0] if made and "<footer>" in made else ""
+    check("the viewer's file: version and build in the generator tag, the version in the footer, the build not",
+          made and f'<meta name="generator" content="Avagahana {version} pack.js abc123">' in made and f"Built with Avagahana {version}</a>" in foot and "abc123" not in foot)
     ask = json.dumps({"text": (EXAMPLES / "garden.md").read_text(encoding="utf-8"), "path": "garden.md", "act": {"mode": "list", "page": "n38", "node": "n38"}})
     _, made, _ = drive(browser, page, lambda ev, _c: ev(f"packWith({ask})", wait=60), wait_drawn=False)
     (tmp / "list.html").write_text(made or "", encoding="utf-8")

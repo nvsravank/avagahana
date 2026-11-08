@@ -10,6 +10,8 @@ export { mount } from './viewer.js';
 // Render supplied map text without atlas, a relay, storage or a visible viewer.
 export const renderMap = (request, options = {}) => renderWith(mount, request, options);
 export { checkTheme } from './themes/theme.js';
+// Avagahana's version (the plugin's), e.g. '0.1.0'
+export { VERSION } from './version.js';
 // the small sparkle a viewer puts on a diagram's icon when something in it changed
 // (contents() entries' changed), for a host's own chips: an <svg> string
 export { sparkleSvg as changeMarkSvg } from './chrome.js';

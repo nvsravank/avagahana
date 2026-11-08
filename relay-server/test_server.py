@@ -128,6 +128,9 @@ class RelayTests(unittest.TestCase):
         status, info = self.s.json("GET", "/api/info")
         self.assertEqual(status, 200)
         self.assertEqual(info["app"], "avagahana-relay")
+        # Avagahana's version: the plugin's, read from .claude-plugin/plugin.json
+        plugin = json.loads((Path(serve_maps.__file__).resolve().parent.parent / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(info["version"], plugin["version"])
         self.assertEqual(info["version"], serve_maps.VERSION)
         # the code's commit (this is a checkout), for the generator tag of an export
         self.assertEqual(info["build"], serve_maps.build_version())
@@ -715,13 +718,16 @@ class PackTests(unittest.TestCase):
         self.assertEqual(o["state"], {"focus": "n6"})
         self.assertEqual(o["prefs"], {"appearance": "dark", "colourBy": "level", "trustMarks": True})
         footer = re.search(r"<footer>(.*?)</footer>", page, re.S).group(1)
-        # always the mark and "Built with Avagahana", linking home; the map's saved time; the
-        # version only in the page's generator tag, never in the footer
-        self.assertRegex(footer, r'^<a class="av-brand" href="https://sravannerella.com/avagahana/"[^>]*><svg class="av-mark"[^>]*>.*</svg>Built with Avagahana</a>')
+        # always the mark and "Built with Avagahana <version>", linking home; the map's saved
+        # time; the build commit only in the page's generator tag, never in the footer
+        self.assertRegex(footer, r'^<a class="av-brand" href="https://sravannerella.com/avagahana/"[^>]*><svg class="av-mark"[^>]*>.*</svg>Built with Avagahana ' + re.escape(serve_maps.VERSION) + '</a>')
         self.assertRegex(footer, r'<span class="av-about">Community garden · as of <time datetime="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}">')
         saved = datetime.datetime.fromtimestamp((EXAMPLES / "garden.md").stat().st_mtime).astimezone()
         self.assertIn(f'datetime="{saved.isoformat(timespec="seconds")}"', footer)
-        self.assertRegex(page, r'<meta name="generator" content="Avagahana pack.py( [0-9a-f]+)?">')
+        self.assertRegex(page, r'<meta name="generator" content="Avagahana ' + re.escape(serve_maps.VERSION) + r' pack.py( [0-9a-f]+)?">')
+        build = serve_maps.build_version()
+        if build:
+            self.assertNotIn(build, footer)
         self.assertNotIn("tabindex", footer)
 
     def test_folder_theme_with_its_font(self):
