@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.1",
+  "name": "c4-with-architect",
+  "tags": [
+    "pick",
+    "conflict"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Draw a C4 container diagram of the shop project. Save what you create in output/.",
+    "max_turns": 50,
+    "timeout_seconds": 900,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "architect",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?solution-architect\""
+    },
+    {
+      "name": "its-output",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.puml[^\\n]*?(?:Container|Rel)\\("
+    },
+    {
+      "name": "no-avagahana",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "\"skill\\\\?\"\\s*:\\s*\\\\?\"(?:[\\w-]+:)?(?:illuminate-concept|trace-architecture)",
+      "match": "not_contains"
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "focus": "last_message",
+      "criteria": "PASS if the final reply says a C4 container diagram of the shop project was written as C4-PlantUML (a .puml file under output/). FAIL if it says it made an Avagahana map instead, or made no diagram."
+    }
+  ]
+}

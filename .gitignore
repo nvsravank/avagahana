@@ -2,3 +2,4 @@
 __pycache__/
 .gstack/
 evals/results/
+evals-conflict/results/

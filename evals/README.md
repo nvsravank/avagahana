@@ -37,7 +37,10 @@ Graders:
   agent's own Write, Edit or Bash calls, not in skill text the trace holds once a skill loads; `communicate` cases are explanations the
   agent makes of its own (a plan it proposes, a trade-off it weighs).
 
-Not covered: a request competing with another plugin's skill (only this plugin is loaded),
+`c4-alone` is a C4 request with no competing skill. The same request with a competing
+skill installed is in `../evals-conflict/` (run by `scripts/eval_conflict.sh`).
+
+Not covered: requests competing with another plugin's skill other than C4,
 and a working tree with uncommitted changes.
 
 On macOS, `/usr/bin/git` is a stub that needs Xcode's folders, which the eval sandbox

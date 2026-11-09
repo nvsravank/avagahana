@@ -1,6 +1,6 @@
 {
   "name": "avagahana",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Clear diagrams for AI agents: write a map as text, read it in an interactive viewer.",
   "author": {
     "name": "nvsravank"

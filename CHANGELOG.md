@@ -7,6 +7,13 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.1.2 (2026-11-08)
+
+- illuminate-concept: when another skill conducts a review or analysis, Avagahana runs
+  after it to present the result.
+- Skill evals for C4 requests with and without a competing skill (`evals-conflict/`,
+  `scripts/eval_conflict.sh`).
+
 ## 0.1.1 (2026-11-08)
 
 - Walkthrough reading file: evidence starts folded behind its trust mark, with one
