@@ -7,6 +7,7 @@
 import { TRUST } from './model/provenance.js';
 import { wrapRuns } from './measure.js';
 import { strokeStyle } from './model/classes.js';
+import { MORE, MARKS } from './flow-shapes.js';
 
 export const PAD = { x: 12, y: 7 };
 export const MAX_LINE = 280;
@@ -219,9 +220,16 @@ export function bangPath(w, h, seed, bump) {
 const SLANT = 0.35;   // a slanted side leans this far (times the height)
 const CYL = 6;        // a cylinder's lid depth
 const FLOW = {
-  // a square turned 45 degrees (as Mermaid draws it): the label's corners touch its sides
-  // when the diagonal is the label's width plus height, plus padding
-  rhombus: (bw, bh) => { const d = Math.ceil(bw + bh + 2 * PAD.x); return { w: d, h: d, ox: (d - bw) / 2, oy: (d - bh) / 2 }; },
+  // a diamond shaped like its label, from 1.5 times as tall as wide to 1.5 times as wide
+  // as tall (WO-59; a square one round a two-line question grew past 260 px): with width
+  // k times the height, the label's corners reach its sides when the height is the
+  // label's width / k plus its height
+  rhombus: (bw, bh) => {
+    const k = Math.min(1.5, Math.max(2 / 3, Math.sqrt(bw / Math.max(bh, 1))));
+    const h = Math.ceil(bw / k + bh + 2 * PAD.y);
+    const w = Math.ceil(k * h);
+    return { w, h, ox: (w - bw) / 2, oy: (h - bh) / 2 };
+  },
   stadium: (bw, bh) => { const h = Math.ceil(bh + 2 * PAD.y); const w = Math.ceil(bw + 2 * PAD.x + h / 2); return { w, h, ox: (w - bw) / 2, oy: PAD.y }; },
   subroutine: (bw, bh) => ({ w: Math.ceil(bw + 2 * PAD.x + 16), h: Math.ceil(bh + 2 * PAD.y), ox: PAD.x + 8, oy: PAD.y }),
   cylinder: (bw, bh) => ({ w: Math.ceil(bw + 2 * PAD.x), h: Math.ceil(bh + 2 * PAD.y + 3 * CYL), ox: PAD.x, oy: PAD.y + 2 * CYL }),
@@ -235,11 +243,13 @@ for (const name of ['parallelogram', 'parallelogram-alt', 'trapezoid', 'trapezoi
     return { w, h, ox: (w - bw) / 2, oy: PAD.y, attach: { l: s / 2, r: s / 2 } };
   };
 }
+// the Mermaid 11.3+ shapes with no bracket form (flow-shapes.js, WO-59)
+for (const [name, def] of Object.entries(MORE)) FLOW[name] = (bw, bh) => def.size(bw, bh, PAD);
 const STATE_MARK = {
   'state-start': () => ({ w: 20, h: 20 }),
   'state-end': () => ({ w: 24, h: 24 }),
   'state-choice': () => ({ w: 28, h: 28 }),
-  'state-bar': (n) => (n.across === 'v' ? { w: 9, h: 60 } : { w: 60, h: 9 }),
+  'state-bar': (n) => (n.across === 'v' ? { w: 9, h: 60 } : { w: 60, h: 9 }),  ...Object.fromEntries(Object.entries(MARKS).map(([name, def]) => [name, def.size])),
 };
 // the outline of a mark, and whether it is filled in the line colour (is-solid)
 function stateOutline(shape, w, h) {
@@ -248,7 +258,7 @@ function stateOutline(shape, w, h) {
     case 'state-end': return { d: `${circlePath(w / 2, h / 2, w / 2 - 1)} ${circlePath(w / 2, h / 2, w / 2 - 6)}`, solid: false, dot: true };
     case 'state-choice': return { d: flowOutline('rhombus', w, h), solid: false };
     case 'state-bar': return { d: `M0,0 H${r2(w)} V${r2(h)} H0 Z`, solid: true };
-    default: return null;
+    default: return MARKS[shape] ? MARKS[shape].outline(w, h) : null;
   }
 }
 const circlePath = (cx, cy, r) => `M${r2(cx - r)},${r2(cy)} a${r2(r)},${r2(r)} 0 1 0 ${r2(2 * r)},0 a${r2(r)},${r2(r)} 0 1 0 ${r2(-2 * r)},0`;
@@ -267,8 +277,30 @@ export function flowOutline(shape, w, h) {
     case 'parallelogram-alt': return `M0,0 H${r2(w - s)} L${r2(w)},${r2(h)} H${r2(s)} Z`;
     case 'trapezoid': return `M${r2(s)},0 H${r2(w - s)} L${r2(w)},${r2(h)} H0 Z`;
     case 'trapezoid-alt': return `M0,0 H${r2(w)} L${r2(w - s)},${r2(h)} H${r2(s)} Z`;
-    default: return null;
+    default: return MORE[shape] ? MORE[shape].outline(w, h) : null;
   }
+}
+
+// A node's outline as an SVG path in its own w x h box, or null for a plain box (a
+// rectangle, rounded or not). The drawing (circle and hexagon aside, which paint.js
+// draws itself, the same) and where arrows end (outline.js, WO-59) both use it.
+export function outlineOf(n, w, h, geo = {}) {
+  if (STATE_MARK[n.shape]) return stateOutline(n.shape, w, h).d;
+  if (n.shape === 'cloud') return cloudPath(w, h, n.id, geo.bump);
+  if (n.shape === 'bang') return bangPath(w, h, n.id, geo.bump);
+  if (n.shape === 'circle') return circlePath(w / 2, h / 2, w / 2);
+  if (n.shape === 'hexagon') {
+    const i = Math.min(14, h / 2);
+    return `M${r2(i)},0 H${r2(w - i)} L${r2(w)},${r2(h / 2)} L${r2(w - i)},${r2(h)} H${r2(i)} L0,${r2(h / 2)} Z`;
+  }
+  if (FLOW[n.shape] || n.shape === 'doublecircle') return flowOutline(n.shape, w, h);
+  return null;
+}
+
+// Where arrows stop on a node (outline.js): its outline, or for a shape with an open
+// side its clip (flow-shapes.js), which closes that side along the box.
+export function clipOutlineOf(n, w, h, geo = {}) {
+  return MORE[n.shape]?.clip ? MORE[n.shape].clip(w, h) : outlineOf(n, w, h, geo);
 }
 
 // What a screen reader says for a node.
@@ -331,9 +363,8 @@ export function nodeShaper(input) {
       if (geo.note) s.note = { x: p.w + 4, y: -6, size: 14 };
       return s;
     }
-    if (n.shape === 'cloud') s.outline = cloudPath(p.w, p.h, n.id, geo.bump);
-    else if (n.shape === 'bang') s.outline = bangPath(p.w, p.h, n.id, geo.bump);
-    else if (FLOW[n.shape] || n.shape === 'doublecircle') s.outline = flowOutline(n.shape, p.w, p.h);
+    const outline = n.shape !== 'circle' && n.shape !== 'hexagon' && outlineOf(n, p.w, p.h, geo);
+    if (outline) s.outline = outline;
     // a box the layout made bigger than its label (a common height): the label centred
     const ox = geo.ox + Math.max(0, (p.w - geo.w) / 2);
     const tx = ox + geo.iconsW + (geo.linkRow ? (geo.linkRow.bodyW - geo.textW) / 2 : 0);

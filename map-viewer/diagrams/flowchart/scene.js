@@ -9,7 +9,8 @@
 // (layout.routes): straight runs with rounded corners; labels where the layout put them
 // (layout.labels), else on the longest run.
 import { TRUST } from '../../model/provenance.js';
-import { nodeShaper, nodeName, typeFor, planClass, passesFilter } from '../../geometry.js';
+import { nodeShaper, nodeName, typeFor, planClass, passesFilter, clipOutlineOf } from '../../geometry.js';
+import { samplePath, clipToOutline } from '../../outline.js';
 import { strokeStyle } from '../../model/classes.js';
 import { labelLines, SIGN_W } from '../../connection-labels.js';
 import { queryScene, queryTone } from '../../query/cards.js';
@@ -127,7 +128,8 @@ export function relationShapes(input) {
     const slot = lineCls?.kindSlot ?? null;
     // a planned change all of them share (model/classes.js)
     const plan = items.every((r) => r.plan === first.plan) ? first.plan || null : null;
-    const route = L.routes && L.routes.get(key);
+    const routed = L.routes && L.routes.get(key);
+    const route = routed && clipRoute(routed, a, b, p, q, input);
     // unrouted: a pair in both directions bows apart, so the two arrows do not lie on one curve
     const { d, mid } = route ? routedPath(route) : arrowPath(p, q, groups.has(`${b.id}>${a.id}`) ? 10 : 0);
     // the layout's place for the label is its centre; text sits on a baseline
@@ -155,6 +157,31 @@ export function relationShapes(input) {
 }
 
 const RADIUS = 8;   // a routed arrow's corners
+
+// WO-59: a route's two ends move from the box round each shape to the shape's drawn
+// outline, along their last straight run (a diamond, circle, cloud, slanted side...).
+// Open boxes and Poster's icon nodes keep the layout's ends.
+function clipRoute(pts, a, b, p, q, input) {
+  const out = pts.slice();
+  const clip = (n, at, i, j) => {
+    if (at.frame || !input.geom) return;
+    const geo = input.geom(n);
+    if (!geo || geo.figure || geo.poster) return;
+    const d = clipOutlineOf(n, at.w, at.h, geo);
+    if (!d) return;
+    // the nearest earlier point that is not the end itself
+    let k = j;
+    while (k >= 0 && k < out.length && out[k][0] === out[i][0] && out[k][1] === out[i][1]) k += j > i ? 1 : -1;
+    if (k < 0 || k >= out.length) return;
+    const ox = at.x - at.w / 2;
+    const oy = at.y - at.h / 2;
+    const end = clipToOutline(samplePath(d), [out[i][0] - ox, out[i][1] - oy], [out[k][0] - ox, out[k][1] - oy]);
+    out[i] = [end[0] + ox, end[1] + oy];
+  };
+  clip(a, p, 0, 1);
+  clip(b, q, out.length - 1, out.length - 2);
+  return out;
+}
 
 // Straight runs joined by rounded corners; the label's place: the middle of the longest
 // run, a run along x preferred (a label lies along it)

@@ -7,6 +7,17 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.1.3 (2026-11-09)
+
+- **Contract** (map format, addition): flowcharts support all of Mermaid's shapes,
+  written as Mermaid 11.3+ node data, `id@{ shape: …, label: … }`, with every name and
+  alias Mermaid accepts. An unknown shape name warns (`node-shape-unknown`); `icon:` and
+  `img:` nodes are a checker error (`node-icon-image`).
+- Each shape is drawn with its own outline, so arrows meet that outline in Outline and
+  Poster. A diamond's arrows meet its corners, and a diamond takes its label's shape,
+  from 1.5 times as tall as wide to 1.5 times as wide as tall.
+- A new example, Flowchart shapes, shows every shape with its name.
+
 ## 0.1.2 (2026-11-08)
 
 - illuminate-concept: when another skill conducts a review or analysis, Avagahana runs

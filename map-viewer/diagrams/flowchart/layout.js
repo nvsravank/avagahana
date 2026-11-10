@@ -58,7 +58,12 @@ const PORT_MARGIN = 10;  // a box's first and last port keep this far from its c
 // runs side by side stack one above the other instead of widening the gap
 const LABEL_SPREAD = 20;
 // shapes that keep their own proportions (no common height)
-const OWN_SHAPE = new Set(['circle', 'doublecircle', 'rhombus', 'hexagon', 'state-start', 'state-end', 'state-choice', 'state-bar']);
+// shapes whose arrows meet their corners (WO-59)
+const DIAMOND = new Set(['rhombus', 'state-choice']);
+// shapes whose arrows meet the middle of each side (an hourglass's small glyph)
+const MIDDLE = new Set(['hourglass']);
+const OWN_SHAPE = new Set(['circle', 'doublecircle', 'rhombus', 'hexagon', 'state-start', 'state-end', 'state-choice', 'state-bar',
+  'sm-circ', 'f-circ', 'fr-circ', 'cross-circ', 'fork', 'bolt', 'tri', 'flip-tri', 'hourglass', 'person']);
 // the sides of a box, by direction: the flow leaves by fwd and comes in by back; low
 // and high are the sides across the flow (top / left, bottom / right)
 const SIDES = {
@@ -478,6 +483,28 @@ export function layoutBoxes(root, kids, size, input) {
     for (const list of free.values()) {
       const { c, side } = list[0].end;
       const s = sizes.get(c);
+      // A diamond (WO-59): arrows meet its corners, in both looks. On the side the flow
+      // leaves by, the exit most nearly straight ahead takes the forward corner (the
+      // middle of the side) and the others the side corners (the side's ends), on their
+      // targets' side; every other side ends at its middle, its corner. The scene clips
+      // each end to the outline, which takes a side's end up to that side corner.
+      if ((DIAMOND.has(c.shape) || MIDDLE.has(c.shape)) && !info.has(c) && !s.anchor && !c.figure) {
+        const len = side === 'L' || side === 'R' ? s.h : s.w;
+        list.forEach((p, i) => { p.at = i; });
+        list.sort((p, q) => (p.key > q.key) - (p.key < q.key) || p.at - q.at);
+        let pick = 0;
+        if (side === SIDES[I.dir].fwd && list.length > 1 && !MIDDLE.has(c.shape)) {
+          const mid = crossC.get(c);
+          const far = (p) => (Number.isFinite(p.key) ? Math.abs(p.key - mid) : Infinity);
+          list.forEach((p, i) => { if (far(p) < far(list[pick]) || (far(p) === far(list[pick]) && p.at < list[pick].at)) pick = i; });
+          list.forEach((p, i) => portAt.set(p.end, { side, off: i < pick ? 0 : i > pick ? len : len / 2 }));
+        } else list.forEach((p) => portAt.set(p.end, { side, off: len / 2 }));
+        list.lo = 0;
+        list.hi = len;
+        list.spread = 0;
+        list.fixed = true;
+        continue;
+      }
       // Poster (WO-38): every arrow on a side ends at its middle, a figure's at its icon's
       // centre; one may slide (below) only within the middle of the icon, to run straight
       if (input.poster && !info.has(c)) {

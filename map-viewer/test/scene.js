@@ -14,10 +14,10 @@ import { loadIconIndex, iconDef } from '../icons.js';
 import { openCalls } from '../diagrams/sequence/scene.js';
 import { limitView, maxZoom } from '../diagrams/sequence/limits.js';
 
-const FIXTURES = ['node-shapes'];
-const MAPS = ['garden', 'tools', 'shapes', 'node-shapes', 'c4-shop', 'slow-checkout', 'job-race', 'shop-plan', 'order-states', 'sales-warehouse'];
+const FIXTURES = ['node-shapes', 'shape-ports'];
+const MAPS = ['garden', 'tools', 'shapes', 'node-shapes', 'c4-shop', 'slow-checkout', 'job-race', 'shop-plan', 'order-states', 'sales-warehouse', 'shape-ports'];
 // per map: a node to select, a search hit, so marks and related links are covered
-const PICK = { garden: { selected: 'n7', hits: ['n26'] }, tools: { selected: 'n2', hits: ['n8'] }, shapes: { selected: 'n15', hits: ['n4'] }, 'node-shapes': { selected: 'n8', hits: ['n5'] }, 'c4-shop': { selected: 'ord', hits: ['db'] }, 'slow-checkout': { selected: 'fraud', hits: ['psp'] }, 'job-race': { selected: 'db', hits: ['b'] }, 'shop-plan': { selected: 'charge', hits: ['payh'] }, 'order-states': { selected: 'Retrying', hits: ['Failed'] }, 'sales-warehouse': { selected: 'ORDER_LINE', hits: ['DATE'] } };
+const PICK = { garden: { selected: 'n7', hits: ['n26'] }, tools: { selected: 'n2', hits: ['n8'] }, shapes: { selected: 'n15', hits: ['n4'] }, 'node-shapes': { selected: 'n8', hits: ['n5'] }, 'c4-shop': { selected: 'ord', hits: ['db'] }, 'slow-checkout': { selected: 'fraud', hits: ['psp'] }, 'job-race': { selected: 'db', hits: ['b'] }, 'shop-plan': { selected: 'charge', hits: ['payh'] }, 'order-states': { selected: 'Retrying', hits: ['Failed'] }, 'sales-warehouse': { selected: 'ORDER_LINE', hits: ['DATE'] }, 'shape-ports': { selected: 'm-diam', hits: ['b-rhombus'] } };
 // the scenes per diagram type; "far" is zoomed out, where small labels become bars. A
 // box diagram is drawn in each of its views, with its boxes open, and with every box
 // below the top level closed (the arrows lifted to the containers).

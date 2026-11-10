@@ -394,6 +394,19 @@ flowchart LR
 - **Nodes**: `<id>` followed by any shape from the list above (`["…"]`, `[("…")]`, …);
   a bare `<id>` is a node labelled with its id. A node belongs to the box it is first
   named in.
+- **Node data** (Mermaid 11.3+): `<id>@{ shape: <name>, label: "…" }`, on its own line,
+  over several lines, or inside an arrow line (`a@{ shape: doc } --> b`). Every shape in
+  Mermaid's flowchart list is drawn as itself, by its short name or any alias (`diamond`,
+  `cyl`, `doc`, `docs`, `delay`, `tri`, `hourglass`, `lin-cyl`, `person`, `folder`, …;
+  the fourteen with a bracket form draw as that form). A name Mermaid does not have draws a
+  box and warns. `icon:` and `img:` nodes are not supported: the checker rejects them, the
+  viewer draws the label in a box and warns; give the node a shape and an icon under
+  `## Node icons` instead. An `@{ … }` line for an arrow's id is that arrow's settings,
+  ignored.
+- **Arrow ends**: an arrow ends on the drawn outline of its node's shape. A diamond's
+  arrows meet its corners: the straightest exit its forward corner, other exits the side
+  corners on their targets' side, arrows in its back corner. A diamond takes its label's
+  shape: from 1.5 times as tall as wide to 1.5 times as wide as tall.
 - **Arrows**: Mermaid's (see `## Relations`), with a label as `-->|label|` or
   `-- label -->`; chains (`a --> b --> c`) and `&` (`a & b --> c`). They are the
   map's default relation view. A label (here, in a state diagram, an ER relationship, a

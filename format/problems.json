@@ -72,6 +72,16 @@
       "side": "both",
       "what": "Flowchart: brackets that are no Mermaid shape"
     },
+    "node-shape-unknown": {
+      "level": "warning",
+      "side": "both",
+      "what": "Flowchart: id@{ shape: … } names a shape Mermaid does not have (drawn as a box)"
+    },
+    "node-icon-image": {
+      "level": "error",
+      "side": "both",
+      "what": "Flowchart: an id@{ icon: … } or id@{ img: … } node: not supported (the viewer draws its label in a box)"
+    },
     "mindmap-shape-unknown": {
       "level": "error",
       "side": "checker",

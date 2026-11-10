@@ -132,6 +132,41 @@ def shape_of(rest):
 
 # ---------- mind map ----------
 
+# Mermaid 11.3+ node data, `id@{ shape: doc, label: "Report" }` (WO-59): every shape
+# name and alias in Mermaid's flowchart list (map-viewer/model/shapes.js draws them all)
+MERMAID_SHAPES = set("""
+rect proc process rectangle rounded event stadium pill terminal subroutine fr-rect
+framed-rectangle subproc subprocess cylinder cyl database db circle circ asymmetric odd
+rhombus diam decision diamond question hexagon hex prepare parallelogram lean-r lean-right
+in-out parallelogram-alt lean-l lean-left out-in trapezoid trap-b priority trapezoid-bottom
+trapezoid-alt trap-t inv-trapezoid manual trapezoid-top doublecircle dbl-circ double-circle
+cloud bang notch-rect card notched-rectangle hourglass collate bolt com-link lightning-bolt
+brace brace-l comment brace-r braces console browser bucket datastore data-store delay
+half-rounded-rectangle h-cyl das horizontal-cylinder lin-cyl disk lined-cylinder curv-trap
+curved-trapezoid display div-rect div-proc divided-process divided-rectangle doc document
+tri extract triangle folder directory fork join win-pane internal-storage window-pane
+f-circ filled-circle junction lin-doc lined-document lin-rect lin-proc lined-process
+lined-rectangle shaded-process notch-pent loop-limit notched-pentagon flip-tri
+flipped-triangle manual-file sl-rect manual-input sloped-rectangle docs documents st-doc
+stacked-document st-rect processes procs stacked-rectangle flag paper-tape person sm-circ
+small-circle start fr-circ framed-circle stop bow-rect bow-tie-rectangle stored-data
+cross-circ crossed-circle summary tag-doc tagged-document tag-rect tag-proc tagged-process
+tagged-rectangle text
+""".split())
+NODE_DATA_KEYS = {"shape", "label", "icon", "img", "form", "pos", "w", "h", "constraint"}
+
+
+def node_data(body):
+    """`shape: doc, label: "A, b"` -> {"shape": "doc", "label": "A, b"}"""
+    out = {}
+    for mm in re.finditer(r"""([A-Za-z_][\w-]*)\s*:\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^,\n]*)""", body):
+        v = mm.group(2).strip()
+        if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+            v = re.sub(r"\\([\"'\\])", r"\1", v[1:-1])
+        out[mm.group(1)] = v
+    return out
+
+
 def read_mindmap(m, lines, first, start_line):
     """-> {ids: {id: node}, root} for a mindmap block; problems go on m."""
     ids = {}
@@ -323,7 +358,17 @@ def read_flowchart(m, lines, first, start_line, what="flowchart"):
             place(n, here)
         elif n["parent"] is root and here is not root and not within(n, here):
             place(n, here)
-        if rest:
+        if rest.startswith("@{") and rest.endswith("}"):
+            n["named"] = True
+            data = node_data(rest[2:-1])
+            if "icon" in data or "img" in data:
+                kind = "icon" if "icon" in data else "image"
+                m.report(ln, "node-icon-image", f"node {nid}: {kind} nodes are not supported; give it a shape (and an icon under Node icons)")
+            elif "shape" in data and data["shape"].strip().lower() not in MERMAID_SHAPES:
+                m.report(ln, "node-shape-unknown", f'node {nid}: Mermaid has no shape "{data["shape"]}"; drawn as a box')
+            if "label" in data:
+                check_label(m, ln, nid, data["label"])
+        elif rest:
             found = shape_of(rest)
             n["named"] = True
             if not found:
@@ -332,9 +377,20 @@ def read_flowchart(m, lines, first, start_line, what="flowchart"):
                 check_label(m, ln, nid, found[1])
         return n
 
+    joined = set()   # lines taken into an earlier line's @{ ... } (WO-59)
     for k in range(first + 1, len(lines)):
+        if k in joined:
+            continue
         ln = start_line + k
         t = re.sub(r";\s*$", "", lines[k].strip())
+        if re.search(r"@\{[^}]*$", t):
+            j = k
+            while j + 1 < len(lines) and "}" not in lines[j]:
+                j += 1
+                t += "\n" + lines[j].strip()
+            if "}" in t:
+                joined.update(range(k + 1, j + 1))
+                t = re.sub(r";\s*$", "", t)
         if not t or t.startswith("%%"):
             continue
         sm = re.fullmatch(r"subgraph\b\s*(.*)", t)
@@ -379,7 +435,11 @@ def read_flowchart(m, lines, first, start_line, what="flowchart"):
         if cm:
             class_lines.append(([x.strip() for x in cm.group(1).split(",")], cm.group(2), ln))
             continue
-        if re.match(r"^[\w-]+@\{", t):
+        dm = re.fullmatch(r"([A-Za-z_][\w-]*)@\{([\s\S]*)\}", t)
+        if dm and dm.group(1) not in eids and set(node_data(dm.group(2))) & NODE_DATA_KEYS:
+            node(t, ln)   # a node's data (WO-59)
+            continue
+        if dm:
             m.report(ln, "arrow-settings", f"{what}: an arrow's @{{...}} settings are ignored")
             continue
         if re.match(r"^(style|linkStyle)\b", t):

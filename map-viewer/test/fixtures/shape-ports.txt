@@ -1,0 +1,3211 @@
+# Shape ports
+
+Every flowchart shape, 16 bracket shapes (b-) and Mermaid's 53 (m-), each with two
+arrows in and three out (WO-59). The browser test (shape-ports.js) measures every arrow end
+against the drawn outline in each direction and both looks; scene.js snapshots the first
+diagram. A diamond's arrows meet its corners.
+
+```mermaid
+flowchart TB
+  subgraph g1 [Shapes 1 to 6]
+    direction TB
+    b-square-a["in A"]
+    b-square-b["in B"]
+    b-square["square<br>bracket"]
+    b-square-x["X"]
+    b-square-y["Y"]
+    b-square-z["Z"]
+    b-rounded-a["in A"]
+    b-rounded-b["in B"]
+    b-rounded("rounded<br>bracket")
+    b-rounded-x["X"]
+    b-rounded-y["Y"]
+    b-rounded-z["Z"]
+    b-stadium-a["in A"]
+    b-stadium-b["in B"]
+    b-stadium(["stadium<br>bracket"])
+    b-stadium-x["X"]
+    b-stadium-y["Y"]
+    b-stadium-z["Z"]
+    b-subroutine-a["in A"]
+    b-subroutine-b["in B"]
+    b-subroutine[["subroutine<br>bracket"]]
+    b-subroutine-x["X"]
+    b-subroutine-y["Y"]
+    b-subroutine-z["Z"]
+    b-cylinder-a["in A"]
+    b-cylinder-b["in B"]
+    b-cylinder[("cylinder<br>bracket")]
+    b-cylinder-x["X"]
+    b-cylinder-y["Y"]
+    b-cylinder-z["Z"]
+    b-circle-a["in A"]
+    b-circle-b["in B"]
+    b-circle(("circle<br>bracket"))
+    b-circle-x["X"]
+    b-circle-y["Y"]
+    b-circle-z["Z"]
+  end
+  b-square-a --> b-square
+  b-square-b -->|label| b-square
+  b-square -->|yes| b-square-x
+  b-square -->|no| b-square-y
+  b-square --> b-square-z
+  b-rounded-a --> b-rounded
+  b-rounded-b -->|label| b-rounded
+  b-rounded -->|yes| b-rounded-x
+  b-rounded -->|no| b-rounded-y
+  b-rounded --> b-rounded-z
+  b-stadium-a --> b-stadium
+  b-stadium-b -->|label| b-stadium
+  b-stadium -->|yes| b-stadium-x
+  b-stadium -->|no| b-stadium-y
+  b-stadium --> b-stadium-z
+  b-subroutine-a --> b-subroutine
+  b-subroutine-b -->|label| b-subroutine
+  b-subroutine -->|yes| b-subroutine-x
+  b-subroutine -->|no| b-subroutine-y
+  b-subroutine --> b-subroutine-z
+  b-cylinder-a --> b-cylinder
+  b-cylinder-b -->|label| b-cylinder
+  b-cylinder -->|yes| b-cylinder-x
+  b-cylinder -->|no| b-cylinder-y
+  b-cylinder --> b-cylinder-z
+  b-circle-a --> b-circle
+  b-circle-b -->|label| b-circle
+  b-circle -->|yes| b-circle-x
+  b-circle -->|no| b-circle-y
+  b-circle --> b-circle-z
+  subgraph g2 [Shapes 7 to 12]
+    direction TB
+    b-doublecircle-a["in A"]
+    b-doublecircle-b["in B"]
+    b-doublecircle((("doublecircle<br>bracket")))
+    b-doublecircle-x["X"]
+    b-doublecircle-y["Y"]
+    b-doublecircle-z["Z"]
+    b-asymmetric-a["in A"]
+    b-asymmetric-b["in B"]
+    b-asymmetric>"asymmetric<br>bracket"]
+    b-asymmetric-x["X"]
+    b-asymmetric-y["Y"]
+    b-asymmetric-z["Z"]
+    b-rhombus-a["in A"]
+    b-rhombus-b["in B"]
+    b-rhombus{"rhombus<br>bracket"}
+    b-rhombus-x["X"]
+    b-rhombus-y["Y"]
+    b-rhombus-z["Z"]
+    b-hexagon-a["in A"]
+    b-hexagon-b["in B"]
+    b-hexagon{{"hexagon<br>bracket"}}
+    b-hexagon-x["X"]
+    b-hexagon-y["Y"]
+    b-hexagon-z["Z"]
+    b-parallelogram-a["in A"]
+    b-parallelogram-b["in B"]
+    b-parallelogram[/"parallelogram<br>bracket"/]
+    b-parallelogram-x["X"]
+    b-parallelogram-y["Y"]
+    b-parallelogram-z["Z"]
+    b-parallelogram-alt-a["in A"]
+    b-parallelogram-alt-b["in B"]
+    b-parallelogram-alt[\"parallelogram-alt<br>bracket"\]
+    b-parallelogram-alt-x["X"]
+    b-parallelogram-alt-y["Y"]
+    b-parallelogram-alt-z["Z"]
+  end
+  b-doublecircle-a --> b-doublecircle
+  b-doublecircle-b -->|label| b-doublecircle
+  b-doublecircle -->|yes| b-doublecircle-x
+  b-doublecircle -->|no| b-doublecircle-y
+  b-doublecircle --> b-doublecircle-z
+  b-asymmetric-a --> b-asymmetric
+  b-asymmetric-b -->|label| b-asymmetric
+  b-asymmetric -->|yes| b-asymmetric-x
+  b-asymmetric -->|no| b-asymmetric-y
+  b-asymmetric --> b-asymmetric-z
+  b-rhombus-a --> b-rhombus
+  b-rhombus-b -->|label| b-rhombus
+  b-rhombus -->|yes| b-rhombus-x
+  b-rhombus -->|no| b-rhombus-y
+  b-rhombus --> b-rhombus-z
+  b-hexagon-a --> b-hexagon
+  b-hexagon-b -->|label| b-hexagon
+  b-hexagon -->|yes| b-hexagon-x
+  b-hexagon -->|no| b-hexagon-y
+  b-hexagon --> b-hexagon-z
+  b-parallelogram-a --> b-parallelogram
+  b-parallelogram-b -->|label| b-parallelogram
+  b-parallelogram -->|yes| b-parallelogram-x
+  b-parallelogram -->|no| b-parallelogram-y
+  b-parallelogram --> b-parallelogram-z
+  b-parallelogram-alt-a --> b-parallelogram-alt
+  b-parallelogram-alt-b -->|label| b-parallelogram-alt
+  b-parallelogram-alt -->|yes| b-parallelogram-alt-x
+  b-parallelogram-alt -->|no| b-parallelogram-alt-y
+  b-parallelogram-alt --> b-parallelogram-alt-z
+  subgraph g3 [Shapes 13 to 18]
+    direction TB
+    b-trapezoid-a["in A"]
+    b-trapezoid-b["in B"]
+    b-trapezoid[/"trapezoid<br>bracket"\]
+    b-trapezoid-x["X"]
+    b-trapezoid-y["Y"]
+    b-trapezoid-z["Z"]
+    b-trapezoid-alt-a["in A"]
+    b-trapezoid-alt-b["in B"]
+    b-trapezoid-alt[\"trapezoid-alt<br>bracket"/]
+    b-trapezoid-alt-x["X"]
+    b-trapezoid-alt-y["Y"]
+    b-trapezoid-alt-z["Z"]
+    b-cloud-a["in A"]
+    b-cloud-b["in B"]
+    b-cloud)"cloud<br>bracket"(
+    b-cloud-x["X"]
+    b-cloud-y["Y"]
+    b-cloud-z["Z"]
+    b-bang-a["in A"]
+    b-bang-b["in B"]
+    b-bang))"bang<br>bracket"((
+    b-bang-x["X"]
+    b-bang-y["Y"]
+    b-bang-z["Z"]
+    m-rect-a["in A"]
+    m-rect-b["in B"]
+    m-rect@{ shape: rect, label: "rect" }
+    m-rect-x["X"]
+    m-rect-y["Y"]
+    m-rect-z["Z"]
+    m-rounded-a["in A"]
+    m-rounded-b["in B"]
+    m-rounded@{ shape: rounded, label: "rounded" }
+    m-rounded-x["X"]
+    m-rounded-y["Y"]
+    m-rounded-z["Z"]
+  end
+  b-trapezoid-a --> b-trapezoid
+  b-trapezoid-b -->|label| b-trapezoid
+  b-trapezoid -->|yes| b-trapezoid-x
+  b-trapezoid -->|no| b-trapezoid-y
+  b-trapezoid --> b-trapezoid-z
+  b-trapezoid-alt-a --> b-trapezoid-alt
+  b-trapezoid-alt-b -->|label| b-trapezoid-alt
+  b-trapezoid-alt -->|yes| b-trapezoid-alt-x
+  b-trapezoid-alt -->|no| b-trapezoid-alt-y
+  b-trapezoid-alt --> b-trapezoid-alt-z
+  b-cloud-a --> b-cloud
+  b-cloud-b -->|label| b-cloud
+  b-cloud -->|yes| b-cloud-x
+  b-cloud -->|no| b-cloud-y
+  b-cloud --> b-cloud-z
+  b-bang-a --> b-bang
+  b-bang-b -->|label| b-bang
+  b-bang -->|yes| b-bang-x
+  b-bang -->|no| b-bang-y
+  b-bang --> b-bang-z
+  m-rect-a --> m-rect
+  m-rect-b -->|label| m-rect
+  m-rect -->|yes| m-rect-x
+  m-rect -->|no| m-rect-y
+  m-rect --> m-rect-z
+  m-rounded-a --> m-rounded
+  m-rounded-b -->|label| m-rounded
+  m-rounded -->|yes| m-rounded-x
+  m-rounded -->|no| m-rounded-y
+  m-rounded --> m-rounded-z
+  subgraph g4 [Shapes 19 to 24]
+    direction TB
+    m-stadium-a["in A"]
+    m-stadium-b["in B"]
+    m-stadium@{ shape: stadium, label: "stadium" }
+    m-stadium-x["X"]
+    m-stadium-y["Y"]
+    m-stadium-z["Z"]
+    m-fr-rect-a["in A"]
+    m-fr-rect-b["in B"]
+    m-fr-rect@{ shape: fr-rect, label: "fr-rect" }
+    m-fr-rect-x["X"]
+    m-fr-rect-y["Y"]
+    m-fr-rect-z["Z"]
+    m-cyl-a["in A"]
+    m-cyl-b["in B"]
+    m-cyl@{ shape: cyl, label: "cyl" }
+    m-cyl-x["X"]
+    m-cyl-y["Y"]
+    m-cyl-z["Z"]
+    m-circle-a["in A"]
+    m-circle-b["in B"]
+    m-circle@{ shape: circle, label: "circle" }
+    m-circle-x["X"]
+    m-circle-y["Y"]
+    m-circle-z["Z"]
+    m-odd-a["in A"]
+    m-odd-b["in B"]
+    m-odd@{ shape: odd, label: "odd" }
+    m-odd-x["X"]
+    m-odd-y["Y"]
+    m-odd-z["Z"]
+    m-diam-a["in A"]
+    m-diam-b["in B"]
+    m-diam@{ shape: diam, label: "diam" }
+    m-diam-x["X"]
+    m-diam-y["Y"]
+    m-diam-z["Z"]
+  end
+  m-stadium-a --> m-stadium
+  m-stadium-b -->|label| m-stadium
+  m-stadium -->|yes| m-stadium-x
+  m-stadium -->|no| m-stadium-y
+  m-stadium --> m-stadium-z
+  m-fr-rect-a --> m-fr-rect
+  m-fr-rect-b -->|label| m-fr-rect
+  m-fr-rect -->|yes| m-fr-rect-x
+  m-fr-rect -->|no| m-fr-rect-y
+  m-fr-rect --> m-fr-rect-z
+  m-cyl-a --> m-cyl
+  m-cyl-b -->|label| m-cyl
+  m-cyl -->|yes| m-cyl-x
+  m-cyl -->|no| m-cyl-y
+  m-cyl --> m-cyl-z
+  m-circle-a --> m-circle
+  m-circle-b -->|label| m-circle
+  m-circle -->|yes| m-circle-x
+  m-circle -->|no| m-circle-y
+  m-circle --> m-circle-z
+  m-odd-a --> m-odd
+  m-odd-b -->|label| m-odd
+  m-odd -->|yes| m-odd-x
+  m-odd -->|no| m-odd-y
+  m-odd --> m-odd-z
+  m-diam-a --> m-diam
+  m-diam-b -->|label| m-diam
+  m-diam -->|yes| m-diam-x
+  m-diam -->|no| m-diam-y
+  m-diam --> m-diam-z
+  subgraph g5 [Shapes 25 to 30]
+    direction TB
+    m-hex-a["in A"]
+    m-hex-b["in B"]
+    m-hex@{ shape: hex, label: "hex" }
+    m-hex-x["X"]
+    m-hex-y["Y"]
+    m-hex-z["Z"]
+    m-lean-r-a["in A"]
+    m-lean-r-b["in B"]
+    m-lean-r@{ shape: lean-r, label: "lean-r" }
+    m-lean-r-x["X"]
+    m-lean-r-y["Y"]
+    m-lean-r-z["Z"]
+    m-lean-l-a["in A"]
+    m-lean-l-b["in B"]
+    m-lean-l@{ shape: lean-l, label: "lean-l" }
+    m-lean-l-x["X"]
+    m-lean-l-y["Y"]
+    m-lean-l-z["Z"]
+    m-trap-b-a["in A"]
+    m-trap-b-b["in B"]
+    m-trap-b@{ shape: trap-b, label: "trap-b" }
+    m-trap-b-x["X"]
+    m-trap-b-y["Y"]
+    m-trap-b-z["Z"]
+    m-trap-t-a["in A"]
+    m-trap-t-b["in B"]
+    m-trap-t@{ shape: trap-t, label: "trap-t" }
+    m-trap-t-x["X"]
+    m-trap-t-y["Y"]
+    m-trap-t-z["Z"]
+    m-dbl-circ-a["in A"]
+    m-dbl-circ-b["in B"]
+    m-dbl-circ@{ shape: dbl-circ, label: "dbl-circ" }
+    m-dbl-circ-x["X"]
+    m-dbl-circ-y["Y"]
+    m-dbl-circ-z["Z"]
+  end
+  m-hex-a --> m-hex
+  m-hex-b -->|label| m-hex
+  m-hex -->|yes| m-hex-x
+  m-hex -->|no| m-hex-y
+  m-hex --> m-hex-z
+  m-lean-r-a --> m-lean-r
+  m-lean-r-b -->|label| m-lean-r
+  m-lean-r -->|yes| m-lean-r-x
+  m-lean-r -->|no| m-lean-r-y
+  m-lean-r --> m-lean-r-z
+  m-lean-l-a --> m-lean-l
+  m-lean-l-b -->|label| m-lean-l
+  m-lean-l -->|yes| m-lean-l-x
+  m-lean-l -->|no| m-lean-l-y
+  m-lean-l --> m-lean-l-z
+  m-trap-b-a --> m-trap-b
+  m-trap-b-b -->|label| m-trap-b
+  m-trap-b -->|yes| m-trap-b-x
+  m-trap-b -->|no| m-trap-b-y
+  m-trap-b --> m-trap-b-z
+  m-trap-t-a --> m-trap-t
+  m-trap-t-b -->|label| m-trap-t
+  m-trap-t -->|yes| m-trap-t-x
+  m-trap-t -->|no| m-trap-t-y
+  m-trap-t --> m-trap-t-z
+  m-dbl-circ-a --> m-dbl-circ
+  m-dbl-circ-b -->|label| m-dbl-circ
+  m-dbl-circ -->|yes| m-dbl-circ-x
+  m-dbl-circ -->|no| m-dbl-circ-y
+  m-dbl-circ --> m-dbl-circ-z
+  subgraph g6 [Shapes 31 to 36]
+    direction TB
+    m-cloud-a["in A"]
+    m-cloud-b["in B"]
+    m-cloud@{ shape: cloud, label: "cloud" }
+    m-cloud-x["X"]
+    m-cloud-y["Y"]
+    m-cloud-z["Z"]
+    m-bang-a["in A"]
+    m-bang-b["in B"]
+    m-bang@{ shape: bang, label: "bang" }
+    m-bang-x["X"]
+    m-bang-y["Y"]
+    m-bang-z["Z"]
+    m-text-a["in A"]
+    m-text-b["in B"]
+    m-text@{ shape: text, label: "text" }
+    m-text-x["X"]
+    m-text-y["Y"]
+    m-text-z["Z"]
+    m-notch-rect-a["in A"]
+    m-notch-rect-b["in B"]
+    m-notch-rect@{ shape: notch-rect, label: "notch-rect" }
+    m-notch-rect-x["X"]
+    m-notch-rect-y["Y"]
+    m-notch-rect-z["Z"]
+    m-lin-rect-a["in A"]
+    m-lin-rect-b["in B"]
+    m-lin-rect@{ shape: lin-rect, label: "lin-rect" }
+    m-lin-rect-x["X"]
+    m-lin-rect-y["Y"]
+    m-lin-rect-z["Z"]
+    m-div-rect-a["in A"]
+    m-div-rect-b["in B"]
+    m-div-rect@{ shape: div-rect, label: "div-rect" }
+    m-div-rect-x["X"]
+    m-div-rect-y["Y"]
+    m-div-rect-z["Z"]
+  end
+  m-cloud-a --> m-cloud
+  m-cloud-b -->|label| m-cloud
+  m-cloud -->|yes| m-cloud-x
+  m-cloud -->|no| m-cloud-y
+  m-cloud --> m-cloud-z
+  m-bang-a --> m-bang
+  m-bang-b -->|label| m-bang
+  m-bang -->|yes| m-bang-x
+  m-bang -->|no| m-bang-y
+  m-bang --> m-bang-z
+  m-text-a --> m-text
+  m-text-b -->|label| m-text
+  m-text -->|yes| m-text-x
+  m-text -->|no| m-text-y
+  m-text --> m-text-z
+  m-notch-rect-a --> m-notch-rect
+  m-notch-rect-b -->|label| m-notch-rect
+  m-notch-rect -->|yes| m-notch-rect-x
+  m-notch-rect -->|no| m-notch-rect-y
+  m-notch-rect --> m-notch-rect-z
+  m-lin-rect-a --> m-lin-rect
+  m-lin-rect-b -->|label| m-lin-rect
+  m-lin-rect -->|yes| m-lin-rect-x
+  m-lin-rect -->|no| m-lin-rect-y
+  m-lin-rect --> m-lin-rect-z
+  m-div-rect-a --> m-div-rect
+  m-div-rect-b -->|label| m-div-rect
+  m-div-rect -->|yes| m-div-rect-x
+  m-div-rect -->|no| m-div-rect-y
+  m-div-rect --> m-div-rect-z
+  subgraph g7 [Shapes 37 to 42]
+    direction TB
+    m-win-pane-a["in A"]
+    m-win-pane-b["in B"]
+    m-win-pane@{ shape: win-pane, label: "win-pane" }
+    m-win-pane-x["X"]
+    m-win-pane-y["Y"]
+    m-win-pane-z["Z"]
+    m-tag-rect-a["in A"]
+    m-tag-rect-b["in B"]
+    m-tag-rect@{ shape: tag-rect, label: "tag-rect" }
+    m-tag-rect-x["X"]
+    m-tag-rect-y["Y"]
+    m-tag-rect-z["Z"]
+    m-st-rect-a["in A"]
+    m-st-rect-b["in B"]
+    m-st-rect@{ shape: st-rect, label: "st-rect" }
+    m-st-rect-x["X"]
+    m-st-rect-y["Y"]
+    m-st-rect-z["Z"]
+    m-notch-pent-a["in A"]
+    m-notch-pent-b["in B"]
+    m-notch-pent@{ shape: notch-pent, label: "notch-pent" }
+    m-notch-pent-x["X"]
+    m-notch-pent-y["Y"]
+    m-notch-pent-z["Z"]
+    m-sl-rect-a["in A"]
+    m-sl-rect-b["in B"]
+    m-sl-rect@{ shape: sl-rect, label: "sl-rect" }
+    m-sl-rect-x["X"]
+    m-sl-rect-y["Y"]
+    m-sl-rect-z["Z"]
+    m-doc-a["in A"]
+    m-doc-b["in B"]
+    m-doc@{ shape: doc, label: "doc" }
+    m-doc-x["X"]
+    m-doc-y["Y"]
+    m-doc-z["Z"]
+  end
+  m-win-pane-a --> m-win-pane
+  m-win-pane-b -->|label| m-win-pane
+  m-win-pane -->|yes| m-win-pane-x
+  m-win-pane -->|no| m-win-pane-y
+  m-win-pane --> m-win-pane-z
+  m-tag-rect-a --> m-tag-rect
+  m-tag-rect-b -->|label| m-tag-rect
+  m-tag-rect -->|yes| m-tag-rect-x
+  m-tag-rect -->|no| m-tag-rect-y
+  m-tag-rect --> m-tag-rect-z
+  m-st-rect-a --> m-st-rect
+  m-st-rect-b -->|label| m-st-rect
+  m-st-rect -->|yes| m-st-rect-x
+  m-st-rect -->|no| m-st-rect-y
+  m-st-rect --> m-st-rect-z
+  m-notch-pent-a --> m-notch-pent
+  m-notch-pent-b -->|label| m-notch-pent
+  m-notch-pent -->|yes| m-notch-pent-x
+  m-notch-pent -->|no| m-notch-pent-y
+  m-notch-pent --> m-notch-pent-z
+  m-sl-rect-a --> m-sl-rect
+  m-sl-rect-b -->|label| m-sl-rect
+  m-sl-rect -->|yes| m-sl-rect-x
+  m-sl-rect -->|no| m-sl-rect-y
+  m-sl-rect --> m-sl-rect-z
+  m-doc-a --> m-doc
+  m-doc-b -->|label| m-doc
+  m-doc -->|yes| m-doc-x
+  m-doc -->|no| m-doc-y
+  m-doc --> m-doc-z
+  subgraph g8 [Shapes 43 to 48]
+    direction TB
+    m-lin-doc-a["in A"]
+    m-lin-doc-b["in B"]
+    m-lin-doc@{ shape: lin-doc, label: "lin-doc" }
+    m-lin-doc-x["X"]
+    m-lin-doc-y["Y"]
+    m-lin-doc-z["Z"]
+    m-tag-doc-a["in A"]
+    m-tag-doc-b["in B"]
+    m-tag-doc@{ shape: tag-doc, label: "tag-doc" }
+    m-tag-doc-x["X"]
+    m-tag-doc-y["Y"]
+    m-tag-doc-z["Z"]
+    m-docs-a["in A"]
+    m-docs-b["in B"]
+    m-docs@{ shape: docs, label: "docs" }
+    m-docs-x["X"]
+    m-docs-y["Y"]
+    m-docs-z["Z"]
+    m-flag-a["in A"]
+    m-flag-b["in B"]
+    m-flag@{ shape: flag, label: "flag" }
+    m-flag-x["X"]
+    m-flag-y["Y"]
+    m-flag-z["Z"]
+    m-delay-a["in A"]
+    m-delay-b["in B"]
+    m-delay@{ shape: delay, label: "delay" }
+    m-delay-x["X"]
+    m-delay-y["Y"]
+    m-delay-z["Z"]
+    m-h-cyl-a["in A"]
+    m-h-cyl-b["in B"]
+    m-h-cyl@{ shape: h-cyl, label: "h-cyl" }
+    m-h-cyl-x["X"]
+    m-h-cyl-y["Y"]
+    m-h-cyl-z["Z"]
+  end
+  m-lin-doc-a --> m-lin-doc
+  m-lin-doc-b -->|label| m-lin-doc
+  m-lin-doc -->|yes| m-lin-doc-x
+  m-lin-doc -->|no| m-lin-doc-y
+  m-lin-doc --> m-lin-doc-z
+  m-tag-doc-a --> m-tag-doc
+  m-tag-doc-b -->|label| m-tag-doc
+  m-tag-doc -->|yes| m-tag-doc-x
+  m-tag-doc -->|no| m-tag-doc-y
+  m-tag-doc --> m-tag-doc-z
+  m-docs-a --> m-docs
+  m-docs-b -->|label| m-docs
+  m-docs -->|yes| m-docs-x
+  m-docs -->|no| m-docs-y
+  m-docs --> m-docs-z
+  m-flag-a --> m-flag
+  m-flag-b -->|label| m-flag
+  m-flag -->|yes| m-flag-x
+  m-flag -->|no| m-flag-y
+  m-flag --> m-flag-z
+  m-delay-a --> m-delay
+  m-delay-b -->|label| m-delay
+  m-delay -->|yes| m-delay-x
+  m-delay -->|no| m-delay-y
+  m-delay --> m-delay-z
+  m-h-cyl-a --> m-h-cyl
+  m-h-cyl-b -->|label| m-h-cyl
+  m-h-cyl -->|yes| m-h-cyl-x
+  m-h-cyl -->|no| m-h-cyl-y
+  m-h-cyl --> m-h-cyl-z
+  subgraph g9 [Shapes 49 to 54]
+    direction TB
+    m-lin-cyl-a["in A"]
+    m-lin-cyl-b["in B"]
+    m-lin-cyl@{ shape: lin-cyl, label: "lin-cyl" }
+    m-lin-cyl-x["X"]
+    m-lin-cyl-y["Y"]
+    m-lin-cyl-z["Z"]
+    m-curv-trap-a["in A"]
+    m-curv-trap-b["in B"]
+    m-curv-trap@{ shape: curv-trap, label: "curv-trap" }
+    m-curv-trap-x["X"]
+    m-curv-trap-y["Y"]
+    m-curv-trap-z["Z"]
+    m-bow-rect-a["in A"]
+    m-bow-rect-b["in B"]
+    m-bow-rect@{ shape: bow-rect, label: "bow-rect" }
+    m-bow-rect-x["X"]
+    m-bow-rect-y["Y"]
+    m-bow-rect-z["Z"]
+    m-tri-a["in A"]
+    m-tri-b["in B"]
+    m-tri@{ shape: tri, label: "tri" }
+    m-tri-x["X"]
+    m-tri-y["Y"]
+    m-tri-z["Z"]
+    m-flip-tri-a["in A"]
+    m-flip-tri-b["in B"]
+    m-flip-tri@{ shape: flip-tri, label: "flip-tri" }
+    m-flip-tri-x["X"]
+    m-flip-tri-y["Y"]
+    m-flip-tri-z["Z"]
+    m-hourglass-a["in A"]
+    m-hourglass-b["in B"]
+    m-hourglass@{ shape: hourglass, label: "hourglass" }
+    m-hourglass-x["X"]
+    m-hourglass-y["Y"]
+    m-hourglass-z["Z"]
+  end
+  m-lin-cyl-a --> m-lin-cyl
+  m-lin-cyl-b -->|label| m-lin-cyl
+  m-lin-cyl -->|yes| m-lin-cyl-x
+  m-lin-cyl -->|no| m-lin-cyl-y
+  m-lin-cyl --> m-lin-cyl-z
+  m-curv-trap-a --> m-curv-trap
+  m-curv-trap-b -->|label| m-curv-trap
+  m-curv-trap -->|yes| m-curv-trap-x
+  m-curv-trap -->|no| m-curv-trap-y
+  m-curv-trap --> m-curv-trap-z
+  m-bow-rect-a --> m-bow-rect
+  m-bow-rect-b -->|label| m-bow-rect
+  m-bow-rect -->|yes| m-bow-rect-x
+  m-bow-rect -->|no| m-bow-rect-y
+  m-bow-rect --> m-bow-rect-z
+  m-tri-a --> m-tri
+  m-tri-b -->|label| m-tri
+  m-tri -->|yes| m-tri-x
+  m-tri -->|no| m-tri-y
+  m-tri --> m-tri-z
+  m-flip-tri-a --> m-flip-tri
+  m-flip-tri-b -->|label| m-flip-tri
+  m-flip-tri -->|yes| m-flip-tri-x
+  m-flip-tri -->|no| m-flip-tri-y
+  m-flip-tri --> m-flip-tri-z
+  m-hourglass-a --> m-hourglass
+  m-hourglass-b -->|label| m-hourglass
+  m-hourglass -->|yes| m-hourglass-x
+  m-hourglass -->|no| m-hourglass-y
+  m-hourglass --> m-hourglass-z
+  subgraph g10 [Shapes 55 to 60]
+    direction TB
+    m-brace-a["in A"]
+    m-brace-b["in B"]
+    m-brace@{ shape: brace, label: "brace" }
+    m-brace-x["X"]
+    m-brace-y["Y"]
+    m-brace-z["Z"]
+    m-brace-r-a["in A"]
+    m-brace-r-b["in B"]
+    m-brace-r@{ shape: brace-r, label: "brace-r" }
+    m-brace-r-x["X"]
+    m-brace-r-y["Y"]
+    m-brace-r-z["Z"]
+    m-braces-a["in A"]
+    m-braces-b["in B"]
+    m-braces@{ shape: braces, label: "braces" }
+    m-braces-x["X"]
+    m-braces-y["Y"]
+    m-braces-z["Z"]
+    m-browser-a["in A"]
+    m-browser-b["in B"]
+    m-browser@{ shape: browser, label: "browser" }
+    m-browser-x["X"]
+    m-browser-y["Y"]
+    m-browser-z["Z"]
+    m-console-a["in A"]
+    m-console-b["in B"]
+    m-console@{ shape: console, label: "console" }
+    m-console-x["X"]
+    m-console-y["Y"]
+    m-console-z["Z"]
+    m-folder-a["in A"]
+    m-folder-b["in B"]
+    m-folder@{ shape: folder, label: "folder" }
+    m-folder-x["X"]
+    m-folder-y["Y"]
+    m-folder-z["Z"]
+  end
+  m-brace-a --> m-brace
+  m-brace-b -->|label| m-brace
+  m-brace -->|yes| m-brace-x
+  m-brace -->|no| m-brace-y
+  m-brace --> m-brace-z
+  m-brace-r-a --> m-brace-r
+  m-brace-r-b -->|label| m-brace-r
+  m-brace-r -->|yes| m-brace-r-x
+  m-brace-r -->|no| m-brace-r-y
+  m-brace-r --> m-brace-r-z
+  m-braces-a --> m-braces
+  m-braces-b -->|label| m-braces
+  m-braces -->|yes| m-braces-x
+  m-braces -->|no| m-braces-y
+  m-braces --> m-braces-z
+  m-browser-a --> m-browser
+  m-browser-b -->|label| m-browser
+  m-browser -->|yes| m-browser-x
+  m-browser -->|no| m-browser-y
+  m-browser --> m-browser-z
+  m-console-a --> m-console
+  m-console-b -->|label| m-console
+  m-console -->|yes| m-console-x
+  m-console -->|no| m-console-y
+  m-console --> m-console-z
+  m-folder-a --> m-folder
+  m-folder-b -->|label| m-folder
+  m-folder -->|yes| m-folder-x
+  m-folder -->|no| m-folder-y
+  m-folder --> m-folder-z
+  subgraph g11 [Shapes 61 to 66]
+    direction TB
+    m-bucket-a["in A"]
+    m-bucket-b["in B"]
+    m-bucket@{ shape: bucket, label: "bucket" }
+    m-bucket-x["X"]
+    m-bucket-y["Y"]
+    m-bucket-z["Z"]
+    m-datastore-a["in A"]
+    m-datastore-b["in B"]
+    m-datastore@{ shape: datastore, label: "datastore" }
+    m-datastore-x["X"]
+    m-datastore-y["Y"]
+    m-datastore-z["Z"]
+    m-person-a["in A"]
+    m-person-b["in B"]
+    m-person@{ shape: person, label: "person" }
+    m-person-x["X"]
+    m-person-y["Y"]
+    m-person-z["Z"]
+    m-sm-circ-a["in A"]
+    m-sm-circ-b["in B"]
+    m-sm-circ@{ shape: sm-circ, label: "sm-circ" }
+    m-sm-circ-x["X"]
+    m-sm-circ-y["Y"]
+    m-sm-circ-z["Z"]
+    m-f-circ-a["in A"]
+    m-f-circ-b["in B"]
+    m-f-circ@{ shape: f-circ, label: "f-circ" }
+    m-f-circ-x["X"]
+    m-f-circ-y["Y"]
+    m-f-circ-z["Z"]
+    m-fr-circ-a["in A"]
+    m-fr-circ-b["in B"]
+    m-fr-circ@{ shape: fr-circ, label: "fr-circ" }
+    m-fr-circ-x["X"]
+    m-fr-circ-y["Y"]
+    m-fr-circ-z["Z"]
+  end
+  m-bucket-a --> m-bucket
+  m-bucket-b -->|label| m-bucket
+  m-bucket -->|yes| m-bucket-x
+  m-bucket -->|no| m-bucket-y
+  m-bucket --> m-bucket-z
+  m-datastore-a --> m-datastore
+  m-datastore-b -->|label| m-datastore
+  m-datastore -->|yes| m-datastore-x
+  m-datastore -->|no| m-datastore-y
+  m-datastore --> m-datastore-z
+  m-person-a --> m-person
+  m-person-b -->|label| m-person
+  m-person -->|yes| m-person-x
+  m-person -->|no| m-person-y
+  m-person --> m-person-z
+  m-sm-circ-a --> m-sm-circ
+  m-sm-circ-b -->|label| m-sm-circ
+  m-sm-circ -->|yes| m-sm-circ-x
+  m-sm-circ -->|no| m-sm-circ-y
+  m-sm-circ --> m-sm-circ-z
+  m-f-circ-a --> m-f-circ
+  m-f-circ-b -->|label| m-f-circ
+  m-f-circ -->|yes| m-f-circ-x
+  m-f-circ -->|no| m-f-circ-y
+  m-f-circ --> m-f-circ-z
+  m-fr-circ-a --> m-fr-circ
+  m-fr-circ-b -->|label| m-fr-circ
+  m-fr-circ -->|yes| m-fr-circ-x
+  m-fr-circ -->|no| m-fr-circ-y
+  m-fr-circ --> m-fr-circ-z
+  subgraph g12 [Shapes 67 to 69]
+    direction TB
+    m-cross-circ-a["in A"]
+    m-cross-circ-b["in B"]
+    m-cross-circ@{ shape: cross-circ, label: "cross-circ" }
+    m-cross-circ-x["X"]
+    m-cross-circ-y["Y"]
+    m-cross-circ-z["Z"]
+    m-fork-a["in A"]
+    m-fork-b["in B"]
+    m-fork@{ shape: fork, label: "fork" }
+    m-fork-x["X"]
+    m-fork-y["Y"]
+    m-fork-z["Z"]
+    m-bolt-a["in A"]
+    m-bolt-b["in B"]
+    m-bolt@{ shape: bolt, label: "bolt" }
+    m-bolt-x["X"]
+    m-bolt-y["Y"]
+    m-bolt-z["Z"]
+  end
+  m-cross-circ-a --> m-cross-circ
+  m-cross-circ-b -->|label| m-cross-circ
+  m-cross-circ -->|yes| m-cross-circ-x
+  m-cross-circ -->|no| m-cross-circ-y
+  m-cross-circ --> m-cross-circ-z
+  m-fork-a --> m-fork
+  m-fork-b -->|label| m-fork
+  m-fork -->|yes| m-fork-x
+  m-fork -->|no| m-fork-y
+  m-fork --> m-fork-z
+  m-bolt-a --> m-bolt
+  m-bolt-b -->|label| m-bolt
+  m-bolt -->|yes| m-bolt-x
+  m-bolt -->|no| m-bolt-y
+  m-bolt --> m-bolt-z
+  click b-square "#left-to-right"
+  click b-rounded "#bottom-to-top"
+  click b-stadium "#right-to-left"
+```
+
+## Left to right
+
+```mermaid
+flowchart LR
+  subgraph g1 [Shapes 1 to 6]
+    direction LR
+    b-square-a["in A"]
+    b-square-b["in B"]
+    b-square["square<br>bracket"]
+    b-square-x["X"]
+    b-square-y["Y"]
+    b-square-z["Z"]
+    b-rounded-a["in A"]
+    b-rounded-b["in B"]
+    b-rounded("rounded<br>bracket")
+    b-rounded-x["X"]
+    b-rounded-y["Y"]
+    b-rounded-z["Z"]
+    b-stadium-a["in A"]
+    b-stadium-b["in B"]
+    b-stadium(["stadium<br>bracket"])
+    b-stadium-x["X"]
+    b-stadium-y["Y"]
+    b-stadium-z["Z"]
+    b-subroutine-a["in A"]
+    b-subroutine-b["in B"]
+    b-subroutine[["subroutine<br>bracket"]]
+    b-subroutine-x["X"]
+    b-subroutine-y["Y"]
+    b-subroutine-z["Z"]
+    b-cylinder-a["in A"]
+    b-cylinder-b["in B"]
+    b-cylinder[("cylinder<br>bracket")]
+    b-cylinder-x["X"]
+    b-cylinder-y["Y"]
+    b-cylinder-z["Z"]
+    b-circle-a["in A"]
+    b-circle-b["in B"]
+    b-circle(("circle<br>bracket"))
+    b-circle-x["X"]
+    b-circle-y["Y"]
+    b-circle-z["Z"]
+  end
+  b-square-a --> b-square
+  b-square-b -->|label| b-square
+  b-square -->|yes| b-square-x
+  b-square -->|no| b-square-y
+  b-square --> b-square-z
+  b-rounded-a --> b-rounded
+  b-rounded-b -->|label| b-rounded
+  b-rounded -->|yes| b-rounded-x
+  b-rounded -->|no| b-rounded-y
+  b-rounded --> b-rounded-z
+  b-stadium-a --> b-stadium
+  b-stadium-b -->|label| b-stadium
+  b-stadium -->|yes| b-stadium-x
+  b-stadium -->|no| b-stadium-y
+  b-stadium --> b-stadium-z
+  b-subroutine-a --> b-subroutine
+  b-subroutine-b -->|label| b-subroutine
+  b-subroutine -->|yes| b-subroutine-x
+  b-subroutine -->|no| b-subroutine-y
+  b-subroutine --> b-subroutine-z
+  b-cylinder-a --> b-cylinder
+  b-cylinder-b -->|label| b-cylinder
+  b-cylinder -->|yes| b-cylinder-x
+  b-cylinder -->|no| b-cylinder-y
+  b-cylinder --> b-cylinder-z
+  b-circle-a --> b-circle
+  b-circle-b -->|label| b-circle
+  b-circle -->|yes| b-circle-x
+  b-circle -->|no| b-circle-y
+  b-circle --> b-circle-z
+  subgraph g2 [Shapes 7 to 12]
+    direction LR
+    b-doublecircle-a["in A"]
+    b-doublecircle-b["in B"]
+    b-doublecircle((("doublecircle<br>bracket")))
+    b-doublecircle-x["X"]
+    b-doublecircle-y["Y"]
+    b-doublecircle-z["Z"]
+    b-asymmetric-a["in A"]
+    b-asymmetric-b["in B"]
+    b-asymmetric>"asymmetric<br>bracket"]
+    b-asymmetric-x["X"]
+    b-asymmetric-y["Y"]
+    b-asymmetric-z["Z"]
+    b-rhombus-a["in A"]
+    b-rhombus-b["in B"]
+    b-rhombus{"rhombus<br>bracket"}
+    b-rhombus-x["X"]
+    b-rhombus-y["Y"]
+    b-rhombus-z["Z"]
+    b-hexagon-a["in A"]
+    b-hexagon-b["in B"]
+    b-hexagon{{"hexagon<br>bracket"}}
+    b-hexagon-x["X"]
+    b-hexagon-y["Y"]
+    b-hexagon-z["Z"]
+    b-parallelogram-a["in A"]
+    b-parallelogram-b["in B"]
+    b-parallelogram[/"parallelogram<br>bracket"/]
+    b-parallelogram-x["X"]
+    b-parallelogram-y["Y"]
+    b-parallelogram-z["Z"]
+    b-parallelogram-alt-a["in A"]
+    b-parallelogram-alt-b["in B"]
+    b-parallelogram-alt[\"parallelogram-alt<br>bracket"\]
+    b-parallelogram-alt-x["X"]
+    b-parallelogram-alt-y["Y"]
+    b-parallelogram-alt-z["Z"]
+  end
+  b-doublecircle-a --> b-doublecircle
+  b-doublecircle-b -->|label| b-doublecircle
+  b-doublecircle -->|yes| b-doublecircle-x
+  b-doublecircle -->|no| b-doublecircle-y
+  b-doublecircle --> b-doublecircle-z
+  b-asymmetric-a --> b-asymmetric
+  b-asymmetric-b -->|label| b-asymmetric
+  b-asymmetric -->|yes| b-asymmetric-x
+  b-asymmetric -->|no| b-asymmetric-y
+  b-asymmetric --> b-asymmetric-z
+  b-rhombus-a --> b-rhombus
+  b-rhombus-b -->|label| b-rhombus
+  b-rhombus -->|yes| b-rhombus-x
+  b-rhombus -->|no| b-rhombus-y
+  b-rhombus --> b-rhombus-z
+  b-hexagon-a --> b-hexagon
+  b-hexagon-b -->|label| b-hexagon
+  b-hexagon -->|yes| b-hexagon-x
+  b-hexagon -->|no| b-hexagon-y
+  b-hexagon --> b-hexagon-z
+  b-parallelogram-a --> b-parallelogram
+  b-parallelogram-b -->|label| b-parallelogram
+  b-parallelogram -->|yes| b-parallelogram-x
+  b-parallelogram -->|no| b-parallelogram-y
+  b-parallelogram --> b-parallelogram-z
+  b-parallelogram-alt-a --> b-parallelogram-alt
+  b-parallelogram-alt-b -->|label| b-parallelogram-alt
+  b-parallelogram-alt -->|yes| b-parallelogram-alt-x
+  b-parallelogram-alt -->|no| b-parallelogram-alt-y
+  b-parallelogram-alt --> b-parallelogram-alt-z
+  subgraph g3 [Shapes 13 to 18]
+    direction LR
+    b-trapezoid-a["in A"]
+    b-trapezoid-b["in B"]
+    b-trapezoid[/"trapezoid<br>bracket"\]
+    b-trapezoid-x["X"]
+    b-trapezoid-y["Y"]
+    b-trapezoid-z["Z"]
+    b-trapezoid-alt-a["in A"]
+    b-trapezoid-alt-b["in B"]
+    b-trapezoid-alt[\"trapezoid-alt<br>bracket"/]
+    b-trapezoid-alt-x["X"]
+    b-trapezoid-alt-y["Y"]
+    b-trapezoid-alt-z["Z"]
+    b-cloud-a["in A"]
+    b-cloud-b["in B"]
+    b-cloud)"cloud<br>bracket"(
+    b-cloud-x["X"]
+    b-cloud-y["Y"]
+    b-cloud-z["Z"]
+    b-bang-a["in A"]
+    b-bang-b["in B"]
+    b-bang))"bang<br>bracket"((
+    b-bang-x["X"]
+    b-bang-y["Y"]
+    b-bang-z["Z"]
+    m-rect-a["in A"]
+    m-rect-b["in B"]
+    m-rect@{ shape: rect, label: "rect" }
+    m-rect-x["X"]
+    m-rect-y["Y"]
+    m-rect-z["Z"]
+    m-rounded-a["in A"]
+    m-rounded-b["in B"]
+    m-rounded@{ shape: rounded, label: "rounded" }
+    m-rounded-x["X"]
+    m-rounded-y["Y"]
+    m-rounded-z["Z"]
+  end
+  b-trapezoid-a --> b-trapezoid
+  b-trapezoid-b -->|label| b-trapezoid
+  b-trapezoid -->|yes| b-trapezoid-x
+  b-trapezoid -->|no| b-trapezoid-y
+  b-trapezoid --> b-trapezoid-z
+  b-trapezoid-alt-a --> b-trapezoid-alt
+  b-trapezoid-alt-b -->|label| b-trapezoid-alt
+  b-trapezoid-alt -->|yes| b-trapezoid-alt-x
+  b-trapezoid-alt -->|no| b-trapezoid-alt-y
+  b-trapezoid-alt --> b-trapezoid-alt-z
+  b-cloud-a --> b-cloud
+  b-cloud-b -->|label| b-cloud
+  b-cloud -->|yes| b-cloud-x
+  b-cloud -->|no| b-cloud-y
+  b-cloud --> b-cloud-z
+  b-bang-a --> b-bang
+  b-bang-b -->|label| b-bang
+  b-bang -->|yes| b-bang-x
+  b-bang -->|no| b-bang-y
+  b-bang --> b-bang-z
+  m-rect-a --> m-rect
+  m-rect-b -->|label| m-rect
+  m-rect -->|yes| m-rect-x
+  m-rect -->|no| m-rect-y
+  m-rect --> m-rect-z
+  m-rounded-a --> m-rounded
+  m-rounded-b -->|label| m-rounded
+  m-rounded -->|yes| m-rounded-x
+  m-rounded -->|no| m-rounded-y
+  m-rounded --> m-rounded-z
+  subgraph g4 [Shapes 19 to 24]
+    direction LR
+    m-stadium-a["in A"]
+    m-stadium-b["in B"]
+    m-stadium@{ shape: stadium, label: "stadium" }
+    m-stadium-x["X"]
+    m-stadium-y["Y"]
+    m-stadium-z["Z"]
+    m-fr-rect-a["in A"]
+    m-fr-rect-b["in B"]
+    m-fr-rect@{ shape: fr-rect, label: "fr-rect" }
+    m-fr-rect-x["X"]
+    m-fr-rect-y["Y"]
+    m-fr-rect-z["Z"]
+    m-cyl-a["in A"]
+    m-cyl-b["in B"]
+    m-cyl@{ shape: cyl, label: "cyl" }
+    m-cyl-x["X"]
+    m-cyl-y["Y"]
+    m-cyl-z["Z"]
+    m-circle-a["in A"]
+    m-circle-b["in B"]
+    m-circle@{ shape: circle, label: "circle" }
+    m-circle-x["X"]
+    m-circle-y["Y"]
+    m-circle-z["Z"]
+    m-odd-a["in A"]
+    m-odd-b["in B"]
+    m-odd@{ shape: odd, label: "odd" }
+    m-odd-x["X"]
+    m-odd-y["Y"]
+    m-odd-z["Z"]
+    m-diam-a["in A"]
+    m-diam-b["in B"]
+    m-diam@{ shape: diam, label: "diam" }
+    m-diam-x["X"]
+    m-diam-y["Y"]
+    m-diam-z["Z"]
+  end
+  m-stadium-a --> m-stadium
+  m-stadium-b -->|label| m-stadium
+  m-stadium -->|yes| m-stadium-x
+  m-stadium -->|no| m-stadium-y
+  m-stadium --> m-stadium-z
+  m-fr-rect-a --> m-fr-rect
+  m-fr-rect-b -->|label| m-fr-rect
+  m-fr-rect -->|yes| m-fr-rect-x
+  m-fr-rect -->|no| m-fr-rect-y
+  m-fr-rect --> m-fr-rect-z
+  m-cyl-a --> m-cyl
+  m-cyl-b -->|label| m-cyl
+  m-cyl -->|yes| m-cyl-x
+  m-cyl -->|no| m-cyl-y
+  m-cyl --> m-cyl-z
+  m-circle-a --> m-circle
+  m-circle-b -->|label| m-circle
+  m-circle -->|yes| m-circle-x
+  m-circle -->|no| m-circle-y
+  m-circle --> m-circle-z
+  m-odd-a --> m-odd
+  m-odd-b -->|label| m-odd
+  m-odd -->|yes| m-odd-x
+  m-odd -->|no| m-odd-y
+  m-odd --> m-odd-z
+  m-diam-a --> m-diam
+  m-diam-b -->|label| m-diam
+  m-diam -->|yes| m-diam-x
+  m-diam -->|no| m-diam-y
+  m-diam --> m-diam-z
+  subgraph g5 [Shapes 25 to 30]
+    direction LR
+    m-hex-a["in A"]
+    m-hex-b["in B"]
+    m-hex@{ shape: hex, label: "hex" }
+    m-hex-x["X"]
+    m-hex-y["Y"]
+    m-hex-z["Z"]
+    m-lean-r-a["in A"]
+    m-lean-r-b["in B"]
+    m-lean-r@{ shape: lean-r, label: "lean-r" }
+    m-lean-r-x["X"]
+    m-lean-r-y["Y"]
+    m-lean-r-z["Z"]
+    m-lean-l-a["in A"]
+    m-lean-l-b["in B"]
+    m-lean-l@{ shape: lean-l, label: "lean-l" }
+    m-lean-l-x["X"]
+    m-lean-l-y["Y"]
+    m-lean-l-z["Z"]
+    m-trap-b-a["in A"]
+    m-trap-b-b["in B"]
+    m-trap-b@{ shape: trap-b, label: "trap-b" }
+    m-trap-b-x["X"]
+    m-trap-b-y["Y"]
+    m-trap-b-z["Z"]
+    m-trap-t-a["in A"]
+    m-trap-t-b["in B"]
+    m-trap-t@{ shape: trap-t, label: "trap-t" }
+    m-trap-t-x["X"]
+    m-trap-t-y["Y"]
+    m-trap-t-z["Z"]
+    m-dbl-circ-a["in A"]
+    m-dbl-circ-b["in B"]
+    m-dbl-circ@{ shape: dbl-circ, label: "dbl-circ" }
+    m-dbl-circ-x["X"]
+    m-dbl-circ-y["Y"]
+    m-dbl-circ-z["Z"]
+  end
+  m-hex-a --> m-hex
+  m-hex-b -->|label| m-hex
+  m-hex -->|yes| m-hex-x
+  m-hex -->|no| m-hex-y
+  m-hex --> m-hex-z
+  m-lean-r-a --> m-lean-r
+  m-lean-r-b -->|label| m-lean-r
+  m-lean-r -->|yes| m-lean-r-x
+  m-lean-r -->|no| m-lean-r-y
+  m-lean-r --> m-lean-r-z
+  m-lean-l-a --> m-lean-l
+  m-lean-l-b -->|label| m-lean-l
+  m-lean-l -->|yes| m-lean-l-x
+  m-lean-l -->|no| m-lean-l-y
+  m-lean-l --> m-lean-l-z
+  m-trap-b-a --> m-trap-b
+  m-trap-b-b -->|label| m-trap-b
+  m-trap-b -->|yes| m-trap-b-x
+  m-trap-b -->|no| m-trap-b-y
+  m-trap-b --> m-trap-b-z
+  m-trap-t-a --> m-trap-t
+  m-trap-t-b -->|label| m-trap-t
+  m-trap-t -->|yes| m-trap-t-x
+  m-trap-t -->|no| m-trap-t-y
+  m-trap-t --> m-trap-t-z
+  m-dbl-circ-a --> m-dbl-circ
+  m-dbl-circ-b -->|label| m-dbl-circ
+  m-dbl-circ -->|yes| m-dbl-circ-x
+  m-dbl-circ -->|no| m-dbl-circ-y
+  m-dbl-circ --> m-dbl-circ-z
+  subgraph g6 [Shapes 31 to 36]
+    direction LR
+    m-cloud-a["in A"]
+    m-cloud-b["in B"]
+    m-cloud@{ shape: cloud, label: "cloud" }
+    m-cloud-x["X"]
+    m-cloud-y["Y"]
+    m-cloud-z["Z"]
+    m-bang-a["in A"]
+    m-bang-b["in B"]
+    m-bang@{ shape: bang, label: "bang" }
+    m-bang-x["X"]
+    m-bang-y["Y"]
+    m-bang-z["Z"]
+    m-text-a["in A"]
+    m-text-b["in B"]
+    m-text@{ shape: text, label: "text" }
+    m-text-x["X"]
+    m-text-y["Y"]
+    m-text-z["Z"]
+    m-notch-rect-a["in A"]
+    m-notch-rect-b["in B"]
+    m-notch-rect@{ shape: notch-rect, label: "notch-rect" }
+    m-notch-rect-x["X"]
+    m-notch-rect-y["Y"]
+    m-notch-rect-z["Z"]
+    m-lin-rect-a["in A"]
+    m-lin-rect-b["in B"]
+    m-lin-rect@{ shape: lin-rect, label: "lin-rect" }
+    m-lin-rect-x["X"]
+    m-lin-rect-y["Y"]
+    m-lin-rect-z["Z"]
+    m-div-rect-a["in A"]
+    m-div-rect-b["in B"]
+    m-div-rect@{ shape: div-rect, label: "div-rect" }
+    m-div-rect-x["X"]
+    m-div-rect-y["Y"]
+    m-div-rect-z["Z"]
+  end
+  m-cloud-a --> m-cloud
+  m-cloud-b -->|label| m-cloud
+  m-cloud -->|yes| m-cloud-x
+  m-cloud -->|no| m-cloud-y
+  m-cloud --> m-cloud-z
+  m-bang-a --> m-bang
+  m-bang-b -->|label| m-bang
+  m-bang -->|yes| m-bang-x
+  m-bang -->|no| m-bang-y
+  m-bang --> m-bang-z
+  m-text-a --> m-text
+  m-text-b -->|label| m-text
+  m-text -->|yes| m-text-x
+  m-text -->|no| m-text-y
+  m-text --> m-text-z
+  m-notch-rect-a --> m-notch-rect
+  m-notch-rect-b -->|label| m-notch-rect
+  m-notch-rect -->|yes| m-notch-rect-x
+  m-notch-rect -->|no| m-notch-rect-y
+  m-notch-rect --> m-notch-rect-z
+  m-lin-rect-a --> m-lin-rect
+  m-lin-rect-b -->|label| m-lin-rect
+  m-lin-rect -->|yes| m-lin-rect-x
+  m-lin-rect -->|no| m-lin-rect-y
+  m-lin-rect --> m-lin-rect-z
+  m-div-rect-a --> m-div-rect
+  m-div-rect-b -->|label| m-div-rect
+  m-div-rect -->|yes| m-div-rect-x
+  m-div-rect -->|no| m-div-rect-y
+  m-div-rect --> m-div-rect-z
+  subgraph g7 [Shapes 37 to 42]
+    direction LR
+    m-win-pane-a["in A"]
+    m-win-pane-b["in B"]
+    m-win-pane@{ shape: win-pane, label: "win-pane" }
+    m-win-pane-x["X"]
+    m-win-pane-y["Y"]
+    m-win-pane-z["Z"]
+    m-tag-rect-a["in A"]
+    m-tag-rect-b["in B"]
+    m-tag-rect@{ shape: tag-rect, label: "tag-rect" }
+    m-tag-rect-x["X"]
+    m-tag-rect-y["Y"]
+    m-tag-rect-z["Z"]
+    m-st-rect-a["in A"]
+    m-st-rect-b["in B"]
+    m-st-rect@{ shape: st-rect, label: "st-rect" }
+    m-st-rect-x["X"]
+    m-st-rect-y["Y"]
+    m-st-rect-z["Z"]
+    m-notch-pent-a["in A"]
+    m-notch-pent-b["in B"]
+    m-notch-pent@{ shape: notch-pent, label: "notch-pent" }
+    m-notch-pent-x["X"]
+    m-notch-pent-y["Y"]
+    m-notch-pent-z["Z"]
+    m-sl-rect-a["in A"]
+    m-sl-rect-b["in B"]
+    m-sl-rect@{ shape: sl-rect, label: "sl-rect" }
+    m-sl-rect-x["X"]
+    m-sl-rect-y["Y"]
+    m-sl-rect-z["Z"]
+    m-doc-a["in A"]
+    m-doc-b["in B"]
+    m-doc@{ shape: doc, label: "doc" }
+    m-doc-x["X"]
+    m-doc-y["Y"]
+    m-doc-z["Z"]
+  end
+  m-win-pane-a --> m-win-pane
+  m-win-pane-b -->|label| m-win-pane
+  m-win-pane -->|yes| m-win-pane-x
+  m-win-pane -->|no| m-win-pane-y
+  m-win-pane --> m-win-pane-z
+  m-tag-rect-a --> m-tag-rect
+  m-tag-rect-b -->|label| m-tag-rect
+  m-tag-rect -->|yes| m-tag-rect-x
+  m-tag-rect -->|no| m-tag-rect-y
+  m-tag-rect --> m-tag-rect-z
+  m-st-rect-a --> m-st-rect
+  m-st-rect-b -->|label| m-st-rect
+  m-st-rect -->|yes| m-st-rect-x
+  m-st-rect -->|no| m-st-rect-y
+  m-st-rect --> m-st-rect-z
+  m-notch-pent-a --> m-notch-pent
+  m-notch-pent-b -->|label| m-notch-pent
+  m-notch-pent -->|yes| m-notch-pent-x
+  m-notch-pent -->|no| m-notch-pent-y
+  m-notch-pent --> m-notch-pent-z
+  m-sl-rect-a --> m-sl-rect
+  m-sl-rect-b -->|label| m-sl-rect
+  m-sl-rect -->|yes| m-sl-rect-x
+  m-sl-rect -->|no| m-sl-rect-y
+  m-sl-rect --> m-sl-rect-z
+  m-doc-a --> m-doc
+  m-doc-b -->|label| m-doc
+  m-doc -->|yes| m-doc-x
+  m-doc -->|no| m-doc-y
+  m-doc --> m-doc-z
+  subgraph g8 [Shapes 43 to 48]
+    direction LR
+    m-lin-doc-a["in A"]
+    m-lin-doc-b["in B"]
+    m-lin-doc@{ shape: lin-doc, label: "lin-doc" }
+    m-lin-doc-x["X"]
+    m-lin-doc-y["Y"]
+    m-lin-doc-z["Z"]
+    m-tag-doc-a["in A"]
+    m-tag-doc-b["in B"]
+    m-tag-doc@{ shape: tag-doc, label: "tag-doc" }
+    m-tag-doc-x["X"]
+    m-tag-doc-y["Y"]
+    m-tag-doc-z["Z"]
+    m-docs-a["in A"]
+    m-docs-b["in B"]
+    m-docs@{ shape: docs, label: "docs" }
+    m-docs-x["X"]
+    m-docs-y["Y"]
+    m-docs-z["Z"]
+    m-flag-a["in A"]
+    m-flag-b["in B"]
+    m-flag@{ shape: flag, label: "flag" }
+    m-flag-x["X"]
+    m-flag-y["Y"]
+    m-flag-z["Z"]
+    m-delay-a["in A"]
+    m-delay-b["in B"]
+    m-delay@{ shape: delay, label: "delay" }
+    m-delay-x["X"]
+    m-delay-y["Y"]
+    m-delay-z["Z"]
+    m-h-cyl-a["in A"]
+    m-h-cyl-b["in B"]
+    m-h-cyl@{ shape: h-cyl, label: "h-cyl" }
+    m-h-cyl-x["X"]
+    m-h-cyl-y["Y"]
+    m-h-cyl-z["Z"]
+  end
+  m-lin-doc-a --> m-lin-doc
+  m-lin-doc-b -->|label| m-lin-doc
+  m-lin-doc -->|yes| m-lin-doc-x
+  m-lin-doc -->|no| m-lin-doc-y
+  m-lin-doc --> m-lin-doc-z
+  m-tag-doc-a --> m-tag-doc
+  m-tag-doc-b -->|label| m-tag-doc
+  m-tag-doc -->|yes| m-tag-doc-x
+  m-tag-doc -->|no| m-tag-doc-y
+  m-tag-doc --> m-tag-doc-z
+  m-docs-a --> m-docs
+  m-docs-b -->|label| m-docs
+  m-docs -->|yes| m-docs-x
+  m-docs -->|no| m-docs-y
+  m-docs --> m-docs-z
+  m-flag-a --> m-flag
+  m-flag-b -->|label| m-flag
+  m-flag -->|yes| m-flag-x
+  m-flag -->|no| m-flag-y
+  m-flag --> m-flag-z
+  m-delay-a --> m-delay
+  m-delay-b -->|label| m-delay
+  m-delay -->|yes| m-delay-x
+  m-delay -->|no| m-delay-y
+  m-delay --> m-delay-z
+  m-h-cyl-a --> m-h-cyl
+  m-h-cyl-b -->|label| m-h-cyl
+  m-h-cyl -->|yes| m-h-cyl-x
+  m-h-cyl -->|no| m-h-cyl-y
+  m-h-cyl --> m-h-cyl-z
+  subgraph g9 [Shapes 49 to 54]
+    direction LR
+    m-lin-cyl-a["in A"]
+    m-lin-cyl-b["in B"]
+    m-lin-cyl@{ shape: lin-cyl, label: "lin-cyl" }
+    m-lin-cyl-x["X"]
+    m-lin-cyl-y["Y"]
+    m-lin-cyl-z["Z"]
+    m-curv-trap-a["in A"]
+    m-curv-trap-b["in B"]
+    m-curv-trap@{ shape: curv-trap, label: "curv-trap" }
+    m-curv-trap-x["X"]
+    m-curv-trap-y["Y"]
+    m-curv-trap-z["Z"]
+    m-bow-rect-a["in A"]
+    m-bow-rect-b["in B"]
+    m-bow-rect@{ shape: bow-rect, label: "bow-rect" }
+    m-bow-rect-x["X"]
+    m-bow-rect-y["Y"]
+    m-bow-rect-z["Z"]
+    m-tri-a["in A"]
+    m-tri-b["in B"]
+    m-tri@{ shape: tri, label: "tri" }
+    m-tri-x["X"]
+    m-tri-y["Y"]
+    m-tri-z["Z"]
+    m-flip-tri-a["in A"]
+    m-flip-tri-b["in B"]
+    m-flip-tri@{ shape: flip-tri, label: "flip-tri" }
+    m-flip-tri-x["X"]
+    m-flip-tri-y["Y"]
+    m-flip-tri-z["Z"]
+    m-hourglass-a["in A"]
+    m-hourglass-b["in B"]
+    m-hourglass@{ shape: hourglass, label: "hourglass" }
+    m-hourglass-x["X"]
+    m-hourglass-y["Y"]
+    m-hourglass-z["Z"]
+  end
+  m-lin-cyl-a --> m-lin-cyl
+  m-lin-cyl-b -->|label| m-lin-cyl
+  m-lin-cyl -->|yes| m-lin-cyl-x
+  m-lin-cyl -->|no| m-lin-cyl-y
+  m-lin-cyl --> m-lin-cyl-z
+  m-curv-trap-a --> m-curv-trap
+  m-curv-trap-b -->|label| m-curv-trap
+  m-curv-trap -->|yes| m-curv-trap-x
+  m-curv-trap -->|no| m-curv-trap-y
+  m-curv-trap --> m-curv-trap-z
+  m-bow-rect-a --> m-bow-rect
+  m-bow-rect-b -->|label| m-bow-rect
+  m-bow-rect -->|yes| m-bow-rect-x
+  m-bow-rect -->|no| m-bow-rect-y
+  m-bow-rect --> m-bow-rect-z
+  m-tri-a --> m-tri
+  m-tri-b -->|label| m-tri
+  m-tri -->|yes| m-tri-x
+  m-tri -->|no| m-tri-y
+  m-tri --> m-tri-z
+  m-flip-tri-a --> m-flip-tri
+  m-flip-tri-b -->|label| m-flip-tri
+  m-flip-tri -->|yes| m-flip-tri-x
+  m-flip-tri -->|no| m-flip-tri-y
+  m-flip-tri --> m-flip-tri-z
+  m-hourglass-a --> m-hourglass
+  m-hourglass-b -->|label| m-hourglass
+  m-hourglass -->|yes| m-hourglass-x
+  m-hourglass -->|no| m-hourglass-y
+  m-hourglass --> m-hourglass-z
+  subgraph g10 [Shapes 55 to 60]
+    direction LR
+    m-brace-a["in A"]
+    m-brace-b["in B"]
+    m-brace@{ shape: brace, label: "brace" }
+    m-brace-x["X"]
+    m-brace-y["Y"]
+    m-brace-z["Z"]
+    m-brace-r-a["in A"]
+    m-brace-r-b["in B"]
+    m-brace-r@{ shape: brace-r, label: "brace-r" }
+    m-brace-r-x["X"]
+    m-brace-r-y["Y"]
+    m-brace-r-z["Z"]
+    m-braces-a["in A"]
+    m-braces-b["in B"]
+    m-braces@{ shape: braces, label: "braces" }
+    m-braces-x["X"]
+    m-braces-y["Y"]
+    m-braces-z["Z"]
+    m-browser-a["in A"]
+    m-browser-b["in B"]
+    m-browser@{ shape: browser, label: "browser" }
+    m-browser-x["X"]
+    m-browser-y["Y"]
+    m-browser-z["Z"]
+    m-console-a["in A"]
+    m-console-b["in B"]
+    m-console@{ shape: console, label: "console" }
+    m-console-x["X"]
+    m-console-y["Y"]
+    m-console-z["Z"]
+    m-folder-a["in A"]
+    m-folder-b["in B"]
+    m-folder@{ shape: folder, label: "folder" }
+    m-folder-x["X"]
+    m-folder-y["Y"]
+    m-folder-z["Z"]
+  end
+  m-brace-a --> m-brace
+  m-brace-b -->|label| m-brace
+  m-brace -->|yes| m-brace-x
+  m-brace -->|no| m-brace-y
+  m-brace --> m-brace-z
+  m-brace-r-a --> m-brace-r
+  m-brace-r-b -->|label| m-brace-r
+  m-brace-r -->|yes| m-brace-r-x
+  m-brace-r -->|no| m-brace-r-y
+  m-brace-r --> m-brace-r-z
+  m-braces-a --> m-braces
+  m-braces-b -->|label| m-braces
+  m-braces -->|yes| m-braces-x
+  m-braces -->|no| m-braces-y
+  m-braces --> m-braces-z
+  m-browser-a --> m-browser
+  m-browser-b -->|label| m-browser
+  m-browser -->|yes| m-browser-x
+  m-browser -->|no| m-browser-y
+  m-browser --> m-browser-z
+  m-console-a --> m-console
+  m-console-b -->|label| m-console
+  m-console -->|yes| m-console-x
+  m-console -->|no| m-console-y
+  m-console --> m-console-z
+  m-folder-a --> m-folder
+  m-folder-b -->|label| m-folder
+  m-folder -->|yes| m-folder-x
+  m-folder -->|no| m-folder-y
+  m-folder --> m-folder-z
+  subgraph g11 [Shapes 61 to 66]
+    direction LR
+    m-bucket-a["in A"]
+    m-bucket-b["in B"]
+    m-bucket@{ shape: bucket, label: "bucket" }
+    m-bucket-x["X"]
+    m-bucket-y["Y"]
+    m-bucket-z["Z"]
+    m-datastore-a["in A"]
+    m-datastore-b["in B"]
+    m-datastore@{ shape: datastore, label: "datastore" }
+    m-datastore-x["X"]
+    m-datastore-y["Y"]
+    m-datastore-z["Z"]
+    m-person-a["in A"]
+    m-person-b["in B"]
+    m-person@{ shape: person, label: "person" }
+    m-person-x["X"]
+    m-person-y["Y"]
+    m-person-z["Z"]
+    m-sm-circ-a["in A"]
+    m-sm-circ-b["in B"]
+    m-sm-circ@{ shape: sm-circ, label: "sm-circ" }
+    m-sm-circ-x["X"]
+    m-sm-circ-y["Y"]
+    m-sm-circ-z["Z"]
+    m-f-circ-a["in A"]
+    m-f-circ-b["in B"]
+    m-f-circ@{ shape: f-circ, label: "f-circ" }
+    m-f-circ-x["X"]
+    m-f-circ-y["Y"]
+    m-f-circ-z["Z"]
+    m-fr-circ-a["in A"]
+    m-fr-circ-b["in B"]
+    m-fr-circ@{ shape: fr-circ, label: "fr-circ" }
+    m-fr-circ-x["X"]
+    m-fr-circ-y["Y"]
+    m-fr-circ-z["Z"]
+  end
+  m-bucket-a --> m-bucket
+  m-bucket-b -->|label| m-bucket
+  m-bucket -->|yes| m-bucket-x
+  m-bucket -->|no| m-bucket-y
+  m-bucket --> m-bucket-z
+  m-datastore-a --> m-datastore
+  m-datastore-b -->|label| m-datastore
+  m-datastore -->|yes| m-datastore-x
+  m-datastore -->|no| m-datastore-y
+  m-datastore --> m-datastore-z
+  m-person-a --> m-person
+  m-person-b -->|label| m-person
+  m-person -->|yes| m-person-x
+  m-person -->|no| m-person-y
+  m-person --> m-person-z
+  m-sm-circ-a --> m-sm-circ
+  m-sm-circ-b -->|label| m-sm-circ
+  m-sm-circ -->|yes| m-sm-circ-x
+  m-sm-circ -->|no| m-sm-circ-y
+  m-sm-circ --> m-sm-circ-z
+  m-f-circ-a --> m-f-circ
+  m-f-circ-b -->|label| m-f-circ
+  m-f-circ -->|yes| m-f-circ-x
+  m-f-circ -->|no| m-f-circ-y
+  m-f-circ --> m-f-circ-z
+  m-fr-circ-a --> m-fr-circ
+  m-fr-circ-b -->|label| m-fr-circ
+  m-fr-circ -->|yes| m-fr-circ-x
+  m-fr-circ -->|no| m-fr-circ-y
+  m-fr-circ --> m-fr-circ-z
+  subgraph g12 [Shapes 67 to 69]
+    direction LR
+    m-cross-circ-a["in A"]
+    m-cross-circ-b["in B"]
+    m-cross-circ@{ shape: cross-circ, label: "cross-circ" }
+    m-cross-circ-x["X"]
+    m-cross-circ-y["Y"]
+    m-cross-circ-z["Z"]
+    m-fork-a["in A"]
+    m-fork-b["in B"]
+    m-fork@{ shape: fork, label: "fork" }
+    m-fork-x["X"]
+    m-fork-y["Y"]
+    m-fork-z["Z"]
+    m-bolt-a["in A"]
+    m-bolt-b["in B"]
+    m-bolt@{ shape: bolt, label: "bolt" }
+    m-bolt-x["X"]
+    m-bolt-y["Y"]
+    m-bolt-z["Z"]
+  end
+  m-cross-circ-a --> m-cross-circ
+  m-cross-circ-b -->|label| m-cross-circ
+  m-cross-circ -->|yes| m-cross-circ-x
+  m-cross-circ -->|no| m-cross-circ-y
+  m-cross-circ --> m-cross-circ-z
+  m-fork-a --> m-fork
+  m-fork-b -->|label| m-fork
+  m-fork -->|yes| m-fork-x
+  m-fork -->|no| m-fork-y
+  m-fork --> m-fork-z
+  m-bolt-a --> m-bolt
+  m-bolt-b -->|label| m-bolt
+  m-bolt -->|yes| m-bolt-x
+  m-bolt -->|no| m-bolt-y
+  m-bolt --> m-bolt-z
+```
+
+## Bottom to top
+
+```mermaid
+flowchart BT
+  subgraph g1 [Shapes 1 to 6]
+    direction BT
+    b-square-a["in A"]
+    b-square-b["in B"]
+    b-square["square<br>bracket"]
+    b-square-x["X"]
+    b-square-y["Y"]
+    b-square-z["Z"]
+    b-rounded-a["in A"]
+    b-rounded-b["in B"]
+    b-rounded("rounded<br>bracket")
+    b-rounded-x["X"]
+    b-rounded-y["Y"]
+    b-rounded-z["Z"]
+    b-stadium-a["in A"]
+    b-stadium-b["in B"]
+    b-stadium(["stadium<br>bracket"])
+    b-stadium-x["X"]
+    b-stadium-y["Y"]
+    b-stadium-z["Z"]
+    b-subroutine-a["in A"]
+    b-subroutine-b["in B"]
+    b-subroutine[["subroutine<br>bracket"]]
+    b-subroutine-x["X"]
+    b-subroutine-y["Y"]
+    b-subroutine-z["Z"]
+    b-cylinder-a["in A"]
+    b-cylinder-b["in B"]
+    b-cylinder[("cylinder<br>bracket")]
+    b-cylinder-x["X"]
+    b-cylinder-y["Y"]
+    b-cylinder-z["Z"]
+    b-circle-a["in A"]
+    b-circle-b["in B"]
+    b-circle(("circle<br>bracket"))
+    b-circle-x["X"]
+    b-circle-y["Y"]
+    b-circle-z["Z"]
+  end
+  b-square-a --> b-square
+  b-square-b -->|label| b-square
+  b-square -->|yes| b-square-x
+  b-square -->|no| b-square-y
+  b-square --> b-square-z
+  b-rounded-a --> b-rounded
+  b-rounded-b -->|label| b-rounded
+  b-rounded -->|yes| b-rounded-x
+  b-rounded -->|no| b-rounded-y
+  b-rounded --> b-rounded-z
+  b-stadium-a --> b-stadium
+  b-stadium-b -->|label| b-stadium
+  b-stadium -->|yes| b-stadium-x
+  b-stadium -->|no| b-stadium-y
+  b-stadium --> b-stadium-z
+  b-subroutine-a --> b-subroutine
+  b-subroutine-b -->|label| b-subroutine
+  b-subroutine -->|yes| b-subroutine-x
+  b-subroutine -->|no| b-subroutine-y
+  b-subroutine --> b-subroutine-z
+  b-cylinder-a --> b-cylinder
+  b-cylinder-b -->|label| b-cylinder
+  b-cylinder -->|yes| b-cylinder-x
+  b-cylinder -->|no| b-cylinder-y
+  b-cylinder --> b-cylinder-z
+  b-circle-a --> b-circle
+  b-circle-b -->|label| b-circle
+  b-circle -->|yes| b-circle-x
+  b-circle -->|no| b-circle-y
+  b-circle --> b-circle-z
+  subgraph g2 [Shapes 7 to 12]
+    direction BT
+    b-doublecircle-a["in A"]
+    b-doublecircle-b["in B"]
+    b-doublecircle((("doublecircle<br>bracket")))
+    b-doublecircle-x["X"]
+    b-doublecircle-y["Y"]
+    b-doublecircle-z["Z"]
+    b-asymmetric-a["in A"]
+    b-asymmetric-b["in B"]
+    b-asymmetric>"asymmetric<br>bracket"]
+    b-asymmetric-x["X"]
+    b-asymmetric-y["Y"]
+    b-asymmetric-z["Z"]
+    b-rhombus-a["in A"]
+    b-rhombus-b["in B"]
+    b-rhombus{"rhombus<br>bracket"}
+    b-rhombus-x["X"]
+    b-rhombus-y["Y"]
+    b-rhombus-z["Z"]
+    b-hexagon-a["in A"]
+    b-hexagon-b["in B"]
+    b-hexagon{{"hexagon<br>bracket"}}
+    b-hexagon-x["X"]
+    b-hexagon-y["Y"]
+    b-hexagon-z["Z"]
+    b-parallelogram-a["in A"]
+    b-parallelogram-b["in B"]
+    b-parallelogram[/"parallelogram<br>bracket"/]
+    b-parallelogram-x["X"]
+    b-parallelogram-y["Y"]
+    b-parallelogram-z["Z"]
+    b-parallelogram-alt-a["in A"]
+    b-parallelogram-alt-b["in B"]
+    b-parallelogram-alt[\"parallelogram-alt<br>bracket"\]
+    b-parallelogram-alt-x["X"]
+    b-parallelogram-alt-y["Y"]
+    b-parallelogram-alt-z["Z"]
+  end
+  b-doublecircle-a --> b-doublecircle
+  b-doublecircle-b -->|label| b-doublecircle
+  b-doublecircle -->|yes| b-doublecircle-x
+  b-doublecircle -->|no| b-doublecircle-y
+  b-doublecircle --> b-doublecircle-z
+  b-asymmetric-a --> b-asymmetric
+  b-asymmetric-b -->|label| b-asymmetric
+  b-asymmetric -->|yes| b-asymmetric-x
+  b-asymmetric -->|no| b-asymmetric-y
+  b-asymmetric --> b-asymmetric-z
+  b-rhombus-a --> b-rhombus
+  b-rhombus-b -->|label| b-rhombus
+  b-rhombus -->|yes| b-rhombus-x
+  b-rhombus -->|no| b-rhombus-y
+  b-rhombus --> b-rhombus-z
+  b-hexagon-a --> b-hexagon
+  b-hexagon-b -->|label| b-hexagon
+  b-hexagon -->|yes| b-hexagon-x
+  b-hexagon -->|no| b-hexagon-y
+  b-hexagon --> b-hexagon-z
+  b-parallelogram-a --> b-parallelogram
+  b-parallelogram-b -->|label| b-parallelogram
+  b-parallelogram -->|yes| b-parallelogram-x
+  b-parallelogram -->|no| b-parallelogram-y
+  b-parallelogram --> b-parallelogram-z
+  b-parallelogram-alt-a --> b-parallelogram-alt
+  b-parallelogram-alt-b -->|label| b-parallelogram-alt
+  b-parallelogram-alt -->|yes| b-parallelogram-alt-x
+  b-parallelogram-alt -->|no| b-parallelogram-alt-y
+  b-parallelogram-alt --> b-parallelogram-alt-z
+  subgraph g3 [Shapes 13 to 18]
+    direction BT
+    b-trapezoid-a["in A"]
+    b-trapezoid-b["in B"]
+    b-trapezoid[/"trapezoid<br>bracket"\]
+    b-trapezoid-x["X"]
+    b-trapezoid-y["Y"]
+    b-trapezoid-z["Z"]
+    b-trapezoid-alt-a["in A"]
+    b-trapezoid-alt-b["in B"]
+    b-trapezoid-alt[\"trapezoid-alt<br>bracket"/]
+    b-trapezoid-alt-x["X"]
+    b-trapezoid-alt-y["Y"]
+    b-trapezoid-alt-z["Z"]
+    b-cloud-a["in A"]
+    b-cloud-b["in B"]
+    b-cloud)"cloud<br>bracket"(
+    b-cloud-x["X"]
+    b-cloud-y["Y"]
+    b-cloud-z["Z"]
+    b-bang-a["in A"]
+    b-bang-b["in B"]
+    b-bang))"bang<br>bracket"((
+    b-bang-x["X"]
+    b-bang-y["Y"]
+    b-bang-z["Z"]
+    m-rect-a["in A"]
+    m-rect-b["in B"]
+    m-rect@{ shape: rect, label: "rect" }
+    m-rect-x["X"]
+    m-rect-y["Y"]
+    m-rect-z["Z"]
+    m-rounded-a["in A"]
+    m-rounded-b["in B"]
+    m-rounded@{ shape: rounded, label: "rounded" }
+    m-rounded-x["X"]
+    m-rounded-y["Y"]
+    m-rounded-z["Z"]
+  end
+  b-trapezoid-a --> b-trapezoid
+  b-trapezoid-b -->|label| b-trapezoid
+  b-trapezoid -->|yes| b-trapezoid-x
+  b-trapezoid -->|no| b-trapezoid-y
+  b-trapezoid --> b-trapezoid-z
+  b-trapezoid-alt-a --> b-trapezoid-alt
+  b-trapezoid-alt-b -->|label| b-trapezoid-alt
+  b-trapezoid-alt -->|yes| b-trapezoid-alt-x
+  b-trapezoid-alt -->|no| b-trapezoid-alt-y
+  b-trapezoid-alt --> b-trapezoid-alt-z
+  b-cloud-a --> b-cloud
+  b-cloud-b -->|label| b-cloud
+  b-cloud -->|yes| b-cloud-x
+  b-cloud -->|no| b-cloud-y
+  b-cloud --> b-cloud-z
+  b-bang-a --> b-bang
+  b-bang-b -->|label| b-bang
+  b-bang -->|yes| b-bang-x
+  b-bang -->|no| b-bang-y
+  b-bang --> b-bang-z
+  m-rect-a --> m-rect
+  m-rect-b -->|label| m-rect
+  m-rect -->|yes| m-rect-x
+  m-rect -->|no| m-rect-y
+  m-rect --> m-rect-z
+  m-rounded-a --> m-rounded
+  m-rounded-b -->|label| m-rounded
+  m-rounded -->|yes| m-rounded-x
+  m-rounded -->|no| m-rounded-y
+  m-rounded --> m-rounded-z
+  subgraph g4 [Shapes 19 to 24]
+    direction BT
+    m-stadium-a["in A"]
+    m-stadium-b["in B"]
+    m-stadium@{ shape: stadium, label: "stadium" }
+    m-stadium-x["X"]
+    m-stadium-y["Y"]
+    m-stadium-z["Z"]
+    m-fr-rect-a["in A"]
+    m-fr-rect-b["in B"]
+    m-fr-rect@{ shape: fr-rect, label: "fr-rect" }
+    m-fr-rect-x["X"]
+    m-fr-rect-y["Y"]
+    m-fr-rect-z["Z"]
+    m-cyl-a["in A"]
+    m-cyl-b["in B"]
+    m-cyl@{ shape: cyl, label: "cyl" }
+    m-cyl-x["X"]
+    m-cyl-y["Y"]
+    m-cyl-z["Z"]
+    m-circle-a["in A"]
+    m-circle-b["in B"]
+    m-circle@{ shape: circle, label: "circle" }
+    m-circle-x["X"]
+    m-circle-y["Y"]
+    m-circle-z["Z"]
+    m-odd-a["in A"]
+    m-odd-b["in B"]
+    m-odd@{ shape: odd, label: "odd" }
+    m-odd-x["X"]
+    m-odd-y["Y"]
+    m-odd-z["Z"]
+    m-diam-a["in A"]
+    m-diam-b["in B"]
+    m-diam@{ shape: diam, label: "diam" }
+    m-diam-x["X"]
+    m-diam-y["Y"]
+    m-diam-z["Z"]
+  end
+  m-stadium-a --> m-stadium
+  m-stadium-b -->|label| m-stadium
+  m-stadium -->|yes| m-stadium-x
+  m-stadium -->|no| m-stadium-y
+  m-stadium --> m-stadium-z
+  m-fr-rect-a --> m-fr-rect
+  m-fr-rect-b -->|label| m-fr-rect
+  m-fr-rect -->|yes| m-fr-rect-x
+  m-fr-rect -->|no| m-fr-rect-y
+  m-fr-rect --> m-fr-rect-z
+  m-cyl-a --> m-cyl
+  m-cyl-b -->|label| m-cyl
+  m-cyl -->|yes| m-cyl-x
+  m-cyl -->|no| m-cyl-y
+  m-cyl --> m-cyl-z
+  m-circle-a --> m-circle
+  m-circle-b -->|label| m-circle
+  m-circle -->|yes| m-circle-x
+  m-circle -->|no| m-circle-y
+  m-circle --> m-circle-z
+  m-odd-a --> m-odd
+  m-odd-b -->|label| m-odd
+  m-odd -->|yes| m-odd-x
+  m-odd -->|no| m-odd-y
+  m-odd --> m-odd-z
+  m-diam-a --> m-diam
+  m-diam-b -->|label| m-diam
+  m-diam -->|yes| m-diam-x
+  m-diam -->|no| m-diam-y
+  m-diam --> m-diam-z
+  subgraph g5 [Shapes 25 to 30]
+    direction BT
+    m-hex-a["in A"]
+    m-hex-b["in B"]
+    m-hex@{ shape: hex, label: "hex" }
+    m-hex-x["X"]
+    m-hex-y["Y"]
+    m-hex-z["Z"]
+    m-lean-r-a["in A"]
+    m-lean-r-b["in B"]
+    m-lean-r@{ shape: lean-r, label: "lean-r" }
+    m-lean-r-x["X"]
+    m-lean-r-y["Y"]
+    m-lean-r-z["Z"]
+    m-lean-l-a["in A"]
+    m-lean-l-b["in B"]
+    m-lean-l@{ shape: lean-l, label: "lean-l" }
+    m-lean-l-x["X"]
+    m-lean-l-y["Y"]
+    m-lean-l-z["Z"]
+    m-trap-b-a["in A"]
+    m-trap-b-b["in B"]
+    m-trap-b@{ shape: trap-b, label: "trap-b" }
+    m-trap-b-x["X"]
+    m-trap-b-y["Y"]
+    m-trap-b-z["Z"]
+    m-trap-t-a["in A"]
+    m-trap-t-b["in B"]
+    m-trap-t@{ shape: trap-t, label: "trap-t" }
+    m-trap-t-x["X"]
+    m-trap-t-y["Y"]
+    m-trap-t-z["Z"]
+    m-dbl-circ-a["in A"]
+    m-dbl-circ-b["in B"]
+    m-dbl-circ@{ shape: dbl-circ, label: "dbl-circ" }
+    m-dbl-circ-x["X"]
+    m-dbl-circ-y["Y"]
+    m-dbl-circ-z["Z"]
+  end
+  m-hex-a --> m-hex
+  m-hex-b -->|label| m-hex
+  m-hex -->|yes| m-hex-x
+  m-hex -->|no| m-hex-y
+  m-hex --> m-hex-z
+  m-lean-r-a --> m-lean-r
+  m-lean-r-b -->|label| m-lean-r
+  m-lean-r -->|yes| m-lean-r-x
+  m-lean-r -->|no| m-lean-r-y
+  m-lean-r --> m-lean-r-z
+  m-lean-l-a --> m-lean-l
+  m-lean-l-b -->|label| m-lean-l
+  m-lean-l -->|yes| m-lean-l-x
+  m-lean-l -->|no| m-lean-l-y
+  m-lean-l --> m-lean-l-z
+  m-trap-b-a --> m-trap-b
+  m-trap-b-b -->|label| m-trap-b
+  m-trap-b -->|yes| m-trap-b-x
+  m-trap-b -->|no| m-trap-b-y
+  m-trap-b --> m-trap-b-z
+  m-trap-t-a --> m-trap-t
+  m-trap-t-b -->|label| m-trap-t
+  m-trap-t -->|yes| m-trap-t-x
+  m-trap-t -->|no| m-trap-t-y
+  m-trap-t --> m-trap-t-z
+  m-dbl-circ-a --> m-dbl-circ
+  m-dbl-circ-b -->|label| m-dbl-circ
+  m-dbl-circ -->|yes| m-dbl-circ-x
+  m-dbl-circ -->|no| m-dbl-circ-y
+  m-dbl-circ --> m-dbl-circ-z
+  subgraph g6 [Shapes 31 to 36]
+    direction BT
+    m-cloud-a["in A"]
+    m-cloud-b["in B"]
+    m-cloud@{ shape: cloud, label: "cloud" }
+    m-cloud-x["X"]
+    m-cloud-y["Y"]
+    m-cloud-z["Z"]
+    m-bang-a["in A"]
+    m-bang-b["in B"]
+    m-bang@{ shape: bang, label: "bang" }
+    m-bang-x["X"]
+    m-bang-y["Y"]
+    m-bang-z["Z"]
+    m-text-a["in A"]
+    m-text-b["in B"]
+    m-text@{ shape: text, label: "text" }
+    m-text-x["X"]
+    m-text-y["Y"]
+    m-text-z["Z"]
+    m-notch-rect-a["in A"]
+    m-notch-rect-b["in B"]
+    m-notch-rect@{ shape: notch-rect, label: "notch-rect" }
+    m-notch-rect-x["X"]
+    m-notch-rect-y["Y"]
+    m-notch-rect-z["Z"]
+    m-lin-rect-a["in A"]
+    m-lin-rect-b["in B"]
+    m-lin-rect@{ shape: lin-rect, label: "lin-rect" }
+    m-lin-rect-x["X"]
+    m-lin-rect-y["Y"]
+    m-lin-rect-z["Z"]
+    m-div-rect-a["in A"]
+    m-div-rect-b["in B"]
+    m-div-rect@{ shape: div-rect, label: "div-rect" }
+    m-div-rect-x["X"]
+    m-div-rect-y["Y"]
+    m-div-rect-z["Z"]
+  end
+  m-cloud-a --> m-cloud
+  m-cloud-b -->|label| m-cloud
+  m-cloud -->|yes| m-cloud-x
+  m-cloud -->|no| m-cloud-y
+  m-cloud --> m-cloud-z
+  m-bang-a --> m-bang
+  m-bang-b -->|label| m-bang
+  m-bang -->|yes| m-bang-x
+  m-bang -->|no| m-bang-y
+  m-bang --> m-bang-z
+  m-text-a --> m-text
+  m-text-b -->|label| m-text
+  m-text -->|yes| m-text-x
+  m-text -->|no| m-text-y
+  m-text --> m-text-z
+  m-notch-rect-a --> m-notch-rect
+  m-notch-rect-b -->|label| m-notch-rect
+  m-notch-rect -->|yes| m-notch-rect-x
+  m-notch-rect -->|no| m-notch-rect-y
+  m-notch-rect --> m-notch-rect-z
+  m-lin-rect-a --> m-lin-rect
+  m-lin-rect-b -->|label| m-lin-rect
+  m-lin-rect -->|yes| m-lin-rect-x
+  m-lin-rect -->|no| m-lin-rect-y
+  m-lin-rect --> m-lin-rect-z
+  m-div-rect-a --> m-div-rect
+  m-div-rect-b -->|label| m-div-rect
+  m-div-rect -->|yes| m-div-rect-x
+  m-div-rect -->|no| m-div-rect-y
+  m-div-rect --> m-div-rect-z
+  subgraph g7 [Shapes 37 to 42]
+    direction BT
+    m-win-pane-a["in A"]
+    m-win-pane-b["in B"]
+    m-win-pane@{ shape: win-pane, label: "win-pane" }
+    m-win-pane-x["X"]
+    m-win-pane-y["Y"]
+    m-win-pane-z["Z"]
+    m-tag-rect-a["in A"]
+    m-tag-rect-b["in B"]
+    m-tag-rect@{ shape: tag-rect, label: "tag-rect" }
+    m-tag-rect-x["X"]
+    m-tag-rect-y["Y"]
+    m-tag-rect-z["Z"]
+    m-st-rect-a["in A"]
+    m-st-rect-b["in B"]
+    m-st-rect@{ shape: st-rect, label: "st-rect" }
+    m-st-rect-x["X"]
+    m-st-rect-y["Y"]
+    m-st-rect-z["Z"]
+    m-notch-pent-a["in A"]
+    m-notch-pent-b["in B"]
+    m-notch-pent@{ shape: notch-pent, label: "notch-pent" }
+    m-notch-pent-x["X"]
+    m-notch-pent-y["Y"]
+    m-notch-pent-z["Z"]
+    m-sl-rect-a["in A"]
+    m-sl-rect-b["in B"]
+    m-sl-rect@{ shape: sl-rect, label: "sl-rect" }
+    m-sl-rect-x["X"]
+    m-sl-rect-y["Y"]
+    m-sl-rect-z["Z"]
+    m-doc-a["in A"]
+    m-doc-b["in B"]
+    m-doc@{ shape: doc, label: "doc" }
+    m-doc-x["X"]
+    m-doc-y["Y"]
+    m-doc-z["Z"]
+  end
+  m-win-pane-a --> m-win-pane
+  m-win-pane-b -->|label| m-win-pane
+  m-win-pane -->|yes| m-win-pane-x
+  m-win-pane -->|no| m-win-pane-y
+  m-win-pane --> m-win-pane-z
+  m-tag-rect-a --> m-tag-rect
+  m-tag-rect-b -->|label| m-tag-rect
+  m-tag-rect -->|yes| m-tag-rect-x
+  m-tag-rect -->|no| m-tag-rect-y
+  m-tag-rect --> m-tag-rect-z
+  m-st-rect-a --> m-st-rect
+  m-st-rect-b -->|label| m-st-rect
+  m-st-rect -->|yes| m-st-rect-x
+  m-st-rect -->|no| m-st-rect-y
+  m-st-rect --> m-st-rect-z
+  m-notch-pent-a --> m-notch-pent
+  m-notch-pent-b -->|label| m-notch-pent
+  m-notch-pent -->|yes| m-notch-pent-x
+  m-notch-pent -->|no| m-notch-pent-y
+  m-notch-pent --> m-notch-pent-z
+  m-sl-rect-a --> m-sl-rect
+  m-sl-rect-b -->|label| m-sl-rect
+  m-sl-rect -->|yes| m-sl-rect-x
+  m-sl-rect -->|no| m-sl-rect-y
+  m-sl-rect --> m-sl-rect-z
+  m-doc-a --> m-doc
+  m-doc-b -->|label| m-doc
+  m-doc -->|yes| m-doc-x
+  m-doc -->|no| m-doc-y
+  m-doc --> m-doc-z
+  subgraph g8 [Shapes 43 to 48]
+    direction BT
+    m-lin-doc-a["in A"]
+    m-lin-doc-b["in B"]
+    m-lin-doc@{ shape: lin-doc, label: "lin-doc" }
+    m-lin-doc-x["X"]
+    m-lin-doc-y["Y"]
+    m-lin-doc-z["Z"]
+    m-tag-doc-a["in A"]
+    m-tag-doc-b["in B"]
+    m-tag-doc@{ shape: tag-doc, label: "tag-doc" }
+    m-tag-doc-x["X"]
+    m-tag-doc-y["Y"]
+    m-tag-doc-z["Z"]
+    m-docs-a["in A"]
+    m-docs-b["in B"]
+    m-docs@{ shape: docs, label: "docs" }
+    m-docs-x["X"]
+    m-docs-y["Y"]
+    m-docs-z["Z"]
+    m-flag-a["in A"]
+    m-flag-b["in B"]
+    m-flag@{ shape: flag, label: "flag" }
+    m-flag-x["X"]
+    m-flag-y["Y"]
+    m-flag-z["Z"]
+    m-delay-a["in A"]
+    m-delay-b["in B"]
+    m-delay@{ shape: delay, label: "delay" }
+    m-delay-x["X"]
+    m-delay-y["Y"]
+    m-delay-z["Z"]
+    m-h-cyl-a["in A"]
+    m-h-cyl-b["in B"]
+    m-h-cyl@{ shape: h-cyl, label: "h-cyl" }
+    m-h-cyl-x["X"]
+    m-h-cyl-y["Y"]
+    m-h-cyl-z["Z"]
+  end
+  m-lin-doc-a --> m-lin-doc
+  m-lin-doc-b -->|label| m-lin-doc
+  m-lin-doc -->|yes| m-lin-doc-x
+  m-lin-doc -->|no| m-lin-doc-y
+  m-lin-doc --> m-lin-doc-z
+  m-tag-doc-a --> m-tag-doc
+  m-tag-doc-b -->|label| m-tag-doc
+  m-tag-doc -->|yes| m-tag-doc-x
+  m-tag-doc -->|no| m-tag-doc-y
+  m-tag-doc --> m-tag-doc-z
+  m-docs-a --> m-docs
+  m-docs-b -->|label| m-docs
+  m-docs -->|yes| m-docs-x
+  m-docs -->|no| m-docs-y
+  m-docs --> m-docs-z
+  m-flag-a --> m-flag
+  m-flag-b -->|label| m-flag
+  m-flag -->|yes| m-flag-x
+  m-flag -->|no| m-flag-y
+  m-flag --> m-flag-z
+  m-delay-a --> m-delay
+  m-delay-b -->|label| m-delay
+  m-delay -->|yes| m-delay-x
+  m-delay -->|no| m-delay-y
+  m-delay --> m-delay-z
+  m-h-cyl-a --> m-h-cyl
+  m-h-cyl-b -->|label| m-h-cyl
+  m-h-cyl -->|yes| m-h-cyl-x
+  m-h-cyl -->|no| m-h-cyl-y
+  m-h-cyl --> m-h-cyl-z
+  subgraph g9 [Shapes 49 to 54]
+    direction BT
+    m-lin-cyl-a["in A"]
+    m-lin-cyl-b["in B"]
+    m-lin-cyl@{ shape: lin-cyl, label: "lin-cyl" }
+    m-lin-cyl-x["X"]
+    m-lin-cyl-y["Y"]
+    m-lin-cyl-z["Z"]
+    m-curv-trap-a["in A"]
+    m-curv-trap-b["in B"]
+    m-curv-trap@{ shape: curv-trap, label: "curv-trap" }
+    m-curv-trap-x["X"]
+    m-curv-trap-y["Y"]
+    m-curv-trap-z["Z"]
+    m-bow-rect-a["in A"]
+    m-bow-rect-b["in B"]
+    m-bow-rect@{ shape: bow-rect, label: "bow-rect" }
+    m-bow-rect-x["X"]
+    m-bow-rect-y["Y"]
+    m-bow-rect-z["Z"]
+    m-tri-a["in A"]
+    m-tri-b["in B"]
+    m-tri@{ shape: tri, label: "tri" }
+    m-tri-x["X"]
+    m-tri-y["Y"]
+    m-tri-z["Z"]
+    m-flip-tri-a["in A"]
+    m-flip-tri-b["in B"]
+    m-flip-tri@{ shape: flip-tri, label: "flip-tri" }
+    m-flip-tri-x["X"]
+    m-flip-tri-y["Y"]
+    m-flip-tri-z["Z"]
+    m-hourglass-a["in A"]
+    m-hourglass-b["in B"]
+    m-hourglass@{ shape: hourglass, label: "hourglass" }
+    m-hourglass-x["X"]
+    m-hourglass-y["Y"]
+    m-hourglass-z["Z"]
+  end
+  m-lin-cyl-a --> m-lin-cyl
+  m-lin-cyl-b -->|label| m-lin-cyl
+  m-lin-cyl -->|yes| m-lin-cyl-x
+  m-lin-cyl -->|no| m-lin-cyl-y
+  m-lin-cyl --> m-lin-cyl-z
+  m-curv-trap-a --> m-curv-trap
+  m-curv-trap-b -->|label| m-curv-trap
+  m-curv-trap -->|yes| m-curv-trap-x
+  m-curv-trap -->|no| m-curv-trap-y
+  m-curv-trap --> m-curv-trap-z
+  m-bow-rect-a --> m-bow-rect
+  m-bow-rect-b -->|label| m-bow-rect
+  m-bow-rect -->|yes| m-bow-rect-x
+  m-bow-rect -->|no| m-bow-rect-y
+  m-bow-rect --> m-bow-rect-z
+  m-tri-a --> m-tri
+  m-tri-b -->|label| m-tri
+  m-tri -->|yes| m-tri-x
+  m-tri -->|no| m-tri-y
+  m-tri --> m-tri-z
+  m-flip-tri-a --> m-flip-tri
+  m-flip-tri-b -->|label| m-flip-tri
+  m-flip-tri -->|yes| m-flip-tri-x
+  m-flip-tri -->|no| m-flip-tri-y
+  m-flip-tri --> m-flip-tri-z
+  m-hourglass-a --> m-hourglass
+  m-hourglass-b -->|label| m-hourglass
+  m-hourglass -->|yes| m-hourglass-x
+  m-hourglass -->|no| m-hourglass-y
+  m-hourglass --> m-hourglass-z
+  subgraph g10 [Shapes 55 to 60]
+    direction BT
+    m-brace-a["in A"]
+    m-brace-b["in B"]
+    m-brace@{ shape: brace, label: "brace" }
+    m-brace-x["X"]
+    m-brace-y["Y"]
+    m-brace-z["Z"]
+    m-brace-r-a["in A"]
+    m-brace-r-b["in B"]
+    m-brace-r@{ shape: brace-r, label: "brace-r" }
+    m-brace-r-x["X"]
+    m-brace-r-y["Y"]
+    m-brace-r-z["Z"]
+    m-braces-a["in A"]
+    m-braces-b["in B"]
+    m-braces@{ shape: braces, label: "braces" }
+    m-braces-x["X"]
+    m-braces-y["Y"]
+    m-braces-z["Z"]
+    m-browser-a["in A"]
+    m-browser-b["in B"]
+    m-browser@{ shape: browser, label: "browser" }
+    m-browser-x["X"]
+    m-browser-y["Y"]
+    m-browser-z["Z"]
+    m-console-a["in A"]
+    m-console-b["in B"]
+    m-console@{ shape: console, label: "console" }
+    m-console-x["X"]
+    m-console-y["Y"]
+    m-console-z["Z"]
+    m-folder-a["in A"]
+    m-folder-b["in B"]
+    m-folder@{ shape: folder, label: "folder" }
+    m-folder-x["X"]
+    m-folder-y["Y"]
+    m-folder-z["Z"]
+  end
+  m-brace-a --> m-brace
+  m-brace-b -->|label| m-brace
+  m-brace -->|yes| m-brace-x
+  m-brace -->|no| m-brace-y
+  m-brace --> m-brace-z
+  m-brace-r-a --> m-brace-r
+  m-brace-r-b -->|label| m-brace-r
+  m-brace-r -->|yes| m-brace-r-x
+  m-brace-r -->|no| m-brace-r-y
+  m-brace-r --> m-brace-r-z
+  m-braces-a --> m-braces
+  m-braces-b -->|label| m-braces
+  m-braces -->|yes| m-braces-x
+  m-braces -->|no| m-braces-y
+  m-braces --> m-braces-z
+  m-browser-a --> m-browser
+  m-browser-b -->|label| m-browser
+  m-browser -->|yes| m-browser-x
+  m-browser -->|no| m-browser-y
+  m-browser --> m-browser-z
+  m-console-a --> m-console
+  m-console-b -->|label| m-console
+  m-console -->|yes| m-console-x
+  m-console -->|no| m-console-y
+  m-console --> m-console-z
+  m-folder-a --> m-folder
+  m-folder-b -->|label| m-folder
+  m-folder -->|yes| m-folder-x
+  m-folder -->|no| m-folder-y
+  m-folder --> m-folder-z
+  subgraph g11 [Shapes 61 to 66]
+    direction BT
+    m-bucket-a["in A"]
+    m-bucket-b["in B"]
+    m-bucket@{ shape: bucket, label: "bucket" }
+    m-bucket-x["X"]
+    m-bucket-y["Y"]
+    m-bucket-z["Z"]
+    m-datastore-a["in A"]
+    m-datastore-b["in B"]
+    m-datastore@{ shape: datastore, label: "datastore" }
+    m-datastore-x["X"]
+    m-datastore-y["Y"]
+    m-datastore-z["Z"]
+    m-person-a["in A"]
+    m-person-b["in B"]
+    m-person@{ shape: person, label: "person" }
+    m-person-x["X"]
+    m-person-y["Y"]
+    m-person-z["Z"]
+    m-sm-circ-a["in A"]
+    m-sm-circ-b["in B"]
+    m-sm-circ@{ shape: sm-circ, label: "sm-circ" }
+    m-sm-circ-x["X"]
+    m-sm-circ-y["Y"]
+    m-sm-circ-z["Z"]
+    m-f-circ-a["in A"]
+    m-f-circ-b["in B"]
+    m-f-circ@{ shape: f-circ, label: "f-circ" }
+    m-f-circ-x["X"]
+    m-f-circ-y["Y"]
+    m-f-circ-z["Z"]
+    m-fr-circ-a["in A"]
+    m-fr-circ-b["in B"]
+    m-fr-circ@{ shape: fr-circ, label: "fr-circ" }
+    m-fr-circ-x["X"]
+    m-fr-circ-y["Y"]
+    m-fr-circ-z["Z"]
+  end
+  m-bucket-a --> m-bucket
+  m-bucket-b -->|label| m-bucket
+  m-bucket -->|yes| m-bucket-x
+  m-bucket -->|no| m-bucket-y
+  m-bucket --> m-bucket-z
+  m-datastore-a --> m-datastore
+  m-datastore-b -->|label| m-datastore
+  m-datastore -->|yes| m-datastore-x
+  m-datastore -->|no| m-datastore-y
+  m-datastore --> m-datastore-z
+  m-person-a --> m-person
+  m-person-b -->|label| m-person
+  m-person -->|yes| m-person-x
+  m-person -->|no| m-person-y
+  m-person --> m-person-z
+  m-sm-circ-a --> m-sm-circ
+  m-sm-circ-b -->|label| m-sm-circ
+  m-sm-circ -->|yes| m-sm-circ-x
+  m-sm-circ -->|no| m-sm-circ-y
+  m-sm-circ --> m-sm-circ-z
+  m-f-circ-a --> m-f-circ
+  m-f-circ-b -->|label| m-f-circ
+  m-f-circ -->|yes| m-f-circ-x
+  m-f-circ -->|no| m-f-circ-y
+  m-f-circ --> m-f-circ-z
+  m-fr-circ-a --> m-fr-circ
+  m-fr-circ-b -->|label| m-fr-circ
+  m-fr-circ -->|yes| m-fr-circ-x
+  m-fr-circ -->|no| m-fr-circ-y
+  m-fr-circ --> m-fr-circ-z
+  subgraph g12 [Shapes 67 to 69]
+    direction BT
+    m-cross-circ-a["in A"]
+    m-cross-circ-b["in B"]
+    m-cross-circ@{ shape: cross-circ, label: "cross-circ" }
+    m-cross-circ-x["X"]
+    m-cross-circ-y["Y"]
+    m-cross-circ-z["Z"]
+    m-fork-a["in A"]
+    m-fork-b["in B"]
+    m-fork@{ shape: fork, label: "fork" }
+    m-fork-x["X"]
+    m-fork-y["Y"]
+    m-fork-z["Z"]
+    m-bolt-a["in A"]
+    m-bolt-b["in B"]
+    m-bolt@{ shape: bolt, label: "bolt" }
+    m-bolt-x["X"]
+    m-bolt-y["Y"]
+    m-bolt-z["Z"]
+  end
+  m-cross-circ-a --> m-cross-circ
+  m-cross-circ-b -->|label| m-cross-circ
+  m-cross-circ -->|yes| m-cross-circ-x
+  m-cross-circ -->|no| m-cross-circ-y
+  m-cross-circ --> m-cross-circ-z
+  m-fork-a --> m-fork
+  m-fork-b -->|label| m-fork
+  m-fork -->|yes| m-fork-x
+  m-fork -->|no| m-fork-y
+  m-fork --> m-fork-z
+  m-bolt-a --> m-bolt
+  m-bolt-b -->|label| m-bolt
+  m-bolt -->|yes| m-bolt-x
+  m-bolt -->|no| m-bolt-y
+  m-bolt --> m-bolt-z
+```
+
+## Right to left
+
+```mermaid
+flowchart RL
+  subgraph g1 [Shapes 1 to 6]
+    direction RL
+    b-square-a["in A"]
+    b-square-b["in B"]
+    b-square["square<br>bracket"]
+    b-square-x["X"]
+    b-square-y["Y"]
+    b-square-z["Z"]
+    b-rounded-a["in A"]
+    b-rounded-b["in B"]
+    b-rounded("rounded<br>bracket")
+    b-rounded-x["X"]
+    b-rounded-y["Y"]
+    b-rounded-z["Z"]
+    b-stadium-a["in A"]
+    b-stadium-b["in B"]
+    b-stadium(["stadium<br>bracket"])
+    b-stadium-x["X"]
+    b-stadium-y["Y"]
+    b-stadium-z["Z"]
+    b-subroutine-a["in A"]
+    b-subroutine-b["in B"]
+    b-subroutine[["subroutine<br>bracket"]]
+    b-subroutine-x["X"]
+    b-subroutine-y["Y"]
+    b-subroutine-z["Z"]
+    b-cylinder-a["in A"]
+    b-cylinder-b["in B"]
+    b-cylinder[("cylinder<br>bracket")]
+    b-cylinder-x["X"]
+    b-cylinder-y["Y"]
+    b-cylinder-z["Z"]
+    b-circle-a["in A"]
+    b-circle-b["in B"]
+    b-circle(("circle<br>bracket"))
+    b-circle-x["X"]
+    b-circle-y["Y"]
+    b-circle-z["Z"]
+  end
+  b-square-a --> b-square
+  b-square-b -->|label| b-square
+  b-square -->|yes| b-square-x
+  b-square -->|no| b-square-y
+  b-square --> b-square-z
+  b-rounded-a --> b-rounded
+  b-rounded-b -->|label| b-rounded
+  b-rounded -->|yes| b-rounded-x
+  b-rounded -->|no| b-rounded-y
+  b-rounded --> b-rounded-z
+  b-stadium-a --> b-stadium
+  b-stadium-b -->|label| b-stadium
+  b-stadium -->|yes| b-stadium-x
+  b-stadium -->|no| b-stadium-y
+  b-stadium --> b-stadium-z
+  b-subroutine-a --> b-subroutine
+  b-subroutine-b -->|label| b-subroutine
+  b-subroutine -->|yes| b-subroutine-x
+  b-subroutine -->|no| b-subroutine-y
+  b-subroutine --> b-subroutine-z
+  b-cylinder-a --> b-cylinder
+  b-cylinder-b -->|label| b-cylinder
+  b-cylinder -->|yes| b-cylinder-x
+  b-cylinder -->|no| b-cylinder-y
+  b-cylinder --> b-cylinder-z
+  b-circle-a --> b-circle
+  b-circle-b -->|label| b-circle
+  b-circle -->|yes| b-circle-x
+  b-circle -->|no| b-circle-y
+  b-circle --> b-circle-z
+  subgraph g2 [Shapes 7 to 12]
+    direction RL
+    b-doublecircle-a["in A"]
+    b-doublecircle-b["in B"]
+    b-doublecircle((("doublecircle<br>bracket")))
+    b-doublecircle-x["X"]
+    b-doublecircle-y["Y"]
+    b-doublecircle-z["Z"]
+    b-asymmetric-a["in A"]
+    b-asymmetric-b["in B"]
+    b-asymmetric>"asymmetric<br>bracket"]
+    b-asymmetric-x["X"]
+    b-asymmetric-y["Y"]
+    b-asymmetric-z["Z"]
+    b-rhombus-a["in A"]
+    b-rhombus-b["in B"]
+    b-rhombus{"rhombus<br>bracket"}
+    b-rhombus-x["X"]
+    b-rhombus-y["Y"]
+    b-rhombus-z["Z"]
+    b-hexagon-a["in A"]
+    b-hexagon-b["in B"]
+    b-hexagon{{"hexagon<br>bracket"}}
+    b-hexagon-x["X"]
+    b-hexagon-y["Y"]
+    b-hexagon-z["Z"]
+    b-parallelogram-a["in A"]
+    b-parallelogram-b["in B"]
+    b-parallelogram[/"parallelogram<br>bracket"/]
+    b-parallelogram-x["X"]
+    b-parallelogram-y["Y"]
+    b-parallelogram-z["Z"]
+    b-parallelogram-alt-a["in A"]
+    b-parallelogram-alt-b["in B"]
+    b-parallelogram-alt[\"parallelogram-alt<br>bracket"\]
+    b-parallelogram-alt-x["X"]
+    b-parallelogram-alt-y["Y"]
+    b-parallelogram-alt-z["Z"]
+  end
+  b-doublecircle-a --> b-doublecircle
+  b-doublecircle-b -->|label| b-doublecircle
+  b-doublecircle -->|yes| b-doublecircle-x
+  b-doublecircle -->|no| b-doublecircle-y
+  b-doublecircle --> b-doublecircle-z
+  b-asymmetric-a --> b-asymmetric
+  b-asymmetric-b -->|label| b-asymmetric
+  b-asymmetric -->|yes| b-asymmetric-x
+  b-asymmetric -->|no| b-asymmetric-y
+  b-asymmetric --> b-asymmetric-z
+  b-rhombus-a --> b-rhombus
+  b-rhombus-b -->|label| b-rhombus
+  b-rhombus -->|yes| b-rhombus-x
+  b-rhombus -->|no| b-rhombus-y
+  b-rhombus --> b-rhombus-z
+  b-hexagon-a --> b-hexagon
+  b-hexagon-b -->|label| b-hexagon
+  b-hexagon -->|yes| b-hexagon-x
+  b-hexagon -->|no| b-hexagon-y
+  b-hexagon --> b-hexagon-z
+  b-parallelogram-a --> b-parallelogram
+  b-parallelogram-b -->|label| b-parallelogram
+  b-parallelogram -->|yes| b-parallelogram-x
+  b-parallelogram -->|no| b-parallelogram-y
+  b-parallelogram --> b-parallelogram-z
+  b-parallelogram-alt-a --> b-parallelogram-alt
+  b-parallelogram-alt-b -->|label| b-parallelogram-alt
+  b-parallelogram-alt -->|yes| b-parallelogram-alt-x
+  b-parallelogram-alt -->|no| b-parallelogram-alt-y
+  b-parallelogram-alt --> b-parallelogram-alt-z
+  subgraph g3 [Shapes 13 to 18]
+    direction RL
+    b-trapezoid-a["in A"]
+    b-trapezoid-b["in B"]
+    b-trapezoid[/"trapezoid<br>bracket"\]
+    b-trapezoid-x["X"]
+    b-trapezoid-y["Y"]
+    b-trapezoid-z["Z"]
+    b-trapezoid-alt-a["in A"]
+    b-trapezoid-alt-b["in B"]
+    b-trapezoid-alt[\"trapezoid-alt<br>bracket"/]
+    b-trapezoid-alt-x["X"]
+    b-trapezoid-alt-y["Y"]
+    b-trapezoid-alt-z["Z"]
+    b-cloud-a["in A"]
+    b-cloud-b["in B"]
+    b-cloud)"cloud<br>bracket"(
+    b-cloud-x["X"]
+    b-cloud-y["Y"]
+    b-cloud-z["Z"]
+    b-bang-a["in A"]
+    b-bang-b["in B"]
+    b-bang))"bang<br>bracket"((
+    b-bang-x["X"]
+    b-bang-y["Y"]
+    b-bang-z["Z"]
+    m-rect-a["in A"]
+    m-rect-b["in B"]
+    m-rect@{ shape: rect, label: "rect" }
+    m-rect-x["X"]
+    m-rect-y["Y"]
+    m-rect-z["Z"]
+    m-rounded-a["in A"]
+    m-rounded-b["in B"]
+    m-rounded@{ shape: rounded, label: "rounded" }
+    m-rounded-x["X"]
+    m-rounded-y["Y"]
+    m-rounded-z["Z"]
+  end
+  b-trapezoid-a --> b-trapezoid
+  b-trapezoid-b -->|label| b-trapezoid
+  b-trapezoid -->|yes| b-trapezoid-x
+  b-trapezoid -->|no| b-trapezoid-y
+  b-trapezoid --> b-trapezoid-z
+  b-trapezoid-alt-a --> b-trapezoid-alt
+  b-trapezoid-alt-b -->|label| b-trapezoid-alt
+  b-trapezoid-alt -->|yes| b-trapezoid-alt-x
+  b-trapezoid-alt -->|no| b-trapezoid-alt-y
+  b-trapezoid-alt --> b-trapezoid-alt-z
+  b-cloud-a --> b-cloud
+  b-cloud-b -->|label| b-cloud
+  b-cloud -->|yes| b-cloud-x
+  b-cloud -->|no| b-cloud-y
+  b-cloud --> b-cloud-z
+  b-bang-a --> b-bang
+  b-bang-b -->|label| b-bang
+  b-bang -->|yes| b-bang-x
+  b-bang -->|no| b-bang-y
+  b-bang --> b-bang-z
+  m-rect-a --> m-rect
+  m-rect-b -->|label| m-rect
+  m-rect -->|yes| m-rect-x
+  m-rect -->|no| m-rect-y
+  m-rect --> m-rect-z
+  m-rounded-a --> m-rounded
+  m-rounded-b -->|label| m-rounded
+  m-rounded -->|yes| m-rounded-x
+  m-rounded -->|no| m-rounded-y
+  m-rounded --> m-rounded-z
+  subgraph g4 [Shapes 19 to 24]
+    direction RL
+    m-stadium-a["in A"]
+    m-stadium-b["in B"]
+    m-stadium@{ shape: stadium, label: "stadium" }
+    m-stadium-x["X"]
+    m-stadium-y["Y"]
+    m-stadium-z["Z"]
+    m-fr-rect-a["in A"]
+    m-fr-rect-b["in B"]
+    m-fr-rect@{ shape: fr-rect, label: "fr-rect" }
+    m-fr-rect-x["X"]
+    m-fr-rect-y["Y"]
+    m-fr-rect-z["Z"]
+    m-cyl-a["in A"]
+    m-cyl-b["in B"]
+    m-cyl@{ shape: cyl, label: "cyl" }
+    m-cyl-x["X"]
+    m-cyl-y["Y"]
+    m-cyl-z["Z"]
+    m-circle-a["in A"]
+    m-circle-b["in B"]
+    m-circle@{ shape: circle, label: "circle" }
+    m-circle-x["X"]
+    m-circle-y["Y"]
+    m-circle-z["Z"]
+    m-odd-a["in A"]
+    m-odd-b["in B"]
+    m-odd@{ shape: odd, label: "odd" }
+    m-odd-x["X"]
+    m-odd-y["Y"]
+    m-odd-z["Z"]
+    m-diam-a["in A"]
+    m-diam-b["in B"]
+    m-diam@{ shape: diam, label: "diam" }
+    m-diam-x["X"]
+    m-diam-y["Y"]
+    m-diam-z["Z"]
+  end
+  m-stadium-a --> m-stadium
+  m-stadium-b -->|label| m-stadium
+  m-stadium -->|yes| m-stadium-x
+  m-stadium -->|no| m-stadium-y
+  m-stadium --> m-stadium-z
+  m-fr-rect-a --> m-fr-rect
+  m-fr-rect-b -->|label| m-fr-rect
+  m-fr-rect -->|yes| m-fr-rect-x
+  m-fr-rect -->|no| m-fr-rect-y
+  m-fr-rect --> m-fr-rect-z
+  m-cyl-a --> m-cyl
+  m-cyl-b -->|label| m-cyl
+  m-cyl -->|yes| m-cyl-x
+  m-cyl -->|no| m-cyl-y
+  m-cyl --> m-cyl-z
+  m-circle-a --> m-circle
+  m-circle-b -->|label| m-circle
+  m-circle -->|yes| m-circle-x
+  m-circle -->|no| m-circle-y
+  m-circle --> m-circle-z
+  m-odd-a --> m-odd
+  m-odd-b -->|label| m-odd
+  m-odd -->|yes| m-odd-x
+  m-odd -->|no| m-odd-y
+  m-odd --> m-odd-z
+  m-diam-a --> m-diam
+  m-diam-b -->|label| m-diam
+  m-diam -->|yes| m-diam-x
+  m-diam -->|no| m-diam-y
+  m-diam --> m-diam-z
+  subgraph g5 [Shapes 25 to 30]
+    direction RL
+    m-hex-a["in A"]
+    m-hex-b["in B"]
+    m-hex@{ shape: hex, label: "hex" }
+    m-hex-x["X"]
+    m-hex-y["Y"]
+    m-hex-z["Z"]
+    m-lean-r-a["in A"]
+    m-lean-r-b["in B"]
+    m-lean-r@{ shape: lean-r, label: "lean-r" }
+    m-lean-r-x["X"]
+    m-lean-r-y["Y"]
+    m-lean-r-z["Z"]
+    m-lean-l-a["in A"]
+    m-lean-l-b["in B"]
+    m-lean-l@{ shape: lean-l, label: "lean-l" }
+    m-lean-l-x["X"]
+    m-lean-l-y["Y"]
+    m-lean-l-z["Z"]
+    m-trap-b-a["in A"]
+    m-trap-b-b["in B"]
+    m-trap-b@{ shape: trap-b, label: "trap-b" }
+    m-trap-b-x["X"]
+    m-trap-b-y["Y"]
+    m-trap-b-z["Z"]
+    m-trap-t-a["in A"]
+    m-trap-t-b["in B"]
+    m-trap-t@{ shape: trap-t, label: "trap-t" }
+    m-trap-t-x["X"]
+    m-trap-t-y["Y"]
+    m-trap-t-z["Z"]
+    m-dbl-circ-a["in A"]
+    m-dbl-circ-b["in B"]
+    m-dbl-circ@{ shape: dbl-circ, label: "dbl-circ" }
+    m-dbl-circ-x["X"]
+    m-dbl-circ-y["Y"]
+    m-dbl-circ-z["Z"]
+  end
+  m-hex-a --> m-hex
+  m-hex-b -->|label| m-hex
+  m-hex -->|yes| m-hex-x
+  m-hex -->|no| m-hex-y
+  m-hex --> m-hex-z
+  m-lean-r-a --> m-lean-r
+  m-lean-r-b -->|label| m-lean-r
+  m-lean-r -->|yes| m-lean-r-x
+  m-lean-r -->|no| m-lean-r-y
+  m-lean-r --> m-lean-r-z
+  m-lean-l-a --> m-lean-l
+  m-lean-l-b -->|label| m-lean-l
+  m-lean-l -->|yes| m-lean-l-x
+  m-lean-l -->|no| m-lean-l-y
+  m-lean-l --> m-lean-l-z
+  m-trap-b-a --> m-trap-b
+  m-trap-b-b -->|label| m-trap-b
+  m-trap-b -->|yes| m-trap-b-x
+  m-trap-b -->|no| m-trap-b-y
+  m-trap-b --> m-trap-b-z
+  m-trap-t-a --> m-trap-t
+  m-trap-t-b -->|label| m-trap-t
+  m-trap-t -->|yes| m-trap-t-x
+  m-trap-t -->|no| m-trap-t-y
+  m-trap-t --> m-trap-t-z
+  m-dbl-circ-a --> m-dbl-circ
+  m-dbl-circ-b -->|label| m-dbl-circ
+  m-dbl-circ -->|yes| m-dbl-circ-x
+  m-dbl-circ -->|no| m-dbl-circ-y
+  m-dbl-circ --> m-dbl-circ-z
+  subgraph g6 [Shapes 31 to 36]
+    direction RL
+    m-cloud-a["in A"]
+    m-cloud-b["in B"]
+    m-cloud@{ shape: cloud, label: "cloud" }
+    m-cloud-x["X"]
+    m-cloud-y["Y"]
+    m-cloud-z["Z"]
+    m-bang-a["in A"]
+    m-bang-b["in B"]
+    m-bang@{ shape: bang, label: "bang" }
+    m-bang-x["X"]
+    m-bang-y["Y"]
+    m-bang-z["Z"]
+    m-text-a["in A"]
+    m-text-b["in B"]
+    m-text@{ shape: text, label: "text" }
+    m-text-x["X"]
+    m-text-y["Y"]
+    m-text-z["Z"]
+    m-notch-rect-a["in A"]
+    m-notch-rect-b["in B"]
+    m-notch-rect@{ shape: notch-rect, label: "notch-rect" }
+    m-notch-rect-x["X"]
+    m-notch-rect-y["Y"]
+    m-notch-rect-z["Z"]
+    m-lin-rect-a["in A"]
+    m-lin-rect-b["in B"]
+    m-lin-rect@{ shape: lin-rect, label: "lin-rect" }
+    m-lin-rect-x["X"]
+    m-lin-rect-y["Y"]
+    m-lin-rect-z["Z"]
+    m-div-rect-a["in A"]
+    m-div-rect-b["in B"]
+    m-div-rect@{ shape: div-rect, label: "div-rect" }
+    m-div-rect-x["X"]
+    m-div-rect-y["Y"]
+    m-div-rect-z["Z"]
+  end
+  m-cloud-a --> m-cloud
+  m-cloud-b -->|label| m-cloud
+  m-cloud -->|yes| m-cloud-x
+  m-cloud -->|no| m-cloud-y
+  m-cloud --> m-cloud-z
+  m-bang-a --> m-bang
+  m-bang-b -->|label| m-bang
+  m-bang -->|yes| m-bang-x
+  m-bang -->|no| m-bang-y
+  m-bang --> m-bang-z
+  m-text-a --> m-text
+  m-text-b -->|label| m-text
+  m-text -->|yes| m-text-x
+  m-text -->|no| m-text-y
+  m-text --> m-text-z
+  m-notch-rect-a --> m-notch-rect
+  m-notch-rect-b -->|label| m-notch-rect
+  m-notch-rect -->|yes| m-notch-rect-x
+  m-notch-rect -->|no| m-notch-rect-y
+  m-notch-rect --> m-notch-rect-z
+  m-lin-rect-a --> m-lin-rect
+  m-lin-rect-b -->|label| m-lin-rect
+  m-lin-rect -->|yes| m-lin-rect-x
+  m-lin-rect -->|no| m-lin-rect-y
+  m-lin-rect --> m-lin-rect-z
+  m-div-rect-a --> m-div-rect
+  m-div-rect-b -->|label| m-div-rect
+  m-div-rect -->|yes| m-div-rect-x
+  m-div-rect -->|no| m-div-rect-y
+  m-div-rect --> m-div-rect-z
+  subgraph g7 [Shapes 37 to 42]
+    direction RL
+    m-win-pane-a["in A"]
+    m-win-pane-b["in B"]
+    m-win-pane@{ shape: win-pane, label: "win-pane" }
+    m-win-pane-x["X"]
+    m-win-pane-y["Y"]
+    m-win-pane-z["Z"]
+    m-tag-rect-a["in A"]
+    m-tag-rect-b["in B"]
+    m-tag-rect@{ shape: tag-rect, label: "tag-rect" }
+    m-tag-rect-x["X"]
+    m-tag-rect-y["Y"]
+    m-tag-rect-z["Z"]
+    m-st-rect-a["in A"]
+    m-st-rect-b["in B"]
+    m-st-rect@{ shape: st-rect, label: "st-rect" }
+    m-st-rect-x["X"]
+    m-st-rect-y["Y"]
+    m-st-rect-z["Z"]
+    m-notch-pent-a["in A"]
+    m-notch-pent-b["in B"]
+    m-notch-pent@{ shape: notch-pent, label: "notch-pent" }
+    m-notch-pent-x["X"]
+    m-notch-pent-y["Y"]
+    m-notch-pent-z["Z"]
+    m-sl-rect-a["in A"]
+    m-sl-rect-b["in B"]
+    m-sl-rect@{ shape: sl-rect, label: "sl-rect" }
+    m-sl-rect-x["X"]
+    m-sl-rect-y["Y"]
+    m-sl-rect-z["Z"]
+    m-doc-a["in A"]
+    m-doc-b["in B"]
+    m-doc@{ shape: doc, label: "doc" }
+    m-doc-x["X"]
+    m-doc-y["Y"]
+    m-doc-z["Z"]
+  end
+  m-win-pane-a --> m-win-pane
+  m-win-pane-b -->|label| m-win-pane
+  m-win-pane -->|yes| m-win-pane-x
+  m-win-pane -->|no| m-win-pane-y
+  m-win-pane --> m-win-pane-z
+  m-tag-rect-a --> m-tag-rect
+  m-tag-rect-b -->|label| m-tag-rect
+  m-tag-rect -->|yes| m-tag-rect-x
+  m-tag-rect -->|no| m-tag-rect-y
+  m-tag-rect --> m-tag-rect-z
+  m-st-rect-a --> m-st-rect
+  m-st-rect-b -->|label| m-st-rect
+  m-st-rect -->|yes| m-st-rect-x
+  m-st-rect -->|no| m-st-rect-y
+  m-st-rect --> m-st-rect-z
+  m-notch-pent-a --> m-notch-pent
+  m-notch-pent-b -->|label| m-notch-pent
+  m-notch-pent -->|yes| m-notch-pent-x
+  m-notch-pent -->|no| m-notch-pent-y
+  m-notch-pent --> m-notch-pent-z
+  m-sl-rect-a --> m-sl-rect
+  m-sl-rect-b -->|label| m-sl-rect
+  m-sl-rect -->|yes| m-sl-rect-x
+  m-sl-rect -->|no| m-sl-rect-y
+  m-sl-rect --> m-sl-rect-z
+  m-doc-a --> m-doc
+  m-doc-b -->|label| m-doc
+  m-doc -->|yes| m-doc-x
+  m-doc -->|no| m-doc-y
+  m-doc --> m-doc-z
+  subgraph g8 [Shapes 43 to 48]
+    direction RL
+    m-lin-doc-a["in A"]
+    m-lin-doc-b["in B"]
+    m-lin-doc@{ shape: lin-doc, label: "lin-doc" }
+    m-lin-doc-x["X"]
+    m-lin-doc-y["Y"]
+    m-lin-doc-z["Z"]
+    m-tag-doc-a["in A"]
+    m-tag-doc-b["in B"]
+    m-tag-doc@{ shape: tag-doc, label: "tag-doc" }
+    m-tag-doc-x["X"]
+    m-tag-doc-y["Y"]
+    m-tag-doc-z["Z"]
+    m-docs-a["in A"]
+    m-docs-b["in B"]
+    m-docs@{ shape: docs, label: "docs" }
+    m-docs-x["X"]
+    m-docs-y["Y"]
+    m-docs-z["Z"]
+    m-flag-a["in A"]
+    m-flag-b["in B"]
+    m-flag@{ shape: flag, label: "flag" }
+    m-flag-x["X"]
+    m-flag-y["Y"]
+    m-flag-z["Z"]
+    m-delay-a["in A"]
+    m-delay-b["in B"]
+    m-delay@{ shape: delay, label: "delay" }
+    m-delay-x["X"]
+    m-delay-y["Y"]
+    m-delay-z["Z"]
+    m-h-cyl-a["in A"]
+    m-h-cyl-b["in B"]
+    m-h-cyl@{ shape: h-cyl, label: "h-cyl" }
+    m-h-cyl-x["X"]
+    m-h-cyl-y["Y"]
+    m-h-cyl-z["Z"]
+  end
+  m-lin-doc-a --> m-lin-doc
+  m-lin-doc-b -->|label| m-lin-doc
+  m-lin-doc -->|yes| m-lin-doc-x
+  m-lin-doc -->|no| m-lin-doc-y
+  m-lin-doc --> m-lin-doc-z
+  m-tag-doc-a --> m-tag-doc
+  m-tag-doc-b -->|label| m-tag-doc
+  m-tag-doc -->|yes| m-tag-doc-x
+  m-tag-doc -->|no| m-tag-doc-y
+  m-tag-doc --> m-tag-doc-z
+  m-docs-a --> m-docs
+  m-docs-b -->|label| m-docs
+  m-docs -->|yes| m-docs-x
+  m-docs -->|no| m-docs-y
+  m-docs --> m-docs-z
+  m-flag-a --> m-flag
+  m-flag-b -->|label| m-flag
+  m-flag -->|yes| m-flag-x
+  m-flag -->|no| m-flag-y
+  m-flag --> m-flag-z
+  m-delay-a --> m-delay
+  m-delay-b -->|label| m-delay
+  m-delay -->|yes| m-delay-x
+  m-delay -->|no| m-delay-y
+  m-delay --> m-delay-z
+  m-h-cyl-a --> m-h-cyl
+  m-h-cyl-b -->|label| m-h-cyl
+  m-h-cyl -->|yes| m-h-cyl-x
+  m-h-cyl -->|no| m-h-cyl-y
+  m-h-cyl --> m-h-cyl-z
+  subgraph g9 [Shapes 49 to 54]
+    direction RL
+    m-lin-cyl-a["in A"]
+    m-lin-cyl-b["in B"]
+    m-lin-cyl@{ shape: lin-cyl, label: "lin-cyl" }
+    m-lin-cyl-x["X"]
+    m-lin-cyl-y["Y"]
+    m-lin-cyl-z["Z"]
+    m-curv-trap-a["in A"]
+    m-curv-trap-b["in B"]
+    m-curv-trap@{ shape: curv-trap, label: "curv-trap" }
+    m-curv-trap-x["X"]
+    m-curv-trap-y["Y"]
+    m-curv-trap-z["Z"]
+    m-bow-rect-a["in A"]
+    m-bow-rect-b["in B"]
+    m-bow-rect@{ shape: bow-rect, label: "bow-rect" }
+    m-bow-rect-x["X"]
+    m-bow-rect-y["Y"]
+    m-bow-rect-z["Z"]
+    m-tri-a["in A"]
+    m-tri-b["in B"]
+    m-tri@{ shape: tri, label: "tri" }
+    m-tri-x["X"]
+    m-tri-y["Y"]
+    m-tri-z["Z"]
+    m-flip-tri-a["in A"]
+    m-flip-tri-b["in B"]
+    m-flip-tri@{ shape: flip-tri, label: "flip-tri" }
+    m-flip-tri-x["X"]
+    m-flip-tri-y["Y"]
+    m-flip-tri-z["Z"]
+    m-hourglass-a["in A"]
+    m-hourglass-b["in B"]
+    m-hourglass@{ shape: hourglass, label: "hourglass" }
+    m-hourglass-x["X"]
+    m-hourglass-y["Y"]
+    m-hourglass-z["Z"]
+  end
+  m-lin-cyl-a --> m-lin-cyl
+  m-lin-cyl-b -->|label| m-lin-cyl
+  m-lin-cyl -->|yes| m-lin-cyl-x
+  m-lin-cyl -->|no| m-lin-cyl-y
+  m-lin-cyl --> m-lin-cyl-z
+  m-curv-trap-a --> m-curv-trap
+  m-curv-trap-b -->|label| m-curv-trap
+  m-curv-trap -->|yes| m-curv-trap-x
+  m-curv-trap -->|no| m-curv-trap-y
+  m-curv-trap --> m-curv-trap-z
+  m-bow-rect-a --> m-bow-rect
+  m-bow-rect-b -->|label| m-bow-rect
+  m-bow-rect -->|yes| m-bow-rect-x
+  m-bow-rect -->|no| m-bow-rect-y
+  m-bow-rect --> m-bow-rect-z
+  m-tri-a --> m-tri
+  m-tri-b -->|label| m-tri
+  m-tri -->|yes| m-tri-x
+  m-tri -->|no| m-tri-y
+  m-tri --> m-tri-z
+  m-flip-tri-a --> m-flip-tri
+  m-flip-tri-b -->|label| m-flip-tri
+  m-flip-tri -->|yes| m-flip-tri-x
+  m-flip-tri -->|no| m-flip-tri-y
+  m-flip-tri --> m-flip-tri-z
+  m-hourglass-a --> m-hourglass
+  m-hourglass-b -->|label| m-hourglass
+  m-hourglass -->|yes| m-hourglass-x
+  m-hourglass -->|no| m-hourglass-y
+  m-hourglass --> m-hourglass-z
+  subgraph g10 [Shapes 55 to 60]
+    direction RL
+    m-brace-a["in A"]
+    m-brace-b["in B"]
+    m-brace@{ shape: brace, label: "brace" }
+    m-brace-x["X"]
+    m-brace-y["Y"]
+    m-brace-z["Z"]
+    m-brace-r-a["in A"]
+    m-brace-r-b["in B"]
+    m-brace-r@{ shape: brace-r, label: "brace-r" }
+    m-brace-r-x["X"]
+    m-brace-r-y["Y"]
+    m-brace-r-z["Z"]
+    m-braces-a["in A"]
+    m-braces-b["in B"]
+    m-braces@{ shape: braces, label: "braces" }
+    m-braces-x["X"]
+    m-braces-y["Y"]
+    m-braces-z["Z"]
+    m-browser-a["in A"]
+    m-browser-b["in B"]
+    m-browser@{ shape: browser, label: "browser" }
+    m-browser-x["X"]
+    m-browser-y["Y"]
+    m-browser-z["Z"]
+    m-console-a["in A"]
+    m-console-b["in B"]
+    m-console@{ shape: console, label: "console" }
+    m-console-x["X"]
+    m-console-y["Y"]
+    m-console-z["Z"]
+    m-folder-a["in A"]
+    m-folder-b["in B"]
+    m-folder@{ shape: folder, label: "folder" }
+    m-folder-x["X"]
+    m-folder-y["Y"]
+    m-folder-z["Z"]
+  end
+  m-brace-a --> m-brace
+  m-brace-b -->|label| m-brace
+  m-brace -->|yes| m-brace-x
+  m-brace -->|no| m-brace-y
+  m-brace --> m-brace-z
+  m-brace-r-a --> m-brace-r
+  m-brace-r-b -->|label| m-brace-r
+  m-brace-r -->|yes| m-brace-r-x
+  m-brace-r -->|no| m-brace-r-y
+  m-brace-r --> m-brace-r-z
+  m-braces-a --> m-braces
+  m-braces-b -->|label| m-braces
+  m-braces -->|yes| m-braces-x
+  m-braces -->|no| m-braces-y
+  m-braces --> m-braces-z
+  m-browser-a --> m-browser
+  m-browser-b -->|label| m-browser
+  m-browser -->|yes| m-browser-x
+  m-browser -->|no| m-browser-y
+  m-browser --> m-browser-z
+  m-console-a --> m-console
+  m-console-b -->|label| m-console
+  m-console -->|yes| m-console-x
+  m-console -->|no| m-console-y
+  m-console --> m-console-z
+  m-folder-a --> m-folder
+  m-folder-b -->|label| m-folder
+  m-folder -->|yes| m-folder-x
+  m-folder -->|no| m-folder-y
+  m-folder --> m-folder-z
+  subgraph g11 [Shapes 61 to 66]
+    direction RL
+    m-bucket-a["in A"]
+    m-bucket-b["in B"]
+    m-bucket@{ shape: bucket, label: "bucket" }
+    m-bucket-x["X"]
+    m-bucket-y["Y"]
+    m-bucket-z["Z"]
+    m-datastore-a["in A"]
+    m-datastore-b["in B"]
+    m-datastore@{ shape: datastore, label: "datastore" }
+    m-datastore-x["X"]
+    m-datastore-y["Y"]
+    m-datastore-z["Z"]
+    m-person-a["in A"]
+    m-person-b["in B"]
+    m-person@{ shape: person, label: "person" }
+    m-person-x["X"]
+    m-person-y["Y"]
+    m-person-z["Z"]
+    m-sm-circ-a["in A"]
+    m-sm-circ-b["in B"]
+    m-sm-circ@{ shape: sm-circ, label: "sm-circ" }
+    m-sm-circ-x["X"]
+    m-sm-circ-y["Y"]
+    m-sm-circ-z["Z"]
+    m-f-circ-a["in A"]
+    m-f-circ-b["in B"]
+    m-f-circ@{ shape: f-circ, label: "f-circ" }
+    m-f-circ-x["X"]
+    m-f-circ-y["Y"]
+    m-f-circ-z["Z"]
+    m-fr-circ-a["in A"]
+    m-fr-circ-b["in B"]
+    m-fr-circ@{ shape: fr-circ, label: "fr-circ" }
+    m-fr-circ-x["X"]
+    m-fr-circ-y["Y"]
+    m-fr-circ-z["Z"]
+  end
+  m-bucket-a --> m-bucket
+  m-bucket-b -->|label| m-bucket
+  m-bucket -->|yes| m-bucket-x
+  m-bucket -->|no| m-bucket-y
+  m-bucket --> m-bucket-z
+  m-datastore-a --> m-datastore
+  m-datastore-b -->|label| m-datastore
+  m-datastore -->|yes| m-datastore-x
+  m-datastore -->|no| m-datastore-y
+  m-datastore --> m-datastore-z
+  m-person-a --> m-person
+  m-person-b -->|label| m-person
+  m-person -->|yes| m-person-x
+  m-person -->|no| m-person-y
+  m-person --> m-person-z
+  m-sm-circ-a --> m-sm-circ
+  m-sm-circ-b -->|label| m-sm-circ
+  m-sm-circ -->|yes| m-sm-circ-x
+  m-sm-circ -->|no| m-sm-circ-y
+  m-sm-circ --> m-sm-circ-z
+  m-f-circ-a --> m-f-circ
+  m-f-circ-b -->|label| m-f-circ
+  m-f-circ -->|yes| m-f-circ-x
+  m-f-circ -->|no| m-f-circ-y
+  m-f-circ --> m-f-circ-z
+  m-fr-circ-a --> m-fr-circ
+  m-fr-circ-b -->|label| m-fr-circ
+  m-fr-circ -->|yes| m-fr-circ-x
+  m-fr-circ -->|no| m-fr-circ-y
+  m-fr-circ --> m-fr-circ-z
+  subgraph g12 [Shapes 67 to 69]
+    direction RL
+    m-cross-circ-a["in A"]
+    m-cross-circ-b["in B"]
+    m-cross-circ@{ shape: cross-circ, label: "cross-circ" }
+    m-cross-circ-x["X"]
+    m-cross-circ-y["Y"]
+    m-cross-circ-z["Z"]
+    m-fork-a["in A"]
+    m-fork-b["in B"]
+    m-fork@{ shape: fork, label: "fork" }
+    m-fork-x["X"]
+    m-fork-y["Y"]
+    m-fork-z["Z"]
+    m-bolt-a["in A"]
+    m-bolt-b["in B"]
+    m-bolt@{ shape: bolt, label: "bolt" }
+    m-bolt-x["X"]
+    m-bolt-y["Y"]
+    m-bolt-z["Z"]
+  end
+  m-cross-circ-a --> m-cross-circ
+  m-cross-circ-b -->|label| m-cross-circ
+  m-cross-circ -->|yes| m-cross-circ-x
+  m-cross-circ -->|no| m-cross-circ-y
+  m-cross-circ --> m-cross-circ-z
+  m-fork-a --> m-fork
+  m-fork-b -->|label| m-fork
+  m-fork -->|yes| m-fork-x
+  m-fork -->|no| m-fork-y
+  m-fork --> m-fork-z
+  m-bolt-a --> m-bolt
+  m-bolt-b -->|label| m-bolt
+  m-bolt -->|yes| m-bolt-x
+  m-bolt -->|no| m-bolt-y
+  m-bolt --> m-bolt-z
+```

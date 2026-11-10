@@ -13,7 +13,7 @@
 // The map's title is the tree's top; boxes and nodes hang below it in the order they
 // first appear. The block's arrows are the map's default relation view. `style` and
 // `linkStyle` lines are skipped: a map names meanings, the theme picks colours.
-import { shapeOf } from '../../model/shapes.js';
+import { shapeOf, mermaidShape, parseNodeData, NODE_DATA_KEYS } from '../../model/shapes.js';
 import { shortenLabel, labelToRuns, arrowLabel } from '../../model/labels.js';
 import { edgeKind } from '../../model/relations.js';
 import { problem } from '../../model/problem.js';
@@ -75,7 +75,8 @@ export function parseFlowchart(lines, start, title, warnings) {
       // a node first named at the top and then inside a box belongs to the box
       place(n, here);
     }
-    if (rest) {
+    if (rest.startsWith('@{') && rest.endsWith('}')) nodeData(n, parseNodeData(rest.slice(2, -1)));
+    else if (rest) {
       const s = shapeOf(rest);
       n.named = true;   // given a label or shape here (a deployment's new box, model/deployments.js)
       if (s) { n.shape = s.shape; setLabel(n, s.label); } else warnings.push(problem('shape-unknown', `Flowchart node "${spec.trim()}": shape not understood.`));
@@ -83,11 +84,33 @@ export function parseFlowchart(lines, start, title, warnings) {
     if (cls) addClass(n, cls);
     return n;
   }
+  // Mermaid 11.3+ node data (WO-59): `id@{ shape: doc, label: "Report" }`. Every Mermaid
+  // shape is drawn; an unknown name, or an icon / image node, is a box with its label.
+  function nodeData(n, data) {
+    n.named = true;
+    if (data.icon != null || data.img != null) {
+      warnings.push(problem('node-icon-image', `Flowchart node "${n.id}": ${data.icon != null ? 'icon' : 'image'} nodes are not drawn; its label is shown in a box. Give the node a shape, and an icon under Node icons.`));
+    } else if (data.shape != null) {
+      const shape = mermaidShape(data.shape);
+      if (shape) n.shape = shape;
+      else warnings.push(problem('node-shape-unknown', `Flowchart node "${n.id}": Mermaid has no shape "${data.shape}"; drawn as a box.`));
+    }
+    if (n.shape === 'fork') n.across = /^(LR|RL)$/.test(dirHere()) ? 'v' : 'h';
+    if (data.label != null) setLabel(n, data.label);
+  }
+  const dirHere = () => { for (let i = stack.length - 1; i >= 0; i--) if (stack[i].dir) return stack[i].dir; return direction; };
   const isAncestor = (a, b) => { for (let x = b; x; x = x.parent) if (x === a) return true; return false; };
   const addClass = (n, cls) => { n.cls = n.cls ? `${n.cls} ${cls}` : cls; };
 
   for (let i = start + 1; i < lines.length; i++) {
-    const t = lines[i].trim().replace(/;\s*$/, '');
+    let t = lines[i].trim().replace(/;\s*$/, '');
+    // node data may run over several lines: `a@{` ... `}`
+    if (/@\{[^}]*$/.test(t)) {
+      const at = i;
+      while (i + 1 < lines.length && !/\}/.test(lines[i])) t += `\n${lines[++i].trim()}`;
+      if (!/\}/.test(t)) i = at;
+      t = t.replace(/;\s*$/, '');
+    }
     if (!t || t.startsWith('%%')) continue;
     let m;
     if ((m = t.match(/^subgraph\b\s*(.*)$/))) {
@@ -119,7 +142,13 @@ export function parseFlowchart(lines, start, title, warnings) {
       }
       continue;
     }
-    if (/^[\w-]+@\{/.test(t)) continue;   // an arrow's own settings (`e1@{ animate: true }`)
+    // `id@{ … }` alone: a node's data (shape, label, …) or an arrow's own settings
+    // (`e1@{ animate: true }`), which are ignored
+    if ((m = t.match(/^([A-Za-z_][\w-]*)@\{([\s\S]*)\}$/))) {
+      const data = parseNodeData(m[2]);
+      if (Object.keys(data).some((k) => NODE_DATA_KEYS.has(k)) && !relations.some((r) => r.eid === m[1])) node(t);
+      continue;
+    }
     if (/^(style|linkStyle)\b/.test(t)) continue;
     if ((m = t.match(/^click\s+([\w-]+)\s+(?:href\s+)?"([^"]+)"/))) {
       const n = byId[m[1]];

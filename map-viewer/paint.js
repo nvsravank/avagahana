@@ -395,7 +395,7 @@ export function createPainter(v) {
   }
 
   function drawShape(g, shape, w, h) {
-    if (shape === 'figure') return;   // no border: the icon and label are the node
+    if (shape === 'figure' || shape === 'text') return;   // no border: the icon and label (a text block's label) are the node
     if (shape === 'hexagon') {
       const i = Math.min(14, h / 2);
       svgEl('polygon', { class: 'mmv-shape', points: `${i},0 ${w - i},0 ${w},${h / 2} ${w - i},${h} ${i},${h} 0,${h / 2}` }, g);

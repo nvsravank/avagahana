@@ -621,7 +621,7 @@
   {
    "kind": "rel",
    "id": "charge>ledger",
-   "d": "M321.9,-55.25 L321.9,-11.25",
+   "d": "M321.9,-55.25 L321.9,-7.81",
    "cls": "mmv-flow mmv-p0",
    "head": "arrow",
    "tail": null,

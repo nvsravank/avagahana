@@ -9,6 +9,7 @@ import { testChangeMarks, showSparkles } from './change-marks.js';
 import { testRender } from './render.js';
 import { testWholeMap } from './whole-map.js';
 import { testPoster } from './poster.js';
+import { testShapePorts } from './shape-ports.js';
 import { testLongSequence } from './long-sequence.js';
 import { testErCompare } from './er-compare.js';
 import { testErClasses, testErRowOrder } from './er-classes.js';
@@ -76,6 +77,7 @@ try {
   await testRender(check);
   await testWholeMap(check);
   await testPoster(check, wait);
+  await testShapePorts(check, wait);
   await testLongSequence(check, wait);
   await testErCompare(check, wait);
   await testErClasses(check, wait);

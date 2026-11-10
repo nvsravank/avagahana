@@ -10,70 +10,70 @@
   {
    "kind": "edge",
    "id": "n10>n11",
-   "d": "M352.5,0 C388.4,0 372.6,-271.5 408.5,-271.5",
+   "d": "M352.5,0 C391.7,0 369.3,-271.5 408.5,-271.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n12",
-   "d": "M352.5,0 C391.7,0 369.3,-184 408.5,-184",
+   "d": "M352.5,0 C391.7,0 369.3,-201.5 408.5,-201.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n13",
-   "d": "M352.5,0 C391.7,0 369.3,-140 408.5,-140",
+   "d": "M352.5,0 C391.7,0 369.3,-157.5 408.5,-157.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n14",
-   "d": "M352.5,0 C383.97,0 377.03,-87 408.5,-87",
+   "d": "M352.5,0 C386.85,0 374.15,-104.5 408.5,-104.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n15",
-   "d": "M352.5,0 C380.5,0 380.5,30.5 408.5,30.5",
+   "d": "M352.5,0 C380.5,0 380.5,13 408.5,13",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n16",
-   "d": "M352.5,0 C399.17,0 372.5,139 419.17,139",
+   "d": "M352.5,0 C399.17,0 372.5,121.5 419.17,121.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n17",
-   "d": "M352.5,0 C395.62,0 370.98,183 414.1,183",
+   "d": "M352.5,0 C395.62,0 370.98,165.5 414.1,165.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n18",
-   "d": "M352.5,0 C395.62,0 370.98,227 414.1,227",
+   "d": "M352.5,0 C395.62,0 370.98,209.5 414.1,209.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n19",
-   "d": "M352.5,0 C395.62,0 370.98,271 414.1,271",
+   "d": "M352.5,0 C395.62,0 370.98,253.5 414.1,253.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
   {
    "kind": "edge",
    "id": "n10>n20",
-   "d": "M352.5,0 C395.62,0 370.98,315 414.1,315",
+   "d": "M352.5,0 C395.62,0 370.98,297.5 414.1,297.5",
    "cls": "mmv-edge mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "width": 2.5
   },
@@ -221,10 +221,10 @@
   {
    "kind": "node",
    "id": "n11",
-   "x": 468,
+   "x": 471.5,
    "y": -271.5,
-   "w": 119,
-   "h": 119,
+   "w": 126,
+   "h": 84,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
    "grow": 1,
    "name": "Rhombus, level 2, has a note",
@@ -233,7 +233,7 @@
     "sel": false
    },
    "shape": "rhombus",
-   "outline": "M59.5,0 L119,59.5 L59.5,119 L0,59.5 Z",
+   "outline": "M63,0 L126,42 L63,84 L0,42 Z",
    "icons": [],
    "text": {
     "size": 14,
@@ -243,14 +243,14 @@
       "text": "Rhombus",
       "bold": false,
       "italic": false,
-      "x": 21.05,
-      "y": 63.8
+      "x": 24.55,
+      "y": 46.3
      }
     ]
    },
    "note": {
-    "x": 82.95,
-    "y": 52,
+    "x": 86.45,
+    "y": 34.5,
     "size": 15
    }
   },
@@ -258,7 +258,7 @@
    "kind": "node",
    "id": "n12",
    "x": 467,
-   "y": -184,
+   "y": -201.5,
    "w": 117,
    "h": 32,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -294,7 +294,7 @@
    "kind": "node",
    "id": "n13",
    "x": 478.5,
-   "y": -140,
+   "y": -157.5,
    "w": 140,
    "h": 32,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -330,7 +330,7 @@
    "kind": "node",
    "id": "n14",
    "x": 463,
-   "y": -87,
+   "y": -104.5,
    "w": 109,
    "h": 50,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -366,7 +366,7 @@
    "kind": "node",
    "id": "n15",
    "x": 489,
-   "y": 30.5,
+   "y": 13,
    "w": 161,
    "h": 161,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -402,7 +402,7 @@
    "kind": "node",
    "id": "n16",
    "x": 453,
-   "y": 139,
+   "y": 121.5,
    "w": 89,
    "h": 32,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -438,7 +438,7 @@
    "kind": "node",
    "id": "n17",
    "x": 490.5,
-   "y": 183,
+   "y": 165.5,
    "w": 164,
    "h": 32,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -474,7 +474,7 @@
    "kind": "node",
    "id": "n18",
    "x": 506,
-   "y": 227,
+   "y": 209.5,
    "w": 195,
    "h": 32,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -510,7 +510,7 @@
    "kind": "node",
    "id": "n19",
    "x": 475.5,
-   "y": 271,
+   "y": 253.5,
    "w": 134,
    "h": 32,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
@@ -546,7 +546,7 @@
    "kind": "node",
    "id": "n20",
    "x": 490.5,
-   "y": 315,
+   "y": 297.5,
    "w": 164,
    "h": 32,
    "cls": "mmv-node mmv-k1 mmv-l2 mmv-d2 mmv-p0",
