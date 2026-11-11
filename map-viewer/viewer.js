@@ -2492,6 +2492,8 @@ export function mount(element, options = {}) {
     // beside the panel, level with the control, so the stop's words stay readable
     placeNote({ get isConnected() { return anchorEl.isConnected && !$.stopPanel.hidden; }, getBoundingClientRect: () => { const p = $.stopPanel.getBoundingClientRect(), b = anchorEl.getBoundingClientRect(); return { left: p.left, right: p.right, top: b.top, bottom: b.bottom }; } });
   }
+  // a note opened from a scrolled Notes button stays level with it
+  $.stopScroll.addEventListener('scroll', () => { if (!$.note.hidden) placeNote(); }, { passive: true });
   $.stopBack.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop));
   $.stopPrev.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop - 1));
   $.stopNext.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop + 1));

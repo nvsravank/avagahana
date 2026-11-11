@@ -179,8 +179,10 @@ export function chromeHtml(uid) {
   <div class="mmv-stop-count" data-mmv="stopCount"></div>
   <div class="mmv-stop-kind" data-mmv="stopKind"></div>
   <h3 class="mmv-stop-title" data-mmv="stopTitle"></h3>
-  <div class="mmv-stop-note" data-mmv="stopNote"></div>
-  <div class="mmv-stop-notes" data-mmv="stopNotes" role="group" aria-label="Notes for this stop" hidden></div>
+  <div class="mmv-stop-scroll" data-mmv="stopScroll">
+    <div class="mmv-stop-note" data-mmv="stopNote"></div>
+    <div class="mmv-stop-notes" data-mmv="stopNotes" role="group" aria-label="Notes for this stop" hidden></div>
+  </div>
   <div class="mmv-stop-off" data-mmv="stopOff" role="status" hidden>
     <span>You are off the path.</span>
     <button class="mmv-pill" data-mmv="stopBack"></button>

@@ -76,6 +76,7 @@ export async function testReadingOptions(check) {
     check('perspective defaults: Open reveals ancestor paths and only named containers', !!svg.querySelector('[data-id="a"]') && !!svg.querySelector('[data-id="b"]') && !svg.querySelector('[data-id="db"]'));
     const noteButtons=[...host.querySelectorAll('[data-mmv=stopNotes] button')];
     check('walkthrough panel: the stop\'s notes are controls, not marks on the picture', !host.querySelector('[data-mmv=stopNotes]').hidden && noteButtons.map(b=>b.textContent).join()==='The A service' && !host.querySelector('.reading-badges'));
+    check('walkthrough panel: the stop\'s notes scroll with its words', host.querySelector('[data-mmv=stopScroll]').contains(host.querySelector('[data-mmv=stopNotes]')) && host.querySelector('[data-mmv=stopScroll]').contains(host.querySelector('[data-mmv=stopNote]')));
     noteButtons[0]?.click();
     check('walkthrough panel: a note control opens that note and stays on the path', !host.querySelector('[data-mmv=note]').hidden && host.querySelector('[data-mmv=noteTitle]').textContent==='The A service' && host.querySelector('[data-mmv=noteBody]').textContent.includes('A note.') && host.querySelector('[data-mmv=stopOff]').hidden);
     check('walkthrough options: display title, explanation with no metadata', host.querySelector('[data-mmv=stopTitle]').textContent === 'Follow the call' && host.querySelector('[data-mmv=stopNote]').textContent === 'Explain the call.');

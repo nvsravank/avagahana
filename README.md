@@ -22,6 +22,19 @@ at your own pace. Avagahana (Telugu: అవగాహన) means understanding.
 [Viewer API](docs/map-viewer-api.md) ·
 [Changelog](CHANGELOG.md)
 
+### Quick install
+
+In Claude Code:
+
+```
+/plugin marketplace add nvsravank/avagahana
+/plugin install avagahana@avagahana
+```
+
+Codex, local checkouts and the maps folder: see [Install](#install).
+
+If Avagahana helps you, a star on the repo helps others find it.
+
 ## What you can do with it
 
 - **Map a codebase** with your coding agent: one linked map of how the system works.

@@ -7,6 +7,12 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.1.4 (2026-11-10)
+
+- The walkthrough panel scrolls a stop's words and its Notes together, so the notes
+  follow the text and Previous and Next stay in view.
+- The README starts with a quick install for Claude Code.
+
 ## 0.1.3 (2026-11-09)
 
 - **Contract** (map format, addition): flowcharts support all of Mermaid's shapes,
