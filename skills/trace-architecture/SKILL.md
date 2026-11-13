@@ -72,7 +72,8 @@ When the map has more than a few diagrams, end with a walkthrough:
 entry diagram first, then the parts and flows that matter (for a security review: trust
 boundaries, outside systems, where secrets and personal data go, and for a release what
 changed there). Give each stop its own perspective, as
-`../illuminate-concept/references/walkthroughs.md` says. List the notes a stop relies on in
+`../illuminate-concept/references/walkthroughs.md` says, and open its introduction with
+what the project is and what it is for. List the notes a stop relies on in
 its Stop options (`- Notes: orders, e1`), so their evidence shows with the stop in the
 exported reading page.
 

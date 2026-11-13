@@ -1812,7 +1812,8 @@ export function mount(element, options = {}) {
       b.append(el('span', 'mmv-vm-label', label));
       if (note) b.append(el('span', 'mmv-vm-note', note));
       b.entry = x;
-      b.addEventListener('click', () => { b.blur(); fn(); });
+      // a pick closes the picker until the pointer leaves it (WO-61)
+      b.addEventListener('click', () => { b.blur(); $.viewWrap.classList.add('is-shut'); fn(); });
       return b;
     };
     // a row with what is under it: a twist that opens and closes it, and the row itself
@@ -2050,6 +2051,8 @@ export function mount(element, options = {}) {
   // ---------- zoom, export, exit ----------
   $.zoomIn.addEventListener('click', () => stage.zoomCentre(1.25));
   $.zoomOut.addEventListener('click', () => stage.zoomCentre(0.8));
+  $.viewWrap.addEventListener('pointerleave', () => $.viewWrap.classList.remove('is-shut'));
+  for (const ev of ['pointerenter', 'focus']) $.viewBtn.addEventListener(ev, () => $.viewWrap.classList.remove('is-shut'));
   $.zoomFit.addEventListener('click', fitOrCenter);
   function fitOrCenter() {
     clearPoint();
@@ -2101,6 +2104,10 @@ export function mount(element, options = {}) {
     if (ae && ae !== document.body && !root.contains(ae)) return;   // the host page has focus
     const t = e.target;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+    // Escape closes an open picker (WO-61)
+    if (e.key === 'Escape' && $.viewWrap.contains(document.activeElement)) { document.activeElement.blur(); $.viewWrap.classList.add('is-shut'); return; }
+    // Escape closes what is on top first: an open note or panel, then the play (WO-61)
+    if (e.key === 'Escape' && (!$.note.hidden || PANELS.some((p) => !$[p].hidden))) { closePanels(); hideNote(); return; }
     if (!page.isOpen() && !e.metaKey && !e.ctrlKey && player.key(e)) { e.preventDefault(); return; }
     if (e.key === 'Escape') { closePanels(); hideNote(); if (page.isOpen()) page.close(); }
     if (e.key === '/' && !e.metaKey && !e.ctrlKey && sInput.offsetParent) { e.preventDefault(); sInput.focus(); }
@@ -2642,7 +2649,7 @@ export function mount(element, options = {}) {
     const capturedTheme = { ...theme, ...(theme.font ? {font:{...theme.font,faces:faces.map(f=>({weight:f.weight,style:f.style,data:f.bytes}))}} : {}) };
     const mark = assets ? await assets('mark.svg') : await fetch(new URL('mark.svg', import.meta.url)).then(r=>{if(!r.ok)throw new Error('Brand mark is unavailable.');return r.text();});
     return buildReading({ text, path, walk, theme, appearance, mark, asOf:saved, fontCss, fontFamily:`"${familyName(theme.id)}"`,
-      render: state => renderWith(mount, {text,path,state,format:'svg'}, {themes:[capturedTheme],defaultTheme:false,theme:theme.id,prefs:{appearance},...(assets?{assets}:{})}) });
+      render: (state, app = appearance) => renderWith(mount, {text,path,state,format:'svg'}, {themes:[capturedTheme],defaultTheme:false,theme:theme.id,prefs:{appearance:app},...(assets?{assets}:{})}) });
   }
 
   // ---------- contents ----------

@@ -484,6 +484,8 @@ export function createPlayer(v, h) {
     speedUi();
     // on a narrow screen the side panel sits on the step bar
     v.root.style.setProperty('--mmv-stepbar-h', `${$.stepBar.offsetHeight}px`);
+    // and the side panel ends above the zoom controls (WO-61)
+    v.root.style.setProperty('--mmv-br-h', `${v.root.querySelector('.mmv-br')?.offsetHeight ?? 180}px`);
     const target = seqMap().playsOver?.[0];
     $.stepSwitch.hidden = onMap() ? false : !target;
     $.stepSwitch.innerHTML = `${uiSvg(onMap() ? 'lifelines' : 'onMap')}<span>${onMap() ? 'Lifelines' : 'On the map'}</span>`;

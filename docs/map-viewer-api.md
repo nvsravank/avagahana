@@ -544,7 +544,9 @@ Whole map     Interactive HTML           explore offline: every diagram, one fil
 file's name (`<name>.md`, or its title when there is no path).
 
 **Walkthrough reading HTML** (`viewer.reading(name?)`) captures the selected edition,
-authored stops and effective theme/appearance once, renders each destination in an
+authored stops and effective theme once (the effective appearance first; when the theme
+has both, the page and each picture also carry the other and follow the reader's
+setting, WO-61), renders each destination in an
 isolated viewer, and returns a complete reading document. It does not change the live
 viewer, camera, marks or storage. All SVGs, fonts and the footer mark are embedded;
 the file makes no network requests and works from disk. A small hashed local script

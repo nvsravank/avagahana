@@ -9,11 +9,15 @@ stateDiagram-v2
 
 ## Walkthrough: Same
 
+What the sample is, and who the walk is for.
+
 ### Diagram: Sample
 
 One stop.
 
 ## Walkthrough: Same
+
+What the sample is, and who the walk is for.
 
 ### Diagram: Sample
 

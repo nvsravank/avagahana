@@ -11,6 +11,7 @@ import { testWholeMap } from './whole-map.js';
 import { testPoster } from './poster.js';
 import { testShapePorts } from './shape-ports.js';
 import { testLongSequence } from './long-sequence.js';
+import { testFirstView } from './first-view.js';
 import { testErCompare } from './er-compare.js';
 import { testErClasses, testErRowOrder } from './er-classes.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
@@ -79,6 +80,7 @@ try {
   await testPoster(check, wait);
   await testShapePorts(check, wait);
   await testLongSequence(check, wait);
+  await testFirstView(check, wait);
   await testErCompare(check, wait);
   await testErClasses(check, wait);
   await testErRowOrder(check);
@@ -945,6 +947,13 @@ try {
       && nb.querySelector('li').textContent === 'an item carried on', nb.innerHTML);
     const md = (text, links = []) => { const d = document.createElement('div'); renderNoteBody(text, d, (a) => links.push(a)); return d; };
     const tags = (d) => [...d.children].map((e) => e.tagName.toLowerCase()).join(' ');
+    // WO-61: bold and links run across a line break, and bold after a colon closes
+    {
+      const b = md('registry: **there is no runtime plug-in\nloading**; a custom build.\n\n**Inferred marks are CertMagic\'s**: loading.');
+      check('notes: bold across a line break and after a colon', [...b.querySelectorAll('strong')].map((x) => x.textContent).join('|') === "there is no runtime plug-in loading|Inferred marks are CertMagic's" && !b.textContent.includes('**'), b.innerHTML);
+      const l = md('See [the\nflow](https://example.test/f) here.');
+      check('notes: a link label across a line break', l.querySelector('a')?.textContent === 'the flow', l.innerHTML);
+    }
     // inline
     let d = md('`https://example.test/doc` and `[a](b)` and ``a`b``');
     check('notes: code spans stay literal, URLs and link syntax included', [...d.querySelectorAll('code')].map((c) => c.textContent).join('|') === 'https://example.test/doc|[a](b)|a`b' && !d.querySelector('a'), d.innerHTML);

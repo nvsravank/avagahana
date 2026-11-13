@@ -28,6 +28,10 @@ export async function testReadingNavigation(html, check) {
     check('reading navigation: click immediately after resize uses the new scroll limit', Math.abs(sections.at(-1).getBoundingClientRect().top-nav.getBoundingClientRect().bottom-24)<1);
     pane.scrollTop=pane.scrollHeight;await settle();
     check('reading navigation: manual scroll to the end selects Data', links.at(-1).hasAttribute('aria-current'));
+    // WO-61: no sideways scroll; a picture too large to read fitted starts readable, panning
+    check('reading layout: nothing wider than the window', pane.scrollWidth<=pane.clientWidth, `${pane.scrollWidth} > ${pane.clientWidth}`);
+    const zooms=[...doc.querySelectorAll('figure')].map(f=>{const img=f.querySelector('img'),board=f.querySelector('.reading-board');return {want:Math.max(1,Math.min(8,Number(img.getAttribute('width'))*0.58/board.clientWidth)),got:parseFloat(f.querySelector('.reading-zoom').value)/100,pan:f.querySelector('[data-action=pan]').getAttribute('aria-pressed')};});
+    check('reading pictures: each starts at its readable zoom, panning when zoomed', zooms.every(z=>Math.abs(z.got-z.want)<0.011&&(z.want>1)===(z.pan==='true')), JSON.stringify(zooms));
     check('reading theme: navigation and footer use the main surface and accent', doc.documentElement.style.getPropertyValue('--frame-bg')===doc.documentElement.style.getPropertyValue('--bg') && doc.documentElement.style.getPropertyValue('--frame-accent')===doc.documentElement.style.getPropertyValue('--accent'));
   } finally {frame.remove();}
 }

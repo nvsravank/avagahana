@@ -1013,9 +1013,12 @@ The calls on the way to payment, and which of them wait for an answer.
 The name after the colon must be an item of this map, spelled as its heading. The note is
 plain Markdown (links, emphasis, lists); raw HTML is not shown. Several walkthroughs may
 share a map, one section each. Checker problems: `walkthrough-empty`, `walkthrough-twice`,
-`walkthrough-stop-kind`, `walkthrough-stop-unknown`.
+`walkthrough-stop-kind`, `walkthrough-stop-unknown`, and the warning
+`walkthrough-introduction`.
 
-An optional introduction precedes the first stop. After each stop's explanation,
+An introduction precedes the first stop. It says what the subject is and what it is for,
+then who the walk is for: the reading page opens with it. A walk without one still reads;
+the checker warns (`walkthrough-introduction`). After each stop's explanation,
 one optional subsection supplies narrative metadata:
 
 ```markdown

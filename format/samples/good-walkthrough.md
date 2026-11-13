@@ -14,6 +14,8 @@ stateDiagram-v2
 
 ## Walkthrough: Security
 
+What the sample is, and who the walk is for.
+
 ### Diagram: Sample
 
 The state at its top. Watch where it goes.

@@ -564,6 +564,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 /* ---------- the sequence player (player.js) ---------- */
 /* one sequence: the play button plays it (no list on hover) */
 .mmv-hov.is-single .mmv-drop { display: none !important; }
+.mmv-hov.is-shut .mmv-drop { display: none !important; }
 /* over a view: what the sequence has not reached is grey, the view's own arrows too */
 .mmv.is-playing[data-boxes] .mmv-rels .mmv-flow { stroke: var(--mmv-idleLine); stroke-opacity: 1; }
 /* its labels, icons and note marks give way to the messages' labels */
@@ -645,7 +646,7 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-stop-foot :is([data-mmv="stopPrev"], [data-mmv="stopNext"])[hidden] { display: none; }
 .mmv-stop-foot { display: flex; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid var(--mmv-chrome-border); }
 .mmv-stop-tab { position: absolute; left: 14px; top: 62px; }
-.mmv-seq-panel { top: 62px; right: 14px; width: min(300px, calc(100cqw - 28px)); max-height: calc(100cqh - 200px); overflow: auto; font-size: 13px; line-height: 1.45; padding: 12px 14px; }
+.mmv-seq-panel { top: 62px; right: 14px; width: min(300px, calc(100cqw - 28px)); max-height: calc(100cqh - 62px - 14px - var(--mmv-br-h, 180px) - 12px); overflow: auto; font-size: 13px; line-height: 1.45; padding: 12px 14px; }
 .mmv-seq-head { font-size: 12px; color: var(--mmv-muted); margin-bottom: 6px; }
 .mmv-seq-cap { font-size: 12px; color: var(--mmv-call); margin: 2px 0; }
 .mmv-seq-msg-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }

@@ -107,7 +107,12 @@ export async function testReadingOptions(check) {
     await testReadingNavigation(html, check);
     const doc = new DOMParser().parseFromString(html,'text/html');
     check('reading HTML: complete walk, diagrams, scenario steps and included notes', doc.querySelectorAll('.reading-section').length===6 && doc.querySelectorAll('.reading-board img').length===6 && doc.querySelectorAll('.reading-steps li').length===11 && doc.querySelectorAll('.reading-note').length===4, `${doc.querySelectorAll('.reading-steps li').length} scenario steps; ${doc.querySelectorAll('.reading-note').length} notes`);
-    check('reading HTML: effective appearance frozen, theme colors and font embedded', doc.documentElement.dataset.appearance==='dark' && doc.documentElement.style.getPropertyValue('--bg')==='#16191d' && doc.querySelector('style').textContent.includes('data:font/woff2;base64,'));
+    check('reading HTML: the exported appearance comes first, theme colors and font embedded', doc.documentElement.dataset.appearance==='dark' && doc.documentElement.style.getPropertyValue('--bg')==='#16191d' && doc.querySelector('style').textContent.includes('data:font/woff2;base64,'));
+    // WO-61: the reader's light or dark; each picture carries the other appearance too
+    check('reading HTML: the other appearance follows the reader setting', doc.querySelector('style').textContent.includes('@media (prefers-color-scheme:light){:root{--bg:') && doc.querySelectorAll('.reading-board picture source[media="(prefers-color-scheme:light)"]').length===6);
+    const lightSvg=new DOMParser().parseFromString(atob(doc.querySelector('.reading-board source').srcset.split(',')[1]),'image/svg+xml');
+    const darkSvg=new DOMParser().parseFromString(atob(doc.querySelector('.reading-board img').src.split(',')[1]),'image/svg+xml');
+    check('reading HTML: the two pictures differ only in appearance', lightSvg.documentElement.getAttribute('width')===darkSvg.documentElement.getAttribute('width') && lightSvg.documentElement.outerHTML!==darkSvg.documentElement.outerHTML);
     check('reading HTML: footer outside scrolling content, branding only in footer', doc.querySelector('.reading-scroll').parentElement===doc.querySelector('.reading-footer').parentElement && !doc.querySelector('.reading-intro img') && doc.querySelector('.reading-footer').textContent.includes(`Built with Avagahana ${VERSION}`));
     check('reading HTML: generation leaves live navigation and picture untouched', JSON.stringify(v.state)===before && picture()===livePicture);
     const firstSvg=new DOMParser().parseFromString(atob(doc.querySelector('.reading-board img').src.split(',')[1]),'image/svg+xml');
@@ -161,6 +166,6 @@ export async function testReadingOptions(check) {
     await v.setTheme('reading-brand');v.setPrefs({appearance:'auto'});
     const branded=new DOMParser().parseFromString(await v.reading('Read'),'text/html');
     const app=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
-    check('reading HTML: custom theme and Auto resolve once at generation', branded.documentElement.dataset.appearance===app && branded.documentElement.style.getPropertyValue('--bg')===(app==='dark'?'#101820':'#fffef0'));
+    check('reading HTML: custom theme and Auto resolve at generation, the other appearance by the reader', branded.documentElement.dataset.appearance===app && branded.documentElement.style.getPropertyValue('--bg')===(app==='dark'?'#101820':'#fffef0'));
   } finally {v.destroy();host.remove();}
 }

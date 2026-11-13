@@ -7,6 +7,27 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.1.5 (2026-11-12)
+
+- **Contract** (map format, addition): the checker warns when a walkthrough has no
+  introduction before its first stop (`walkthrough-introduction`). The introduction says
+  what the subject is and what it is for, then who the walk is for.
+- **Contract** (viewer API, change): the walkthrough reading page from `viewer.reading()`
+  follows the reader's light or dark when the theme has both, pictures included. It
+  opens in the exported appearance and is about twice as large.
+- The skills: the agent writes the map and lets the viewer draw it, checks layout when
+  an atlas page is open, and makes pictures, snapshots and reading pages when asked. One
+  Commands table lists every command and what it needs.
+- A map opens fitted, at the zoom where every label is drawn or closer; a larger map
+  opens on its middle and the reader pans. Walkthrough stops do the same. Readers zoom
+  out to 50%.
+- Bold and links in notes and stop text run across a line break.
+- Escape closes an open note or panel first, then a playing sequence.
+- A sequence's step panel ends above the zoom controls.
+- The diagram picker closes on a pick and on Escape.
+- The reading page starts a large picture at a readable zoom, ready to pan, and Fit
+  shows it whole. Long links wrap to the window.
+
 ## 0.1.4 (2026-11-10)
 
 - The walkthrough panel scrolls a stop's words and its Notes together, so the notes

@@ -304,31 +304,37 @@ function renderList(lines, i, parent, onLink, depth) {
 }
 
 function renderBlocks(lines, parent, onLink, depth) {
-  let p = null;      // the paragraph a plain line goes on
+  // the plain lines of the paragraph being read: styled once it ends, so bold or a link
+  // may run across a line break (WO-61)
+  let para = null;
+  const end = () => {
+    if (!para) return;
+    const p = make('p');
+    appendInline(p, para.join(' '), onLink);
+    parent.append(p);
+    para = null;
+  };
   for (let i = 0; i < lines.length;) {
     const line = lines[i];
-    if (!line.trim()) { p = null; i++; continue; }
+    if (!line.trim()) { end(); i++; continue; }
     const nested = depth < MAX_DEPTH;
     const heading = line.match(HEADING);
-    if (FENCE.test(line)) { i = renderFence(lines, i, parent); p = null; continue; }
+    if (FENCE.test(line)) { end(); i = renderFence(lines, i, parent); continue; }
     if (heading) {
+      end();
       const h = make(`h${heading[1].length}`, `mmv-md-h${heading[1].length}`);
       appendInline(h, heading[2], onLink);
       parent.append(h);
-      p = null; i++; continue;
+      i++; continue;
     }
-    if (RULE.test(line)) { parent.append(make('hr', 'mmv-md-rule')); p = null; i++; continue; }
-    if (nested && QUOTE.test(line)) { i = renderQuote(lines, i, parent, onLink, depth); p = null; continue; }
-    if (isTableAt(lines, i)) { i = renderTable(lines, i, parent, onLink); p = null; continue; }
-    if (nested && MARKER.test(line) && (!p || startsBlock(lines, i))) { i = renderList(lines, i, parent, onLink, depth); p = null; continue; }
-    if (p) appendInline(p, ` ${line.trim()}`, onLink);
-    else {
-      p = make('p');
-      appendInline(p, line.trim(), onLink);
-      parent.append(p);
-    }
+    if (RULE.test(line)) { end(); parent.append(make('hr', 'mmv-md-rule')); i++; continue; }
+    if (nested && QUOTE.test(line)) { end(); i = renderQuote(lines, i, parent, onLink, depth); continue; }
+    if (isTableAt(lines, i)) { end(); i = renderTable(lines, i, parent, onLink); continue; }
+    if (nested && MARKER.test(line) && (!para || startsBlock(lines, i))) { end(); i = renderList(lines, i, parent, onLink, depth); continue; }
+    (para ||= []).push(line.trim());
     i++;
   }
+  end();
 }
 
 // Lines next to each other are one paragraph (or one list item, when indented under

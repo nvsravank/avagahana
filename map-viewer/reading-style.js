@@ -1,5 +1,6 @@
 // Styles belong to the generated standalone document; all paint comes from its
-// captured theme. No reader OS appearance or viewer chrome is shipped here.
+// captured theme, in the reader's light or dark when the theme has both (WO-61). No viewer
+// chrome is shipped here.
 export const READING_CSS = `
 html,body{margin:0;height:100%;overflow:hidden}body{font-family:var(--reading-font,system-ui),sans-serif;color:var(--ink);background:var(--bg)}
 *{box-sizing:border-box}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit}a{color:var(--link)}button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
@@ -22,7 +23,7 @@ html,body{margin:0;height:100%;overflow:hidden}body{font-family:var(--reading-fo
 .reading-prose .mmv-md-quote{margin:14px 0;padding:1px 0 1px 14px;border-left:3px solid var(--accent);opacity:.85}.reading-prose .mmv-md-rule{border:0;border-top:1px solid currentColor;opacity:.25;margin:22px 0}
 .reading-prose .mmv-md-pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.88em;padding:10px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);border-radius:4px}
 .reading-prose .mmv-md-table{margin:14px 0;max-width:100%;overflow-x:auto}.reading-prose .mmv-md-table table{border-collapse:collapse;font-size:.92em}.reading-prose .mmv-md-table th,.reading-prose .mmv-md-table td{padding:5px 10px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);text-align:left;vertical-align:top}.reading-prose .mmv-md-table .mmv-md-center{text-align:center}.reading-prose .mmv-md-table .mmv-md-right{text-align:right}
-figure{margin:26px 0}.reading-board{position:relative;width:100%;overflow:hidden;background:var(--bg);border:1px solid var(--border);min-height:160px}.reading-board img{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center;user-select:none;-webkit-user-drag:none}
+figure{margin:26px 0}.reading-board{position:relative;width:100%;overflow:hidden;background:var(--bg);border:1px solid var(--border);min-height:160px}.reading-board picture{display:block;width:100%;height:100%}.reading-board img{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center;user-select:none;-webkit-user-drag:none}
 .reading-board.is-panning{cursor:grab;touch-action:none}.reading-board.is-dragging{cursor:grabbing}.reading-figure-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:9px}figcaption{font-size:13px;line-height:1.5;color:var(--muted)}
 .reading-controls{display:flex;gap:3px;align-items:center}.reading-controls[hidden]{display:none}.reading-controls button{min-width:32px;min-height:30px;padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--ink);font-size:14px}.reading-controls button[aria-pressed=true]{background:var(--active);color:var(--active-ink)}.reading-controls button:disabled{opacity:.45}.reading-zoom{min-width:40px;text-align:center;color:var(--muted);font-size:12px}
 .reading-notes{margin-top:28px;padding-top:6px;border-top:1px solid var(--border)}.reading-notes-head{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}.reading-note{margin:18px 0}.reading-note h3{margin:0;font-size:17px;display:flex;gap:10px;align-items:baseline}
@@ -47,7 +48,7 @@ figure{margin:26px 0}.reading-board{position:relative;width:100%;overflow:hidden
 .reading-nav .reading-evidence-all[aria-pressed=true]{background:var(--active);color:var(--active-ink);border-color:var(--active)}
 .reading-nav .reading-evidence-all[hidden]{display:none}
 .reading-nav .reading-evidence-all svg{width:1.1em;height:1.1em}
-.reading-section figure{width:min(1500px,calc(100vw - 48px),max(100%,var(--picture-width,0px)));position:relative;left:50%;transform:translateX(-50%)}
+.reading-prose a,.reading-prose code{overflow-wrap:anywhere}.reading-section figure{--fig-w:min(1500px,calc(100vw - 48px),max(100%,var(--picture-width,0px)));width:var(--fig-w);margin-left:calc((100% - var(--fig-w)) / 2);margin-right:0}
 .reading-footer .reading-save{text-decoration:underline;margin-right:auto}
 @media print{.reading-evidence-all{display:none!important}}.reading-steps{font-size:16px;line-height:1.7;padding-left:25px;max-width:72ch}.reading-steps li{margin:10px 0;padding-left:5px}.reading-warning{color:var(--warn)}
 .mmv-evidence{font-size:14px;line-height:1.6;margin:18px 0;padding:16px;background:var(--surface);border:1px solid var(--border)}.mmv-evidence-head{font-weight:600}.mmv-evidence-source{margin:14px 0}.mmv-evidence-meta,.mmv-muted{color:var(--muted)}.mmv-evidence-ref{margin:10px 0}.mmv-evidence-hash{display:block;overflow-wrap:anywhere}.mmv-evidence-support p{margin:5px 0}.mmv-evidence a{overflow-wrap:anywhere}

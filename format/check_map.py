@@ -1256,6 +1256,8 @@ def check_walkthroughs(m, src, parts, title):
         stops = [x for x in headings(body) if x['level'] == 3]
         if not stops:
             m.report(line, 'walkthrough-empty', 'walkthrough "{}" has no stops'.format(name))
+        elif not body[:stops[0]['start']].strip():
+            m.report(line, 'walkthrough-introduction', 'walkthrough "{}" has no introduction: start with what the subject is and what it is for, then who the walk is for'.format(name))
         for j, st in enumerate(stops):
             sline = m.line_at(h['end'] + st['start'])
             sm = re.fullmatch(r'([A-Za-z]+)\s*:\s*(.+)', st['title'])

@@ -32,6 +32,10 @@ export function readingClient() {
     const controls=figure.querySelector('.reading-controls'),status=controls.querySelector('output');
     controls.hidden=false;
     let scale=1,x=0,y=0,pan=false,drag=null;
+    // a picture too large to read when fitted starts where its smallest labels read
+    // (8 px of 14, as the viewer), ready to pan; Fit shows it whole (WO-61)
+    const readable=()=>Math.min(8,Math.max(1,(Number(image.getAttribute('width'))*0.58)/Math.max(1,board.clientWidth)));
+    scale=readable();pan=scale>1;
     const panButton=controls.querySelector('[data-action=pan]');
     function apply(){const mx=board.clientWidth*(scale-1)/2,my=board.clientHeight*(scale-1)/2;x=Math.max(-mx,Math.min(mx,x));y=Math.max(-my,Math.min(my,y));image.style.transform=`translate(${x}px,${y}px) scale(${scale})`;status.value=`${Math.round(scale*100)}%`;status.textContent=status.value;panButton.disabled=scale===1;panButton.setAttribute('aria-pressed',String(pan&&scale>1));board.classList.toggle('is-panning',pan&&scale>1);}
     controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.action;if(action==='in')scale=Math.min(8,scale*1.4);if(action==='out')scale=Math.max(1,scale/1.4);if(action==='fit'){scale=1;x=y=0;pan=false;}if(action==='pan')pan=!pan;apply();});

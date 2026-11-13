@@ -51,14 +51,37 @@ ask for text only. The text answers; the map shows it.
    on macOS, `xdg-open` on Linux, `start` on Windows). An open page redraws by itself
    when the file changes. `ERROR=...`: tell the user what it says (for example the maps
    folder does not exist; check `AVAGAHANA_MAP_DIR` or `~/.config/avagahana/maps-dir`).
-5. **Verify the picture**: run `render.py ... --report` (`references/render.md`, "Check
-   it") for each diagram and each perspective, and fix what it reports: cut labels,
-   overlaps, avoidable crossings, touching lines, text too small. Then read the map for
-   what a report cannot measure: a diagram that shows nothing another does not (fold it
-   into a note), or one that answers a different question than the user asked. Take a
-   screenshot only when the report leaves a doubt or the user says something looks wrong.
+5. **Verify the picture**, when an atlas page is open (step 4 opened it): run
+   `render.py ... --report` (`references/render.md`, "Check it") for each diagram and each
+   perspective, and fix what it reports: cut labels, overlaps, avoidable crossings, touching
+   lines, text too small. Then read the map for what a report cannot measure: a diagram that
+   shows nothing another does not (fold it into a note), or one that answers a different
+   question than the user asked. `STATUS=none` with no way to open the page (no desktop, or
+   the user said no browser): skip the report and say so.
+
+You write the map; the viewer draws it. Never drive a browser (browser tools, clicks,
+screenshots) to draw, export or check a map, and make no picture, snapshot or reading page
+the user did not ask for. Take a screenshot only when the user says something looks wrong.
 
 After an edit, go straight back to step 3; the open page redraws.
+
+## Commands
+
+Every command the plugin has, in one place. Each prints one `STATUS=...` line (the checker: `OK` or
+one line per problem; `themes.py`: JSON); the reference named says the options.
+
+| To | Run | Needs |
+|---|---|---|
+| Check the text | `python3 "<plugin root>/format/check_map.py" "<maps folder>/<Topic>/<Name>.md"` | nothing |
+| Show the map to the user | `python3 "<plugin root>/relay-server/serve_maps.py" --maps-dir "<maps folder>" --map "<Topic>/<Name>.md"` | nothing; prints the link to open |
+| Move open pages to a place | `python3 "<plugin root>/relay-server/show.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" ...` (below) | an open page |
+| Check the layout | `python3 "<plugin root>/relay-server/render.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" --out "<file>.svg" --report` (`references/render.md`) | an open page |
+| A picture (SVG, PNG) | `render.py`, as above, without `--report` (`references/render.md`) | an open page |
+| One file to send (a snapshot) | `python3 "<plugin root>/relay-server/pack.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" --out "<file>.html"` (`references/render.md`, "Sending a map") | nothing |
+| List themes | `python3 "<plugin root>/relay-server/themes.py" list --maps-dir "<maps folder>"` (`references/themes.md`) | nothing |
+
+A walkthrough's reading page has no command: the reader makes it with the walkthrough
+panel's Export walkthrough button. To send a walk, send a snapshot; it holds the walk.
 
 ## Evidence
 

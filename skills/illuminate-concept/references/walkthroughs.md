@@ -21,14 +21,19 @@ matter. Let the explanation set the number of stops.
 
 ## Write the explanation
 
-An optional introduction says who the walk is for and why. Each stop says what to notice
+Start with an introduction (the checker warns without one). Its first sentence says what
+the subject is and what it is for, in words a newcomer follows ("Caddy is a web server
+whose headline feature is automatic HTTPS"); the reader may have seen nothing else. Then
+say who the walk is for and why. Never number stops or their titles ("4. Startup"): the
+panel and the reading page number every stop, and a second numbering disagrees. Each stop says what to notice
 and why it matters, using the labels the reader sees on the boxes and arrows, and stands on
 its own when read by scrolling. Optional Stop options go after the explanation:
 
 ````markdown
 ## Walkthrough: Payments for the security team
 
-Follow the boundary, card exchange and retry behavior.
+Payments takes a shop's card payments to an outside card provider. For the security
+team: follow the boundary, card exchange and retry behavior.
 
 ### Perspective: Payment boundary
 
@@ -72,7 +77,8 @@ options: the next heading at the same level or above does.
 A panel with the stop, its explanation, and Previous and Next. Each stop opens its
 destination as written, with its perspective's open boxes; the reader may explore from
 there and Return. The panel's Export walkthrough button makes one offline reading page of
-every stop. A sequence stop draws full lifelines there, and a scenario its highlighted path
+every stop; the reader makes it, not you (there is no command). To send a walk, send a
+snapshot (`render.md`, "Sending a map"): it holds the walk and its button. A sequence stop draws full lifelines there, and a scenario its highlighted path
 with every step. So keep branching in sequences (`alt`, `par`) rather than inventing one
 order, and put the essential explanation in the stop, not in a link.
 

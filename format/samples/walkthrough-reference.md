@@ -20,6 +20,8 @@ A note.
 
 ## Walkthrough: Read
 
+What the sample is, and who the walk is for.
+
 ### Perspective: Calls
 
 A story.

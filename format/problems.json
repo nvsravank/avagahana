@@ -584,6 +584,11 @@
       "side": "both",
       "what": "A walkthrough with no stops"
     },
+    "walkthrough-introduction": {
+      "level": "warning",
+      "side": "checker",
+      "what": "A walkthrough with no introduction before its first stop (it should say what the subject is and what it is for)"
+    },
     "walkthrough-twice": {
       "level": "error",
       "side": "both",

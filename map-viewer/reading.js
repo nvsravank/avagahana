@@ -94,6 +94,12 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
   style.textContent=fontCss+READING_CSS;
   doc.head.append(style);
   for(const [k,v] of Object.entries(vars))doc.documentElement.style.setProperty(`--${k}`,v);
+  // The reader's light or dark (WO-61, replacing WO-49's frozen appearance): the exported
+  // appearance is the page's own; the theme's other one takes over when the reader's
+  // setting asks for it, and each picture carries both
+  const other=appearance==='dark'?'light':'dark',b=theme.appearances[other];
+  if(b){const bc=b.chrome,ov={bg:b.bg,ink:b.ink,muted:b.muted,accent:b.accent,link:b.roles.link,warn:b.roles.warn,border:bc.border,surface:bc.hover,active:bc.active,'active-ink':bc.activeInk,'frame-bg':b.bg,'frame-ink':b.ink,'frame-muted':b.muted,'frame-accent':b.accent,'frame-edge':b.muted};
+    style.textContent+=`@media (prefers-color-scheme:${other}){:root{${Object.entries(ov).map(([k,v])=>`--${k}:${v} !important`).join(';')};color-scheme:${other} !important}}`;}
   doc.documentElement.style.setProperty('--reading-font',fontFamily);
   doc.documentElement.style.colorScheme=appearance;
   const root=el('main');root.id='avagahana-reading';doc.body.append(root);
@@ -135,8 +141,8 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
       state={seq:null,part:m.scenarioOf,view:scenario.view || null,highlight:[...new Set(steps.flatMap(s=>[s.from,s.to]))]};
       caption=`${stop.name} · complete path highlighted`;
     }
-    let image;
-    try {image=await render(state);}catch(error){throw new Error(`Stop ${i+1}: ${stop.name}: ${error.message || error}`);}
+    let image,second=null;
+    try {image=await render(state);if(b)second=await render(state,other);}catch(error){throw new Error(`Stop ${i+1}: ${stop.name}: ${error.message || error}`);}
     const figure=el('figure'),board=el('div','reading-board'),img=el('img');
     // A sequence already numbers its messages: a message's note takes that number and the
     // picture gains nothing. Elsewhere notes count 1, 2, 3 and the picture is marked to match.
@@ -144,7 +150,10 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
     const numberOf=(id,k)=>seq?owner.sequence?.messages.find(m=>m.eid===id)?.num??null:k+1;
     const numbered=seq?[]:stop.notes.map((id,k)=>[k+1,targets.has(id)?id:null]).filter(x=>x[1]);
     img.src=dataImage(numberPicture(image,numbered,owner,{accent:a.accent,bg:a.bg}));figure.style.setProperty('--picture-width',`${Math.ceil(image.width)}px`);img.alt=`${stop.name} diagram`;img.width=Math.ceil(image.width);img.height=Math.ceil(image.height);
-    board.style.aspectRatio=`${image.width} / ${image.height}`;board.append(img);figure.append(board);
+    board.style.aspectRatio=`${image.width} / ${image.height}`;
+    if(second){const pic=el('picture'),src=el('source');src.media=`(prefers-color-scheme:${other})`;src.srcset=dataImage(numberPicture(second,numbered,owner,{accent:b.accent,bg:b.bg}));pic.append(src,img);board.append(pic);}
+    else board.append(img);
+    figure.append(board);
     const foot=el('div','reading-figure-foot');figure.append(foot);
     const cap=el('figcaption','',caption);cap.id=`caption-${i+1}`;foot.append(cap);figure.setAttribute('aria-describedby',cap.id);
     const controls=el('div','reading-controls');controls.hidden=true;controls.setAttribute('role','group');controls.setAttribute('aria-label',`Inspect ${stop.name}`);

@@ -3,7 +3,8 @@
 // never the window. Wheel and drag updates are applied once per animation frame.
 import { MIN_LABEL_PX } from './paint.js';
 
-export const MIN_ZOOM = 0.4;
+// the reader may zoom out to half size; below it a picture is a shape, not a diagram
+export const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 4;
 // level-of-detail key: changes only when some label size crosses the bar threshold
 const lodKey = (k, sizes) => sizes.map((size) => (size * k >= MIN_LABEL_PX ? 1 : Math.round(k * 20) / 20)).join(',');
@@ -51,6 +52,12 @@ export function createStage(v, handlers) {
     S.view = { k, x: w / 2 - p.x * k, y: h / 2 - p.y * k };
     applyView();
   }
+  // The lowest zoom a fit opens at (WO-61): the one where every label size of the diagram
+  // is drawn as text, not a bar, and never below the reader's own limit
+  function readZoom() {
+    const sizes = v.diagram().detailSizes || [20, 16, 14];
+    return Math.max(MIN_ZOOM, (MIN_LABEL_PX / Math.min(...sizes)) * 1.01);   // clear of rounding
+  }
   // quiet: set the camera only; the caller draws and applies it
   function fitView(levelsOnly, quiet = false) {
     if (!S.layout) return;
@@ -81,11 +88,13 @@ export function createStage(v, handlers) {
     const left = v.fitInset?.() || 0, W = full - left;
     const pad = S.thumb ? 8 : Math.min(70, W / 10);
     const k = Math.min(1.4, (W - pad * 2) / Math.max(1, x1 - x0), (H - pad * 2) / Math.max(1, y1 - y0));
-    if (k < MIN_ZOOM && !S.thumb) {   // a thumbnail fits whatever it takes
-      // too big to fit at a readable size: open on the centre at minimum zoom (the
-      // drawing's middle when the root is not drawn, as a box diagram's top is not)
+    const floor = readZoom();
+    if (k < floor && !S.thumb) {   // a thumbnail fits whatever it takes
+      // too big to fit with every label drawn (WO-61): open on the centre at the zoom
+      // where they are, and the reader pans (the drawing's middle when the root is not
+      // drawn, as a box diagram's top is not)
       const r = S.layout.pos.get(v.viewRoot()) || { x: (x0 + x1) / 2, y: (y0 + y1) / 2 };
-      S.view = { k: MIN_ZOOM, x: left + W / 2 - r.x * MIN_ZOOM, y: H / 2 - r.y * MIN_ZOOM };
+      S.view = { k: floor, x: left + W / 2 - r.x * floor, y: H / 2 - r.y * floor };
     } else S.view = { k, x: left + W / 2 - ((x0 + x1) / 2) * k, y: H / 2 - ((y0 + y1) / 2) * k };
     if (!quiet) applyView();
   }
