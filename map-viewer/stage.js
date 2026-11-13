@@ -79,6 +79,9 @@ export function createStage(v, handlers) {
       x0 = Math.min(x0, p.x - p.w / 2); x1 = Math.max(x1, p.x + p.w / 2);
       y0 = Math.min(y0, p.y - p.h / 2); y1 = Math.max(y1, p.y + p.h / 2);
     }
+    // what a layout draws round its nodes (a lane diagram's lanes and their names)
+    const ex = !only && S.layout.extent;
+    if (ex) { x0 = Math.min(x0, ex.x0); y0 = Math.min(y0, ex.y0); x1 = Math.max(x1, ex.x1); y1 = Math.max(y1, ex.y1); }
     S.lastFit = levelsOnly ? 'levels' : 'all';
     S.userMoved = false;
     S.readerZoom = false;

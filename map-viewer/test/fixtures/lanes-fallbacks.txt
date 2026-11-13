@@ -1,0 +1,27 @@
+<!-- expect: lanes-unplaced lanes-parent-unknown-child -->
+# Lane fallbacks
+
+```mermaid
+flowchart LR
+  ask[Ask] --> check{Ok?}
+  check -->|yes| pay[Pay]
+  check -->|no| stray[Not placed]
+  pay --> ship[Ship]
+```
+
+## Lanes
+
+### Rows
+- buyer : Buyer
+- shop : Shop
+- bank : Bank
+- store : Store
+
+### Parent rows
+- company : Company : shop, store, ghost
+
+### Placement
+- ask : buyer
+- check : shop
+- pay : bank
+- ship : store

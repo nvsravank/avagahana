@@ -785,3 +785,29 @@ marker.is-kind .mmv-er-end { stroke: var(--n); stroke-opacity: 1; }
 .mmv [data-query-column] { cursor: pointer; }
 .mmv [data-query-column]:focus-visible { outline: 2px solid var(--mmv-accent); }
 .mmv .mmv-query-grain,.mmv .mmv-query-effect{font-style:italic;opacity:.85}
+
+/* lane diagrams (WO-62): bands behind the steps, names in header cells, lines fainter
+   than the arrows. Flat: every lane line, no fill. Zebra: rows (or a columns-only
+   diagram's columns) striped, no lines between them; column and parent lines stay.
+   Parent edges are slightly stronger, the outermost strongest. A lane a view leaves
+   empty is faded. */
+.mmv-lane > .mmv-lane-fill { fill: none; stroke: none; }
+.mmv-lane > .mmv-lane-head { fill: color-mix(in srgb, var(--mmv-ink) 5%, var(--mmv-bg)); stroke: none; }
+.mmv-lane.is-parent > .mmv-lane-head { fill: color-mix(in srgb, var(--mmv-ink) 9%, var(--mmv-bg)); }
+.mmv-lane.is-parent.mmv-lane-d0 > .mmv-lane-head { fill: color-mix(in srgb, var(--mmv-ink) 12%, var(--mmv-bg)); }
+.mmv-lane-name { fill: var(--mmv-ink); }
+.mmv-lane-name.is-parent { fill: var(--mmv-ink); }
+.mmv-lane.is-empty .mmv-lane-name, .mmv-lane.is-other .mmv-lane-name { fill: var(--mmv-muted); }
+.mmv-lane.is-empty { opacity: 0.55; }
+.mmv[data-lane-look="poster"] .mmv-lane.is-odd > .mmv-lane-fill { fill: color-mix(in srgb, var(--mmv-ink) 5%, var(--mmv-bg)); }
+.mmv-lane-line { fill: none; stroke: var(--mmv-ink); stroke-opacity: 0.2; }
+.mmv-lane-line.is-parent { stroke-opacity: 0.34; }
+.mmv-lane-line.is-parent.mmv-lane-d0 { stroke-opacity: 0.44; }
+.mmv[data-lane-look="poster"] .mmv-lane-line.is-lane.is-row { display: none; }
+.mmv-lane.is-lit > .mmv-lane-head { fill: color-mix(in srgb, var(--mmv-highlight, var(--mmv-ink)) 22%, var(--mmv-bg)); }
+.mmv-lgroup { font-size: 12px; font-weight: 600; color: var(--mmv-muted); padding: 8px 10px 2px; }
+/* only a lane's name cell answers a click (it selects the lane); the rest of the band lets
+   clicks through to the canvas */
+.mmv-lane > .mmv-hit, .mmv-lane > .mmv-lane-fill { pointer-events: none; }
+.mmv-lane > .mmv-lane-head, .mmv-lane > .mmv-lane-name { cursor: pointer; }
+.mmv-lane-pin > .mmv-lane-head { stroke: color-mix(in srgb, var(--mmv-ink) 25%, transparent); stroke-width: 1; }

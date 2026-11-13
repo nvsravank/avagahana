@@ -1,0 +1,240 @@
+Hard routing cases for lane diagrams (WO-62). Each case starts with a "<!-- case: name -->"
+line and is a map of its own; test/lanes.js lays each out and checks its arrows.
+
+<!-- case: three-way-decision -->
+# Three-way decision
+
+```mermaid
+flowchart LR
+  ask[Ask] --> q{Which team?}
+  q -->|sales| s[Quote]
+  q -->|support| t[Fix]
+  q -->|billing| b[Refund]
+```
+
+## Lanes
+
+### Rows
+- desk : Desk
+- sales : Sales
+- support : Support
+- billing : Billing
+
+### Placement
+- ask, q : desk
+- s : sales
+- t : support
+- b : billing
+
+<!-- case: chained-decisions -->
+# Chained decisions
+
+```mermaid
+flowchart LR
+  a[Order] --> q1{In stock?}
+  q1 -->|yes| q2{Paid?}
+  q1 -->|no| back[Back order]
+  q2 -->|yes| ship[Ship]
+  q2 -->|no| chase[Chase payment]
+  chase --> q2
+```
+
+## Lanes
+
+### Rows
+- shop : Shop
+- money : Finance
+- store : Warehouse
+
+### Placement
+- a, q1 : shop
+- q2, chase : money
+- back, ship : store
+
+<!-- case: up-and-down-in-one-gap -->
+# Up and down in one gap
+
+```mermaid
+flowchart LR
+  a[Top start] --> d[Bottom end]
+  b[Bottom start] --> c[Top end]
+  e[Middle start] --> f[Middle end]
+```
+
+## Lanes
+
+### Rows
+- one : One
+- two : Two
+- three : Three
+- four : Four
+
+### Placement
+- a, c : one
+- e, f : two
+- b, d : four
+
+<!-- case: many-in-one-gap -->
+# Many arrows in one gap
+
+```mermaid
+flowchart LR
+  hub[Dispatch] --> l1[One]
+  hub --> l2[Two]
+  hub --> l3[Three]
+  hub --> l4[Four]
+  hub --> l5[Five]
+  hub --> l6[Six]
+  hub --> l7[Seven]
+  hub --> l8[Eight]
+```
+
+## Lanes
+
+### Rows
+- r1 : R1
+- r2 : R2
+- r3 : R3
+- r4 : R4
+- r5 : R5
+- r6 : R6
+- r7 : R7
+- r8 : R8
+
+### Placement
+- hub, l1 : r1
+- l2 : r2
+- l3 : r3
+- l4 : r4
+- l5 : r5
+- l6 : r6
+- l7 : r7
+- l8 : r8
+
+<!-- case: back-arrows -->
+# Back arrows
+
+```mermaid
+flowchart LR
+  a[Draft] --> b[Review]
+  b --> q{Approved?}
+  q -->|no| a
+  q -->|yes| c[Publish]
+  c --> d[Audit]
+  d -->|issue| b
+```
+
+## Lanes
+
+### Rows
+- author : Author
+- editor : Editor
+- legal : Legal
+
+### Placement
+- a : author
+- b, q, c : editor
+- d : legal
+
+<!-- case: crowded-cell -->
+# Crowded cell
+
+```mermaid
+flowchart LR
+  in1[In one] --> x1[Check A]
+  in2[In two] --> x2[Check B]
+  x1 --> x2
+  x2 --> x3[Check C]
+  x3 --> out[Done]
+  x1 --> out
+```
+
+## Lanes
+
+### Rows
+- top : Top
+- mid : Middle
+- low : Low
+
+### Columns
+- before : Before
+- during : During
+- after : After
+
+### Placement
+- in1 : top : before
+- in2 : low : before
+- x1, x2, x3 : mid : during
+- out : top : after
+
+<!-- case: shared-entry -->
+# Shared entry
+
+```mermaid
+flowchart LR
+  a[Start] --> q{Ok?}
+  q -->|yes| p[Proceed]
+  q -->|no| r[Rework]
+  x[Other] --> y[Prepare]
+  y --> r
+```
+
+## Lanes
+
+### Rows
+- main : Main
+- side : Side
+
+### Placement
+- a, q, p : main
+- x, y, r : side
+
+<!-- case: three-way-columns -->
+# Three-way decision, columns
+
+```mermaid
+flowchart TB
+  ask[Ask] --> q{Which team?}
+  q -->|sales| s[Quote]
+  q -->|support| t[Fix]
+  q -->|billing| b[Refund]
+```
+
+## Lanes
+
+### Columns
+- desk : Desk
+- sales : Sales
+- support : Support
+- billing : Billing
+
+### Placement
+- ask, q : desk
+- s : sales
+- t : support
+- b : billing
+
+<!-- case: back-arrows-columns -->
+# Back arrows, columns
+
+```mermaid
+flowchart TB
+  a[Draft] --> b[Review]
+  b --> q{Approved?}
+  q -->|no| a
+  q -->|yes| c[Publish]
+  c --> d[Audit]
+  d -->|issue| b
+```
+
+## Lanes
+
+### Columns
+- author : Author
+- editor : Editor
+- legal : Legal
+
+### Placement
+- a : author
+- b, q, c : editor
+- d : legal

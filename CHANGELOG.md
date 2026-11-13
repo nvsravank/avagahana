@@ -7,6 +7,20 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.2.0 (2026-11-13)
+
+- **Contract** (map format, addition): lane diagrams (swim lanes). A flowchart followed by
+  `## Lanes` (`### Rows`, `### Columns`, `### Parent rows`, `### Parent columns`,
+  `### Placement`) is drawn as horizontal lanes, vertical lanes or a grid, with nested
+  parent bands; no subgraphs. Fifteen `lanes-*` problem codes, checker and viewer.
+- Lane diagrams read with Flat or Zebra lanes, lane names that stay at the edge while
+  panning, a lane name that lights up its steps when clicked, and a List grouped by lane.
+- Arrows in a lane diagram take the fewest turns that keep them clear of every step and
+  of each other, leave by any side or a decision's corners, and keep the order the lines
+  are written where nothing else decides.
+- The skill suggests a lane diagram for a process with hand-offs between people, teams or
+  systems.
+
 ## 0.1.5 (2026-11-12)
 
 - **Contract** (map format, addition): the checker warns when a walkthrough has no

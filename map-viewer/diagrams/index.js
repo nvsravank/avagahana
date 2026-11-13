@@ -25,8 +25,11 @@ import * as flowchart from './flowchart/diagram.js';
 import * as sequence from './sequence/diagram.js';
 import * as state from './state/diagram.js';
 import * as er from './er/diagram.js';
+import * as lanes from './lanes/diagram.js';
 
-export const DIAGRAMS = [mindmap, flowchart, sequence, state, er];
+export const DIAGRAMS = [mindmap, flowchart, sequence, state, er, lanes];
+// a flowchart with ## Lanes (WO-62): never matched by its header; model/map.js switches to it
+export const LANES = lanes;
 
 export const diagramForHeader = (header) => DIAGRAMS.find((d) => d.matches(header)) || null;
 export const diagramOf = (map) => DIAGRAMS.find((d) => d.type === map?.type) || mindmap;

@@ -49,6 +49,7 @@ from check_connections import check_connections, check_renames
 from check_scenarios import check_scenarios  # noqa: E402
 from check_provenance import check_provenance, check_verification_pairs
 from check_vendor import VENDOR_CODE, nearest, vendor_ok  # noqa: E402
+from check_lanes import check_lanes  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 VIEWER = ROOT / "map-viewer"
@@ -66,7 +67,7 @@ SHAPES = [
 BUILT_IN_CLASSES = {"person", "database", "external", "added", "changed", "removed"}
 # planned changes (map-viewer/model/classes.js): built in, one per node or arrow
 CHANGE_CLASSES = ("added", "changed", "removed")
-RESERVED = re.compile(r"^(relations|perspective|scenario|walkthrough|joins|renames|classes|details|notes|icons|node icons)\b", re.I)
+RESERVED = re.compile(r"^(relations|perspective|scenario|walkthrough|joins|renames|classes|details|notes|icons|node icons|lanes)\b", re.I)
 DIRS = {"LR", "RL", "TB", "TD", "BT"}
 # box diagrams: their own arrows are the default view; sequences and scenarios play over them
 BOX_KINDS = {"flowchart", "state", "er"}
@@ -102,7 +103,7 @@ def seq_names(text):
             scenario = re.match(r"scenario\s*:\s*([^|]+)", heading, re.I)
             if scenario:
                 names.add(f"{current}-scenario-{anchor_of(scenario.group(1))}")
-            elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|joins|renames)\b", heading, re.I):
+            elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|joins|renames|lanes)\b", heading, re.I):
                 heading_anchor = anchor_of(heading)
             continue
         if not first:
@@ -492,6 +493,7 @@ def read_flowchart(m, lines, first, start_line, what="flowchart"):
     if len(ids) > LARGE_MAP:
         m.report(start_line + first, "large-map", f"large map: {len(ids):,} nodes; drawing may be slow")
     return {"ids": ids, "root": root, "arrows": arrows, "eids": eids, "class_defs": class_defs, "links": links,
+            "direction": header[1].upper() if len(header) > 1 else "TB",
             "plans": plans_of([(x, cls, ln) for names, cls, ln in inline_classes + class_lines for x in names]),
             "line_classes": {(c, ln) for names, c, ln in class_lines if any(x in eids for x in names)},
             # the classes each node names itself (a class's cloud icon is its main icon)
@@ -616,12 +618,12 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     seen = {}
     for title, _, hl in secs:
         key = title.lower()
-        single = key in ("details", "notes", "icons", "node icons", "classes", "plays over", "renames", "sources")
+        single = key in ("details", "notes", "icons", "node icons", "classes", "plays over", "renames", "sources", "lanes")
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
         if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|query\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*)$", title, re.I):
-            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over, Renames), and no Mermaid block follows")
+            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over, Renames, Lanes), and no Mermaid block follows")
         if re.fullmatch(r'joins\s*:\s*.+',title,re.I):
             m.report(hl,'joins-retired','Joins sections are retired. Put query joins in Query SQL; keep model relationships in Relations/Perspective. Migrate using actual SQL or confirmed intent, without guessing join types or outputs.')
         if key == "plays over" and kind != "sequence":
@@ -870,7 +872,9 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         dm = re.fullmatch(r"deployment\s*:\s*(.*)", title, re.I)
         if dm and dm.group(1).strip() and not any(x.strip().lower() in with_block for x in dm.group(1).split(",")):
             m.report(hl, "deployment-no-block", f"## {title} has no Mermaid block (a flowchart of where things run)")
-    check_deployments(m, part, views)
+    check_lanes(m, part, secs)
+    if not any(t.strip().lower() == "lanes" for t, _, _ in secs) or part["kind"] != "flowchart":
+        check_deployments(m, part, views)
     check_verification_pairs(m, part, secs, own_icons, class_trust, classes)
 
 

@@ -299,7 +299,9 @@ export function mount(element, options = {}) {
   }
   function paintPins() {
     if (!$.pins) return;
-    if (!limited()) { $.pins.replaceChildren(); return; }
+    // a sequence's names (while its pan is limited), or a lane diagram's (WO-62)
+    const lanes = !!S.layout?.lanes && !S.thumb && !S.exporting && S.mode !== 'list';
+    if (!limited() && !lanes) { $.pins.replaceChildren(); return; }
     diagram().paintPins($.pins, S.layout, S.view, v.size().w, (id) => $.nodes.querySelector(`[data-id="${CSS.escape(id)}"]`));
   }
   const exporter = createExporter(v);
@@ -698,6 +700,8 @@ export function mount(element, options = {}) {
   }
   let lastClick = { id: null, t: 0 };
   function clickNode(id) {
+    // a lane's name (WO-62): selects the lane, or clears it when it is already selected
+    if (diagram().isLane?.(id)) { if (S.selected === id) deselect(); else select(id); return; }
     const now = performance.now();
     if (lastClick.id === id && now - lastClick.t < 450) {
       lastClick = { id: null, t: 0 };
@@ -1461,6 +1465,8 @@ export function mount(element, options = {}) {
     }
     root.dataset.look = cssLook();
     if (S.map?.queryFlow) root.dataset.queryLook = lookOf(); else delete root.dataset.queryLook;
+    // a lane diagram's lanes: Flat lines or Zebra stripes (WO-62, base.css)
+    if (diagram().type === 'lanes') root.dataset.laneLook = lookOf(); else delete root.dataset.laneLook;
     $.modes.querySelectorAll('button').forEach((b) => b.classList.toggle('is-on', b.dataset.mode === S.mode));
     $.relBtn.hidden = !!diagram().layoutByView || !!diagram().noRelations;   // a box diagram always shows its arrows; a sequence has none
     $.relBtn.classList.toggle('is-active', S.rels === '1');

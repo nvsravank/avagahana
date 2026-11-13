@@ -658,6 +658,81 @@
       "level": "error",
       "side": "both",
       "what": "Authored Joins sections are retired; migrate query intent to SQL or keep model relations in Perspectives"
+    },
+    "lanes-not-flowchart": {
+      "level": "error",
+      "side": "both",
+      "what": "## Lanes after a diagram that is not a flowchart: not read"
+    },
+    "lanes-syntax": {
+      "level": "error",
+      "side": "both",
+      "what": "A ## Lanes line or subsection that cannot be read, a subsection twice, no Rows and no Columns, or a Placement line with more values than the diagram has axes"
+    },
+    "lanes-id-twice": {
+      "level": "error",
+      "side": "both",
+      "what": "A lane or parent id used twice among rows, columns and parents: the first is kept"
+    },
+    "lanes-parent-unknown-child": {
+      "level": "error",
+      "side": "both",
+      "what": "A parent names an id that is no lane or parent of its axis: the child is ignored"
+    },
+    "lanes-parent-twice": {
+      "level": "error",
+      "side": "both",
+      "what": "A lane or parent in two parents: the first parent is kept"
+    },
+    "lanes-parent-loop": {
+      "level": "error",
+      "side": "both",
+      "what": "A parent inside itself: the link closing the loop is ignored"
+    },
+    "lanes-parent-order": {
+      "level": "warning",
+      "side": "both",
+      "what": "A parent's lanes not written together: drawn together, at the first one's place"
+    },
+    "lanes-unknown-step": {
+      "level": "error",
+      "side": "both",
+      "what": "A ### Placement line names no node: ignored"
+    },
+    "lanes-unknown-lane": {
+      "level": "error",
+      "side": "both",
+      "what": "A ### Placement line names no row or column of the right axis: the step goes in Other for that axis"
+    },
+    "lanes-placed-twice": {
+      "level": "error",
+      "side": "both",
+      "what": "A step placed twice: the first is kept"
+    },
+    "lanes-unplaced": {
+      "level": "error",
+      "side": "both",
+      "what": "A step in no ### Placement line: drawn in an Other lane at the end"
+    },
+    "lanes-subgraph": {
+      "level": "error",
+      "side": "both",
+      "what": "A subgraph in a lane diagram: its steps are drawn flat"
+    },
+    "lanes-deployment": {
+      "level": "error",
+      "side": "both",
+      "what": "A ## Deployment: under a lane diagram: not read"
+    },
+    "lanes-cell-order": {
+      "level": "warning",
+      "side": "both",
+      "what": "In a lane grid, an arrow between two steps of one cell runs against their written order: drawn as written"
+    },
+    "lanes-direction": {
+      "level": "warning",
+      "side": "both",
+      "what": "A lane diagram with rows only and TB / BT, or columns only and LR / RL: the flow still runs along the lanes"
     }
   }
 }

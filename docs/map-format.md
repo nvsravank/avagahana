@@ -658,6 +658,112 @@ flowchart LR
   environment.
 - Deployments are for box diagrams; under a mind map they are not read (a warning).
 
+## Lane diagrams (swim lanes): `## Lanes`
+
+A flowchart followed by a `## Lanes` section is a lane diagram (WO-62): each step sits
+in the lane of whoever does it (a row, a horizontal swimlane), the stage it belongs to
+(a column, a vertical swimlane), or both (a grid). It reads as a flowchart (decisions,
+branches, loops) that also says who does each step. The block stays a plain Mermaid
+flowchart, so other renderers draw it without lanes.
+
+````markdown
+# Order fulfilment
+
+```mermaid
+flowchart LR
+  order([Place order])
+  stock{In stock?}
+  pay[Take payment]
+  refund[Refund]
+  pack[Pack box]
+  ship[Hand to courier]
+  order --> stock
+  stock -->|yes| pay
+  stock -->|no| refund
+  pay --> pack --> ship
+```
+
+## Lanes
+
+### Rows
+- customer : Customer
+- shop : Shop
+- finance : Finance
+- warehouse : Warehouse
+
+### Columns
+- ask : Request
+- check : Approve
+- send : Deliver
+
+### Parent rows
+- company : Our company : shop, finance, warehouse
+
+### Parent columns
+- after : After the order : check, send
+
+### Placement
+- order : customer : ask
+- stock : shop : check
+- pay, refund : finance : check
+- pack, ship : warehouse : send
+````
+
+- **Subsections**, each at most once: `### Rows`, `### Columns`, `### Parent rows`,
+  `### Parent columns`, `### Placement`. At least one of Rows and Columns. Rows only:
+  horizontal lanes; columns only: vertical lanes; both: a grid.
+- **A lane**: `- <id> : <label>` (the label may be left out: the id is shown). Lanes
+  are drawn in the order written.
+- **A parent**: `- <id> : <label> : <child>, <child>`. A parent row groups rows and
+  other parent rows, a parent column columns and parent columns, to any depth; a
+  child may be a parent defined before or after it. A parent is drawn as a header band
+  across its lanes.
+- **Ids**: row, column and parent ids are one set: an id is used once
+  (`lanes-id-twice`). They may share a name with a node.
+- **Placement**: `- <step>, <step> : <row> : <column>` in a grid, `- <steps> : <lane>`
+  when the diagram has one axis. In a grid a step may name only its row or only its
+  column (the ids say which); its place along the other axis then comes from its
+  arrows. A step is a node of the block; it is placed once.
+- **Layout**: the view is fixed: a lane diagram is always drawn as lanes (no Boxes or
+  Layers; List lists the steps under their lanes). With rows only, the flow runs along
+  the lanes and steps in all lanes share one order by their arrows, so a hand-off moves
+  forward or straight across; with columns only, the same downwards. In a grid,
+  `LR` / `TB` arranges the steps that share a cell, in the order they are written in
+  Placement. Arrows are drawn as in any flowchart.
+- **No subgraphs**: a lane diagram has no boxes (`lanes-subgraph`); the viewer draws
+  their steps flat. Deployments are not read under a lane diagram (`lanes-deployment`).
+- **Looks**: Flat and Zebra, as in ER diagrams (the shared look preference; `## Look:
+  outline` opens Flat, `poster` Zebra). Flat: thin lines between lanes; Zebra: rows
+  marked by alternating fill, columns by thin lines. Parent edges are slightly stronger,
+  the outermost strongest; every lane line is fainter than the arrows.
+- **Views**: perspectives and scenarios work as in any flowchart. A lane a view leaves
+  empty stays, faded, so the lanes do not move between views.
+- **Reading**: lane names stay at the edge while panning; clicking a lane name lights
+  its steps and fades the rest.
+
+What the checker and the viewer do with a mistake:
+
+| Problem | Checker | Viewer |
+|---|---|---|
+| `lanes-not-flowchart`: `## Lanes` after a diagram that is not a flowchart | error | not read |
+| `lanes-syntax`: a line or subsection that cannot be read, a subsection twice, no Rows and no Columns, a Placement line with more values than the diagram has axes | error | line skipped (no lanes at all: drawn as a flowchart) |
+| `lanes-id-twice`: an id used twice among rows, columns and parents | error | first kept |
+| `lanes-parent-unknown-child`: a parent names an id that is not a lane or parent of its axis | error | child ignored |
+| `lanes-parent-twice`: a lane or parent in two parents | error | first parent kept |
+| `lanes-parent-loop`: a parent inside itself | error | the link closing the loop ignored |
+| `lanes-parent-order`: a parent's lanes not written together | warning | moved to the first one's place, in written order |
+| `lanes-unknown-step`: Placement names no node | error | ignored |
+| `lanes-unknown-lane`: Placement names no row or column of the right axis | error | step in Other for that axis |
+| `lanes-placed-twice`: a step placed twice | error | first kept |
+| `lanes-unplaced`: a step in no Placement line | error | drawn in an Other lane at the end |
+| `lanes-subgraph`: a subgraph in a lane diagram | error | its steps drawn flat |
+| `lanes-deployment`: a `## Deployment:` under a lane diagram | error | not read |
+| `lanes-cell-order`: in a grid, an arrow between two steps of one cell runs against their written order | warning | drawn as written |
+| `lanes-direction`: rows only with `TB` / `BT`, or columns only with `LR` / `RL` | warning | the flow still runs along the lanes |
+
+Other: a step with no row goes in an Other row at the bottom, one with no column in an
+Other column at the end, one with neither in their corner.
+
 ## Sequences: a `sequenceDiagram` block
 
 How something moves through a system, step by step: Mermaid's own sequence diagram. A

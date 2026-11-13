@@ -35,6 +35,8 @@ export const UI = {
   expandOne: '<path d="M4 6h16M4 12h16M4 18h16"/>',
   print: '<path d="M7 9V3.5h10V9"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v6.5H7z"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.2"/>',
+  // a lane diagram (WO-62): bands with a name column
+  lanes: '<rect x="2.5" y="4" width="19" height="16" rx="1.5"/><path d="M2.5 9.33h19M2.5 14.67h19M7 4v16"/>',
   layers: '<rect x="3" y="3.5" width="18" height="4.5" rx="1.2"/><rect x="3" y="9.75" width="18" height="4.5" rx="1.2"/><rect x="3" y="16" width="18" height="4.5" rx="1.2"/>',
   flowchart: '<rect x="2" y="2" width="7" height="5" rx="1"/><path d="m17 8 4 4-4 4-4-4Z"/><rect x="2" y="17" width="7" height="5" rx="1"/><path d="M5.5 7v5H13M17 16v3.5H9"/>',
   state: '<circle cx="4.5" cy="12" r="3.5"/><circle cx="19.5" cy="12" r="3.5"/><path d="M8 12h7M12.5 9.5 15 12l-2.5 2.5"/>',

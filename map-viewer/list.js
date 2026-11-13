@@ -46,8 +46,42 @@ export function buildListScene(input) {
     });
     input.kids(n).forEach(walk);
   };
-  walk(input.root);
+  if (input.root.lanes && input.root.synthetic) laneRows(input, walk, rows);
+  else walk(input.root);
   return rows;
+}
+
+// A lane diagram's list (WO-62): its steps under their lanes (rows first, else columns),
+// lanes under their parents; each heading says what it is (a horizontal or vertical
+// swimlane), and in a grid each step names its vertical swimlane too.
+function laneRows(input, walk, rows) {
+  const L = input.root.lanes;
+  const byRows = L.rows.length > 0;
+  const lanes = byRows ? L.rows : L.cols;
+  const parents = byRows ? L.rowParents : L.colParents;
+  const kind = byRows ? 'horizontal' : 'vertical';
+  const cols = new Map(L.cols.map((c) => [c.id, c.label]));
+  const steps = [];
+  (function all(n) { for (const c of n.children) { if (c.container) all(c); else steps.push(c); } })(input.root);
+  const placeOf = (n) => L.place.get(n.id) || {};
+  const at = rows.length;
+  lanes.forEach((lane, i) => {
+    const up = parents.filter((p) => p.from <= i && p.to >= i).sort((a, b) => a.depth - b.depth);
+    up.forEach((p, d) => { if (p.from === i) rows.push({ kind: 'group', id: `~p~${p.id}`, depth: d, text: `${p.label} (a group of ${kind} swimlanes)` }); });
+    rows.push({ kind: 'group', id: `~l~${lane.id}`, depth: up.length, text: `${lane.label} (${kind} swimlane)${lane.other ? ': steps not placed' : ''}` });
+    const mine = steps.filter((n) => (byRows ? placeOf(n).row : placeOf(n).col) === lane.id).sort((a, b) => placeOf(a).i - placeOf(b).i);
+    for (const n of mine) {
+      const from = rows.length;
+      walk(n);
+      const col = byRows && L.cols.length ? placeOf(n).col : null;
+      for (const r of rows.slice(from)) {
+        r.depth = up.length + 1;
+        r.flat = true;   // every step reads the same, whatever its lane's depth
+        if (col) r.where = `${cols.get(col) || 'Other'} (vertical swimlane)`;
+      }
+    }
+  });
+  return rows.length - at;
 }
 
 // An arrow for a relation, seen from one of its ends: direction and line kind.
@@ -101,6 +135,14 @@ export function renderList(v, on) {
   };
   const words = (code) => v.iconDef(code, legend).label;
   for (const s of buildListScene(listInput(v))) {
+    // a lane diagram's lane or parent heading (WO-62)
+    if (s.kind === 'group') {
+      const head = add(document.createElement('div'), { key: `g:${s.id}`, level: s.depth + 1, kind: 'group', id: s.id });
+      head.className = 'mmv-lgroup';
+      head.style.paddingLeft = `${10 + s.depth * 22}px`;
+      head.textContent = s.text;
+      continue;
+    }
     const n = v.S.map.byId[s.id];
     const level = s.depth + 1;
     const row = document.createElement('div');
@@ -120,7 +162,7 @@ export function renderList(v, on) {
     const label = document.createElement('span');
     label.className = 'mmv-llabel';
     const text = document.createElement('span');
-    text.className = s.depth === 0 ? 'mmv-d0' : s.depth === 1 ? 'mmv-d1' : '';
+    text.className = s.flat ? '' : s.depth === 0 ? 'mmv-d0' : s.depth === 1 ? 'mmv-d1' : '';
     const trustMarks = [];
     s.icons.forEach((code) => {
       const span = document.createElement('span'); span.innerHTML = v.iconHtml(code, legend, 'mmv-inline-ic', 'var(--n)');
@@ -135,6 +177,7 @@ export function renderList(v, on) {
         text.appendChild(e);
       }
     });
+    if (s.where) text.appendChild(Object.assign(document.createElement('span'), { className: 'mmv-lrel-label', textContent: ` · ${s.where}` }));
     // changed since you looked (seen.js): the drawing's badge before the label
     const change = v.changeOf?.(s.id);
     // a planned change (WO-34): the drawing's ringed sign before the label
@@ -301,6 +344,7 @@ export function renderList(v, on) {
       case 'Enter': case ' ':
         if (x.kind === 'node') { k.key = x.key; if (e.key === 'Enter') on.page(x.id); else on.click(x.id); }
         else if (x.kind === 'note') flip(x.key);
+        else if (x.kind === 'group') done = true;   // a lane heading: nothing to open
         else { k.key = `n:${x.other}`; on.jump(x.other); }
         break;
       default:

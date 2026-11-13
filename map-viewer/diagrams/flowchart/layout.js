@@ -160,24 +160,7 @@ export function layoutBoxes(root, kids, size, input) {
   // relation with a note shows a note mark (a merged arrow shows none); the icons all
   // its relations carry (diagrams/flowchart/scene.js)
   // (Poster, WO-38: no icons or note mark on the line; the arrow's pop-up has them)
-  for (const w of arrows.values()) {
-    w.note = !input.poster && w.items.length === 1 && !!w.items[0].note;
-    // its ringed sign before the label: when its relations share one (scene.js)
-    w.sign = !!w.items[0].plan && w.items.every((r) => r.plan === w.items[0].plan);
-    w.icons = input.poster ? 0 : w.items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), w.items[0].icons || []).length;
-    w.text = w.items.length > 1 ? `${w.items.length} links` : w.items[0].label || (w.note || w.icons ? ' ' : null);
-    // a label of two lines (WO-41): its gap makes room for both; measured by its widest
-    if (w.items.length === 1) writtenLabel(w, w.items[0]);
-    // playing: the arrow says only what the sequence sends along it, the longest
-    // message each way (so the picture keeps its place through the play)
-    if (input.playLabel) {
-      const ways = w.items.map((r) => input.playLabel(r)).filter(Boolean);
-      const longest = (k) => ways.map((x) => x[k]).filter(Boolean).sort((p, q) => q.length - p.length)[0] || null;
-      const [fwd, back] = [longest('fwd'), longest('back')];
-      Object.assign(w, { note: false, icons: 0, rows: 1, lines: (fwd ? 1 : 0) + (back ? 1 : 0) });
-      w.text = [fwd, back].filter(Boolean).sort((p, q) => q.length - p.length)[0] || null;
-    }
-  }
+  for (const w of arrows.values()) arrowText(w, input);
 
   // ---- per box: children, lifted arrows, ranks (in any order) ----
   const info = new Map();
@@ -832,7 +815,30 @@ const crossings = (p, q) => (inSpan(q.near, p) ? 1 : 0) + (inSpan(p.far, q) ? 1 
 const meets = (p, q) => p.lo < q.hi + 6 && q.lo < p.hi + 6;
 
 // drop repeated points and points in the middle of a straight run
-function simplify(pts) {
+// What an arrow says (w: {items: [relations]}): its label, or how many relations it
+// stands for; a note mark, its icons, its ringed sign. Shared with lane diagrams
+// (diagrams/lanes/layout.js).
+export function arrowText(w, input) {
+  w.note = !input.poster && w.items.length === 1 && !!w.items[0].note;
+  // its ringed sign before the label: when its relations share one (scene.js)
+  w.sign = !!w.items[0].plan && w.items.every((r) => r.plan === w.items[0].plan);
+  w.icons = input.poster ? 0 : w.items.reduce((acc, r) => acc.filter((c) => r.icons?.includes(c)), w.items[0].icons || []).length;
+  w.text = w.items.length > 1 ? `${w.items.length} links` : w.items[0].label || (w.note || w.icons ? ' ' : null);
+  // a label of two lines (WO-41): its gap makes room for both; measured by its widest
+  if (w.items.length === 1) writtenLabel(w, w.items[0]);
+  // playing: the arrow says only what the sequence sends along it, the longest
+  // message each way (so the picture keeps its place through the play)
+  if (input.playLabel) {
+    const ways = w.items.map((r) => input.playLabel(r)).filter(Boolean);
+    const longest = (k) => ways.map((x) => x[k]).filter(Boolean).sort((p, q) => q.length - p.length)[0] || null;
+    const [fwd, back] = [longest('fwd'), longest('back')];
+    Object.assign(w, { note: false, icons: 0, rows: 1, lines: (fwd ? 1 : 0) + (back ? 1 : 0) });
+    w.text = [fwd, back].filter(Boolean).sort((p, q) => q.length - p.length)[0] || null;
+  }
+  return w;
+}
+
+export function simplify(pts) {
   const out = [];
   for (const p of pts) {
     const q = out[out.length - 1];
@@ -868,7 +874,7 @@ function shownBy(root, input) {
 }
 
 // Longest-path ranks; a cycle's back arrows are turned round for ranking only.
-function rankOf(items, edges) {
+export function rankOf(items, edges) {
   const out = new Map(items.map((c) => [c, []]));
   for (const [a, z] of edges) out.get(a).push(z);
   // drop back arrows found by a depth-first walk

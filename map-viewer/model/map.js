@@ -3,7 +3,8 @@
 // the tree, and the parts every type shares are read here: the title, notes, icon
 // legend, node and arrow icons, relation views and the size warnings.
 import { addQueries, queryPart } from '../query/model.js';
-import { diagramForHeader, DIAGRAMS } from '../diagrams/index.js';
+import { diagramForHeader, DIAGRAMS, LANES } from '../diagrams/index.js';
+import { parseLanes } from './lanes.js';
 import { MAX_LABEL_LINE, MAX_LABEL } from './labels.js';
 import { problem } from './problem.js';
 import { splitSections, attachNotes, parseIconLegend, attachNodeIcons, attachArrowIcons, parsePlaysOver } from './sections.js';
@@ -171,7 +172,7 @@ function parsePart(text, fileName, shared) {
     i++;
   }
   while (i < lines.length && (!lines[i].trim() || lines[i].trim().startsWith('%%'))) i++;
-  const diagram = lines[i] != null ? diagramForHeader(lines[i].trim()) : null;
+  let diagram = lines[i] != null ? diagramForHeader(lines[i].trim()) : null;
   if (!diagram) {
     warnings.push(problem('diagram-type', 'Diagram is not a Mermaid "mindmap", "flowchart", "sequenceDiagram", "stateDiagram-v2" or "erDiagram".'));
     return empty();
@@ -192,6 +193,15 @@ function parsePart(text, fileName, shared) {
   assignDepth(root, 0, -1);
 
   const sections = splitSections(after);
+  // ## Lanes after a flowchart makes it a lane diagram (WO-62): its own type from here on
+  let lanes = null;
+  if (sections.lanes != null) {
+    if (diagram.type !== 'flowchart') warnings.push(problem('lanes-not-flowchart', '## Lanes is for flowcharts: not read.'));
+    else {
+      lanes = parseLanes(sections.lanes, { byId, relations: read.relations || [], direction: read.extra?.direction || 'TB' }, warnings);
+      if (lanes) { diagram = LANES; root.lanes = lanes; }
+    }
+  }
   const arrowIcons = sections.nodeIcons ? attachNodeIcons(sections.nodeIcons, byId, warnings) : [];
   // classes: a meaning per node. A class flows down to everything inside, until a node
   // names its own; the colour follows it, the class's default icon only goes on nodes
@@ -213,7 +223,8 @@ function parsePart(text, fileName, shared) {
     if (two.length) warnings.push(problem('er-table-class-twice', `Table ${n.id} is ${two.join(' and ')}: one table class per table; ${own.get(n)}, the later, is used.`));
   }
   // deployments: read now, so their new boxes take colour slots and notes with the rest
-  if (sections.deployments.length && diagram.type !== 'flowchart') warnings.push(problem('deployment-not-flowchart', 'Deployments are for box diagrams (flowcharts): not read.'));
+  if (sections.deployments.length && lanes) warnings.push(problem('lanes-deployment', 'Deployments are not read under a lane diagram.'));
+  else if (sections.deployments.length && diagram.type !== 'flowchart') warnings.push(problem('deployment-not-flowchart', 'Deployments are for box diagrams (flowcharts): not read.'));
   const raw = diagram.type === 'flowchart' ? sections.deployments.map((d) => readDeployment(d, warnings)).filter(Boolean) : [];
   const infra = raw.flatMap((d) => infraOf(d, byId).map((n) => ({ n, d })));
   for (const { n } of infra) own.set(n, classOf(n, classes, styleOnly));
@@ -234,7 +245,7 @@ function parsePart(text, fileName, shared) {
   let look = null;
   if (sections.looks) {
     const offered = (diagram.looks || []).map(([id]) => id);
-    if (diagram.type !== 'flowchart') warnings.push(problem('look-not-flowchart', `"## Look: ${sections.looks[0]}" is for flowcharts: not read.`));
+    if (diagram.type !== 'flowchart' && !lanes) warnings.push(problem('look-not-flowchart', `"## Look: ${sections.looks[0]}" is for flowcharts: not read.`));
     else if (sections.looks.length > 1) warnings.push(problem('look-twice', `${sections.looks.length} "## Look:" lines: one per diagram.`));
     else if (!offered.includes(sections.looks[0])) warnings.push(problem('look-unknown', `"## Look: ${sections.looks[0]}": a flowchart's looks are ${offered.join(' and ')}.`));
     else look = sections.looks[0];

@@ -10,6 +10,7 @@ import { testRender } from './render.js';
 import { testWholeMap } from './whole-map.js';
 import { testPoster } from './poster.js';
 import { testShapePorts } from './shape-ports.js';
+import { testLanes, testLaneRouting } from './lanes.js';
 import { testLongSequence } from './long-sequence.js';
 import { testFirstView } from './first-view.js';
 import { testErCompare } from './er-compare.js';
@@ -79,6 +80,8 @@ try {
   await testWholeMap(check);
   await testPoster(check, wait);
   await testShapePorts(check, wait);
+  await testLanes(check);
+  await testLaneRouting(check);
   await testLongSequence(check, wait);
   await testFirstView(check, wait);
   await testErCompare(check, wait);

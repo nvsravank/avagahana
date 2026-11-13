@@ -5,7 +5,8 @@
 // (model/deployments.js), after a sequence `## Plays over` (the views it plays over), and
 // after a state or ER diagram `## Scenario: <name>` (model/scenarios.js), `## Walkthrough: <name>` (model/walkthroughs.js), and `## Look: <look>`
 // (the look a flowchart opens in, WO-38), and after an ER diagram `## Renames` (columns
-// renamed since the earlier version, diagrams/er/connections.js).
+// renamed since the earlier version, diagrams/er/connections.js), and after a flowchart
+// `## Lanes` (a lane diagram, model/lanes.js).
 import { parseIconCodes, normalizeIconCode } from './icon-codes.js';
 import { problem } from './problem.js';
 import { takeMain, MAIN } from './main-icon.js';
@@ -25,6 +26,7 @@ export function splitSections(after) {
     if (h.name === 'classes') out.classes = text;
     if (h.name === 'plays over') out.playsOver = text;
     if (h.name === 'renames') out.renames = text;
+    if (h.name === 'lanes') out.lanes ??= text;   // a lane diagram (model/lanes.js); a second is section-twice
     if (/^relations$/i.test(h.title)) out.relations.push({ name: null, text });
     const persp = h.title.match(/^perspective\s*:\s*(.+)$/i);
     if (persp) out.relations.push({ name: persp[1].trim(), text });
