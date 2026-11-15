@@ -83,7 +83,7 @@ def options_section(text, name, fields, report):
             if not m or key not in fields or not m[2] or key in options:
                 bad = True
                 continue
-            options[key] = list(dict.fromkeys(x.strip() for x in m[2].split(',') if x.strip())) if key in ('open', 'notes', 'columns') else m[2]
+            options[key] = list(dict.fromkeys(x.strip() for x in m[2].split(',') if x.strip())) if key in ('open', 'notes', 'columns', 'spotlight') else m[2]
             if not options[key]:
                 bad = True
     bad = bad or not options

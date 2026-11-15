@@ -40,6 +40,9 @@ export { anchorOf };
 //    `unlinked: [anchor]`; a box diagram gets `sequences: [{anchor, view}]` (anchor
 //    null: the first diagram), a sequence `playsOver: [{anchor, view, viewLabel}]` (the valid ones)
 const fenceStarts = (src) => new Set(fenceBlocks(src).map((b) => b.start));
+// the diagram types with a spotlight (diagrams/*/diagram.js spotlight; WO-63)
+const SPOTLIT = new Set(['flowchart', 'state', 'er', 'lanes']);
+
 export function parseMap(text, fileName) {
   const src = text.replace(/\r\n?/g, '\n');
   // A block quoted inside a longer fence is an example, not a diagram.
@@ -123,6 +126,26 @@ export function parseMap(text, fileName) {
         stop.invalidReference = true;
         stop.options = null;
       } else stop.point = at.id;
+    }
+    // Spotlight (WO-63): boxes and lines the stop lights, by node id or an arrow's own id,
+    // on a stop that opens a box diagram with a spotlight; never with Point to
+    if (stop.options?.spotlight) {
+      const kinds = ['diagram', 'perspective', 'deployment'];
+      if (!kinds.includes(stop.kind) || stop.options['point to'] || !SPOTLIT.has(owner.type)) {
+        main.warnings.push(problem('walkthrough-options', `Stop "${stop.name}": Spotlight is for a Diagram, Perspective or Deployment stop of a flowchart, state, ER or lane diagram, and not with Point to.`));
+        stop.invalidReference = true;
+        stop.options = null;
+        continue;
+      }
+      const known = new Set([...Object.keys(owner.byId), ...(owner.views || []).flatMap((v) => [...Object.keys(v.deploy?.byId || {}), ...v.relations.map((r) => r.eid).filter(Boolean)])]);
+      const unknown = stop.options.spotlight.filter((id) => !known.has(id));
+      if (unknown.length) {
+        main.warnings.push(problem('walkthrough-reference', `Stop "${stop.name}": Spotlight ${unknown.join(', ')} must name nodes or arrow ids of the destination's diagram.`));
+        stop.invalidReference = true;
+        stop.options = null;
+        continue;
+      }
+      stop.spot = stop.options.spotlight.slice();
     }
   }
   linkSequences(main);

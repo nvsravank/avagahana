@@ -14,6 +14,8 @@ export const label = 'Lane diagram';
 export const matches = () => false;
 export const parseBody = parseFlowchart;
 export const boxes = true;
+// a spotlight switch: a selected box or line lit, the rest faded (WO-63, viewer.js paintSpotlight)
+export const spotlight = true;
 
 export const modes = [
   { id: 'lanes', label: 'Lanes', icon: 'lanes' },

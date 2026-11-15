@@ -15,6 +15,7 @@ import { testLongSequence } from './long-sequence.js';
 import { testFirstView } from './first-view.js';
 import { testErCompare } from './er-compare.js';
 import { testErClasses, testErRowOrder } from './er-classes.js';
+import { testSpotlight } from './spotlight.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
@@ -87,6 +88,7 @@ try {
   await testErCompare(check, wait);
   await testErClasses(check, wait);
   await testErRowOrder(check);
+  await testSpotlight(check, wait);
   // Zoom changes label detail, never box geometry or the precomputed routes.
   for (const [kind, body] of [
     ['flowchart', 'flowchart LR\n  a[Top level] --> b{Decision}\n  subgraph group[Group]\n    c[Nested label] --> d[Another label]\n  end\n  b --> c'],

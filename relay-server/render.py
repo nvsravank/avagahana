@@ -5,7 +5,7 @@ reader's open atlas page (no headless browser), without moving what the reader s
   python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.png
                                  [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID]
                                  [--mode MODE] [--colour-by category|level|class|changes]
-                                 [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
+                                 [--expand N|all] [--close a,b] [--highlight a,b] [--spot a,e1] [--crop ID]
                                  [--seq ANCHOR [--step N | --steps all|3-5]]
                                  [--before FILE [--edition before|after]] [--draft FILE]
                                  [--theme ID] [--appearance light|dark] [--look outline|poster]
@@ -63,8 +63,8 @@ _ports = {}
 def draft_report(map_path, text, *, maps_dir=None, port=DEFAULT_PORT, **state):
     """The layout report (a dict, map-viewer-api.md) of text drawn in map_path's place by
     the reader's open page, out of sight. state: the picture's state as the request names
-    it (mode, view, part, env, focus, expand, close, highlight, crop, colourBy, ...);
-    close and highlight as lists or comma-separated ids. One HTTP request, no files."""
+    it (mode, view, part, env, focus, expand, close, highlight, spot, crop, colourBy, ...);
+    close, highlight and spot as lists or comma-separated ids. One HTTP request, no files."""
     folder, problem = resolve_maps_dir(maps_dir)
     if problem:
         raise RenderError(problem)
@@ -74,7 +74,7 @@ def draft_report(map_path, text, *, maps_dir=None, port=DEFAULT_PORT, **state):
         if found is None:
             raise RenderError("no relay server for this maps folder: start serve_maps.py")
         _ports[key] = found
-    st = {k: (ids(v) if k in ("close", "highlight") and isinstance(v, str) else v) for k, v in state.items() if v is not None}
+    st = {k: (ids(v) if k in ("close", "highlight", "spot") and isinstance(v, str) else v) for k, v in state.items() if v is not None}
     answer, error = ask(_ports[key], {"path": map_path, "text": text, "state": st, "format": "svg", "report": True})
     if error:
         raise RenderError(error)
@@ -144,6 +144,7 @@ def main(argv=None) -> int:
     ap.add_argument("--expand", help="levels shown below the top: a whole number, or all")
     ap.add_argument("--close", help="boxes shown closed: node ids, comma separated")
     ap.add_argument("--highlight", help="these nodes in colour, everything else in the idle colours")
+    ap.add_argument("--spot", help="spotlight these boxes and lines (node ids, arrow ids): they and their lines stay, the rest fades")
     ap.add_argument("--crop", help="this box and what it connects to, instead of the whole diagram")
     ap.add_argument("--seq", help="a sequence over its view: its heading's anchor (main: the first diagram)")
     ap.add_argument("--step", type=int, help="the sequence's step, from 1")
@@ -193,7 +194,7 @@ def main(argv=None) -> int:
 
     state = {k: v for k, v in {"part": args.part, "view": args.view, "env": args.env, "focus": args.focus,
                                 "mode": args.mode, "colourBy": args.colour_by, "expand": expand,
-                                "close": ids(args.close), "highlight": ids(args.highlight), "crop": args.crop,
+                                "close": ids(args.close), "highlight": ids(args.highlight), "spot": ids(args.spot), "crop": args.crop,
                                 "seq": args.seq, "step": args.step if args.seq and not args.steps else None,
                                 "edition": args.edition if args.before else None}.items() if v is not None}
     # an unknown --seq: the page quietly draws the diagram without it; the checker's names say so

@@ -13,6 +13,8 @@ export const label = 'Flowchart';
 export const matches = (header) => /^(flowchart|graph)\b/.test(header);
 export const parseBody = parseFlowchart;
 export const boxes = true;
+// a spotlight switch: a selected box or line lit, the rest faded (WO-63, viewer.js paintSpotlight)
+export const spotlight = true;
 
 export const modes = [
   { id: 'boxes', label: 'Boxes', icon: 'flowchart' },

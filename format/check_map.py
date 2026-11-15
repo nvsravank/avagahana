@@ -1273,7 +1273,7 @@ def check_walkthroughs(m, src, parts, title):
             if dest not in names[want]:
                 m.report(sline, 'walkthrough-stop-unknown', '{} "{}" is not in this map'.format(kind, sm[2].strip()))
             stop_body = body[st['end']:stops[j + 1]['start'] if j + 1 < len(stops) else len(body)]
-            _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to'], lambda msg: m.report(sline, 'walkthrough-options', msg))
+            _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to', 'spotlight'], lambda msg: m.report(sline, 'walkthrough-options', msg))
             if opts is not None:
                 owner = next((x for x in owners if dest in x['names'][want] and ('diagram' not in opts or x['title'] == opts['diagram'])), None)
                 if not owner or any(nid not in owner['notes'] for nid in opts.get('notes', [])):
@@ -1283,6 +1283,18 @@ def check_walkthroughs(m, src, parts, title):
                     tree = owner['part'].get('query_parts', {}).get(focus)
                     if tree is None or not part_exists(tree, opts['point to']):
                         m.report(sline, 'walkthrough-reference', 'Point to "{}" must name a part of the query box its perspective focuses on'.format(opts['point to']))
+                if owner and 'spotlight' in opts:
+                    # Spotlight (WO-63): nodes or arrow ids of a box diagram the stop opens; not with Point to
+                    part = owner['part']
+                    if kind not in ('diagram', 'perspective', 'deployment') or 'point to' in opts or part['kind'] not in ('flowchart', 'state', 'er'):
+                        m.report(sline, 'walkthrough-options', 'Spotlight is for a Diagram, Perspective or Deployment stop of a flowchart, state, ER or lane diagram, and not with Point to')
+                    else:
+                        known = set((part['read'] or {}).get('ids', {})) | set(part.get('view_eids', set())) | set((part['read'] or {}).get('eids', {}))
+                        for dep in part.get('deployments', []):
+                            known |= set((dep['read'] or {}).get('ids', {}))
+                        unknown = [x for x in opts['spotlight'] if x not in known]
+                        if unknown:
+                            m.report(sline, 'walkthrough-reference', 'Spotlight {} must name nodes or arrow ids of the destination diagram'.format(', '.join(unknown)))
 
 
 def check(path):

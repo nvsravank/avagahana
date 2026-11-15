@@ -1,4 +1,5 @@
-// hash.js — the atlas URL: #/<folder>/<file>.md?mode=..&part=..&focus=..&node=..&page=..&view=..&env=..&seq=..&step=..&rels=1
+// hash.js — the atlas URL: #/<folder>/<file>.md?mode=..&part=..&focus=..&node=..&spot=..&page=..&view=..&env=..&seq=..&step=..&rels=1
+// (spot: the spotlit boxes and lines, comma-separated, WO-63)
 // (part: which of the file's diagrams, by its heading's anchor; none for the first;
 // page: the node whose page is open; seq: the sequence playing over the view, by its
 // anchor, 'main' for the first diagram; step: its step, from 1; edition=before: the
@@ -36,6 +37,9 @@ export function parseHash(hash) {
   if (Number.isInteger(step) && step > 0) state.step = step;
   if (p.get('rels') === '1' || p.get('rels') === '0') state.rels = p.get('rels') === '1';
   if (p.get('edition') === 'before' || p.get('edition') === 'after') state.edition = p.get('edition');
+  // the spotlit boxes and lines (WO-63), comma-separated
+  const spot = (p.get('spot') || '').split(',').map((x) => x.trim()).filter(Boolean);
+  if (spot.length) state.spot = spot;
   const prefs = {};
   if (p.get('trustMarks') === '0' || p.get('trustMarks') === '1') prefs.trustMarks = p.get('trustMarks') === '1';
   // old links: theme=light|dark was the appearance; scheme=colorful|blues the colours
@@ -63,6 +67,8 @@ export function buildHash(path, state = {}, prefs = null, before = null) {
   for (const k of ['part', 'focus', 'node', 'page', 'view', 'env', 'seq']) if (state[k]) p.set(k, state[k]);
   if (state.seq && state.step) p.set('step', String(state.step));
   if (state.rels) p.set('rels', '1');
+  // several spotlit, or a line: the whole set (one box is node=)
+  if (state.spot?.length > 1 || (state.spot?.length && state.arrow)) p.set('spot', state.spot.join(','));
   if (state.edition === 'before') p.set('edition', 'before');
   if (typeof prefs?.trustMarks === 'boolean') p.set('trustMarks', prefs.trustMarks ? '1' : '0');
   if (prefs?.colourBy) p.set('colourBy', prefs.colourBy);

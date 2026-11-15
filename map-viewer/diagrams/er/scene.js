@@ -43,7 +43,7 @@ export function buildScene(input) {
       // compared with an earlier version, or a planned change: its ringed sign (paint.js)
       ...(n.plan ? { plan: n.plan } : {}),
       name: `${nodeName(n, 1, false)}, ${n.kindLabel ? `${n.kindLabel} table` : 'table'}, ${n.attrs.length} columns`,
-      marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
+      marks: { hit: input.hits.includes(n.id), sel: input.selectedSet ? input.selectedSet.has(n.id) : input.selected === n.id },
       title: { text: n.plain, size: geo.type.size, weight: geo.type.weight, bar: far(geo.type.size),
         ...(geo.titleLines.length > 1 || geo.titleLines.some((l) => l.runs.some((r) => r.bold || r.italic)) ? { lines: geo.titleLines.map((l) => l.runs), lh: geo.lh } : {}) },
       ...(geo.head !== HEAD ? { head: geo.head } : {}), ...(geo.signW ? { signW: geo.signW } : {}),
@@ -69,7 +69,7 @@ export function buildScene(input) {
     ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
     name: `${n.plain}, a group of ${tablesIn(n).length} tables`,
     title: { text: n.plain, x: 14, y: 25, size: 15, weight: 600 },
-    icons: [], marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
+    icons: [], marks: { hit: input.hits.includes(n.id), sel: input.selectedSet ? input.selectedSet.has(n.id) : input.selected === n.id },
     ...(n.plan ? { plan: n.plan } : {}),
     note: n.note ? { x: w - 30, y: 6, size: 16 } : null,
     dot: { x: w - 1, y: 1, closed: false, count: null },
@@ -87,7 +87,7 @@ function closedGroup(n, p, input, shaper) {
     ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
     ...(n.plan ? { plan: n.plan } : {}),
     name: `${n.plain}, a group of ${count} tables, collapsed`,
-    marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
+    marks: { hit: input.hits.includes(n.id), sel: input.selectedSet ? input.selectedSet.has(n.id) : input.selected === n.id },
     shape: 'rect', icons: [],
     text: { size: 15, weight: 600, spans: [{ text: n.plain, bold: false, italic: false, x: 14, y: p.h / 2 + 5 }] },
     ...(n.note ? { note: { x: p.w - 32, y: (p.h - 16) / 2, size: 16 } } : {}),
@@ -104,7 +104,7 @@ export function relationShapes(input) {
   const r2 = (v) => Math.round(v * 100) / 100;
   for (const [key, { r, pair, points }] of paths) {
     const d = points.map((pt, i) => `${i ? 'L' : 'M'}${r2(pt[0])},${r2(pt[1])}`).join(' ');
-    const lit = input.selected === r.from || input.selected === r.to;
+    const lit = !input.spotlight && (input.selected === r.from || input.selected === r.to);   // the spotlight replaces it (WO-63)
     const dim = input.iconFilter?.size > 0 && !passesFilter(r, input.iconFilter);
     // Use layout-owned label positions, with the same baseline as flowcharts.
     const a = points[Math.floor((points.length - 1) / 2)], b = points[Math.ceil((points.length - 1) / 2)];

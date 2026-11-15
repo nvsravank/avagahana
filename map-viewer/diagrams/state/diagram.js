@@ -12,6 +12,8 @@ export const label = 'State diagram';
 export const matches = (header) => /^stateDiagram(-v2)?\b/.test(header);
 export const parseBody = parseState;
 export const boxes = true;
+// a spotlight switch: a selected box or line lit, the rest faded (WO-63, viewer.js paintSpotlight)
+export const spotlight = true;
 // a state links to another diagram (a sub-machine) through a link in its note: Mermaid's
 // state diagrams have no click
 export const noteLinks = true;

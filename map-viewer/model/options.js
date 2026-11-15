@@ -82,7 +82,7 @@ export function optionsSection(text, name, fields, code, warnings) {
       const m = line.match(BULLET);
       const key = m?.[1].trim().toLowerCase();
       if (!m || !fields.includes(key) || !m[2] || Object.hasOwn(options, key)) { bad = true; continue; }
-      options[key] = ['open', 'notes', 'columns'].includes(key) ? [...new Set(m[2].split(',').map((s) => s.trim()).filter(Boolean))] : m[2];
+      options[key] = ['open', 'notes', 'columns', 'spotlight'].includes(key) ? [...new Set(m[2].split(',').map((s) => s.trim()).filter(Boolean))] : m[2];
       if (Array.isArray(options[key]) && !options[key].length) bad = true;
     }
   }

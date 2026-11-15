@@ -17,6 +17,8 @@ export const label = 'ER diagram';
 export const matches = (header) => /^erDiagram\b/.test(header);
 export const parseBody = parseEr;
 export const boxes = true;
+// a spotlight switch: a selected box or line lit, the rest faded (WO-63, viewer.js paintSpotlight)
+export const spotlight = true;
 // the icons its tables draw (loaded before the first draw)
 export const icons = ['ph key'];
 

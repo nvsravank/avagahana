@@ -7,6 +7,18 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.2.1 (2026-11-15)
+
+- **Contract** (viewer API, addition): the selection spotlight. A toolbar switch (a cursor
+  icon) on flowchart, architecture, lane, ER, state and query-flow diagrams, off by default
+  and kept per reader: a selected box stays lit with every line touching it, a line clicked
+  anywhere along it stays lit with its two boxes, and everything else fades. Shift-click
+  lights several. The viewer state gains `arrow` (the selected line) and `spot` (everything
+  lit); `setPrefs` and the link prefs gain `spotlight`; a render takes `spot`
+  (`render.py --spot`).
+- **Contract** (map format, addition): a walkthrough stop's `- Spotlight: <ids>` lights the
+  boxes and lines the stop is about, on screen and in the reading document.
+
 ## 0.2.0 (2026-11-13)
 
 - **Contract** (map format, addition): lane diagrams (swim lanes). A flowchart followed by

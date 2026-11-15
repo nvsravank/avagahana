@@ -118,7 +118,7 @@ HEARTBEAT_S = 15.0         # keeps event streams open through proxies; finds clo
 MODE = re.compile(r"^[a-z][a-z-]{0,23}$")
 # colour-by values a show may ask for (the viewer ignores one the map does not offer)
 COLOUR_BY = ("category", "level", "class", "changes")
-# what a show may ask for (a render's state may ask for more: expand, close, highlight, crop)
+# what a show may ask for (a render's state may ask for more: expand, close, highlight, spot, crop)
 BEFORE_MAX = 2 * 1024 * 1024   # an earlier version's text, in POST /api/show
 SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "trustMarks", "step", "view", "env", "edition")
 NODE_ID = re.compile(r"^[A-Za-z][\w-]{0,99}$")
@@ -282,7 +282,8 @@ def picture_fields(body: dict, out: dict):
         if expand != "all" and (not isinstance(expand, int) or isinstance(expand, bool) or expand < 0):
             return "expand must be a whole number of levels or \"all\""
         out["expand"] = expand
-    for key in ("close", "highlight"):
+    # spot (WO-63): the boxes and arrow ids a spotlight lights
+    for key in ("close", "highlight", "spot"):
         value = body.get(key)
         if value is None:
             continue

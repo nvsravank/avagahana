@@ -75,7 +75,8 @@ changed there). Give each stop its own perspective, as
 `../illuminate-concept/references/walkthroughs.md` says, and open its introduction with
 what the project is and what it is for. List the notes a stop relies on in
 its Stop options (`- Notes: orders, e1`), so their evidence shows with the stop in the
-exported reading page.
+exported reading page, and light the boxes and lines the stop is about
+(`- Spotlight: payments, e1`) when the picture is busy.
 
 ## 6. Verify the map, then show it
 

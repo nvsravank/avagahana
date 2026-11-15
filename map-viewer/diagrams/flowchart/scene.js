@@ -54,7 +54,7 @@ export function buildScene(input) {
           name: `${nodeName(n, rel, false)}, a box`,
           title: { text: n.plain, ...titleLines(input.geom(n).lines), x: main ? POSTER_CORNER + 8 : TITLE_X, y: 17, size: Math.min(type.size, 15) - 1, weight: 600 },
           icons: [], ...(main ? { main } : {}), hover: true,
-          marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
+          marks: { hit: input.hits.includes(n.id), sel: input.selectedSet ? input.selectedSet.has(n.id) : input.selected === n.id },
           ...(n.plan ? { plan: n.plan } : {}),
           note: null,
           dot: n !== root && !L.context?.has(n) ? { x: p.w - 1, y: 1, closed: false, count: null } : null,
@@ -79,7 +79,7 @@ export function buildScene(input) {
         title: { text: n.plain, ...titleLines(input.geom(n).lines), x: titleX, y: TITLE_Y, size: Math.min(type.size, 15), weight: 600 },
         icons,
         ...(main ? { main } : {}),
-        marks: { hit: input.hits.includes(n.id), sel: input.selected === n.id },
+        marks: { hit: input.hits.includes(n.id), sel: input.selectedSet ? input.selectedSet.has(n.id) : input.selected === n.id },
         ...(n.plan ? { plan: n.plan } : {}),
         note: n.note ? { x: p.w - 30 - trustW, y: 6, size: 16 } : null,
         // a frame round a drilled-in box's neighbour: faded, no dot (drill out to open)

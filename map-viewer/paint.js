@@ -48,11 +48,12 @@ export function createPainter(v) {
     return {
       layout: L, root: v.viewRoot(), mode: S.mode, thumb: S.thumb,
       relDepth: v.relDepth, categoryOf: v.categoryOf, levelOf: v.levelOf, geom: nodeGeom, zoom: v.detailZoom(),
-      collapsed: S.collapsed, selected: S.selected, hits: S.hits, iconFilter: S.iconFilter,
+      collapsed: S.collapsed, selected: S.selected, selectedSet: new Set([S.selected, ...(S.spot || [])].filter(Boolean)), hits: S.hits, iconFilter: S.iconFilter,
       rels: S.rels === '1', relNode: S.relNode, relations: S.map.relations, byId: S.map.byId,
       relCount: v.relCount, countDesc: v.countDesc,
       legend: v.legend(), iconDef: v.iconDef,
       poster: !!v.poster?.(), tintOf: v.tintOf,
+      spotlight: !!v.spotShown?.(),   // the spotlight shown (WO-63): ER draws no thicker lit lines
       play: S.play,   // a sequence being played: {step} (diagrams/sequence/scene.js)
     };
   }
@@ -488,13 +489,13 @@ export function createPainter(v) {
         const trustGap = icons.length > ordinaryCount ? 6 : 0;
         const iw = icons.length * 16 + trustGap;
         const x0 = s.label.x - (tw + iw + (s.label.note ? 14 : 0)) / 2;
-        const lg = s.dim ? svgEl('g', { class: 'is-dim' }, frag) : frag;
+        const lg = s.dim ? svgEl('g', { class: 'is-dim', 'data-for': s.id }, frag) : frag;
         if (s.label.text) labelText(lg, { class: s.cls ? 'mmv-flow-label' : 'mmv-rel-label', x: x0, y: s.label.y, 'text-anchor': 'start', 'font-size': 12, 'data-for': s.id }, s);
         const iy = labelTop(s.label) - 11;   // the icons and note mark sit on the first line
         icons.forEach((def, k) => {
           if (S.exporting && !v.trustMarks() && TRUST.has(def.code)) return;
           const iconX = x0 + tw + k * 16 + (TRUST.has(def.code) ? (s.label.note ? 14 : 0) + trustGap : 0);
-          const ig = svgEl('g', { class: `mmv-icon mmv-flow-icon${TRUST.has(def.code) ? ' mmv-trust-mark' : ''}`, ...(TRUST.has(def.code) ? { 'data-trust': def.code, 'data-trust-arrow': s.id, tabindex: 0, role: 'button', 'aria-label': `${def.label}: evidence`, 'aria-expanded': 'false' } : {}), transform: `translate(${iconX},${iy})`, style: def.color ? `color:${def.color}` : null }, lg);
+          const ig = svgEl('g', { class: `mmv-icon mmv-flow-icon${TRUST.has(def.code) ? ' mmv-trust-mark' : ''}`, ...(lg === frag ? { 'data-for': s.id } : {}), ...(TRUST.has(def.code) ? { 'data-trust': def.code, 'data-trust-arrow': s.id, tabindex: 0, role: 'button', 'aria-label': `${def.label}: evidence`, 'aria-expanded': 'false' } : {}), transform: `translate(${iconX},${iy})`, style: def.color ? `color:${def.color}` : null }, lg);
           svgEl('rect', { class: 'mmv-flow-note-bg', x: -1, y: -1, width: 16, height: 16, rx: 3 }, ig);
           if (def.vendor) {
             const dark = def.dark && picture(def.dark);
@@ -629,7 +630,8 @@ export function createPainter(v) {
     // a type whose drawing changes with the selection (an ER table's grain sentence) draws again
     if (S.mode === 'list' || !S.layout || !S.marked || v.diagram().drawsSelection) return false;
     const hitSet = new Set(S.hits);
-    const want = new Set([...S.hits, S.selected].filter((id) => id && S.layout.pos.has(S.map.byId[id])));
+    const sel = new Set([S.selected, ...(S.spot || [])].filter(Boolean));   // several with the spotlight (WO-63)
+    const want = new Set([...S.hits, ...sel].filter((id) => id && S.layout.pos.has(S.map.byId[id])));
     const touch = new Set([...S.marked, ...want]);
     for (const g of [...$.frames.children, ...$.nodes.children]) {
       const id = g.dataset.id;
@@ -639,7 +641,7 @@ export function createPainter(v) {
       g.querySelectorAll(':scope > .mmv-mark').forEach((m) => m.remove());
       const shape = g.querySelector(':scope > .mmv-shape');
       const p = S.layout.pos.get(S.map.byId[id]);
-      drawMarks(g, (shape || g.firstElementChild).nextSibling, { hit: hitSet.has(id), sel: S.selected === id }, p.w, p.h, S.map.byId[id].shape);
+      drawMarks(g, (shape || g.firstElementChild).nextSibling, { hit: hitSet.has(id), sel: sel.has(id) }, p.w, p.h, S.map.byId[id].shape);
     }
     S.marked = want;
     return true;
@@ -656,5 +658,9 @@ export function createPainter(v) {
     return true;
   }
 
-  return { draw, paintMarks, paintRels, paintChanges, nodeGeom, sceneInput, badge, marker: (kind, tint) => end(kind, null, tint), animateNext: () => { animate = true; }, lod: () => { if (gliding) lodLater = true; else if (S.layout) draw(S.layout); }, forget: () => { lastPos = new Map(); }, arrow: (id) => arrows.get(id) || null, cutLabel: (id) => cutLabels.get(id) || null, clearSizes: () => sizeCache.clear() };
+  return { draw, paintMarks, paintRels, paintChanges, nodeGeom, sceneInput, badge, marker: (kind, tint) => end(kind, null, tint), animateNext: () => { animate = true; }, lod: () => { if (gliding) lodLater = true; else if (S.layout) draw(S.layout); }, forget: () => { lastPos = new Map(); }, arrow: (id) => arrows.get(id) || null, arrowByEid: (eid) => {
+    // an arrow's own id from the map (e1@): the drawn line that carries that relation
+    const rel = (S.map?.relations || []).find((r) => r.eid === eid);
+    return rel ? [...arrows.values()].find((a) => a.items.some((r) => r.eid === eid || (r.from === rel.from && r.to === rel.to && (r.label || '') === (rel.label || '')))) || null : null;
+  }, cutLabel: (id) => cutLabels.get(id) || null, clearSizes: () => sizeCache.clear() };
 }

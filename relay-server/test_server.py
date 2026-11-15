@@ -347,7 +347,7 @@ class RelayTests(unittest.TestCase):
         t.start()
         try:
             status, body = self.s.json("POST", "/api/render", {"path": "garden.md", "format": "svg", "width": 800, "report": True, "look": "poster",
-                                                              "state": {"expand": 2, "highlight": "n3, n4", "crop": "n3", "seq": "main", "step": 2}})
+                                                              "state": {"expand": 2, "highlight": "n3, n4", "spot": "n3,e1", "crop": "n3", "seq": "main", "step": 2}})
             t.join(5)
         finally:
             es.close()
@@ -355,7 +355,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(body, {"status": "rendered", "format": "svg", "encoding": "utf-8", "data": "<svg/>", "width": 10, "height": 5, "report": {"touching": []}, "steps": 4})
         self.assertEqual(got["event"], "render")
         req = got["req"]
-        self.assertEqual(req["state"], {"expand": 2, "highlight": ["n3", "n4"], "crop": "n3", "seq": "main", "step": 2})
+        self.assertEqual(req["state"], {"expand": 2, "highlight": ["n3", "n4"], "spot": ["n3", "e1"], "crop": "n3", "seq": "main", "step": 2})
         self.assertEqual((req["format"], req["width"], req["background"], req["report"], req["look"]), ("svg", 800, "theme", True, "poster"))
         self.assertEqual(got["claim"], (200, {"claimed": True}))
         self.assertEqual(got["again"], (409, {"claimed": False}))

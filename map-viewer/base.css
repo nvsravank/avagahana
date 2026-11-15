@@ -35,6 +35,13 @@
 .mmv-node.is-context, .mmv-frame.is-context { opacity: 0.55; }
 .mmv-node.is-context:hover { opacity: 0.85; }
 .mmv .is-dim { opacity: 0.22; }
+/* the spotlight (WO-63, viewer.js paintSpotlight): what the selection keeps at full strength,
+   the rest faded by opacity (hue kept), fading in; it sets the icon filter's and a drill's
+   context fading aside while on */
+.mmv.is-spotlit [data-mmv=viewport] :is(.is-dim, .is-context):not(.is-spot-out) { opacity: 1; }
+.mmv.is-spotlit [data-mmv=viewport] .is-spot-out { opacity: 0.22; transition: opacity .18s ease-out; }
+/* a selected line's mark: a soft halo along it, as a box's dashed outline marks a box */
+.mmv-mark-line { fill: none; stroke: var(--mmv-ink); stroke-opacity: .16; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .mmv-rels { pointer-events: none; }
 .mmv-ghosts { pointer-events: none; }
 

@@ -44,6 +44,7 @@ Card provider. Start with this boundary before following the full exchange.
 - Title: Start with the payment boundary
 - Label: Boundary
 - Notes: orders, e1
+- Spotlight: payments, e1
 - Diagram: Shop platform
 
 ### Sequence: Checkout
@@ -67,6 +68,11 @@ charge. Follow both attempts through to confirmation.
 - **Notes** lists the notes the stop relies on (node, arrow or sequence-message ids of that
   diagram). They and their evidence show with the stop, so the reader need not click a
   small note or confidence mark to find them.
+- **Spotlight** lights the boxes and lines the stop is about (node ids, arrow ids like
+  `e1`): they and the lines touching a box stay, the rest of the picture fades. Use it
+  when a stop's words are about a few parts of a busy picture, on Diagram, Perspective
+  and Deployment stops of flowcharts, architecture, lanes, ER and state diagrams; not
+  with Point to, not on Sequence or Scenario stops.
 - **Diagram** says which diagram a name belongs to when two diagrams use the same name.
 
 All options are optional; field names are case-insensitive. Blank lines do not end the

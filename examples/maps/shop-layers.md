@@ -498,6 +498,7 @@ payment perspective above isolates the external boundary within that larger path
 
 - Title: Follow the calls that wait for an answer
 - Label: Calls
+- Spotlight: orders
 
 ### Sequence: Checkout
 

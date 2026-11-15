@@ -16,6 +16,7 @@ export const UI = {
   stepBack: '<path d="M6 5v14M19 5 9 12l10 7z"/>',
   stepFwd: '<path d="M18 5v14M5 5l10 7-10 7z"/>',
   onMap: '<rect x="2.5" y="3.5" width="7" height="5" rx="1"/><rect x="14.5" y="15.5" width="7" height="5" rx="1"/><path d="M6 8.5v4.5a2 2 0 0 0 2 2h6.5M12 12.5l2.5 2.5-2.5 2.5"/>',
+  cursor: '<path d="M5.5 3v16.5l4.4-4.2 2.9 6.2 2.6-1.2-2.9-6.1 6-.4z"/>',
   search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
   palette: '<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-1.3-1-1.6-1-2.7 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.4 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
@@ -207,6 +208,7 @@ export function chromeHtml(uid) {
     <div class="mmv-panel mmv-iconbar" data-mmv="iconBar"></div>
   </div>
   <button class="mmv-pill mmv-icon" data-mmv="relBtn" title="Show related links">${ic('rel')}</button>
+  <button class="mmv-pill mmv-icon" data-mmv="spotBtn" title="Spotlight what you click" aria-label="Spotlight what you click" aria-pressed="false" hidden>${ic('cursor')}</button>
   <div class="mmv-hov" data-mmv="themeWrap">
     <button class="mmv-pill mmv-icon" data-mmv="themeBtn" title="Theme">${ic('palette')}</button>
     <div class="mmv-panel mmv-drop" data-mmv="themePanel"></div>

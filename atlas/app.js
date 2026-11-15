@@ -116,7 +116,7 @@ addEventListener('hashchange', () => {
   const h = parseHash(location.hash);
   if (!h || !source) return;
   // a link names the whole place: no focus means the whole map, no node none selected
-  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...h.state }); usePrefs(h.prefs); if ((h.before || null) !== picked) useBefore(h.path, h.before || null); }
+  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...(h.state.spot ? {} : { spot: null }), ...h.state }); usePrefs(h.prefs); if ((h.before || null) !== picked) useBefore(h.path, h.before || null); }
   else { picker.close(); openMap(h.path, h.state, h.prefs, h.before || null); }   // a failed open shows the list again
 });
 
@@ -316,7 +316,7 @@ async function onChange() {
 // points at the node.
 async function onShow(d) {
   const state = {};
-  for (const k of ['mode', 'part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'step', 'edition']) if (d[k]) state[k] = d[k];
+  for (const k of ['mode', 'part', 'focus', 'node', 'spot', 'page', 'view', 'env', 'seq', 'step', 'edition']) if (d[k]) state[k] = d[k];
   const prefs = d.colourBy || d.theme || typeof d.trustMarks === 'boolean' ? { ...(typeof d.trustMarks === 'boolean' ? { trustMarks: d.trustMarks } : {}), ...(d.colourBy ? { colourBy: d.colourBy } : {}), ...(d.theme ? { theme: d.theme } : {}) } : null;
   if (d.path === shown?.path) {
     picker.close();

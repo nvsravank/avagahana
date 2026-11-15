@@ -25,7 +25,7 @@ const viewer = mount(element, {
   theme: 'default',     // id of the starting theme (an unknown id: another, with a problem)
   themes: [ … ],        // theme objects from the host, below
   defaultTheme: true,   // false hides the built-in theme (unless no other can be used)
-  prefs: { … },         // starting looks from a link: {theme, appearance, colourBy, look}; not saved
+  prefs: { … },         // starting looks from a link: {theme, appearance, colourBy, look, spotlight}; not saved
                         // (look: for each diagram that offers it, WO-38)
   storageKey: 'avagahana-viewer-prefs',   // where preferences are kept, and (as `<key>-seen`) what
                                        // the reader has seen of each map; null keeps none
@@ -74,7 +74,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.themes` | `[{id, label}]` of the registered themes. |
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
 | `viewer.setTheme(id)` | Switch to a registered theme. The reader keeps their place: the diagram, view, step and camera (pan and zoom) stay as they were. |
-| `viewer.setPrefs({appearance, colourBy, look})` | Change looks from outside (a link, the agent's show), not kept; a colour-by or look the shown diagram does not offer is ignored (a look applies to the shown diagram's type, WO-38). E.g. `{colourBy: 'changes'}` for a plan (added in WO-13). |
+| `viewer.setPrefs({appearance, colourBy, look, spotlight})` | Change looks from outside (a link, the agent's show), not kept; a colour-by or look the shown diagram does not offer is ignored (a look applies to the shown diagram's type, WO-38). E.g. `{colourBy: 'changes'}` for a plan (added in WO-13). `spotlight` (`true` / `false`) turns the spotlight switch on or off (WO-63; this one is kept with the reader's preferences, as the switch is). |
 | `viewer.slot` | An empty element at the start of the toolbar for the host's own button. While empty, it shows the map title (unless `title: false`). |
 | `viewer.destroy()` | Remove everything the viewer added to the element and the document: listeners, observers, styles no other viewer uses. |
 
@@ -90,10 +90,39 @@ promise; a failure is reported as a `host` problem and the viewer carries on.
 | `readMap(path) -> Promise<text>` | Naming another map's node in the popover, and finding targets that are not there. | The popover shows the target's path. |
 | `shutdown()` | The power button. What to show afterwards is the host's business. | No power button. |
 
+## The spotlight (WO-63)
+
+A toolbar switch (`data-mmv="spotBtn"`, a cursor icon, `is-active` and `aria-pressed`
+while on) on flowcharts (architecture, C4, deployments and lanes included), ER, state and
+query-flow diagrams; not on a mind map, a sequence or in List mode. Off by default; the
+reader's choice is kept with the preferences (`spotlight`) across maps. While it is on:
+
+- A selected box keeps itself, what is inside it, the boxes round it and every line
+  touching it, in and out, at full strength; everything else (the boxes at the far ends
+  too) fades by opacity, keeping its colours. A selected closed box keeps the lines
+  lifted to it.
+- A click anywhere along a line opens its pop-up, as always, and selects it (`arrow`):
+  the line, a halo along it and its two end boxes stay; the rest fades.
+- **Shift-click** adds a box or a line (without its pop-up), and takes back one already
+  lit; a plain click replaces the set. Several lit: what each keeps. A Shift-click never
+  drills. The set is the state's `spot`.
+- A walkthrough stop's `Spotlight`, a link's or a render's `spot` show it whatever the
+  switch says (with the switch off, until the reader touches the picture).
+- It wins over the icon filter's fading and a drill's context neighbours while
+  something is selected. A lane diagram's lanes never fade; a lane selected by its name
+  keeps its own highlight. ER draws no thicker lit lines (`is-lit`) while it is on.
+- It clears on a click on empty canvas, Escape when no note, panel or page is open,
+  turning the switch off, a drill (a double click drills with nothing selected), another
+  view or diagram. Panning and zooming keep it. It waits while a `highlight` (a
+  walkthrough's Point to) is set or a sequence plays.
+- Exports (SVG, PNG, print) show it as seen; a snapshot keeps it (`spot`).
+
+With the switch off nothing changes.
+
 ## State
 
 ```js
-{ mode, part, focus, node, page, view, env, rels, seq, step, walkthrough, stop }
+{ mode, part, focus, node, arrow, spot, page, view, env, rels, seq, step, walkthrough, stop }
 ```
 
 `walkthrough` (the name) and `stop` (1-based) are present while a walkthrough is open. Setting
@@ -106,6 +135,8 @@ promise; a failure is reported as a `host` problem and the viewer carries on.
 | `part` | Which of the file's diagrams is shown: the anchor of its heading (`shop-system-containers`), or `null` for the first. Setting it opens that diagram by the way its links lead to it, so the crumbs lead back. |
 | `focus` | Node id the view is drilled into, or `null` for the whole map. |
 | `node` | Node id that is selected / pointed at, or `null`. |
+| `arrow` | The line selected while the spotlight is on (its arrow id, as `data-arrow` names it), or `null`; a selected line and a selected node exclude each other. Setting it selects that line when the spotlight is on and the line is drawn; otherwise it is ignored. Another view or diagram clears it (WO-63). |
+| `spot` | What the spotlight lights, in the order selected: node ids and lines (a drawn line's id, or an arrow's own id from the map, `e1`); `node` and `arrow` are its last box and line. Setting it (an array, or ids separated by commas; `null` or `[]` clears) lights those, whatever the reader's switch says: with the switch off, until the reader touches the picture. A walkthrough stop's Spotlight sets it. `render`'s state takes it too (WO-63). |
 | `page` | Node id whose page is open (its note, arrows and linked diagrams over the drawing), or `null`. |
 | `view` | Name of the relation view shown; `null` for the default view (and while a deployment is shown). Setting it shows that view (relations on); in a box diagram it lays the diagram out again for the view, animated. A deployment's name is accepted too. |
 | `env` | Environment of the deployment shown (`## Deployment: <env>`, map format), or `null`. Setting it shows that deployment (the diagram's arrows over its placement, animated); `null` returns to the default view. Both are views of one picker, so at most one of `view` and `env` is set. |
@@ -511,13 +542,13 @@ permission to supply arbitrary CSS.
 
 Root: `.mmv` (`is-narrow` while the toolbar leaves out Export, Search and a `'wide'` view picker: under 480 px, or the top row does not fit; a host may style its own slot button by it) with `data-theme`, `data-appearance`, `data-colour-by`, `data-look` (how the look draws: `fade` or `outline` for a mind map and ER, `fade` for a flowchart's Outline and for state diagrams and sequences, `poster`), `data-diagram` (`mindmap`, `flowchart`, `sequence`, `state` or `er`), `data-boxes` (a box diagram: flowchart, state, er). Drawing: `mmv-node`, `mmv-shape` (`is-solid`, `is-mark`: a state diagram's dots, bar and choice), `mmv-divider` (a state's description rule), `mmv-warn` (a state's path warning), `mmv-table` with `mmv-table-head`, `mmv-table-row`, `mmv-table-more`, `mmv-key`, `mmv-grain` (an ER table), `mmv-er-line` (`is-lit`; `is-lifted` to a closed group), `mmv-er-end` (crow's-foot marks), `mmv-er-group` (an ER group: on its frame when open, on its box when closed), `mmv-label`, `mmv-icon`, `mmv-edge`, `mmv-frame` (an open box; `is-poster` in Poster, its `--n` set to an AWS main icon's colour), `mmv-frame-title`, `is-poster` on a Poster node (`data-hover`: the node whose details hovering shows), `mmv-icon is-tile` with `mmv-tile` (a Phosphor main icon on a tile), `mmv-inner-spot` (a Poster node's linked-diagram sparkle), `mmv-flow` (a box diagram's arrow; `is-dotted`, `is-thick`), `mmv-flow-label`,
 `mmv-rel`, `mmv-rel-label`, `mmv-dot`, `mmv-rel-dot`, `mmv-bar`,
-`mmv-mark-hit`, `mmv-mark-sel`. Colour classes: `mmv-c<n>` (a node's class: its slot, `mmv-cm` external, `mmv-c0` none; box diagrams), `mmv-k<n>` (category, 0 = centre),
+`mmv-mark-hit`, `mmv-mark-sel`, `mmv-mark-line` (a selected line's halo, WO-63). Colour classes: `mmv-c<n>` (a node's class: its slot, `mmv-cm` external, `mmv-c0` none; box diagrams), `mmv-k<n>` (category, 0 = centre),
 `mmv-l<n>` (level), `mmv-d0|1|2` (depth band), `mmv-pa|pc|pr|p0` (planned change: added,
 changed, removed, none; WO-13). Changes since you looked: `mmv-change` (`is-new`,
 `is-changed`), `mmv-spark` (a diagram icon's small sparkle), `is-glow`, `is-gone`,
 `has-marks` on the expand button; the sparkles button (`data-mmv="sparklesBtn"`, `is-on`
 and `aria-pressed` while they show) and its panel (`sparklesPanel`: `showSparkles`,
-`sparklesCounts`, `sparklesGone`, `clearView`, `clearMap`). States: `is-dim`, `is-closed`,
+`sparklesCounts`, `sparklesGone`, `clearView`, `clearMap`). States: `is-dim`, `is-spot-out` (faded by the spotlight, while the root has `is-spotlit`), `is-closed`,
 `is-on`, `is-selected`, `is-hit`. Per node, `--n` and `--n-ink` hold its colour and
 the text colour on it.
 
@@ -574,7 +605,7 @@ reader is:
 - Kept: the diagram, view or deployment, mode, relations shown, colouring, theme and
   appearance, Before or After. A sequence that was playing opens at step 1.
 - Dropped: an open node page, a search, a selection, a drilled-in box, boxes opened by
-  hand. The reader's own "since you looked" marks never go in; a host's `since` does
+  hand. While the spotlight is on, its switch and its selected box or line are kept (WO-63). The reader's own "since you looked" marks never go in; a host's `since` does
   (with `sinceLabel`), and then every reader of the file sees the same marks, hidden
   until they show them.
 

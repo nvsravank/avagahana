@@ -36,7 +36,7 @@ import { clearMeasureCache } from './measure.js';
 const CHANGE_ICONS = ['ph sparkle'];   // new or changed (seen.js)
 const FRESH_MS = 2500;   // how long what a load brought counts as just arrived (it glows)
 const APPEARANCES = ['light', 'dark', 'auto'];
-const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'looks', 'rels', 'infoClosed', 'stepSeconds', 'sparkles', 'trustMarks'];
+const PREF_KEYS = ['theme', 'appearance', 'colourBy', 'looks', 'rels', 'infoClosed', 'stepSeconds', 'sparkles', 'trustMarks', 'spotlight'];
 // below this the viewer shows a message and nothing else
 const MIN_W = 320;
 const MIN_H = 280;
@@ -142,9 +142,15 @@ export function mount(element, options = {}) {
 
   // ---------- state ----------
   const S = {
-    themeId: null, appearance: 'auto', colourBy: 'category', looks: {}, mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0', trustMarks: '1',
+    themeId: null, appearance: 'auto', colourBy: 'category', looks: {}, mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0', trustMarks: '1', spotlight: '0',
     relNode: null, noteSticky: false, noteOpen: false,
     path: null, text: null, map: null, focus: null, collapsed: new Set(), selected: null,
+    arrow: null,   // the line selected while the spotlight is on (WO-63): its arrow id
+    // what the spotlight lights (WO-63), in click order: node ids and lines (a drawn line's
+    // id, or an arrow's own id from the map); selected and arrow are its last node and line.
+    // spotForced: set from outside (a walkthrough stop, a link, a render) with the switch
+    // off: shown until the reader touches the picture
+    spot: [], spotForced: false, spotFromStop: false,
     // a file may hold several diagrams (model/map.js): file is the first, map the one
     // shown, part its anchor (null: the first), trail the levels above it, outermost
     // first, as {anchor, focus, node} (node: the node that opened the next level)
@@ -167,6 +173,7 @@ export function mount(element, options = {}) {
   else if (typeof saved.look === 'string') S.looks = { mindmap: saved.look, er: saved.look };
   for (const k of ['appearance', 'colourBy']) if (link[k] != null) S[k] = String(link[k]);
   if (typeof link.trustMarks === 'boolean') S.trustMarks = link.trustMarks ? '1' : '0';
+  if (typeof link.spotlight === 'boolean') S.spotlight = link.spotlight ? '1' : '0';
   // a link's look: for every diagram that offers it, this visit only
   const linkLook = link.look != null ? String(link.look) : null;
   // a look set from outside (setPrefs) or by the reader on this file, by diagram (part
@@ -381,7 +388,7 @@ export function mount(element, options = {}) {
     // played: the sequence's change mark goes (seen.js)
     played: (key) => seenAck([`${key || ''}|s`]),
   });
-  v.afterDraw = () => { player.decorate(false); paintHighlight(); };
+  v.afterDraw = () => { player.decorate(false); paintHighlight(); paintSpotlight(); };
 
   // ---------- a picture for an export: highlight, expand, close, crop (setState) ----------
   // highlight: these nodes (and what is inside them) keep their colours; every other box,
@@ -403,8 +410,133 @@ export function mount(element, options = {}) {
       line.classList.toggle('is-idle', idle);
       if (idle && shape?.head) line.setAttribute('marker-end', painter.marker(shape.head, 'idle'));
       if (idle && shape?.tail) line.setAttribute('marker-start', painter.marker(shape.tail, 'idle'));
-      $.rels.querySelectorAll(`[data-for="${CSS.escape(line.dataset.id)}"]`).forEach((l) => l.classList.toggle('is-idle', idle));
+      $.rels.querySelectorAll(`:not(g)[data-for="${CSS.escape(line.dataset.id)}"]`).forEach((l) => l.classList.toggle('is-idle', idle));
     }
+  }
+  // ---------- the spotlight (WO-63) ----------
+  // The switch is on and this diagram type has one (diagrams/index.js spotlight), not in
+  // List mode nor in a thumbnail.
+  const spotOn = () => S.spotlight === '1' && !!diagram().spotlight && S.mode !== 'list' && !S.thumb && !!S.map?.root;
+  v.spotOn = spotOn;
+  // A spot ref -> {node: id} or {arrow: the drawn line}, or null when it is not drawn
+  // here (a lane is never one: its own highlight, WO-62, is not a spotlight)
+  function spotRef(ref) {
+    if (!S.map?.byId || diagram().isLane?.(ref)) return null;
+    if (S.map.byId[ref]) return { node: ref };
+    const a = painter.arrow(ref) || painter.arrowByEid(ref);
+    return a ? { arrow: a } : null;
+  }
+  // selected and arrow follow the spot: its last node and its last line
+  function syncSpot() {
+    const refs = S.spot.map(spotRef);
+    S.selected = S.spot.filter((_, i) => refs[i]?.node).at(-1) ?? (S.spot.length ? null : S.selected);
+    S.arrow = S.spot.filter((_, i) => refs[i]?.arrow).at(-1) ?? null;
+  }
+  // a selection of one (a click, a search hit, a page, Escape's clear): the spot follows it
+  function oneSpot(id) { S.spot = id ? [id] : []; S.spotForced = false; S.arrow = null; }
+  const spotAble = () => !!diagram().spotlight && S.mode !== 'list' && !S.thumb && !!S.map?.root;
+  // shown: the switch is on (or the spot was set from outside), something is spotlit, and
+  // no highlight (Point to) or sequence play owns the picture
+  const spotShown = () => spotAble() && (S.spotlight === '1' || S.spotForced) && S.spot.length > 0 && !S.play && !S.highlight;
+  v.spotShown = spotShown;
+  // Each selected box keeps itself, what is inside it, the boxes round it and every line
+  // touching it (in and out); each selected line keeps itself and its two end boxes (a
+  // closed box holding an end is that end). Several selected: what each keeps. Everything
+  // else fades by opacity.
+  function paintSpotlight() {
+    $.rels.querySelectorAll(':scope > .mmv-mark-line').forEach((e) => e.remove());
+    for (const el of root.querySelectorAll('[data-mmv=viewport] .is-spot-out')) el.classList.remove('is-spot-out');
+    const refs = spotShown() && S.layout ? S.spot.map(spotRef).filter(Boolean) : [];
+    const on = refs.length > 0;
+    root.classList.toggle('is-spotlit', on);
+    if (!on) return;
+    const inside = (id, set) => { for (let n = S.map.byId[id]; n; n = n.parent) if (set.has(n.id)) return true; return false; };
+    const boxes = new Set(refs.filter((r) => r.node).map((r) => r.node));
+    const lines = refs.filter((r) => r.arrow).map((r) => r.arrow);
+    const lineIds = new Set(lines.map((a) => a.id));
+    const kept = new Set([...boxes, ...lines.flatMap((a) => a.items.flatMap((r) => [r.from, r.to]))]);
+    const round = new Set();
+    for (const id of kept) for (let n = S.map.byId[id]?.parent; n; n = n.parent) round.add(n.id);
+    const keep = (id) => inside(id, kept) || round.has(id);
+    const lineKept = new Map();
+    const lineLit = (id) => {
+      if (lineIds.has(id)) return true;
+      if (!lineKept.has(id)) lineKept.set(id, !!boxes.size && (painter.arrow(id)?.items || []).some((r) => inside(r.from, boxes) || inside(r.to, boxes)));
+      return lineKept.get(id);
+    };
+    for (const g of [...$.frames.children, ...$.nodes.children]) {
+      const id = g.dataset.id;
+      if (!id || diagram().isLane?.(id)) continue;   // the lanes stay: they say where things are
+      if (!keep(id)) g.classList.add('is-spot-out');
+    }
+    for (const e of $.edges.children) if (!keep(String(e.dataset.id || '').split('>').pop())) e.classList.add('is-spot-out');
+    // a line, its hit strip, label, icons, note mark and change marks carry its id
+    for (const el of $.rels.children) {
+      const k = el.dataset.id || el.dataset.for || el.dataset.arrow || el.dataset.trustArrow;
+      if (k && !lineLit(k)) el.classList.add('is-spot-out');
+    }
+    for (const id of lineIds) {
+      const path = $.rels.querySelector(`:scope > path[data-id="${CSS.escape(id)}"]`);
+      if (!path) continue;
+      const mark = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      mark.setAttribute('class', 'mmv-mark-line');
+      mark.setAttribute('d', path.getAttribute('d'));
+      $.rels.insertBefore(mark, path);
+    }
+  }
+  // a line clicked while the spotlight is on: it alone is selected (no box is)
+  function selectArrow(id) {
+    const hadNode = !!S.selected;
+    S.spot = [id];
+    S.spotForced = false;
+    S.arrow = id;
+    S.selected = null;
+    if (hadNode) paintMarks(); else paintSpotlight();
+    emitState();
+  }
+  // Shift-click with the spotlight on: adds a box or line, or takes back one already lit
+  function toggleSpot(ref) {
+    const base = S.spotForced ? [] : S.spot.filter((r) => spotRef(r));
+    const i = base.findIndex((r) => r === ref || spotRef(r)?.arrow?.id === ref);
+    if (i >= 0) base.splice(i, 1); else base.push(ref);
+    S.spot = base;
+    S.spotForced = false;
+    syncSpot();
+    if (!S.spot.length) S.selected = null;
+    hideNote();
+    paintMarks();
+    emitState();
+  }
+  // A spot from outside (a stop, a link, setState, a render): ids or "a, b". With the
+  // switch on it is the reader's own; off, it shows until the reader touches the picture.
+  function setSpot(list) {
+    const ids = (Array.isArray(list) ? list : String(list ?? '').split(',')).map((x) => String(x).trim()).filter(Boolean);
+    S.spot = [...new Set(ids)];
+    S.spotForced = S.spot.length > 0 && S.spotlight !== '1';
+    S.spotFromStop = openingStop && S.spot.length > 0;
+    syncSpot();
+    if (!S.spot.length) { S.selected = null; S.arrow = null; }
+    // a lit box inside a closed one: open the way to it
+    for (const id of S.spot) for (let c = S.map?.byId[id]?.parent; c; c = c.parent) S.collapsed.delete(c.id);
+    render(false);
+  }
+  // the reader touches the picture: a spot shown with the switch off goes
+  // (no redraw here: a type that draws again on selection would replace the element the
+  // click lands on; the last box stays selected, as a click would leave it)
+  function liftSpot() {
+    if (!S.spotForced) return;
+    oneSpot(S.selected);
+    painter.paintMarks();
+    paintSpotlight();
+    emitState();
+  }
+  // a walkthrough stop's spot belongs to the stop: another stop, or closing, takes it away
+  function dropStopSpot() {
+    if (!S.spotFromStop) return;
+    S.spotFromStop = false;
+    oneSpot(null);
+    S.selected = null;
+    paintMarks();
   }
   // the picture asked for: expand (a whole number of levels below the view's top, or
   // 'all'), close (boxes shown closed), highlight (node ids), crop (a node id). Returns
@@ -660,7 +792,7 @@ export function mount(element, options = {}) {
     stage.applyView(true);
     markExpandBtn();
   }
-  const paintMarks = () => { if (!painter.paintMarks()) render(false); };
+  const paintMarks = () => { if (!painter.paintMarks()) render(false); else paintSpotlight(); };
   const paintRels = () => { applyChrome(); if (!painter.paintRels()) render(false); };
 
   // ---------- canvas clicks ----------
@@ -672,7 +804,8 @@ export function mount(element, options = {}) {
     lastDot = { key, t: now };
     return !again;
   };
-  function canvasClick(target) {
+  function canvasClick(target, event) {
+    const add = !!event?.shiftKey && spotAble() && S.spotlight === '1';   // Shift-click adds (WO-63)
     const pin = target.closest('[data-pin]');
     if (pin) { clickNode(pin.dataset.pin); return; }
     if (target.closest('[data-trust], [data-query-column]')) return;
@@ -691,10 +824,22 @@ export function mount(element, options = {}) {
     const opener = target.closest('[data-note]');
     if (opener) { openPage(opener.dataset.note); return; }
     const arrow = target.closest('[data-arrow]');
-    if (arrow) { showArrow(arrow.dataset.arrow, arrow); return; }
+    if (arrow) {
+      const id = arrow.dataset.arrow;
+      if (add && painter.arrow(id)) { toggleSpot(id); return; }
+      if (spotOn() && painter.arrow(id)) {
+        // a type that draws again on selection (ER) replaces the clicked line: anchor on the new one
+        const hit = arrow.classList.contains('mmv-flow-hit');
+        selectArrow(id);
+        const now = arrow.isConnected ? arrow : $.rels.querySelector(`${hit ? '.mmv-flow-hit' : ':not(.mmv-flow-hit)'}[data-arrow="${CSS.escape(id)}"]`) || $.rels.querySelector(`[data-arrow="${CSS.escape(id)}"]`);
+        if (now) showArrow(id, now);
+      } else showArrow(id, arrow);
+      return;
+    }
     // a node or an open box (lines carry data-id too, for an export: not a node)
     const node = target.closest(':is([data-mmv=frames], [data-mmv=nodes]) > [data-id]');
     if (node && node.dataset.bar) stage.zoomToRead(S.map.byId[node.dataset.id]);
+    else if (node && add && !diagram().isLane?.(node.dataset.id)) toggleSpot(node.dataset.id);
     else if (node) clickNode(node.dataset.id);
     else deselect();
   }
@@ -787,6 +932,8 @@ export function mount(element, options = {}) {
     const n = S.map.byId[id];
     if (!n) return;
     S.focus = n === S.map.root ? null : id;
+    // the spotlight's selection goes with a drill: the drilled view opens with nothing selected (WO-63)
+    if (spotOn() || S.spotForced) { S.selected = null; oneSpot(null); }
     // the drilled-into node opens the way a freshly opened map does
     setExpand('default');
     hideNote();
@@ -836,6 +983,7 @@ export function mount(element, options = {}) {
     if (!S.map?.byId[id]) return;
     hideNote();
     S.selected = id;
+    oneSpot(id);
     paintMarks();
     pageSince = marked() ? { id, kind: seen.ownMark(partKey(), id, envName()), removed: seen.removedUnder(partKey(), id) } : null;
     page.open(id);
@@ -951,6 +1099,7 @@ export function mount(element, options = {}) {
   });
   function select(id) {
     S.selected = id;
+    oneSpot(id);
     hideNote();
     if (S.mode === 'list') render(false); else paintMarks();
     // Poster (WO-38): a click, a tap or the keyboard keeps the node's details open
@@ -968,6 +1117,7 @@ export function mount(element, options = {}) {
     S.relNode = on ? id : null;
     if (on) {
       S.selected = id;
+      oneSpot(id);
       showNote(S.map.byId[id], anchorEl);
       S.noteSticky = true;
     } else hideNote();
@@ -977,6 +1127,7 @@ export function mount(element, options = {}) {
   }
   function deselect() {
     S.selected = null;
+    oneSpot(null);
     hideNote();
     paintMarks();
     emitState();
@@ -992,6 +1143,7 @@ export function mount(element, options = {}) {
     if (!inView(n)) { S.focus = null; painter.clearSizes(); }
     for (let c = n.parent; c; c = c.parent) S.collapsed.delete(c.id);
     S.selected = id;
+    oneSpot(id);
     render(false);
     stage.zoomToRead(n);  // a search hit or related node is always readable
     if (!keepNote) hideNote();
@@ -1471,6 +1623,10 @@ export function mount(element, options = {}) {
     $.relBtn.hidden = !!diagram().layoutByView || !!diagram().noRelations;   // a box diagram always shows its arrows; a sequence has none
     $.relBtn.classList.toggle('is-active', S.rels === '1');
     $.relBtn.title = S.rels === '1' ? 'Hide related links' : 'Show related links';
+    $.spotBtn.hidden = !diagram().spotlight || S.mode === 'list';
+    $.spotBtn.classList.toggle('is-active', S.spotlight === '1');
+    $.spotBtn.setAttribute('aria-pressed', String(S.spotlight === '1'));
+    $.spotBtn.title = S.spotlight === '1' ? 'Spotlight what you click: on' : 'Spotlight what you click';
     $.themePanel.querySelectorAll('[data-pref] button').forEach((b) => { const pref = b.closest('[data-pref]').dataset.pref; b.classList.toggle('is-on', b.dataset.v === String(pref === 'look' ? lookOf() : S[pref])); });
   }
   // The theme panel is built from the registered themes: each shows its own
@@ -1575,6 +1731,18 @@ export function mount(element, options = {}) {
     paintRels();
     emitState();
   });
+  $.spotBtn.addEventListener('click', () => setSpotlight(S.spotlight !== '1'));
+  // the spotlight switch (WO-63): kept with the reader's prefs; off, a selected line goes
+  function setSpotlight(on) {
+    if ((S.spotlight === '1') === !!on) return;
+    S.spotlight = on ? '1' : '0';
+    if (!on && !S.spotForced) oneSpot(S.selected);
+    savePrefs();
+    applyChrome();
+    // ER draws its lit lines only with the switch off
+    if (S.layout && S.mode !== 'list') render(false);
+    emitState();
+  }
   $.warnBtn.addEventListener('click', () => togglePanel('warnPanel'));
   $.verificationBtn.addEventListener('click', () => { togglePanel('verificationPanel'); verification.renderPanel(); });
   $.infoBtn.addEventListener('click', () => { togglePanel('infoPanel'); renderInfo(); });
@@ -1734,8 +1902,10 @@ export function mount(element, options = {}) {
   };
   function useView(name) {
     const view = viewNamed(name) || S.map.views[0] || null;
+    const wasView = S.relView;
     S.relView = view && view !== S.map.views[0] ? view.name : null;
     S.map.relations = view ? view.relations : [];
+    if (S.relView !== wasView) oneSpot(S.selected);
     const before = S.map.root;
     S.map.root = view?.deploy ? view.deploy.root : S.map.base.root;
     S.map.byId = view?.deploy ? view.deploy.byId : S.map.base.byId;
@@ -2115,7 +2285,13 @@ export function mount(element, options = {}) {
     // Escape closes what is on top first: an open note or panel, then the play (WO-61)
     if (e.key === 'Escape' && (!$.note.hidden || PANELS.some((p) => !$[p].hidden))) { closePanels(); hideNote(); return; }
     if (!page.isOpen() && !e.metaKey && !e.ctrlKey && player.key(e)) { e.preventDefault(); return; }
-    if (e.key === 'Escape') { closePanels(); hideNote(); if (page.isOpen()) page.close(); }
+    if (e.key === 'Escape') {
+      const paged = page.isOpen();
+      closePanels(); hideNote();
+      if (paged) page.close();
+      // nothing open: Escape clears the spotlight's selection (WO-63)
+      else if ((spotOn() || S.spotForced) && S.spot.length) deselect();
+    }
     if (e.key === '/' && !e.metaKey && !e.ctrlKey && sInput.offsetParent) { e.preventDefault(); sInput.focus(); }
     if (e.key === 'p' && (IS_MAC ? e.metaKey : e.ctrlKey) && S.map?.root) { e.preventDefault(); closePanels(); hideNote(); exporter.print(); }
     if (e.key === '0' && !e.metaKey && !e.ctrlKey) fitOrCenter();
@@ -2169,7 +2345,7 @@ export function mount(element, options = {}) {
   function currentState() {
     // a deployment is reported as env, a relation view as view
     const env = viewNamed(S.relView)?.deploy ? S.relView : null;
-    return { mode: S.mode, part: S.part, focus: S.focus, node: S.selected, page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state(), ...(S.compare ? { edition: S.edition } : {}), ...(S.walkthrough ? { walkthrough: S.walkthrough, stop: S.stop } : {}) };
+    return { mode: S.mode, part: S.part, focus: S.focus, node: S.selected, arrow: S.arrow, spot: S.spot.slice(), page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state(), ...(S.compare ? { edition: S.edition } : {}), ...(S.walkthrough ? { walkthrough: S.walkthrough, stop: S.stop } : {}) };
   }
   function emitState() {
     renderChanges();   // the view shown may be another
@@ -2306,6 +2482,9 @@ export function mount(element, options = {}) {
       // a thumbnail marks the node where the fit put it (no camera move)
       if (st.node && S.map.byId[st.node]) { if (S.thumb) { S.selected = st.node; root.classList.add('is-spot'); render('all'); } else jumpTo(st.node); }
       if (st.page && S.map.byId[st.page]) { S.selected = st.page; page.open(st.page, { instant: true }); }
+      // a selected line (WO-63): only while the spotlight is on
+      if (st.arrow && spotOn() && painter.arrow(String(st.arrow))) selectArrow(String(st.arrow));
+      if (st.spot) setSpot(st.spot);
       if (st.seq) playState(st);
     } else {
       firstLoad = false;
@@ -2355,6 +2534,7 @@ export function mount(element, options = {}) {
       S.focus = null;
       setExpand('default');
       S.selected = null;
+      oneSpot(null);
       S.hits = [];
       S.iconFilter.clear();
       S.highlight = null;
@@ -2385,6 +2565,7 @@ export function mount(element, options = {}) {
     S.stop = i;
     S.offPath = false;
     clearPoint();
+    dropStopSpot();
     // the panel first: a fit frames the picture around it
     renderWalkthrough();
     // the stop's place is set in steps; the reader is not following until it is there
@@ -2419,6 +2600,7 @@ export function mount(element, options = {}) {
     S.stop = null;
     S.offPath = false;
     clearPoint();
+    dropStopSpot();
     renderWalkthrough();
     refitForPanel();
     emitState();
@@ -2435,7 +2617,7 @@ export function mount(element, options = {}) {
     updateExpandBtn();
     render('all');
   }
-  $.canvas.addEventListener('pointerdown', () => clearPoint());
+  $.canvas.addEventListener('pointerdown', () => { clearPoint(); liftSpot(); });
   function clearPoint() {
     if (!S.point) return;
     S.point = null;
@@ -2579,6 +2761,12 @@ export function mount(element, options = {}) {
     if ('node' in partial) {
       if (partial.node == null) { if (S.selected) deselect(); } else if (S.map.byId[partial.node]) jumpTo(partial.node);
     }
+    if ('arrow' in partial) {
+      // a line selected (WO-63): only while the spotlight is on and the line is drawn
+      if (partial.arrow == null) { if (S.arrow) { oneSpot(S.selected); paintSpotlight(); } }
+      else if (spotOn() && painter.arrow(String(partial.arrow))) selectArrow(String(partial.arrow));
+    }
+    if ('spot' in partial) setSpot(partial.spot);
     if ('page' in partial) {
       if (partial.page == null) page.close();
       else if (S.map.byId[partial.page] && partial.page !== page.id) openPage(partial.page);
@@ -2615,7 +2803,7 @@ export function mount(element, options = {}) {
   // A snapshot of the map shown (pack.js, as relay-server/pack.py makes one): every
   // diagram, opening where the reader is. Kept: the diagram, view or deployment, mode,
   // relations shown, colouring, theme and appearance, Before; a sequence opens at step 1.
-  // Dropped: a node page, a search, a selection, a drilled-in box, boxes opened by hand,
+  // Dropped: a node page, a search, a selection (kept while the spotlight is on: WO-63), a drilled-in box, boxes opened by hand,
   // and this reader's own "since you looked" marks (a host's since goes in).
   async function snapshot() {
     await ready;
@@ -2630,6 +2818,8 @@ export function mount(element, options = {}) {
       ...(S.rels === '1' ? { rels: true } : {}),
       ...(play.seq ? { seq: play.seq, step: 1 } : {}),
       ...(S.compare && S.edition === 'before' ? { edition: 'before' } : {}),
+      // the spotlight as seen (WO-63): its box or line stays selected
+      ...(spotShown() ? { spot: S.spot.slice() } : {}),
     };
     const marks = sinceText != null && options.marks !== false;
     const opts = {
@@ -2637,7 +2827,7 @@ export function mount(element, options = {}) {
       ...(marks ? { since: sinceText, ...(options.sinceLabel ? { sinceLabel: options.sinceLabel } : {}) } : {}),
       ...(beforeText != null ? { before: beforeText } : {}),
       state,
-      prefs: { trustMarks: S.trustMarks !== '0', ...(S.appearance !== 'auto' ? { appearance: S.appearance } : {}), colourBy: S.colourBy },
+      prefs: { trustMarks: S.trustMarks !== '0', ...(S.appearance !== 'auto' ? { appearance: S.appearance } : {}), colourBy: S.colourBy, ...(S.spotlight === '1' ? { spotlight: true } : {}) },
     };
     const { packSnapshot } = await import(new URL('./pack.js', import.meta.url).href);
     return packSnapshot({ text: S.text, path: S.path, theme: themeSources.get(S.themeId) || currentTheme(), options: opts, asOf, version: options.version ?? null });
@@ -2697,7 +2887,7 @@ export function mount(element, options = {}) {
     const entries = items();
     return list.map((w) => ({ name: w.name, intro: w.intro, stops: w.stops.map((st) => {
       const hit = st.known && !st.invalidReference && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name && (!st.options?.diagram || (e.diagram || (e.part ? S.file.parts.get(e.part)?.title : S.file.title)) === st.options.diagram));
-      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, state: hit ? (st.point ? { ...hit.state, point: st.point } : hit.state) : null };
+      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, state: hit ? { ...hit.state, ...(st.point ? { point: st.point } : {}), ...(st.spot ? { spot: st.spot } : {}) } : null };
     }) }));
   }
   // the walkthroughs come first (the menu's Walks), then the items
@@ -2786,6 +2976,7 @@ export function mount(element, options = {}) {
     },
     setPrefs(p = {}) {
       if (typeof p.trustMarks === 'boolean') setTrustMarks(p.trustMarks);
+      if (typeof p.spotlight === 'boolean') setSpotlight(p.spotlight);
       if (APPEARANCES.includes(p.appearance)) S.appearance = p.appearance;
       const was = posterNow();
       if (p.look != null && looksOf().some(([id]) => id === p.look)) lookHere.set(S.part || '', String(p.look));

@@ -148,7 +148,7 @@ viewer is JavaScript and draws in the browser, so the open page draws.
 ```bash
 python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.png
                                [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID] [--mode MODE] [--colour-by NAME]
-                               [--expand N|all] [--close a,b] [--highlight a,b] [--crop ID]
+                               [--expand N|all] [--close a,b] [--highlight a,b] [--spot a,e1] [--crop ID]
                                [--seq ANCHOR [--step N | --steps all|3-5]]
                                [--before FILE [--edition before|after]] [--draft FILE]
                                [--theme ID] [--appearance light|dark] [--look outline|poster] [--width PX | --scale X] [--background theme|none]
@@ -172,7 +172,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   with no page; `422 {error}` when the page could not draw it; `400` for a bad field.
 - `state` takes the show fields (`part`, `view`, `env`, `focus`, `node`, `page`, `mode`,
   `seq`, `step`, `colourBy`, `edition`) and the picture's (`expand`: a whole number or `"all"`;
-  `close`, `highlight`: node ids; `crop`: a node id). `format` `svg` (default) or `png`;
+  `close`, `highlight`: node ids; `spot`: node and arrow ids the spotlight lights, WO-63; `crop`: a node id). `format` `svg` (default) or `png`;
   `width` 16 to 16,000 px, or `scale` 0.1 to 8; `background` `theme` or `none`;
   `appearance` `light` or `dark`; `theme` a theme id (an unknown one: the default, and
   `problems` says so); `report` the layout report (`map-viewer-api.md`, Export);

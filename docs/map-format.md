@@ -1133,13 +1133,20 @@ one optional subsection supplies narrative metadata:
 - Label: Boundary
 - Notes: orders, charge
 - Diagram: Shop platform
+- Spotlight: payments, e1
 ```
 
 Title is the section/panel title (default: destination name). Label is the short
 reading-document navigation and section-eyebrow label (default: Title/name). Notes lists existing
 note-bearing node, arrow or message IDs from the destination's owning diagram; these
 notes are offered with the stop in the walkthrough panel and the reading document. Repeated IDs are
-included once. Diagram optionally qualifies a destination name that occurs in several
+included once. Spotlight (WO-63) lists node ids and arrow ids (`e1@`) of the destination's
+diagram that the stop spotlights: each box stays with every line touching it, each line
+with its two end boxes, and the rest fades; it shows whatever the reader's spotlight switch
+says, a move or click in the picture lifts it, and returning to the stop brings it back. It
+is for Diagram, Perspective and Deployment stops of flowchart, state, ER and lane diagrams,
+not with Point to (`walkthrough-options`); an id the diagram does not have is
+`walkthrough-reference`. The reading document draws the stop spotlit. Diagram optionally qualifies a destination name that occurs in several
 diagrams; unqualified old files keep their first-match resolution. An invalid explicit
 qualifier never falls back to another diagram. Field/subsection names are case-insensitive;
 duplicate, empty or unknown fields are `walkthrough-options`; invalid Diagram/Notes

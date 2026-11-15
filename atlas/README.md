@@ -41,5 +41,7 @@ Rule: imports the viewer only through `map-viewer/index.js`.
 - Opening another map adds a history entry (Back returns); moving around in a map
   replaces the URL.
 - A link with no `focus` shows the whole map; no `node` selects nothing.
+- `spot=a,b>c`: the spotlit boxes and lines (WO-63), written when more than one box or a
+  line is spotlit; the link reopens them lit.
 - A note link to this atlas (same host and port; `localhost` and `127.0.0.1` count as
   one) opens in place, drilled in.
