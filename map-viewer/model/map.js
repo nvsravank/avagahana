@@ -331,8 +331,9 @@ function parsePart(text, fileName, shared) {
       views.push({ name, relations: dep.relations, deploy: dep });
     }
   }
-  // icons on arrows, by arrow id, in every view (a deployment's own arrows included)
-  attachArrowIcons(arrowIcons, [...new Set(views.flatMap((v) => v.relations))], warnings);
+  // icons on arrows, by arrow id, in every view (a deployment's own arrows included), and
+  // on sequence messages, by message id (`%% id:`, WO-64)
+  attachArrowIcons(arrowIcons, [...new Set([...views.flatMap((v) => v.relations), ...messages])], warnings);
   // a line's class: a colour when it has a meaning; dashes and width from its classDef
   for (const v of views) {
     for (const r of v.relations) {

@@ -25,7 +25,9 @@ try {
   const faces = (t.font?.faces || []).map((f, i) => ({ weight: f.weight, style: f.style, data: () => Promise.resolve(bytes(data.fonts[i])) }));
   const theme = { ...t, font: faces.length ? { family: t.font.family, faces } : undefined };
   mount(document.getElementById('avagahana-map'), {
-    ...data.options, assets, themes: [theme], theme: theme.id, defaultTheme: false, storageKey: null,
+    // a snapshot is for readers: no problems badge (authors see problems in the atlas and
+    // from the checker, WO-64); events and the console still get them
+    ...data.options, assets, themes: [theme], theme: theme.id, defaultTheme: false, storageKey: null, showProblems: 'none',
     crossMapNote: 'Not in this snapshot',
   });
 } catch (x) {

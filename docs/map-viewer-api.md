@@ -600,7 +600,8 @@ Atlas uses it for agent renders; no relay or atlas is needed by an embedding hos
 does (below), with no server and no atlas: `map-viewer/pack.js`, loaded on first use,
 reads the viewer's own files beside it. The file holds every diagram, view, deployment
 and play, Before and After when the host gave an earlier version, and opens where the
-reader is:
+reader is. It is for readers: it shows no problems badge (`showProblems: 'none'`;
+authors see problems in the atlas and from the checker):
 
 - Kept: the diagram, view or deployment, mode, relations shown, colouring, theme and
   appearance, Before or After. A sequence that was playing opens at step 1.

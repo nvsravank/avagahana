@@ -7,6 +7,18 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.2.2 (2026-11-15)
+
+- **Contract** (map format, clarification): a `## Node icons` line may name a sequence
+  message id (`%% id:`); the viewer now draws its icons after the message's label, as for
+  arrows. The checker already accepted it, so maps that showed a problem per such line
+  (the toolbar count) now open with none.
+- Interactive HTML snapshots (`pack.py`, Export > Interactive HTML) show readers the map
+  alone, without the problems badge; the atlas and the checker report problems to authors.
+- Every example map is held to no problems from both the checker and the viewer.
+- Skills: a sequence message takes its confidence mark and evidence by its message id, as
+  a box or arrow does.
+
 ## 0.2.1 (2026-11-15)
 
 - **Contract** (viewer API, addition): the selection spotlight. A toolbar switch (a cursor

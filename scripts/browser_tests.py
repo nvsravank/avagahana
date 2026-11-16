@@ -457,15 +457,36 @@ def snapshot_tests(browser, base=None):
         drawn, info, errors = open_snapshot(browser, verified, lambda ev, click: click('[data-note="atlas"]') and ev("({icon:!!document.querySelector('.mmv-page .mmv-evidence-mark svg'),evidence:document.querySelector('.mmv-page .mmv-evidence')?.textContent.includes('atlas/app.js')})"))
         check("offline verification: node page retains icons and evidence when hidden", drawn and info == {"icon": True, "evidence": True} and not errors, f"{info}; {errors[:3]}")
 
+        # a snapshot is for readers: no problems badge, even for a map with problems (WO-64)
+        line, flawed = pack("node-icons-unknown-id.md", tmp / "flawed.html", maps_dir=ROOT / "format" / "samples")
+        drawn, badge, errors = open_snapshot(browser, flawed, lambda ev, _c: ev("document.querySelector('#avagahana-map [data-mmv=warnBtn]')?.hidden"))
+        check("a snapshot shows no problems badge", line.startswith("STATUS=packed") and drawn and badge is True and not errors, f"{line}; badge hidden: {badge}; {errors[:3]}")
+
         # inside a snapshot (WO-35): no interactive file; the Markdown saves under the policy
         saved = tmp / "saved"
         saved.mkdir()
         menu = "[...document.querySelectorAll('#avagahana-map [data-mmv=exportWrap] .mmv-menu-item')].filter((b) => !b.hidden).map((b) => b.dataset.mmv).join(' ')"
-        drawn, items, errors = open_snapshot(browser, garden, lambda ev, _c: [ev(menu), ev("document.querySelector('[data-mmv=exportMd]').click()"), time.sleep(2)][0], downloads=saved)
-        check("inside a snapshot: SVG, PNG, Print and Markdown, no interactive file", items == "exportSvg exportPng printBtn exportMd", items)
         got = saved / "garden.md"
+
+        def export_md(ev, click):
+            items = ev(menu)
+            # a real click, as a reader makes it (a synthetic one may not count as the
+            # reader's on every platform); the menu opens first so the item has a box
+            click('[data-mmv=exportBtn]')
+            if not click('[data-mmv=exportMd]'):
+                ev("document.querySelector('[data-mmv=exportMd]').click()")
+            # wait for the saved file, not a fixed time (WO-64: Windows was slower than 2 s).
+            # Chrome renames a download to its final name only once it is complete.
+            end = time.time() + 30
+            while not got.is_file() and time.time() < end:
+                ev('true')  # drain the download events while the file is being saved
+                time.sleep(0.1)
+            return items
+        events = []
+        drawn, items, errors = open_snapshot(browser, garden, export_md, downloads=saved, download_events=events)
+        check("inside a snapshot: SVG, PNG, Print and Markdown, no interactive file", items == "exportSvg exportPng printBtn exportMd", items)
         check("inside a snapshot: Source file saves the map's text, allowed by the policy",
-              got.is_file() and got.read_text(encoding="utf-8") == (EXAMPLES / "garden.md").read_text(encoding="utf-8") and not errors, f"{sorted(p.name for p in saved.iterdir())}; {errors[:3]}")
+              got.is_file() and got.read_text(encoding="utf-8") == (EXAMPLES / "garden.md").read_text(encoding="utf-8") and not errors, f"{sorted(p.name for p in saved.iterdir())}; downloads: {events[-3:]}; {errors[:3]}")
 
         if base:
             viewer_pack_tests(browser, base, tmp, check)

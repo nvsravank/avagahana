@@ -148,6 +148,9 @@ erDiagram
 
 ## Walkthrough: Understand the refunds
 
+The order query lists each order with its payments and refunds. This walk is for someone
+reviewing how refunds are found: it goes from the sources through the joins to the output.
+
 ### Diagram: Order query
 
 The overview shows the source catalogue, order_base CTE and final report.

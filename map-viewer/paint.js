@@ -518,6 +518,9 @@ export function createPainter(v) {
     }
     $.rels.replaceChildren(frag);
     arrows = new Map(rels.filter((r) => r.items).map((r) => [r.id, r]));
+    // a sequence message is its own one-item arrow, so its note and trust marks open it (WO-64)
+    const messages = S.map?.sequence?.messages || [];
+    for (const r of rels) if (r.msg != null && messages[r.msg]) arrows.set(r.id, { ...r, items: [messages[r.msg]] });
     markArrows();
   }
 

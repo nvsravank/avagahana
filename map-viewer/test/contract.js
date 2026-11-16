@@ -450,6 +450,33 @@ try {
     check('every code the viewer reports has a sample', !missing.length, missing.join(' '));
   }
 
+  // ---- icons on sequence messages, by message id (WO-64) ----
+  {
+    const mv = mount(document.getElementById('a'), { storageKey: null });
+    await mv.load(await fetch('../../format/samples/good-message-icons.md').then((r) => r.text()), 'good-message-icons.md');
+    await waitFor(() => document.querySelectorAll('#a .mmv-flow-icon').length >= 3);
+    const drawn = [...document.querySelectorAll('#a .mmv-flow-icon')].map((g) => `${g.dataset.for}:${g.querySelector('title')?.textContent}`);
+    check('message icons drawn after their labels', drawn.join(', ') === 'm0:Shopping cart, m1:Check circle, m1:Status: green', drawn.join(', '));
+    check('message icons: no problems', !mv.problems.some((x) => x.source === 'map'), JSON.stringify(mv.problems.map((x) => x.message)));
+    mv.destroy();
+  }
+
+  // ---- every example map: no problems from the viewer (WO-64) ----
+  // scripts/check_samples.py holds the checker to none on the same maps, so a map the
+  // checker passes and the viewer warns about (or the other way) fails one of them.
+  {
+    const listing = await fetch('../../examples/maps/').then((r) => r.text());
+    const names = [...new Set([...listing.matchAll(/href="([\w-]+\.md)"/g)].map((x) => x[1]))];
+    check('example maps found', names.length >= 20, names.join(', '));
+    const xv = mount(document.getElementById('a'), { storageKey: null });
+    for (const name of names) {
+      await xv.load(await fetch(`../../examples/maps/${name}`).then((r) => r.text()), name);
+      const got = xv.problems.filter((x) => x.source === 'map');
+      check(`example ${name}: the viewer reports nothing`, !got.length, JSON.stringify(got.map((x) => `${x.code}: ${x.message}`)));
+    }
+    xv.destroy();
+  }
+
   // ---- arrow labels: clear of boxes, titles, borders and each other ----
   {
     const shop = parseMap(await fetch('../../examples/maps/c4-shop.md').then((r) => r.text()), 'c4-shop.md');

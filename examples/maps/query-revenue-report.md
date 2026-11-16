@@ -229,6 +229,9 @@ erDiagram
 
 ## Walkthrough: Read the report
 
+The net revenue report ranks regions by sales less refunds. This walk is for someone
+who has to read or change the query: it follows the data from its sources to the ranking.
+
 ### Diagram: Net revenue report
 
 Start with the shape: sales and refunds come in separately, meet in net_by_order, and

@@ -47,7 +47,9 @@ The basket id and the delivery slot, with an idempotency key.
   fair way to tell the story and gets none. `+` and `-`, or `activate` and `deactivate`, draw a bar
   where there is no reply to draw it from.
 - `%% id: <id>` on the line before a message names it, so `## Details` can hold its
-  note.
+  note. A message backed by evidence takes its confidence mark by that id in
+  `## Node icons` (`- m-post : verified`) and its `#### Evidence` in that note, as a box or
+  arrow does; other icons there are drawn after its label too.
 - `## Plays over`: one line per view, `- #<diagram anchor> : <view name>` (the first
   diagram's anchor is its `# Title`'s; `Relations` is the block's own arrows). Run the
   checker: every participant must be a node the view shows and every message must run

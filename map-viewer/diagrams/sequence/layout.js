@@ -25,6 +25,8 @@ const BAR_STEP = 5;      // a bar inside another sits this far to the right
 const CHAR_W = 6.6;      // a label character at 12px (near enough to keep labels apart)
 
 export const labelWidth = (text) => (text ? text.length * CHAR_W + 16 : 0);
+// a message's icons (16 each) and note mark (14) drawn after its label, as paint lays them out
+export const markWidth = (m) => (m.icons?.length || 0) * 16 + (m.note ? 14 : 0) + (m.icons?.length || m.note ? 4 : 0);
 // a note's lines in `width`: its own line breaks, then at words (a word too long stays whole)
 export function noteLines(text, width) {
   const fit = Math.max(1, Math.floor((width - 16) / CHAR_W));
@@ -63,7 +65,7 @@ export function layoutLifelines(root, size, seq) {
   const spans = seq.messages.map((m) => {
     const a = col.get(m.from);
     const b = col.get(m.to);
-    return { a: Math.min(a, b), b: m.self ? a + 1 : Math.max(a, b), need: labelWidth(drawnLabel(m).text) + (m.self ? SELF_W : 24) + 22 };
+    return { a: Math.min(a, b), b: m.self ? a + 1 : Math.max(a, b), need: labelWidth(drawnLabel(m).text) + markWidth(m) + (m.self ? SELF_W : 24) + 22 };
   }).filter((s) => s.b < heads.length).sort((p, q) => (p.b - p.a) - (q.b - q.a));
   for (const s of spans) {
     const lack = s.need - (x[s.b] - x[s.a]);

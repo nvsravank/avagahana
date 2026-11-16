@@ -826,7 +826,7 @@ export function mount(element, options = {}) {
     const arrow = target.closest('[data-arrow]');
     if (arrow) {
       const id = arrow.dataset.arrow;
-      if (add && painter.arrow(id)) { toggleSpot(id); return; }
+      if (add && diagram().spotlight && painter.arrow(id)) { toggleSpot(id); return; }
       if (spotOn() && painter.arrow(id)) {
         // a type that draws again on selection (ER) replaces the clicked line: anchor on the new one
         const hit = arrow.classList.contains('mmv-flow-hit');
@@ -1544,11 +1544,11 @@ export function mount(element, options = {}) {
     }
   }
   // the map's arrows that carry icons, each arrow id once (the same id in several views
-  // is one arrow)
+  // is one arrow), and a sequence's messages that carry icons (WO-64)
   function arrowsWithIcons() {
     const seen = new Map();
     for (const x of S.map?.views || []) for (const r of x.relations) if (r.icons?.length && !seen.has(r.eid)) seen.set(r.eid, r);
-    return [...seen.values()];
+    return [...seen.values(), ...(S.map?.sequence?.messages || []).filter((m) => m.icons?.length)];
   }
   function updateFilterBtn() {
     $.filterBtn.classList.toggle('is-active', S.iconFilter.size > 0);
@@ -2412,6 +2412,7 @@ export function mount(element, options = {}) {
       walk(m.base?.root || m.root);
       for (const x of m.views) if (x.deploy) walk(x.deploy.root);
       for (const x of m.views) for (const r of x.relations) used.push(...(r.icons || []));
+      for (const msg of m.sequence?.messages || []) used.push(...(msg.icons || []));
       await ensureIcons(used, m.iconLegend);
       for (const code of new Set(used)) {
         if (!iconDef(code, m.iconLegend).vendor && !iconKnown(code, m.iconLegend)) extra.push({ level: 'warning', code: 'map-unknown-icon', message: `Unknown icon code "${code}"; shown as the unknown icon.`, where: null });

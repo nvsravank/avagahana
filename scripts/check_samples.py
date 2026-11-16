@@ -3,7 +3,8 @@
 
     python3 scripts/check_samples.py
 
-- Every example map has no errors; compatibility fixtures may declare expected errors.
+- Every example map gets no problems at all, warnings included (the viewer test holds it
+  to none from the viewer too, WO-64); compatibility fixtures may declare expected errors.
 - Every sample (format/samples/) gets exactly the codes its first line expects
   (`<!-- expect: code code -->`; none for a clean map), of those the checker reports
   (side both or checker), and fails exactly when one of them is an error.
@@ -47,6 +48,10 @@ def main():
             if code in want:
                 continue
             bad.append(f"example {f.name}:{line}: {code}: {msg}")
+        if f.parent == ROOT / "examples" / "maps":
+            for line, code, level, msg in check_map.check(f):
+                if level != "error":
+                    bad.append(f"example {f.name}:{line}: {level} {code}: {msg}")
     covered = set()
     for f in sorted((ROOT / "format" / "samples").glob("*.md")):
         want = expected(f)

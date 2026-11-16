@@ -130,7 +130,8 @@ export function attachNodeIcons(text, byId, warnings) {
 }
 
 // The icon lines attachNodeIcons left: each goes on every relation with that arrow id,
-// in any view; one naming no arrow either is reported.
+// in any view, or on the sequence message with that message id; one naming neither is
+// reported.
 export function attachArrowIcons(rest, relations, warnings) {
   for (const { id, codes } of rest) {
     const rels = relations.filter((r) => r.eid === id);

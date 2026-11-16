@@ -4,7 +4,7 @@
 // is in the step shown (is-now), in one before (is-past) or not reached yet (is-idle).
 // Pure: no DOM, no viewer state.
 import { nodeShaper, nodeName } from '../../geometry.js';
-import { labelWidth, drawnLabel } from './layout.js';
+import { labelWidth, markWidth, drawnLabel } from './layout.js';
 import { labelLines, LABEL_LINE } from '../../connection-labels.js';
 import { CAPTION } from './parse.js';
 
@@ -129,7 +129,7 @@ export function relationShapes(input, play = playState(input.layout.seq, input.p
     if (m.self) {
       const x = r.x1;
       d = `M${x},${r.y} H${x + 30} V${r.y + 18} H${x + 3}`;
-      label = { x: x + 38 + labelWidth(drawnLabel(m).text) / 2, y: r.y + 13, text: m.label };
+      label = { x: x + 38 + (labelWidth(drawnLabel(m).text) + markWidth(m)) / 2, y: r.y + 13, text: m.label };
       badge = { x: x - 14, y: r.y };
     } else {
       const s = r.x2 > r.x1 ? 1 : -1;
@@ -140,7 +140,7 @@ export function relationShapes(input, play = playState(input.layout.seq, input.p
     }
     out.push({
       kind: 'rel', id: `m${m.i}`, d, cls, head, tail: m.both ? head : null, tint,
-      label: m.label || m.note ? { ...label, ...labelLines(m, `${input.byId?.[m.from]?.plain || m.from} → ${input.byId?.[m.to]?.plain || m.to}`), ...(m.note ? { note: true } : {}) } : null,
+      label: m.label || m.note || m.icons?.length ? { ...label, ...labelLines(m, `${input.byId?.[m.from]?.plain || m.from} → ${input.byId?.[m.to]?.plain || m.to}`), ...(m.note ? { note: true } : {}), ...(m.icons?.length ? { icons: m.icons.slice() } : {}) } : null,
       badge: { ...badge, text: num, ...(m.back ? { back: true } : {}), reply: !!m.back || m.reply, cls: st.trim() },
       msg: m.i,
     });

@@ -15,6 +15,7 @@ import secrets
 import shutil
 import socket
 import struct
+import sys
 import subprocess
 import threading
 import tempfile
@@ -190,8 +191,25 @@ def chrome_port(browser, profile):
     finally:
         if connection:
             connection.close()
-        try:
-            proc.wait(10)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait(10)
+        stop_browser(proc)
+
+
+def stop_browser(proc):
+    """Ends the browser once its tests are done. On a slow Windows runner Chrome can
+    outlive Browser.close and a kill of its main process by more than ten seconds (WO-64,
+    Validate run 43781677741), so its whole process tree is ended, and a browser that will
+    not go is reported rather than failing tests that have already passed."""
+    try:
+        proc.wait(10)
+        return
+    except subprocess.TimeoutExpired:
+        pass
+    if os.name == 'nt':
+        subprocess.run(['taskkill', '/F', '/T', '/PID', str(proc.pid)],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+    else:
+        proc.kill()
+    try:
+        proc.wait(30)
+    except subprocess.TimeoutExpired:
+        print(f'warning: browser process {proc.pid} did not exit', file=sys.stderr)

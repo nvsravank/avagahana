@@ -830,6 +830,9 @@ The basket id and the delivery slot, with an idempotency key.
 - **Message ids**: a comment line `%% id: <id>` right before a message names it; its
   details are a `## Details` entry keyed by that id, as for nodes and arrows. Mermaid
   ignores the comment. An id used twice, or one with no message after it, is a problem.
+  A `## Node icons` line may name a message id: its icons are drawn after the message's
+  label, as for arrows ("Icons on arrows"); a confidence mark (`verified`, ...) there
+  needs the message's `## Details` entry to carry its `#### Evidence`, as for any claim.
 - `## Details` and `## Icons` work as for any diagram; relation views and deployments do
   not apply.
 
