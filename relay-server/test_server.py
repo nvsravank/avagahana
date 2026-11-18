@@ -165,10 +165,10 @@ class RelayTests(unittest.TestCase):
         self.assertIn("trustMarks=0", map_url(18300, "garden.md", trustMarks=False))
 
     def test_show_mode_extensibility(self):
-        for mode in ("tables", "future-mode"):
-            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "mode": mode})[0], 200)
-        for mode in (12, [], "A", "x" * 25, "tables\n"):
-            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "mode": mode})[0], 400)
+        for layout in ("hubs", "future-layout"):
+            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "layout": layout})[0], 200)
+        for layout in (12, [], "A", "x" * 25, "hubs\n"):
+            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "layout": layout})[0], 400)
 
     def test_ping_alias(self):
         status, ping = self.s.json("GET", "/api/ping")
@@ -226,7 +226,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "nope.md"})[0], 404)
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "../x.md"})[0], 404)
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "node": "1; drop"})[0], 400)
-        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "mode": "bad mode"})[0], 400)
+        self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "layout": "bad layout"})[0], 400)
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "view": "x" * 101})[0], 400)
         self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "colourBy": "red"})[0], 400)
         conn = http.client.HTTPConnection("127.0.0.1", self.s.port, timeout=5)
@@ -269,8 +269,8 @@ class RelayTests(unittest.TestCase):
         try:
             first = es.next()
             self.assertEqual(first[0], "tree")
-            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "node": "n33", "focus": "n32", "mode": "org"}), (200, {"delivered": 1}))
-            self.assertEqual(es.next(), ("show", {"path": "garden.md", "node": "n33", "focus": "n32", "mode": "org"}))
+            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "node": "n33", "focus": "n32", "layout": "org"}), (200, {"delivered": 1}))
+            self.assertEqual(es.next(), ("show", {"path": "garden.md", "node": "n33", "focus": "n32", "layout": "org"}))
             self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "colourBy": "changes"}), (200, {"delivered": 1}))
             self.assertEqual(es.next(), ("show", {"path": "garden.md", "colourBy": "changes"}))
             self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "part": "shop-containers"}), (200, {"delivered": 1}))
@@ -280,8 +280,8 @@ class RelayTests(unittest.TestCase):
             self.assertEqual(es.next(), ("show", {"path": "garden.md", "page": "n3"}))
             self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "page": "not an id"})[0], 400)
             # a sequence to play over its view, at a step
-            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "seq": "checkout", "step": 3, "mode": "lifelines"}), (200, {"delivered": 1}))
-            self.assertEqual(es.next(), ("show", {"path": "garden.md", "mode": "lifelines", "seq": "checkout", "step": 3}))
+            self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "seq": "checkout", "step": 3, "layout": "lifelines"}), (200, {"delivered": 1}))
+            self.assertEqual(es.next(), ("show", {"path": "garden.md", "layout": "lifelines", "seq": "checkout", "step": 3}))
             self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "seq": "no spaces"})[0], 400)
             self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "seq": "checkout", "step": 0})[0], 400)
             self.assertEqual(self.s.json("POST", "/api/show", {"path": "garden.md", "seq": "checkout", "step": "3"})[0], 400)
@@ -394,12 +394,12 @@ class RelayTests(unittest.TestCase):
         es = EventStream(self.s.port)
         t = stand_in(es, {"draft": True, "report": {"crossings": {"count": 0, "pairs": []}}})
         try:
-            report = render.draft_report("garden.md", "# Draft garden\n", maps_dir=str(self.maps), port=self.s.port, mode="boxes", highlight="n1, n2")
+            report = render.draft_report("garden.md", "# Draft garden\n", maps_dir=str(self.maps), port=self.s.port, layout="boxes", highlight="n1, n2")
             t.join(5)
         finally:
             es.close()
         self.assertEqual(report, {"crossings": {"count": 0, "pairs": []}})
-        self.assertEqual((got[1]["text"], got[1]["state"]), ("# Draft garden\n", {"mode": "boxes", "highlight": ["n1", "n2"]}))
+        self.assertEqual((got[1]["text"], got[1]["state"]), ("# Draft garden\n", {"layout": "boxes", "highlight": ["n1", "n2"]}))
         es = EventStream(self.s.port)
         t = stand_in(es, {})
         try:
@@ -588,7 +588,7 @@ class LauncherTests(unittest.TestCase):
                                       capture_output=True, text=True, timeout=20,
                                       env={**os.environ, "AVAGAHANA_MAP_DIR": str(maps)}).stdout.strip()
             self.assertTrue(env_line.startswith("STATUS=none"), env_line)
-            self.assertTrue(self.run_cmd("show.py", "sales-warehouse.md", "--mode", "tables", *common).startswith("STATUS=none"))
+            self.assertTrue(self.run_cmd("show.py", "sales-warehouse.md", "--layout", "hubs", *common).startswith("STATUS=none"))
             line = self.run_cmd("show.py", "garden.md", "--node", "n3", *common)
             self.assertTrue(line.startswith("STATUS=none URL=") and line.endswith("#/garden.md?node=n3"), line)
             self.assertTrue(self.run_cmd("show.py", "nope.md", *common).startswith("STATUS=failed"))

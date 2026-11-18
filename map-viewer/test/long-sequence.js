@@ -64,7 +64,7 @@ export async function testLongSequence(check, wait) {
   };
   const lineX = (k) => view().x + +q(`[data-mmv=edges] [data-id$="~life"]:nth-child(${k})`).getAttribute('d').match(/M([\d.]+)/)[1] * view().k;
 
-  v.setState({ mode: 'lifelines', seq: null });
+  v.setState({ layout: 'lifelines', seq: null });
   await wait(50);
   await drag(0, 9000);
   check('at the top no names are pinned over the heads', !q('[data-pin]'), view().y);
@@ -100,7 +100,7 @@ export async function testLongSequence(check, wait) {
   const w = mount(host, { storageKey: null });
   await w.load(WIDE, 'wide.md');
   await wait(50);
-  w.setState({ mode: 'lifelines', seq: null });
+  w.setState({ layout: 'lifelines', seq: null });
   await wait(50);
   const wq = (sel) => [...host.querySelectorAll(sel)];
   const canvas = host.querySelector('[data-mmv=canvas]');
@@ -152,7 +152,7 @@ export async function testLongSequence(check, wait) {
   };
   const canvasRect = () => host.querySelector('[data-mmv=canvas]').getBoundingClientRect();
   const stepTo = async (step) => { p.setState({ step }); await settle(); return zoom(); };
-  p.setState({ part: 'checkout', mode: 'lifelines', seq: 'checkout', step: 1 });
+  p.setState({ part: 'checkout', layout: 'lifelines', seq: 'checkout', step: 1 });
   await settle();
   const first = zoom();
   check('a play starts close, not with every column in view', first > 1, first);
@@ -180,7 +180,7 @@ export async function testLongSequence(check, wait) {
   // a long note wraps, and a step's note fits when the step comes
   Object.assign(host.style, { width: '560px', height: '500px' });
   const part = 'orders-data-scenario-paid-amount-per-line';
-  p.setState({ part, mode: 'lifelines', seq: part, step: 2 });
+  p.setState({ part, layout: 'lifelines', seq: part, step: 2 });
   await settle();
   const note = host.querySelector('[data-mmv=frames] [data-id="_n1"]');
   const said = [...note.querySelectorAll('.mmv-frame-title tspan')].map((t) => t.textContent);

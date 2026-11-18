@@ -18,7 +18,7 @@ source.capabilities          // { shutdown: bool, openExternal: bool }
 await source.list()          // -> tree
 await source.read(path)      // -> map text
 source.watch?.(fn)           // optional; fn(change) on every change; returns stop()
-source.onShow?.(fn)          // optional; fn({path, node?, focus?, mode?, view?, env?}) on "look here"; returns stop()
+source.onShow?.(fn)          // optional; fn({path, node?, focus?, layout?, view?, env?}) on "look here"; returns stop()
 await source.shutdown?.()    // present only when capabilities.shutdown
 await source.openExternal?.(url) // present only when capabilities.openExternal
 ```

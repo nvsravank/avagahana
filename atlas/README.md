@@ -29,7 +29,7 @@ Rule: imports the viewer only through `map-viewer/index.js`.
 
 ## The URL
 
-`#/<folder>/<file>.md?mode=mindmap&focus=n8&node=n13&view=…&env=…&rels=1`
+`#/<folder>/<file>.md?layout=mindmap&focus=n8&node=n13&view=…&env=…&rels=1`
 
 - Same shape as the old Simple Mind Maps viewer, so old links open. Old looks in a link
   (`theme=light|dark`, `scheme=colorful|blues`, `look=`) still set the looks; they are

@@ -1,7 +1,7 @@
 # Mind maps (`mindmap`)
 
-A tree of ideas: a breakdown, options, a topic's parts. Modes: mind map, org chart,
-list. Full rules: `../../../docs/map-format.md`, "The diagram", "Icons", "`## Relations`".
+A tree of ideas: a breakdown, options, a topic's parts. Layouts: mind map, org chart
+(and the List outline); `## Layout: org` after the block opens it as an org chart. Full rules: `../../../docs/map-format.md`, "The diagram", "Icons", "`## Relations`".
 
 ````markdown
 # Garden plan

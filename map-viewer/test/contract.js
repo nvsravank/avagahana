@@ -16,6 +16,7 @@ import { testFirstView } from './first-view.js';
 import { testErCompare } from './er-compare.js';
 import { testErClasses, testErRowOrder } from './er-classes.js';
 import { testSpotlight } from './spotlight.js';
+import { testLayouts } from './layouts.js';
 import { mount, applyTheme, checkTheme } from '../index.js';
 import defaultTheme from '../themes/default/theme.js';
 import { parseMap } from '../model/map.js';
@@ -74,6 +75,7 @@ try {
   }
   await testVerification(check, wait);
   await testErConnections(check);
+  await testLayouts(check);
   await testDiagramLinks(check);
   await testContents(check);
   await testChangeMarks(check, wait);
@@ -208,7 +210,7 @@ try {
   for (const k of Object.keys(events)) a.on(k, (e) => events[k].push(e));
   await a.load(SAMPLE, 'garden.md');
   check('load emits load with title', events.load[0]?.title === 'Community garden', JSON.stringify(events.load));
-  check('state has the contract fields', ['mode', 'focus', 'node', 'view', 'env', 'rels'].every((k) => k in a.state), JSON.stringify(a.state));
+  check('state has the contract fields', ['layout', 'focus', 'node', 'view', 'env', 'rels'].every((k) => k in a.state), JSON.stringify(a.state));
   check('nodes drawn', document.querySelectorAll('#a .mmv-node').length === 34);
   check('sample map has no problems', a.problems.length === 0, JSON.stringify(a.problems));
   check('no power button without host.shutdown', document.querySelector('#a [data-mmv=exitBtn]').hidden);
@@ -218,9 +220,9 @@ try {
   check('setState focus drills in', a.state.focus === 'n6' && events.state.at(-1)?.focus === 'n6');
   a.setState({ node: 'n7' });
   check('setState node selects', a.state.node === 'n7');
-  a.setState({ mode: 'list' });
-  check('setState mode list', a.state.mode === 'list' && !document.querySelector('#a [data-mmv=list]').hidden);
-  a.setState({ mode: 'mindmap', rels: true });
+  a.setState({ layout: 'list' });
+  check('setState layout list', a.state.layout === 'list' && !document.querySelector('#a [data-mmv=list]').hidden);
+  a.setState({ layout: 'mindmap', rels: true });
   check('setState rels draws relations', document.querySelectorAll('#a .mmv-rel').length > 0);
 
   // ---- live reload keeps the place ----
@@ -414,7 +416,7 @@ try {
     // merged: only the icons all of them carry; the filter finds an arrow by any of them
     const fv = mount(document.getElementById('a'), { storageKey: null });
     await fv.load(await fetch('../../examples/maps/slow-checkout.md').then((r) => r.text()), 'slow-checkout.md');
-    fv.setState({ mode: 'boxes', view: 'Relations' });
+    fv.setState({ layout: 'boxes', view: 'Relations' });
     await wait(50);
     const marks = () => [...document.querySelectorAll('#a .mmv-flow-icon title')].map((t) => t.textContent);
     check('arrows draw their icons', marks().filter((x) => x === 'A guess to test').length === 1 && marks().filter((x) => x === 'Checked in the source').length === 3, JSON.stringify(marks()));
@@ -659,8 +661,8 @@ try {
   const fvStates = [];
   fv.on('state', (s) => fvStates.push(s));
   await fv.load(await fetch('../../examples/maps/c4-shop.md').then((r) => r.text()), 'c4-shop.md');
-  const modeButtons = [...document.querySelectorAll('#a [data-mmv=modes] button')].map((b) => b.dataset.mode).join();
-  check('a box diagram offers boxes, layers and list', modeButtons === 'boxes,layers,list' && fv.state.mode === 'boxes', modeButtons);
+  const modeButtons = [...document.querySelectorAll('#a [data-mmv=layouts] button')].map((b) => b.dataset.layout).join();
+  check('a box diagram offers boxes, layers and list', modeButtons === 'boxes,layers,list' && fv.state.layout === 'boxes', modeButtons);
   check('a box diagram always shows its arrows (no related-links button)', document.querySelector('#a [data-mmv=relBtn]').hidden);
   {
     const menu = document.querySelector('#a [data-mmv=viewMenu]');
@@ -812,7 +814,7 @@ try {
   {
     const pv = mount(document.getElementById('a'), { storageKey: null });
     await pv.load(await fetch('../../examples/maps/shop-layers.md').then((r) => r.text()), 'shop-layers.md');
-    pv.setState({ mode: 'list' });
+    pv.setState({ layout: 'list' });
     check('repeated click lines: one node opens several diagrams (an icon each)', pv.problems.length === 0
       && document.querySelectorAll('#a .mmv-lrow[data-id="orders"] .mmv-lnote-ic').length === 4, JSON.stringify(pv.problems));
     document.querySelector('#a .mmv-lrow[data-id="orders"] .mmv-lnote-ic').click();
@@ -836,7 +838,7 @@ try {
     check('Escape closes the page', !document.querySelector('#a .mmv-page') && !document.querySelector('#a .mmv').classList.contains('is-paged'),
       `${!!document.querySelector('#a .mmv-page')} ${document.querySelector('#a .mmv').classList} active=${document.activeElement?.tagName}.${document.activeElement?.className}`);
     // the page is a step: in the state, in the crumbs; back from a diagram it opened stops there
-    pv.setState({ mode: 'boxes', page: 'orders' });
+    pv.setState({ layout: 'boxes', page: 'orders' });
     await wait(50);
     const crumbs = () => document.querySelector('#a [data-mmv=crumbs]').textContent;
     check('setState page opens the node\'s page; the state says so', pv.state.page === 'orders' && /Orders service$/.test(crumbs()), `${pv.state.page} ${crumbs()}`);
@@ -895,13 +897,13 @@ try {
     check('360 wide: the top row does not overlap', tl.right <= tr.left, `${tl.right} ${tr.left}`);
     nv.destroy();
     tiny.remove();
-    // List mode: an outline the keyboard and a screen reader can use
+    // List layout: an outline the keyboard and a screen reader can use
     const lt = document.createElement('div');
     Object.assign(lt.style, { width: '800px', height: '600px', position: 'absolute', left: '-9999px' });
     document.body.appendChild(lt);
     const tv = mount(lt, { storageKey: null });
     await tv.load(SAMPLE, 'garden.md');
-    tv.setState({ mode: 'list' });
+    tv.setState({ layout: 'list' });
     await wait(50);
     const tree = lt.querySelector('.mmv-list [role=tree]');
     const items = () => [...lt.querySelectorAll('.mmv-list [role=treeitem]')];
@@ -942,7 +944,7 @@ try {
     await wait(400);
     check('list: closing the page gives focus back to the row', document.activeElement.dataset?.key === nodeRow.dataset.key, document.activeElement.className);
     await tv.load(await fetch('../../examples/maps/shop-layers.md').then((r) => r.text()), 'shop-layers.md');
-    tv.setState({ mode: 'list' });
+    tv.setState({ layout: 'list' });
     tv.setPrefs({ colourBy: 'class' });
     await wait(50);
     check('list: coloured by class, a row shows its class name', [...lt.querySelectorAll('.mmv-lclass')].some((e) => e.textContent === 'Person'), [...lt.querySelectorAll('.mmv-lclass')].map((e) => e.textContent).slice(0, 4).join());
@@ -959,7 +961,7 @@ try {
     await wait(50);
     check("viewPicker 'wide': shown wide, gone on a phone (is-narrow)", wideShown && vw() === 'none', `${wideShown} ${vw()}`);
     // a top row that does not fit goes narrow above 480 px too, and back when there is room;
-    // measured at its widest (longest view name, every mode, search open, play)
+    // measured at its widest (longest view name, every layout, search open, play)
     lt.style.width = '700px';
     wv.slot.appendChild(Object.assign(document.createElement('button'), { textContent: 'A host button with a very long name indeed' }));
     await wait(80);
@@ -1141,7 +1143,7 @@ try {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
     check('the right arrow key steps forward', p.state.step === 5, p.state.step);
     q('[data-mmv=stepSwitch]').click();
-    check('the switch shows the same sequence as lifelines, at the same step', p.state.part === 'checkout' && p.state.mode === 'lifelines' && p.state.seq === 'checkout' && p.state.step === 5
+    check('the switch shows the same sequence as lifelines, at the same step', p.state.part === 'checkout' && p.state.layout === 'lifelines' && p.state.seq === 'checkout' && p.state.step === 5
       && document.querySelectorAll('#a .mmv-seq-msg.is-now').length === 1, JSON.stringify(p.state));
     q('[data-mmv=stepSwitch]').click();
     check('and back over its view', !p.state.part && p.state.view === 'Checkout (synchronous)' && p.state.seq === 'checkout', JSON.stringify(p.state));

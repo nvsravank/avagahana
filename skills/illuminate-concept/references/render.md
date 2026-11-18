@@ -28,7 +28,7 @@ written. A walkthrough's exported reading page is described in `walkthroughs.md`
 
 The same flags as `show.py`, plus the picture's own:
 
-- `--part <anchor>`, `--view <name>`, `--env <name>`, `--focus <id>`, `--mode <mode>`,
+- `--part <anchor>`, `--view <name>`, `--env <name>`, `--focus <id>`, `--layout <layout>`,
   `--colour-by changes` (a map with change marks).
 - `--expand N` levels below the top (`--expand all` everything); `--close a,b` boxes
   shown closed.
@@ -73,6 +73,13 @@ writes `<file>.report.json` beside the picture:
   larger `--width` or a smaller picture.
 - `colours`: each box's fill and outline (`stroke`) and why (`category 3`, `class database`), to describe
   the picture in the text ("the databases in teal").
+- `linesBehind.count`: lines running behind a box they do not join; `groupOverlaps`:
+  group frames over each other or over another group's box (also in `overlaps`).
+- `layout` and `layouts`: the layout drawn, and every layout the diagram draws scored
+  the same way (`crossings`, `linesBehind`, `overlaps`, `groupOverlaps`, `cutLabels`,
+  `smallestText`, `aspect`). Choose the diagram's `## Layout:` from them: fewest
+  crossings, then fewest lines behind, then nearest square (`state-and-er.md`, "Choose
+  the layout"; for a box diagram Boxes or Layers, for a mind map Mind map or Org chart).
 
 ## For a document
 
@@ -93,7 +100,7 @@ writes `<file>.report.json` beside the picture:
   python3 "<plugin root>/relay-server/pack.py" "<Topic>/<Name>.md" --maps-dir "<maps folder>" --out "<file>.html" [options]
   ```
 
-  It needs no open page. Options as above (`--part --view --env --focus --mode
+  It needs no open page. Options as above (`--part --view --env --focus --layout
   --colour-by --seq --step --theme --appearance`), plus `--since <older file>` to show
   every reader what changed since that version and `--before <older file>` for Before
   and After. It prints `STATUS=packed FILE=... SIZE=...` or `STATUS=failed ERROR=...`.

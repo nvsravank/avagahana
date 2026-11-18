@@ -159,7 +159,7 @@ export const STYLE_POLICY = {
     "mmv-menu-sep",
     "mmv-mi-label",
     "mmv-missing",
-    "mmv-modes",
+    "mmv-layouts",
     "mmv-muted",
     "mmv-node",
     "mmv-note",

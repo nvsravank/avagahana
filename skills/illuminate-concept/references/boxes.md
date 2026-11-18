@@ -1,7 +1,8 @@
 # Box diagrams (`flowchart`)
 
-A system: boxes inside boxes (`subgraph … end`) and arrows between them. Modes: Boxes,
-Layers, List. Subgraphs are the only "inside" a flowchart has; an arrow never means
+A system: boxes inside boxes (`subgraph … end`) and arrows between them. Layouts: Boxes,
+Layers (and the List outline); `## Layout: layers` after the block opens it in Layers
+(the report's `layouts` scores both: `render.md`). Subgraphs are the only "inside" a flowchart has; an arrow never means
 "belongs to". Full rules: `../../../docs/map-format.md`, "Box diagrams", "Classes", "Several diagrams
 in one file", "Deployments".
 
@@ -72,22 +73,22 @@ MAP, MAPS = "<Topic>/<Name>.md", "<maps folder>"
 VIEWS = [None, "Events"]          # None: the default view; then each `## Perspective: <name>`
 
 def score(text):
-    """(crossings, problems) for each mode and view of the first diagram."""
+    """(crossings, problems) for each layout and view of the first diagram."""
     out = {}
-    for mode in ("boxes", "layers"):   # an ER diagram: ("tables",)
+    for layout in ("boxes", "layers"):   # an ER diagram: ("hubs", "flow", "balanced")
         for view in VIEWS:
-            r = draft_report(MAP, text, maps_dir=MAPS, mode=mode, view=view)
-            out[mode, view] = (r["crossings"]["count"], len(r["overlaps"]) + len(r["cutLabels"]))
+            r = draft_report(MAP, text, maps_dir=MAPS, layout=layout, view=view)
+            out[layout, view] = (r["crossings"]["count"], len(r["overlaps"]) + len(r["cutLabels"]))
     return out
 ```
 
-Score every mode and perspective, not only the one the person reads (an ER diagram's
+Score every layout and perspective, not only the one the person reads (an ER diagram's
 perspectives list its relationships; SQL queries have generated numbered join items). The
 reader can switch between Boxes and Layers, and a perspective lays out the first block's
 nodes in the first block's order, so a reorder that helps the default view can tangle a
 perspective. `view=`
 takes the name after `## Perspective: `; `part=` a further diagram's heading anchor. Keep
-an attempt only when nothing gets worse anywhere; when the modes want opposite orders
+an attempt only when nothing gets worse anywhere; when the layouts want opposite orders
 and neither can gain without the other losing, the picture is at its best: leave it.
 There is no need to look at pictures.
 
@@ -196,11 +197,11 @@ A perspective can also say which boxes start open, after its arrow list:
 ## Layer diagrams
 
 - `flowchart TB` with one top-level subgraph per layer (People, Channels, Edge,
-  Services, Data, Outside). Layers mode makes every row as wide as the widest; layers
+  Services, Data, Outside). The Layers layout makes every row as wide as the widest; layers
   with no arrows between them share a row.
 - People across the top: `subgraph people [People]`, `classDef plain stroke-width: 0`,
   `class people plain`, and the people themselves `class … person`.
-- Layers mode stacks only the top level: a single top-level system box draws as one
+- Layers stacks only the top level: a single top-level system box draws as one
   band. For a layer picture, make the layers themselves the top-level subgraphs.
 - Name a layer for its responsibility in this system (what the parts in it do for the
   layer above), in the reader's words, not after folders, packages or frameworks.

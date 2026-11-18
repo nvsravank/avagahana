@@ -24,7 +24,7 @@ python3 relay-server/test_server.py                             # tests
 `pack.py` needs no running server: it writes one HTML file that opens from disk with no
 network (the map as data, the viewer's modules, only the icons the map uses, the theme
 and its font, a strict security policy). Options as `render.py` (`--part --view --env
---focus --node --page --mode --colour-by --seq --step --theme --appearance`), plus
+--focus --node --page --layout --colour-by --seq --step --theme --appearance`), plus
 `--since FILE [--since-label TEXT]` (every reader sees what changed since it) and
 `--before FILE` (Before and After). Prints `STATUS=packed FILE=... SIZE=...` or
 `STATUS=failed ERROR=...`.

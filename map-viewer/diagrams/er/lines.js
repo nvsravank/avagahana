@@ -137,7 +137,7 @@ function improveChannels(paths, sides) {
 }
 
 // Unmapped connections use the header; mapped columns are always visible.
-function rowY(geo, box, col) {
+export function rowY(geo, box, col) {
   const head = geo.head ?? HEAD;
   if (!col) return box.y - box.h / 2 + head / 2;
   let y = box.y - box.h / 2 + head;

@@ -14,7 +14,7 @@ export const label = 'Sequence';
 export const matches = (header) => /^sequenceDiagram\b/.test(header);
 export const parseBody = parseSequence;
 
-export const modes = [
+export const layouts = [
   { id: 'lifelines', label: 'Lifelines', icon: 'lifelines' },
   { id: 'list', label: 'List', icon: 'list' },
 ];
@@ -29,7 +29,7 @@ export const defaultCollapsed = () => new Set();
 // no related links: the messages are the sequence's own (no related-links button)
 export const noRelations = true;
 
-export const layout = (mode, root, kids, size, input) => layoutLifelines(root, size, input.sequence);
+export const place = (layoutId, root, kids, size, input) => layoutLifelines(root, size, input.sequence);
 export { buildScene, relationShapes, limitView, maxZoom, paintPins };
-// List mode: the numbered steps, not the participants' outline
+// List layout: the numbered steps, not the participants' outline
 export const renderList = renderSequenceList;

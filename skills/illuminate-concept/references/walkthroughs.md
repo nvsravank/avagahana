@@ -74,6 +74,10 @@ charge. Follow both attempts through to confirmation.
   and Deployment stops of flowcharts, architecture, lanes, ER and state diagrams; not
   with Point to, not on Sequence or Scenario stops.
 - **Diagram** says which diagram a name belongs to when two diagrams use the same name.
+- **Layout** shows the stop's place in another of its diagram's layouts (`org`,
+  `layers`, `flow`, `balanced`, ...; `render.md`, the report's `layouts`). A stop without
+  it shows the diagram's `## Layout:`. Use it rarely: every table moving between two
+  stops costs the reader their bearings. Not on Sequence stops.
 
 All options are optional; field names are case-insensitive. Blank lines do not end the
 options: the next heading at the same level or above does.

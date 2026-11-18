@@ -3,7 +3,7 @@
 // the tree, and the parts every type shares are read here: the title, notes, icon
 // legend, node and arrow icons, relation views and the size warnings.
 import { addQueries, queryPart } from '../query/model.js';
-import { diagramForHeader, DIAGRAMS, LANES } from '../diagrams/index.js';
+import { diagramForHeader, diagramOf, drawnLayouts, DIAGRAMS, LANES } from '../diagrams/index.js';
 import { parseLanes } from './lanes.js';
 import { MAX_LABEL_LINE, MAX_LABEL } from './labels.js';
 import { problem } from './problem.js';
@@ -55,7 +55,7 @@ export function parseMap(text, fileName) {
     const h = before.match(/(?:^|\n)(#{2,6})\s+(.+)$/);
     // a deployment's block belongs to the diagram above it (model/deployments.js)
     if (h && /^deployment\s*:/i.test(h[2].trim())) continue;
-    if (h && !/^(relations|perspective|scenario|walkthrough|joins|classes|details|notes|icons|node icons|look)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
+    if (h && !/^(relations|perspective|scenario|walkthrough|joins|classes|details|notes|icons|node icons|look|layout)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
     else lost.push(f.index);
   }
   const main = parsePart(src.slice(0, cuts[0]?.start ?? src.length), fileName, null);
@@ -146,6 +146,24 @@ export function parseMap(text, fileName) {
         continue;
       }
       stop.spot = stop.options.spotlight.slice();
+    }
+    // Layout (WO-47): the layout the stop shows its place in, one of its diagram's drawn layouts
+    if (stop.options?.layout) {
+      const want = stop.options.layout.trim().toLowerCase();
+      const drawn = drawnLayouts(diagramOf(owner));
+      if (stop.kind === 'sequence') {
+        main.warnings.push(problem('walkthrough-options', `Stop "${stop.name}": Layout is for a Diagram, Perspective, Deployment or Scenario stop.`));
+        stop.invalidReference = true;
+        stop.options = null;
+        continue;
+      }
+      if (!drawn.includes(want)) {
+        main.warnings.push(problem('layout-unknown', `Stop "${stop.name}": Layout ${want}: this diagram's layouts are ${drawn.join(', ')}.`));
+        stop.invalidReference = true;
+        stop.options = null;
+        continue;
+      }
+      stop.layout = want;
     }
   }
   linkSequences(main);
@@ -273,6 +291,14 @@ function parsePart(text, fileName, shared) {
     else if (!offered.includes(sections.looks[0])) warnings.push(problem('look-unknown', `"## Look: ${sections.looks[0]}": a flowchart's looks are ${offered.join(' and ')}.`));
     else look = sections.looks[0];
   }
+  // ## Layout: the layout a diagram opens in (WO-47): one of its type's drawn layouts
+  let layout = null;
+  if (sections.layouts) {
+    const drawn = drawnLayouts(diagram);
+    if (sections.layouts.length > 1) warnings.push(problem('layout-twice', `${sections.layouts.length} "## Layout:" lines: one per diagram.`));
+    else if (!drawn.includes(sections.layouts[0])) warnings.push(problem('layout-unknown', `"## Layout: ${sections.layouts[0]}": this diagram's layouts are ${drawn.join(', ')}.`));
+    else layout = sections.layouts[0];
+  }
   if (sections.playsOver && diagram.type !== 'sequence') warnings.push(problem('plays-over-not-sequence', 'A "Plays over" section is for a sequence diagram: not read.'));
   const playsOver = sections.playsOver && diagram.type === 'sequence' ? parsePlaysOver(sections.playsOver, warnings) : [];
   for (const { n } of infra) n.note ||= firstInfra[n.id].note;
@@ -355,6 +381,7 @@ function parsePart(text, fileName, shared) {
     scenarios: SCENARIO_TYPES.has(diagram.type) ? sections.scenarios : [],
     walkthroughs: sections.walkthroughs, querySections: sections.queries,
     ...(look ? { look } : {}),
+    ...(layout ? { layout } : {}),
     ...(renames ? { renames } : {}),
   };
 }

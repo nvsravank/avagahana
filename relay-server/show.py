@@ -2,7 +2,7 @@
 """show.py — point the human at a node while explaining: the agent's "look here".
 
   python3 relay-server/show.py "<folder>/<file>.md" [--part shop-containers] [--node n13] [--focus n8] [--page n13]
-                               [--mode MODE] [--view NAME] [--env NAME]
+                               [--layout LAYOUT] [--view NAME] [--env NAME]
                                [--seq checkout] [--step 3] [--colour-by changes] [--theme ID]
                                [--before FILE | --before none] [--port N] [--maps-dir DIR]
 
@@ -39,7 +39,7 @@ def main(argv=None) -> int:
     ap.add_argument("--node", help="the node to point at")
     ap.add_argument("--focus", help="drill into this node first")
     ap.add_argument("--page", help="open this node's page (its note, arrows and linked diagrams)")
-    ap.add_argument("--mode", help="diagram mode identifier (for example tables or boxes)")
+    ap.add_argument("--layout", help="diagram layout identifier (for example hubs, flow or layers)")
     ap.add_argument("--view")
     ap.add_argument("--env")
     ap.add_argument("--seq", help="play this sequence over its view: its heading's anchor (main: the first diagram)")
@@ -62,7 +62,7 @@ def main(argv=None) -> int:
         print(status_line("not_running", error="start it with serve_maps.py"))
         return 1
     body = {k: v for k, v in {"path": args.map, "part": args.part, "node": args.node, "focus": args.focus, "page": args.page,
-                              "mode": args.mode, "view": args.view, "env": args.env, "seq": args.seq,
+                              "layout": args.layout, "view": args.view, "env": args.env, "seq": args.seq,
                               "step": args.step if args.seq else None, "colourBy": args.colour_by, "theme": args.theme}.items() if v}
     if args.trust_marks is not None:
         body["trustMarks"] = args.trust_marks == "show"
@@ -91,7 +91,7 @@ def main(argv=None) -> int:
     except Exception as exc:  # noqa: BLE001
         print(status_line("failed", error=exc))
         return 1
-    url = map_url(port, args.map, mode=args.mode, part=args.part, focus=args.focus, node=args.node, page=args.page, view=args.view, env=args.env,
+    url = map_url(port, args.map, layout=args.layout, part=args.part, focus=args.focus, node=args.node, page=args.page, view=args.view, env=args.env,
                   seq=args.seq, step=args.step if args.seq else None, colourBy=args.colour_by, theme=args.theme, trustMarks=None if args.trust_marks is None else args.trust_marks == "show")
     print(status_line("shown" if delivered else "none", url=url))
     return 0

@@ -7,6 +7,29 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.3.0 (2026-11-17)
+
+- **Contract** (viewer API, map source, server HTTP API, **breaking**): a diagram's
+  *mode* is now its *layout*. The viewer state's `mode` is `layout`, the atlas URL's
+  `?mode=` is `?layout=`, `POST /api/show` and the `show` event take `layout`, a map
+  source's `onShow` gets `layout`, `show.py`, `render.py` and `pack.py` take `--layout`,
+  and `draft_report()` takes `layout=`. `mode` is no longer read: a link or call naming
+  it opens the diagram in its default layout. The viewer gains `layouts` (the drawn
+  layouts of the diagram shown).
+- **Contract** (map format, addition): `## Layout: <layout>` says which layout a diagram
+  opens in, for every diagram type (`org`, `layers`, `flow`, ...), and a walkthrough stop
+  can name its own (`Layout:`); problems `layout-twice` and `layout-unknown`. The reader's
+  own switch holds for that diagram until another file opens.
+- ER diagrams have three layouts: **Hubs** (the hub and spoke drawn until now, renamed
+  from Tables, the default), **Flow** (columns along the foreign keys, for chains and
+  transactional schemas) and **Balanced** (a stress layout, for several facts and large
+  schemas). In Flow and Balanced a group's tables stay near each other and its frame is
+  drawn round them.
+- **Contract** (viewer API, addition): the layout report gains `linesBehind`,
+  `groupOverlaps` and `aspect`, and a render's report (`render.py --report`,
+  `draft_report()`) names the `layout` drawn and scores every layout the diagram draws
+  (`layouts`), so an agent can pick one before writing a walkthrough.
+
 ## 0.2.2 (2026-11-15)
 
 - **Contract** (map format, clarification): a `## Node icons` line may name a sequence

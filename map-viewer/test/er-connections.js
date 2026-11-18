@@ -11,15 +11,15 @@ import { iconDef } from '../icons.js';
 import { mount } from '../index.js';
 
 export async function testErConnections(check) {
-  // a table drilled into (focus) in Tables mode: it and its neighbours, never a blank canvas (WO-42)
+  // a table drilled into (focus) in Tables layout: it and its neighbours, never a blank canvas (WO-42)
   {
     const host = document.body.appendChild(Object.assign(document.createElement('div'), { style: 'width:1200px;height:700px' }));
-    const fv = mount(host, { storageKey: null, state: { mode: 'tables', focus: 'ORDER_LINE', node: 'ORDER_LINE' } });
+    const fv = mount(host, { storageKey: null, state: { layout: 'hubs', focus: 'ORDER_LINE', node: 'ORDER_LINE' } });
     await fv.load(await fetch('../../examples/maps/sales-warehouse.md').then((r) => r.text()), 'sales-warehouse.md');
     await new Promise((r) => setTimeout(r, 60));
     const drawn = [...host.querySelectorAll('[data-mmv=nodes] > g')].map((g) => g.dataset.id).sort().join();
-    check('ER focus in Tables mode: the table and its neighbours', drawn === 'CURRENCY,CUSTOMER,DATE,ORDER_LINE,PRODUCT,STORE', drawn);
-    check('ER focus in Tables mode: nothing placed at NaN', !host.querySelector('[transform*="NaN"]'));
+    check('ER focus in Tables layout: the table and its neighbours', drawn === 'CURRENCY,CUSTOMER,DATE,ORDER_LINE,PRODUCT,STORE', drawn);
+    check('ER focus in Tables layout: nothing placed at NaN', !host.querySelector('[transform*="NaN"]'));
     fv.destroy();
     host.remove();
   }
@@ -31,7 +31,7 @@ export async function testErConnections(check) {
   // Start above the old stage's last threshold (8/14), cross the column threshold
   // (8/12) in both directions, and verify that each transition requests a repaint.
   let redraws = 0;
-  const camera = { view: { k: 0.65, x: 0, y: 0 }, mode: 'tables', layout: {}, lodKey: null };
+  const camera = { view: { k: 0.65, x: 0, y: 0 }, layout: 'hubs', placed: {}, lodKey: null };
   const stage = createStage({ S: camera, $: { canvas: document.createElementNS('http://www.w3.org/2000/svg', 'svg'), viewport: document.createElementNS('http://www.w3.org/2000/svg', 'g') }, diagram: () => ({ detailSizes: [16, 14, 12] }) }, { onLod: () => redraws++ });
   stage.applyView(true);
   camera.view.k = 0.7; stage.applyView();

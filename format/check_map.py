@@ -103,7 +103,7 @@ def seq_names(text):
             scenario = re.match(r"scenario\s*:\s*([^|]+)", heading, re.I)
             if scenario:
                 names.add(f"{current}-scenario-{anchor_of(scenario.group(1))}")
-            elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|joins|renames|lanes)\b", heading, re.I):
+            elif not re.match(r"(deployment|relations|plays over|details|node icons|classes|look|layout|joins|renames|lanes)\b", heading, re.I):
                 heading_anchor = anchor_of(heading)
             continue
         if not first:
@@ -573,6 +573,17 @@ def cross_target(m, path, ln, target):
 
 MAIN = "main"   # the reserved word that marks a main icon (WO-38)
 LOOKS = ("outline", "poster")   # a flowchart's looks
+# each type's drawn layouts (WO-47; map-viewer/diagrams/*/diagram.js, List left out):
+# what ## Layout: and a stop's Layout: may name
+LAYOUTS = {"mindmap": ("mindmap", "org"), "flowchart": ("boxes", "layers"), "er": ("hubs", "flow", "balanced"),
+           "state": ("boxes",), "sequence": ("lifelines",), "lanes": ("lanes",)}
+
+
+def layouts_of(part, secs=None):
+    """A diagram's drawn layouts: a flowchart with ## Lanes is a lane diagram."""
+    secs = sections_of(part["after"], part["after_line"]) if secs is None else secs
+    lanes = part["kind"] == "flowchart" and any(t.strip().lower() == "lanes" for t, _, _ in secs)
+    return LAYOUTS["lanes" if lanes else part["kind"]]
 TRUST = {"verified", "inferred", "hypothesis", "unsourced"}
 
 
@@ -622,8 +633,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
-        if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|query\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*)$", title, re.I):
-            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Details, Icons, Node icons, Classes, Plays over, Renames, Lanes), and no Mermaid block follows")
+        if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|query\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*|layout\s*:.*)$", title, re.I):
+            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Layout: <layout>, Details, Icons, Node icons, Classes, Plays over, Renames, Lanes), and no Mermaid block follows")
         if re.fullmatch(r'joins\s*:\s*.+',title,re.I):
             m.report(hl,'joins-retired','Joins sections are retired. Put query joins in Query SQL; keep model relationships in Relations/Perspective. Migrate using actual SQL or confirmed intent, without guessing join types or outputs.')
         if key == "plays over" and kind != "sequence":
@@ -637,6 +648,15 @@ def check_part(m, part, shared_classes, anchors, legend_out):
             m.report(looks[1][1], "look-twice", f"{len(looks)} ## Look: lines; one per diagram")
         elif looks[0][0] not in LOOKS:
             m.report(looks[0][1], "look-unknown", f"## Look: {looks[0][0]}: a flowchart's looks are {' and '.join(LOOKS)}")
+
+    # ## Layout: the layout a diagram opens in (WO-47)
+    layouts = [(re.match(r"^layout\s*:\s*(.*)$", t, re.I).group(1).strip().lower(), hl) for t, _, hl in secs if re.match(r"^layout\s*:", t, re.I)]
+    if layouts:
+        drawn = layouts_of(part, secs)
+        if len(layouts) > 1:
+            m.report(layouts[1][1], "layout-twice", f"{len(layouts)} ## Layout: lines; one per diagram")
+        elif layouts[0][0] not in drawn:
+            m.report(layouts[0][1], "layout-unknown", f"## Layout: {layouts[0][0]}: this diagram's layouts are {', '.join(drawn)}")
 
     # icon legend first: other sections may use its names
     legend = {}
@@ -1273,7 +1293,7 @@ def check_walkthroughs(m, src, parts, title):
             if dest not in names[want]:
                 m.report(sline, 'walkthrough-stop-unknown', '{} "{}" is not in this map'.format(kind, sm[2].strip()))
             stop_body = body[st['end']:stops[j + 1]['start'] if j + 1 < len(stops) else len(body)]
-            _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to', 'spotlight'], lambda msg: m.report(sline, 'walkthrough-options', msg))
+            _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to', 'spotlight', 'layout'], lambda msg: m.report(sline, 'walkthrough-options', msg))
             if opts is not None:
                 owner = next((x for x in owners if dest in x['names'][want] and ('diagram' not in opts or x['title'] == opts['diagram'])), None)
                 if not owner or any(nid not in owner['notes'] for nid in opts.get('notes', [])):
@@ -1283,6 +1303,13 @@ def check_walkthroughs(m, src, parts, title):
                     tree = owner['part'].get('query_parts', {}).get(focus)
                     if tree is None or not part_exists(tree, opts['point to']):
                         m.report(sline, 'walkthrough-reference', 'Point to "{}" must name a part of the query box its perspective focuses on'.format(opts['point to']))
+                if owner and 'layout' in opts:
+                    # Layout (WO-47): one of the stop's diagram's drawn layouts; not on a sequence stop
+                    drawn = layouts_of(owner['part'])
+                    if kind == 'sequence':
+                        m.report(sline, 'walkthrough-options', 'Layout is for a Diagram, Perspective, Deployment or Scenario stop')
+                    elif opts['layout'].strip().lower() not in drawn:
+                        m.report(sline, 'layout-unknown', 'Layout {}: this diagram\'s layouts are {}'.format(opts['layout'].strip().lower(), ', '.join(drawn)))
                 if owner and 'spotlight' in opts:
                     # Spotlight (WO-63): nodes or arrow ids of a box diagram the stop opens; not with Point to
                     part = owner['part']

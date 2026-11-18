@@ -50,31 +50,31 @@ const show = (x) => JSON.stringify(x);
 
 try {
   // ---- hash -> state ----
-  let h = parseHash('#/Topic/My%20map.md?mode=org&focus=n8&node=n13');
-  check('hash: path, mode, focus, node', same(h, { path: 'Topic/My map.md', state: { mode: 'org', focus: 'n8', node: 'n13' }, prefs: {} }), show(h));
+  let h = parseHash('#/Topic/My%20map.md?layout=org&focus=n8&node=n13');
+  check('hash: path, layout, focus, node', same(h, { path: 'Topic/My map.md', state: { layout: 'org', focus: 'n8', node: 'n13' }, prefs: {} }), show(h));
   check('hash: nothing named is null', parseHash('') === null && parseHash('#') === null && parseHash('#/') === null);
   h = parseHash('#/garden.md');
   check('hash: a path alone', same(h, { path: 'garden.md', state: {}, prefs: {} }), show(h));
   h = parseHash('#/a.md?view=Runtime&env=prod&rels=1');
   check('hash: view, env and rels', same(h.state, { view: 'Runtime', env: 'prod', rels: true }), show(h.state));
   check('hash: rels=0 is off', parseHash('#/a.md?rels=0').state.rels === false);
-  h = parseHash('#/a.md?mode=boxes&view=Checkout&seq=checkout&step=4');
+  h = parseHash('#/a.md?layout=boxes&view=Checkout&seq=checkout&step=4');
   check('hash: a sequence playing (seq, step) round trip', h.state.seq === 'checkout' && h.state.step === 4
-    && buildHash('a.md', h.state) === '#/a.md?mode=boxes&view=Checkout&seq=checkout&step=4', JSON.stringify(h.state));
+    && buildHash('a.md', h.state) === '#/a.md?layout=boxes&view=Checkout&seq=checkout&step=4', JSON.stringify(h.state));
   check('hash: a bad step is dropped; a step without seq is not written', parseHash('#/a.md?seq=x&step=0').state.step === undefined
-    && !buildHash('a.md', { step: 3 }).includes('step') && parseHash('#/a.md?mode=lifelines').state.mode === 'lifelines');
-  h = parseHash('#/a.md?mode=layers&part=shop-system-containers&focus=ord');
-  check('hash: layers mode and the diagram (part)', same(h.state, { mode: 'layers', part: 'shop-system-containers', focus: 'ord' }), show(h.state));
-  check('hash: an open node page round trip', parseHash('#/a.md?mode=boxes&page=orders').state.page === 'orders'
-    && buildHash('a.md', { mode: 'boxes', node: 'orders', page: 'orders' }) === '#/a.md?mode=boxes&node=orders&page=orders', buildHash('a.md', { mode: 'boxes', page: 'orders' }));
-  check('hash: a map picked as Before round-trips (WO-43)', buildHash('r/after.md', { mode: 'tables' }, null, 'r/before.md') === '#/r/after.md?mode=tables&before=r%2Fbefore.md'
-    && parseHash('#/r/after.md?mode=tables&before=r%2Fbefore.md').before === 'r/before.md' && !('before' in parseHash('#/a.md')));
-  check('hash: the diagram (part) round trip', buildHash('a.md', { mode: 'boxes', part: 'ideas', node: 'x' }) === '#/a.md?mode=boxes&part=ideas&node=x', buildHash('a.md', { mode: 'boxes', part: 'ideas', node: 'x' }));
-  // the viewer checks a mode against the map's type; the URL keeps any well-formed one
-  check('hash: a malformed mode is dropped', !('mode' in parseHash('#/a.md?mode=No%20pe!').state));
-  check('hash: a new type\'s mode is kept', parseHash('#/a.md?mode=tables').state.mode === 'tables');
-  check('hash: a box diagram\'s mode round-trips', parseHash(buildHash('c4.md', { mode: 'boxes', view: 'Data flow' })).state.mode === 'boxes'
-    && parseHash(buildHash('c4.md', { mode: 'boxes', view: 'Data flow' })).state.view === 'Data flow');
+    && !buildHash('a.md', { step: 3 }).includes('step') && parseHash('#/a.md?layout=lifelines').state.layout === 'lifelines');
+  h = parseHash('#/a.md?layout=layers&part=shop-system-containers&focus=ord');
+  check('hash: layers layout and the diagram (part)', same(h.state, { layout: 'layers', part: 'shop-system-containers', focus: 'ord' }), show(h.state));
+  check('hash: an open node page round trip', parseHash('#/a.md?layout=boxes&page=orders').state.page === 'orders'
+    && buildHash('a.md', { layout: 'boxes', node: 'orders', page: 'orders' }) === '#/a.md?layout=boxes&node=orders&page=orders', buildHash('a.md', { layout: 'boxes', page: 'orders' }));
+  check('hash: a map picked as Before round-trips (WO-43)', buildHash('r/after.md', { layout: 'hubs' }, null, 'r/before.md') === '#/r/after.md?layout=hubs&before=r%2Fbefore.md'
+    && parseHash('#/r/after.md?layout=hubs&before=r%2Fbefore.md').before === 'r/before.md' && !('before' in parseHash('#/a.md')));
+  check('hash: the diagram (part) round trip', buildHash('a.md', { layout: 'boxes', part: 'ideas', node: 'x' }) === '#/a.md?layout=boxes&part=ideas&node=x', buildHash('a.md', { layout: 'boxes', part: 'ideas', node: 'x' }));
+  // the viewer checks a layout against the map's type; the URL keeps any well-formed one
+  check('hash: a malformed layout is dropped', !('layout' in parseHash('#/a.md?layout=No%20pe!').state));
+  check('hash: a new type\'s layout is kept', parseHash('#/a.md?layout=hubs').state.layout === 'hubs');
+  check('hash: a box diagram\'s layout round-trips', parseHash(buildHash('c4.md', { layout: 'boxes', view: 'Data flow' })).state.layout === 'boxes'
+    && parseHash(buildHash('c4.md', { layout: 'boxes', view: 'Data flow' })).state.view === 'Data flow');
   h = parseHash('#/Topic/Q%3F%20and%20%26.md?node=n1');
   check('hash: ? and & inside the path', h.path === 'Topic/Q? and &.md' && h.state.node === 'n1', show(h));
   check('hash: unencoded spaces (hand-written links)', parseHash('#/My map.md?node=n2').path === 'My map.md');
@@ -87,12 +87,13 @@ try {
   check('hash: a theme id and the new names', same(h.prefs, { theme: 'work', appearance: 'light', colourBy: 'category' }), show(h.prefs));
 
   // ---- state -> hash ----
-  check('build: mode always, empty fields left out',
-    buildHash('Topic/My map.md', { mode: 'mindmap', focus: null, node: null, view: null, env: null, rels: false }) === '#/Topic/My%20map.md?mode=mindmap');
-  check('build: every field', buildHash('a.md', { mode: 'list', focus: 'n2', node: 'n3', view: 'V', env: 'E', rels: true })
-    === '#/a.md?mode=list&focus=n2&node=n3&view=V&env=E&rels=1');
+  check('build: the layout when named, empty fields left out',
+    buildHash('Topic/My map.md', { layout: 'mindmap', focus: null, node: null, view: null, env: null, rels: false }) === '#/Topic/My%20map.md?layout=mindmap');
+  check('build: no layout named, none in the link (the diagram\'s ## Layout: wins, WO-47)', buildHash('a.md', { focus: 'n2' }) === '#/a.md?focus=n2', buildHash('a.md', { focus: 'n2' }));
+  check('build: every field', buildHash('a.md', { layout: 'list', focus: 'n2', node: 'n3', view: 'V', env: 'E', rels: true })
+    === '#/a.md?layout=list&focus=n2&node=n3&view=V&env=E&rels=1');
   for (const path of ['Topic/My map.md', 'Q? and &.md', 'a/b/c d/é.md', '100%.md']) {
-    const st = { mode: 'org', focus: 'n1', node: 'n2', rels: true };
+    const st = { layout: 'org', focus: 'n1', node: 'n2', rels: true };
     const back = parseHash(buildHash(path, st));
     check(`round trip: ${path}`, back.path === path && same(back.state, st), show(back));
   }

@@ -6,6 +6,7 @@
 #                (Orders publishes events; Payments, order status and Notifications consume them)
 #   map          maps/Shop/Shop platform.md, an existing architecture map
 #   billing      billing/schema.sql (CREATE TABLE scripts) and billing/reports.sql
+#   warehouse    warehouse/schema.sql, a star schema with four facts sharing dimensions (WO-47)
 #   deploy       deploy/k8s/ (production on EKS) and deploy/staging/ (docker compose and nginx on one VM)
 #   jobs         jobs/worker.py, a queue worker that backs off, alerts and requeues
 set -euo pipefail
@@ -16,6 +17,7 @@ case "${1:-empty}" in
   deploy) cp -R "$here/deploy" deploy; exit 0 ;;
   jobs) mkdir -p jobs; cp "$here/jobs/worker.py" jobs/; exit 0 ;;
   billing) mkdir -p billing; cp "$here/billing/schema.sql" "$here/billing/reports.sql" billing/; exit 0 ;;
+  warehouse) mkdir -p warehouse; cp "$here/warehouse/schema.sql" warehouse/; exit 0 ;;
   repo) ;;
   *) echo "unknown fixture: $1" >&2; exit 1 ;;
 esac

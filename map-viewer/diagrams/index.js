@@ -1,8 +1,8 @@
 // index.js — the diagram types the viewer knows. The Mermaid block's first line picks
 // one (mindmap, flowchart, sequenceDiagram, stateDiagram, erDiagram). Each type (diagrams/<type>/diagram.js) exports:
 //   type, label, matches(headerLine), parseBody(lines, start, title, warnings),
-//   modes [{id, label, icon}] (list mode is shared), colourBy [{id, label}],
-//   branchOrder(children), defaultCollapsed(top), layout(mode, root, kids, size, input),
+//   layouts [{id, label, icon}] (the drawn layouts, then list: the shared outline), colourBy [{id, label}],
+//   branchOrder(children), defaultCollapsed(top), place(layoutId, root, kids, size, input),
 //   buildScene(input), and optionally renderList(v, on) (a list mode of its own) and
 //   boxes: true (a box diagram: boxes holding boxes, arrows, sequences and scenarios play over it),
 //   and hooks for a type that draws its nodes its own way: nodeGeometry(n, rel, font,
@@ -33,3 +33,5 @@ export const LANES = lanes;
 
 export const diagramForHeader = (header) => DIAGRAMS.find((d) => d.matches(header)) || null;
 export const diagramOf = (map) => DIAGRAMS.find((d) => d.type === map?.type) || mindmap;
+// a type's drawn layouts (WO-47): what ## Layout: and a stop's Layout: may name (List is not one)
+export const drawnLayouts = (d) => d.layouts.map((x) => x.id).filter((id) => id !== 'list');

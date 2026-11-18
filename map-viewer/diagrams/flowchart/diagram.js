@@ -16,7 +16,7 @@ export const boxes = true;
 // a spotlight switch: a selected box or line lit, the rest faded (WO-63, viewer.js paintSpotlight)
 export const spotlight = true;
 
-export const modes = [
+export const layouts = [
   { id: 'boxes', label: 'Boxes', icon: 'flowchart' },
   // the top level as stacked rows of bands, every row as wide as the widest, each band running left to right
   { id: 'layers', label: 'Layers', icon: 'layers' },
@@ -45,10 +45,10 @@ export const paintNode = paintQueryCard;
 // switching view lays the diagram out again (the view's arrows place the boxes)
 export const layoutByView = true;
 
-export const layout = (mode, root, kids, size, input) => root.queryCard && !(root.queryTransform && !input.collapsed.has(root.queryTransform)) ? {
+export const place = (layoutId, root, kids, size, input) => root.queryCard && !(root.queryTransform && !input.collapsed.has(root.queryTransform)) ? {
   pos: new Map([[root, { x: 0, y: 0, w: size(root).w, h: input.collapsed.has(root.id) ? size(root).h : size(root).hOpen }]]), edges: [], routes: new Map(),
 } : layoutBoxes(root, kids, n => {
   const g = size(n);
   return n.queryCard ? { ...g, h: input.collapsed.has(n.id) ? g.h : g.hOpen } : g;
-}, { ...input, root, relations: queryRelations({ ...input, root }), layers: mode === 'layers' });
+}, { ...input, root, relations: queryRelations({ ...input, root }), layers: layoutId === 'layers' });
 export { buildScene, relationShapes };

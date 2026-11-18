@@ -67,7 +67,7 @@ export function buildScene(input) {
     if (n.children.length && n !== root) {
       let x;
       let y;
-      if (input.mode === 'org' && !p.stacked) { x = p.w / 2; y = p.h + 1; } else if (input.mode === 'org') { x = p.w + 1 - (geo.attach?.r || 0); y = p.h / 2; } else { x = p.side < 0 ? (geo.attach?.l || 0) - 1 : p.w + 1 - (geo.attach?.r || 0); y = p.h / 2; }
+      if (input.layoutId === 'org' && !p.stacked) { x = p.w / 2; y = p.h + 1; } else if (input.layoutId === 'org') { x = p.w + 1 - (geo.attach?.r || 0); y = p.h / 2; } else { x = p.side < 0 ? (geo.attach?.l || 0) - 1 : p.w + 1 - (geo.attach?.r || 0); y = p.h / 2; }
       node.dot = { x, y, closed: input.collapsed.has(n.id), count: input.collapsed.has(n.id) ? input.countDesc(n) : null };
     }
   }

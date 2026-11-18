@@ -28,7 +28,7 @@ export function createStage(v, handlers) {
     if (key !== S.lodKey) {
       const first = S.lodKey == null;
       S.lodKey = key;
-      if (!first && S.layout && S.mode !== 'list') handlers.onLod();
+      if (!first && S.placed && S.layout !== 'list') handlers.onLod();
     }
   }
   function schedule() {
@@ -44,7 +44,7 @@ export function createStage(v, handlers) {
   }
 
   function zoomToRead(n) {
-    const p = S.layout?.pos.get(n);
+    const p = S.placed?.pos.get(n);
     if (!p) return;
     const { w, h } = v.size();
     const k = Math.max(S.view.k, (MIN_LABEL_PX / v.nodeGeom(n).type.size) * 1.15);
@@ -60,12 +60,12 @@ export function createStage(v, handlers) {
   }
   // quiet: set the camera only; the caller draws and applies it
   function fitView(levelsOnly, quiet = false) {
-    if (!S.layout) return;
+    if (!S.placed) return;
     let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
     // a walkthrough stop pointing at one part of a query fits that part
     const point = S.point && S.map.byId[S.point];
-    const only = point && S.layout.pos.has(point) ? point : null;
-    for (const [n, p] of S.layout.pos) {
+    const only = point && S.placed.pos.has(point) ? point : null;
+    for (const [n, p] of S.placed.pos) {
       if (only && n !== only) continue;
       // A focused query fits its own content. Faded outside dependencies still
       // exist around it, but must not shrink its SQL to make every neighbour fit.
@@ -80,7 +80,7 @@ export function createStage(v, handlers) {
       y0 = Math.min(y0, p.y - p.h / 2); y1 = Math.max(y1, p.y + p.h / 2);
     }
     // what a layout draws round its nodes (a lane diagram's lanes and their names)
-    const ex = !only && S.layout.extent;
+    const ex = !only && S.placed.extent;
     if (ex) { x0 = Math.min(x0, ex.x0); y0 = Math.min(y0, ex.y0); x1 = Math.max(x1, ex.x1); y1 = Math.max(y1, ex.y1); }
     S.lastFit = levelsOnly ? 'levels' : 'all';
     S.userMoved = false;
@@ -96,7 +96,7 @@ export function createStage(v, handlers) {
       // too big to fit with every label drawn (WO-61): open on the centre at the zoom
       // where they are, and the reader pans (the drawing's middle when the root is not
       // drawn, as a box diagram's top is not)
-      const r = S.layout.pos.get(v.viewRoot()) || { x: (x0 + x1) / 2, y: (y0 + y1) / 2 };
+      const r = S.placed.pos.get(v.viewRoot()) || { x: (x0 + x1) / 2, y: (y0 + y1) / 2 };
       S.view = { k: floor, x: left + W / 2 - r.x * floor, y: H / 2 - r.y * floor };
     } else S.view = { k, x: left + W / 2 - ((x0 + x1) / 2) * k, y: H / 2 - ((y0 + y1) / 2) * k };
     if (!quiet) applyView();
@@ -113,7 +113,7 @@ export function createStage(v, handlers) {
   }
   function zoomCentre(factor) { const { w, h } = v.size(); zoomAt(factor, w / 2, h / 2); }
   function centerOn(n) {
-    const p = S.layout?.pos.get(n);
+    const p = S.placed?.pos.get(n);
     if (!p) return;
     const { w, h } = v.size();
     S.view.x = w / 2 - p.x * S.view.k;

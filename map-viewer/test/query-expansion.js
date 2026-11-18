@@ -2,7 +2,7 @@ import { parseMap } from '../model/map.js';
 import { mount } from '../index.js';
 import { clauseLines, sqlRows } from '../query/sql-display.js';
 import { readQuery, tokenize, cleanSql } from '../query/sql.js';
-import { layout } from '../diagrams/flowchart/diagram.js';
+import { place } from '../diagrams/flowchart/diagram.js';
 import { queryGeometry } from '../query/cards.js';
 
 export async function testQueryExpansion(check) {
@@ -24,7 +24,7 @@ export async function testQueryExpansion(check) {
   check('expansion: join/filter/other-clause sections are distinct', join.parent.plain === 'Joins' && nodes.find(n => inScope(n, 'enriched') && n.plain === 'WHERE').parent.plain === 'Filter');
   const geometry = n => queryGeometry(n, 1, 'test', t => t.length * 7, {});
   const closed = new Set(nodes.filter(n => n.queryCard && n.queryRole === 'source').map(n => n.id));
-  const layoutOf = (mode, root = model.byId.enriched) => layout(mode, root, n => closed.has(n.id) ? [] : n.children, geometry, { queryFlow: true, relations: model.relations, byId: model.byId, collapsed: closed, direction: model.direction });
+  const layoutOf = (id, root = model.byId.enriched) => place(id, root, n => closed.has(n.id) ? [] : n.children, geometry, { queryFlow: true, relations: model.relations, byId: model.byId, collapsed: closed, direction: model.direction });
   const boxLayout = layoutOf('boxes'), layerLayout = layoutOf('layers');
   const inputs = nodes.find(n => n.queryInputs && n.parent.id === 'enriched');
   const ordered = inputs.children.filter(n => boxLayout.pos.has(n)).sort((a,b) => boxLayout.pos.get(a).y - boxLayout.pos.get(b).y);
@@ -36,7 +36,7 @@ export async function testQueryExpansion(check) {
   check('expansion: focused CTE uses existing TB Layers layout and LR Boxes layout', layerLayout.pos.get(inputs).y < layerLayout.pos.get(clauses).y && layerLayout.pos.get(clauses).y < layerLayout.pos.get(output).y && boxLayout.pos.get(inputs).x < boxLayout.pos.get(clauses).x && boxLayout.pos.get(clauses).x < boxLayout.pos.get(output).x);
   check('expansion: Layers transposes input stacking into an ordered top row', ordered.every((n,i) => !i || layerLayout.pos.get(ordered[i-1]).x < layerLayout.pos.get(n).x));
   const grouped = parseMap(text.replace('base["order_base"]', 'subgraph upstream [Upstream build-up]\n    base["order_base"]\n  end'), 'grouped.md');
-  const groupedContext = layout('boxes', grouped.byId.enriched, n => n.children, geometry, { queryFlow: true, relations: grouped.relations, byId: grouped.byId, collapsed: new Set(), direction: grouped.direction });
+  const groupedContext = place('boxes', grouped.byId.enriched, n => n.children, geometry, { queryFlow: true, relations: grouped.relations, byId: grouped.byId, collapsed: new Set(), direction: grouped.direction });
   check('expansion: focused query uses CTE output tables without original authored containers', !groupedContext.pos.has(grouped.byId.base) && !groupedContext.pos.has(grouped.byId.upstream) && [...groupedContext.pos.keys()].some(n => n.queryRole === 'output' && n.queryOwner === 'base'));
   const incomingContext = [...boxLayout.context].filter(n => boxLayout.pos.get(n).x < boxLayout.pos.get(model.byId.enriched).x).sort((a,z) => boxLayout.pos.get(a).y - boxLayout.pos.get(z).y);
   check('expansion: incoming focus context is one column ordered binds, physical tables, CTE tables', incomingContext.length === 3 && incomingContext[0].queryBind && incomingContext[1].schemaRef && incomingContext[2].queryOwner === 'base' && new Set(incomingContext.map(n => boxLayout.pos.get(n).x)).size === 1);
@@ -161,9 +161,9 @@ export async function testQueryExpansion(check) {
   const bindCard = () => host.querySelector(`[data-id="${localBindNode.id}"]`);
   const solidHeight = () => bindCard().querySelector('.mmv-table-head').getAttribute('height') === bindCard().querySelector('.mmv-table-body').getAttribute('height');
   check('expansion: bind and FROM cards have no empty body padding', geometry(localBindNode).hOpen === geometry(localBindNode).head && geometry(from).hOpen === geometry(from).head && solidHeight());
-  v.setState({ mode: 'layers' }); await wait();
+  v.setState({ layout: 'layers' }); await wait();
   check('expansion: stretched Layers bind card stays solid through its full height', solidHeight());
-  v.setState({ mode: 'boxes' }); await wait();
+  v.setState({ layout: 'boxes' }); await wait();
   v.setState({ focus: null, expand: 'all' }); await wait();
   const physicalCards = [...host.querySelectorAll('.mmv-query-source')], parameterCards = [...host.querySelectorAll('.mmv-query-bind')];
   check('expansion: global and local occurrences retain the same semantic colors', physicalCards.length > 2 && parameterCards.length > 2 && physicalCards.every(el => color(el) === sourceColor) && parameterCards.every(el => color(el) === bindColor));
@@ -222,7 +222,7 @@ export async function testQueryExpansion(check) {
   const unpivotRef = host.querySelector(`[data-id="${unpivotInput.id}"]`);
   check('expansion: UNPIVOT internals stay hidden in the containing CTE', unpivotRef && !host.querySelector(`[data-id="${unpivotOutput.id}"]`));
   unpivotRef.querySelector(`[data-dot="${unpivotScope.id}"]`).dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await wait();
-  v.setState({ mode: 'layers' }); await wait();
+  v.setState({ layout: 'layers' }); await wait();
   check('expansion: UNPIVOT opens inline by keyboard and stays open when switching to Layers', v.state.focus === 'unpivoted' && host.querySelector(`[data-id="${unpivotOutput.id}"]`) && host.querySelector(`[data-id="${unpivotInput.id}"] [data-dot="${unpivotInput.id}"]`).getAttribute('transform') === 'translate(1,1)');
   const inlineSvg = await v.export({ format: 'svg' });
   check('expansion: inline transformation export retains input and output mappings', inlineSvg.data.includes('Non-NULL value') && inlineSvg.data.includes('Column name:'));
@@ -230,7 +230,7 @@ export async function testQueryExpansion(check) {
   tap(unpivotCard); tap(unpivotCard); await wait();
   const unpivotOp = unpivotScope.children.find(n => n.queryRole === 'sql');
   check('expansion: UNPIVOT focus isolates input, operation and output', v.state.focus === unpivotScope.id && host.querySelector(`[data-id="${unpivotOutput.id}"]`)?.textContent.includes('Non-NULL') && host.querySelector('.mmv-query-card [data-col="Q4"]') && !host.querySelector('[data-mmv=nodes] > .is-context'));
-  v.setState({ mode: 'layers' }); await wait();
+  v.setState({ layout: 'layers' }); await wait();
   const unpivotSource = unpivotScope.children.find(n => n.queryInputs).children.find(n => n.queryRole === 'source');
   const rect = id => host.querySelector(`[data-id="${id}"]`).getBoundingClientRect();
   check('expansion: UNPIVOT Layers places inputs above the operation and output', rect(unpivotSource.id).top < rect(unpivotOp.id).top && rect(unpivotOp.id).top < rect(unpivotOutput.id).top);
@@ -244,7 +244,7 @@ export async function testQueryExpansion(check) {
   const hintSvg = await v.export({ format: 'svg' });
   check('expansion: optimizer hint export retains hints and literals while hiding ordinary comments', hintSvg.data.includes('--+ LEADING(b c)') && hintSvg.data.includes('/*+ literal */ -- text') && !hintSvg.data.includes('ordinary join comment') && !hintSvg.data.includes('customer_id = -1'));
   await v.load(unpivotText, 'unpivot.md');
-  v.setState({ focus: null, expand: 'all', mode: 'list' }); await wait();
+  v.setState({ focus: null, expand: 'all', layout: 'list' }); await wait();
   check('expansion: List retains the same source and bind colors', [...host.querySelectorAll('.mmv-lrow.mmv-query-source')].length > 2 && [...host.querySelectorAll('.mmv-lrow.mmv-query-source')].every(el => color(el) === sourceColor) && host.querySelectorAll('.mmv-lrow.mmv-query-bind').length > 1 && [...host.querySelectorAll('.mmv-lrow.mmv-query-bind')].every(el => color(el) === bindColor));
   const migratedText = await fetch('../../examples/maps/query-understanding.md').then(r => r.text());
   const migrated = parseMap(migratedText, 'understanding.md');
@@ -254,7 +254,7 @@ export async function testQueryExpansion(check) {
   check('expansion: migrated queries can reuse an existing primary ER schema without duplication', !warehouse.problems.length && warehouse.type === 'er' && stock.queryFlow && Object.values(stock.byId).filter(n => n.schemaRef).every(n => n.schemaRef.primary));
   // a perspective lands inside a query box; a box drawn around query boxes starts closed
   const staged = text.replace('base["order_base"]', 'subgraph upstream [Upstream build-up]\n    base["order_base"]\n  end').replace(/^## Query:/m, '## Perspective: Inside enriched\n- base --> enriched\n\n#### Perspective options\n- Focus: enriched\n\n## Query:');
-  await v.load(staged, 'staged.md'); v.setState({ mode: 'boxes' }); await wait();
+  await v.load(staged, 'staged.md'); v.setState({ layout: 'boxes' }); await wait();
   check('stage boxes: a box around query boxes starts closed', host.querySelector('[data-dot="upstream"]') && !host.querySelector('[data-dot="base"]'));
   v.setState({ expand: 'all' }); await wait();
   check('stage boxes: the expand control still opens them', !!host.querySelector('[data-dot="base"]') || !!host.querySelector('[data-id="base"]'));
@@ -264,7 +264,7 @@ export async function testQueryExpansion(check) {
   v.setState({ focus: null, view: null });
   // a stop can point at one part of a query; a fit frames around the walkthrough panel
   const pointed = (await fetch('../../examples/maps/query-revenue-report.md').then(r => r.text()));
-  await v.load(pointed, 'pointed.md'); v.setState({ mode: 'boxes' }); await wait();
+  await v.load(pointed, 'pointed.md'); v.setState({ layout: 'boxes' }); await wait();
   const walk = v.contents().find(x => x.kind === 'walkthrough');
   v.setState({ walkthrough: walk.label, stop: walk.stopList.findIndex(s => s.label === 'Inside net_by_order') + 1 }); await wait();
   const panelRight = host.querySelector('.mmv-stop-panel').getBoundingClientRect().right;
@@ -282,7 +282,7 @@ export async function testQueryExpansion(check) {
   check('Point to: the reading document shows the part, opened inside its input', pictures['Inside sales diagram'].svg.includes('period_start') && pictures['Inside sales diagram'].width > 200 && pictures['Inside net_by_order diagram'].width < 900, JSON.stringify(Object.values(pictures).map(p => p.width)));
   v.setState({ walkthrough: null }); await wait();
   check('Point to: closing the walkthrough lifts it', !host.querySelector('.is-idle') && !host.querySelector('.mmv-stop-panel:not([hidden])'));
-  await v.load(warehouseText, 'warehouse.md'); v.setState({ mode: 'boxes', part: stock.anchor, focus: 'stock_report' }); await wait();
+  await v.load(warehouseText, 'warehouse.md'); v.setState({ layout: 'boxes', part: stock.anchor, focus: 'stock_report' }); await wait();
   const primarySource = Object.values(stock.byId).find(n => n.queryRole === 'source' && n.schemaRef);
   host.querySelector(`[data-query-schema="${primarySource.id}"]`).dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await wait();
   check('expansion: a source ER control returns to the primary schema table', !v.state.part && v.state.node === primarySource.schemaRef.table);

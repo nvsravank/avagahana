@@ -62,6 +62,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.setBefore(text)` | Set the shown map's earlier version (text), or clear it (`null`), and draw again; a promise (added in WO-34). |
 | `viewer.setState(partial)` | Change state from outside, e.g. to point at a node. With `seq: null` the sequence stops first and the other fields still apply (`{seq: null, view: 'Events'}` stops and switches view). With a sequence to play, the sequence chooses its diagram and view, so only `seq` and `step` are read. |
 | `viewer.state` | The current state (a copy). |
+| `viewer.layouts` | The drawn layouts of the diagram shown, as `layout` names them (List left out): `['hubs', 'flow', 'balanced']` for an ER diagram (added in WO-47). |
 | `viewer.on(type, fn)` | Subscribe to an event; returns an unsubscribe function. |
 | `viewer.ready` | Resolves when themes, stylesheet and font are ready. |
 | `viewer.title` | The current map's title, or `null`. |
@@ -122,7 +123,7 @@ With the switch off nothing changes.
 ## State
 
 ```js
-{ mode, part, focus, node, arrow, spot, page, view, env, rels, seq, step, walkthrough, stop }
+{ layout, part, focus, node, arrow, spot, page, view, env, rels, seq, step, walkthrough, stop }
 ```
 
 `walkthrough` (the name) and `stop` (1-based) are present while a walkthrough is open. Setting
@@ -131,7 +132,7 @@ With the switch off nothing changes.
 
 | Field | Meaning |
 |---|---|
-| `mode` | The diagram type's modes: a mind map `mindmap`, `org` or `list`; a box diagram (`flowchart`) `boxes`, `layers` or `list`; a sequence `lifelines` or `list`. A mode the type does not have is ignored. |
+| `layout` | The diagram type's layouts, as on the top-left switch, plus `list` (the outline): a mind map `mindmap` or `org`; a box diagram (`flowchart`) `boxes` or `layers`; an ER diagram `hubs`, `flow` or `balanced`; a state diagram `boxes`; lanes `lanes`; a sequence `lifelines`. A layout the type does not have is ignored. Renamed from `mode` (WO-47); `mode` is no longer read. |
 | `part` | Which of the file's diagrams is shown: the anchor of its heading (`shop-system-containers`), or `null` for the first. Setting it opens that diagram by the way its links lead to it, so the crumbs lead back. |
 | `focus` | Node id the view is drilled into, or `null` for the whole map. |
 | `node` | Node id that is selected / pointed at, or `null`. |
@@ -141,7 +142,7 @@ With the switch off nothing changes.
 | `view` | Name of the relation view shown; `null` for the default view (and while a deployment is shown). Setting it shows that view (relations on); in a box diagram it lays the diagram out again for the view, animated. A deployment's name is accepted too. |
 | `env` | Environment of the deployment shown (`## Deployment: <env>`, map format), or `null`. Setting it shows that deployment (the diagram's arrows over its placement, animated); `null` returns to the default view. Both are views of one picker, so at most one of `view` and `env` is set. |
 | `rels` | Whether all relations are drawn (`true` / `false`). |
-| `seq` | The sequence being played: the anchor of its heading, `main` when it is the file's first diagram, or `null`. Setting it plays that sequence, paused, over the view it is linked to (`## Plays over`; the view is shown), or as the sequence itself when `mode` is `lifelines` (or `list` with `part` the sequence) or it is linked to no view. `null` stops it. |
+| `seq` | The sequence being played: the anchor of its heading, `main` when it is the file's first diagram, or `null`. Setting it plays that sequence, paused, over the view it is linked to (`## Plays over`; the view is shown), or as the sequence itself when `layout` is `lifelines` (or `list` with `part` the sequence) or it is linked to no view. `null` stops it. |
 | `step` | The step shown while a sequence plays, from 1, or `null`. Setting it alone moves the playing sequence to that step. |
 
 **The picture** (added in WO-32, for an export; `setState` and `options.state` take
@@ -158,7 +159,7 @@ them, `state` does not report them; another diagram clears `highlight` and `crop
   are ignored.
 - `viewer.on('state', fn)` reports every change, with the full state.
 - **The viewer never reads or writes `location` or `document.title`.** The host maps
-  state to and from its URL (atlas uses `#/<path>?mode=…&part=…&focus=…&page=…&view=…&env=…&seq=…&step=…&before=…`; `before` names a map picked as Before, WO-43).
+  state to and from its URL (atlas uses `#/<path>?layout=…&part=…&focus=…&page=…&view=…&env=…&seq=…&step=…&before=…`; `before` names a map picked as Before, WO-43).
 
 `load` accepts optional context `{sourceId, signal}`. A stable `sourceId` separates
 reader baselines for equal relative paths in different sources. Changing it starts
@@ -354,8 +355,8 @@ move. Options:
 
 Result: `{format, type, data, width, height, scaledDown, report}`; `data` is the SVG
 text or a PNG `Blob`. A PNG is scaled down to the browser's canvas limits (16,000 px a
-side, 120 million pixels); `scaledDown` says so. In list mode the list is drawn (no
-report, no crop).
+side, 120 million pixels); `scaledDown` says so. In the List layout the list is drawn
+(no report, no crop).
 
 **The file:** colours and the font resolved to their values (the font embedded), arrow
 ends drawn as shapes, so editors read it. It names itself (`role="img"`, a root
@@ -367,7 +368,14 @@ references only to its own `#ids` or to `data:` images and fonts. Change marks,
 selection, search hits and the controls are left out (a host rendering for a document
 mounts with `marks: false` and selects nothing).
 
-**The layout report** (`report`), read from what was drawn:
+**The layout report** (`report`), read from what was drawn. A render (`renderMap`, the
+relay's `POST /api/render`, `render.py --report`, `draft_report()`) adds `layout`, the
+layout drawn, and `layouts`: for every layout the diagram draws (`viewer.layouts`), the
+same picture laid out that way, `{crossings, linesBehind, overlaps, groupOverlaps,
+cutLabels, smallestText, width, height, aspect}` (counts; `overlaps` without the frame
+ones), so an agent can choose a layout before writing a walkthrough (WO-47). Not for a
+sequence being played.
+
 
 | Field | What it holds |
 |---|---|
@@ -379,6 +387,9 @@ mounts with `marks: false` and selects nothing).
 | `touching` | `[{a, b, gap, at}]`: two lines closer than `minGap` px at the output's scale. Lines that share an end meet there by design: the first 24 drawing units from that end do not count, and two lines running together into one end (two keys to one column) are one line until they part. |
 | `minGap` | 2 (px). |
 | `smallestText` | `{px, id}`: the smallest text at the output width. |
+| `linesBehind` | `{count, pairs: [{line, box}]}`: a line passing behind a box that is not one of its ends (a group's frame is no box here) (WO-47). |
+| `groupOverlaps` | `{count, pairs: [{a, b, area}]}`: the overlaps that involve a group's frame (they are in `overlaps` too) (WO-47). |
+| `aspect` | The drawing's width over its height (WO-47). |
 | `changes` | Only with an earlier version (WO-34): `{edition, diagram, view, whole, groups, views, diagramsAdded, diagramsRemoved}`. `groups`: `[{state, lines}]` in the order removed, added, moved, changed, as the changes list says them, for the view drawn; `views`: `[{view, deployment, whole, groups}]` for each view and deployment of that diagram; `whole`: `added` or `removed` for a view or diagram only one file has. |
 | `colours` | Per box `{id, label, fill, stroke, why}`: its fill and its outline as `#rrggbb` (a class or theme may colour either, so read both) and why, from the colour-by: `category 3`, `level 2`, `class database`, `change added`, `centre`. |
 
@@ -557,7 +568,7 @@ the text colour on it.
 The viewer needs at least 320 × 280 pixels (its mount element; a phone in landscape).
 Smaller, it shows a message saying so and nothing else, until it is made larger. Below
 480 pixels wide (a phone upright), or wider when the top row would not fit at its widest
-(the longest view name, every layout mode, search open, the play button, a host's button
+(the longest view name, every layout, search open, the play button, a host's button
 in the slot), the toolbar leaves out Export and Search (class `is-narrow`). Switching
 views, hovering or playing never changes it.
 
@@ -603,7 +614,7 @@ and play, Before and After when the host gave an earlier version, and opens wher
 reader is. It is for readers: it shows no problems badge (`showProblems: 'none'`;
 authors see problems in the atlas and from the checker):
 
-- Kept: the diagram, view or deployment, mode, relations shown, colouring, theme and
+- Kept: the diagram, view or deployment, layout, relations shown, colouring, theme and
   appearance, Before or After. A sequence that was playing opens at step 1.
 - Dropped: an open node page, a search, a selection, a drilled-in box, boxes opened by
   hand. While the spotlight is on, its switch and its selected box or line are kept (WO-63). The reader's own "since you looked" marks never go in; a host's `since` does

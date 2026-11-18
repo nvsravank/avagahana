@@ -318,7 +318,7 @@ export function createPlayer(v, h) {
       const y = +e.getAttribute('y');
       return { l: x, t: y, r: x + +e.getAttribute('width'), b: y + +e.getAttribute('height') };
     });
-    for (const q of S.layout.pos.values()) {
+    for (const q of S.placed.pos.values()) {
       if (q === own || q.frame) continue;
       rects.push({ l: q.x - q.w / 2, t: q.y - q.h / 2, r: q.x + q.w / 2, b: q.y + q.h / 2 });
     }
@@ -353,7 +353,7 @@ export function createPlayer(v, h) {
 
   // ---------- camera ----------
   function camera(animate) {
-    if (!follow || !S.layout) return;
+    if (!follow || !S.placed) return;
     const steps = seq().steps;
     const { w, h: H } = v.size();
     const { top: under, right, bottom } = clearArea();
@@ -369,7 +369,7 @@ export function createPlayer(v, h) {
       if (!ps.length) return;
       const box = bounds(ps);
       const pad = Math.min(60, cw / 8);
-      const fitAll = fitK(bounds([...S.layout.pos.values()]), cw, ch, 20);
+      const fitAll = fitK(bounds([...S.placed.pos.values()]), cw, ch, 20);
       const want = fitK(box, cw, ch, pad);
       // no further in than needed, never past easy reading, never further out than all
       const k = Math.max(Math.min(want, 1.15), Math.min(fitAll, 1.15));
@@ -380,7 +380,7 @@ export function createPlayer(v, h) {
   // lifelines: the reader's zoom or the growing one; the view stays put while the step's
   // rows and lines are in it, else centres on them
   function lifelinesView(steps, left, cw, top, ch) {
-    const L = S.layout;
+    const L = S.placed;
     const pad = Math.min(20, cw / 16);
     const k = S.readerZoom ? S.view.k : stepZoom(L, steps, S.play.step, cw - pad * 2);
     const span = stepSpan(L, steps, S.play.step) || { x0: (left - S.view.x) / k, x1: (left + cw - S.view.x) / k };   // nothing drawn: stay

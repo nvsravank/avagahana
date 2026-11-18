@@ -26,7 +26,7 @@ Serves, on 127.0.0.1 only:
   GET  /api/events      Server-Sent Events: tree (maps changed), show (look here), render
   GET  /api/themes      {themes, settings, problems}: the maps folder's .themes/ (WO-32)
   GET  /api/theme-file?f=<file>  a font file from .themes/
-  POST /api/show        {path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?, before?}: tell open pages to show it
+  POST /api/show        {path, part?, node?, focus?, page?, layout?, view?, env?, seq?, step?, colourBy?, theme?, before?}: tell open pages to show it
                         (before: an earlier version's text, kept in memory for that map; null forgets it)
   GET  /api/before?p=   that map's earlier version as text (404: none; 204 with &empty=1)
   POST /api/render      {path, state?, theme?, appearance?, look?, format?, width?|scale?, background?, report?}:
@@ -115,12 +115,12 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
 START_TIMEOUT_S = 10
 WATCH_INTERVAL_S = 1.0     # how often the maps folder is scanned while a page listens
 HEARTBEAT_S = 15.0         # keeps event streams open through proxies; finds closed pages
-MODE = re.compile(r"^[a-z][a-z-]{0,23}$")
+LAYOUT = re.compile(r"^[a-z][a-z-]{0,23}$")
 # colour-by values a show may ask for (the viewer ignores one the map does not offer)
 COLOUR_BY = ("category", "level", "class", "changes")
 # what a show may ask for (a render's state may ask for more: expand, close, highlight, spot, crop)
 BEFORE_MAX = 2 * 1024 * 1024   # an earlier version's text, in POST /api/show
-SHOW_KEYS = ("node", "focus", "page", "part", "mode", "seq", "colourBy", "trustMarks", "step", "view", "env", "edition")
+SHOW_KEYS = ("node", "focus", "page", "part", "layout", "seq", "colourBy", "trustMarks", "step", "view", "env", "edition")
 NODE_ID = re.compile(r"^[A-Za-z][\w-]{0,99}$")
 PART_ID = re.compile(r"^[\w-]{1,100}$")   # a diagram heading's anchor
 THEME_ID = re.compile(r"^[A-Za-z0-9][\w-]{0,63}$")
@@ -237,11 +237,11 @@ def picture_fields(body: dict, out: dict):
         if not isinstance(part, str) or not PART_ID.match(part):
             return "part must be a heading anchor like shop-containers"
         out["part"] = part
-    mode = body.get("mode")
-    if mode is not None:
-        if not isinstance(mode, str) or not MODE.fullmatch(mode):
-            return "mode must be a short lowercase identifier"
-        out["mode"] = mode
+    layout = body.get("layout")
+    if layout is not None:
+        if not isinstance(layout, str) or not LAYOUT.fullmatch(layout):
+            return "layout must be a short lowercase identifier"
+        out["layout"] = layout
     seq = body.get("seq")
     if seq is not None:
         # a sequence to play over the view: its heading's anchor, "main" for the first diagram

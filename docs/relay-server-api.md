@@ -72,7 +72,7 @@ python3 relay-server/serve_maps.py [--port N] [--maps-dir DIR] [--map <rel path>
 | `GET /api/map?p=<path>` | Raw text of one map, `text/plain; charset=utf-8`. `404` if not a map. |
 | `GET /api/events` | Server-Sent Events, below. |
 | `GET /api/before?p=<path>` | The map's earlier version that a show sent (`before`), as text; `404` when there is none, or `204` (empty) when the request adds `&empty=1` (added in WO-39). Added in WO-34. |
-| `POST /api/show` | Body `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?}`. Tells every open page to show that map and node; `part` names one of the file's further diagrams by its heading's anchor (added in WO-07); `page` opens that node's page (added in WO-08); `seq` plays a sequence by its heading's anchor (`main` for the first diagram) over the view it is linked to, at `step` (a whole number from 1); `mode` may be `lifelines` (added in WO-12). `colourBy` (`category`, `level`, `class` or `changes`) opens the map in that colouring, e.g. `changes` for a plan (added in WO-13). `before`: the map's earlier version as text (2 MB at most), kept in the server's memory for that map until another, `null` (forget it) or a restart; `edition` (`before` or `after`) which of the two to show (added in WO-34). `{delivered: <number of pages told>}`; `404` for no such map, `400` for a bad field. Stores nothing else. |
+| `POST /api/show` | Body `{path, part?, node?, focus?, page?, layout?, view?, env?, seq?, step?, colourBy?}`. Tells every open page to show that map and node; `part` names one of the file's further diagrams by its heading's anchor (added in WO-07); `page` opens that node's page (added in WO-08); `seq` plays a sequence by its heading's anchor (`main` for the first diagram) over the view it is linked to, at `step` (a whole number from 1); `layout` may be `lifelines` (added in WO-12 as `mode`, renamed in WO-47). `colourBy` (`category`, `level`, `class` or `changes`) opens the map in that colouring, e.g. `changes` for a plan (added in WO-13). `before`: the map's earlier version as text (2 MB at most), kept in the server's memory for that map until another, `null` (forget it) or a restart; `edition` (`before` or `after`) which of the two to show (added in WO-34). `{delivered: <number of pages told>}`; `404` for no such map, `400` for a bad field. Stores nothing else. |
 | `GET /api/themes` | `{themes, settings, problems}`: the maps folder's `.themes/` (below). `themes`: each `<id>.json` with `id` (its file name) and `label` (its `name`) set and its font faces as `{weight, style, url}`; `settings`: `{builtIn, default, logo}` with defaults filled in; `problems`: files it could not read. Empty lists when there is no `.themes/`. Added in WO-32. |
 | `GET /api/theme-file?f=<file>` | A font file (`.woff2 .woff .ttf .otf`) in `.themes/`; `404` for anything else. Added in WO-32. |
 | `POST /api/render` | Body `{path, state?, theme?, appearance?, look?, format?, width? or scale?, background?, report?, before?, text?}`: one open page draws the map and sends the file back (below). Added in WO-32; `text` in WO-37, `look` in WO-38. |
@@ -88,8 +88,9 @@ only with known types (`.html .css .js .json .svg .png .woff2 .txt`).
 `atlas_dir`, `viewer_dir`, `can_open`, `can_shutdown`, and `idle_minutes` for reuse
 comparison. Added fields do not change existing response fields.
 
-Show `mode` accepts a lowercase letter followed by up to 23 lowercase letters or
-hyphens. Unsupported modes are ignored by the viewer for the current diagram.
+Show `layout` accepts a lowercase letter followed by up to 23 lowercase letters or
+hyphens. Unsupported layouts are ignored by the viewer for the current diagram.
+Renamed from `mode` (WO-47, a breaking change); a body naming `mode` has it ignored.
 
 ### `GET /api/events`
 
@@ -98,7 +99,7 @@ hyphens. Unsupported modes are ignored by the viewer for the current diagram.
 | Event | Data | When |
 |---|---|---|
 | `tree` | `{state}` | A map was added, removed or changed (the folder is scanned about once a second while a page listens). |
-| `show` | `{path, part?, node?, focus?, page?, mode?, view?, env?, seq?, step?, colourBy?, theme?}` | Someone called `POST /api/show`. |
+| `show` | `{path, part?, node?, focus?, page?, layout?, view?, env?, seq?, step?, colourBy?, theme?}` | Someone called `POST /api/show`. |
 | `render` | `{id, path, state, format, theme?, appearance?, look?, width? or scale?, background, report, before?, text?, pages}` | Someone called `POST /api/render`: the page that claims it answers. |
 
 A comment line (`: keep-alive`) every 15 s keeps the stream open. A page that cannot hold
@@ -110,7 +111,7 @@ The agent's one-way pointer while it explains. There is no channel back from the
 viewer to the agent.
 
 ```bash
-python3 relay-server/show.py "<folder>/<file>.md" [--part shop-containers] [--node n13] [--focus n8] [--page n13] [--mode org]
+python3 relay-server/show.py "<folder>/<file>.md" [--part shop-containers] [--node n13] [--focus n8] [--page n13] [--layout org]
                              [--view NAME] [--env NAME] [--seq checkout] [--step 3] [--colour-by changes] [--theme ID]
                              [--before FILE | --before none] [--port N] [--maps-dir DIR]
 ```
@@ -126,7 +127,7 @@ preview it (added in WO-32); the reader keeps it until they choose another.
 
 `--seq` plays a sequence (its heading's anchor; `main` when it is the file's first
 diagram) over the view it is linked to (`## Plays over`), paused at `--step` (from 1);
-with `--mode lifelines` (or `list` and `--part` the sequence) as the sequence itself.
+with `--layout lifelines` (or `list` and `--part` the sequence) as the sequence itself.
 
 Prints one line:
 
@@ -147,7 +148,7 @@ viewer is JavaScript and draws in the browser, so the open page draws.
 
 ```bash
 python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.png
-                               [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID] [--mode MODE] [--colour-by NAME]
+                               [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID] [--layout LAYOUT] [--colour-by NAME]
                                [--expand N|all] [--close a,b] [--highlight a,b] [--spot a,e1] [--crop ID]
                                [--seq ANCHOR [--step N | --steps all|3-5]]
                                [--before FILE [--edition before|after]] [--draft FILE]
@@ -170,7 +171,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
   `{status: "rendered", format, encoding ("utf-8" for SVG text, "base64" for PNG),
   data, width, height, scaledDown, report?, steps?, problems?, draft?}`; `{status: "none"}`
   with no page; `422 {error}` when the page could not draw it; `400` for a bad field.
-- `state` takes the show fields (`part`, `view`, `env`, `focus`, `node`, `page`, `mode`,
+- `state` takes the show fields (`part`, `view`, `env`, `focus`, `node`, `page`, `layout`,
   `seq`, `step`, `colourBy`, `edition`) and the picture's (`expand`: a whole number or `"all"`;
   `close`, `highlight`: node ids; `spot`: node and arrow ids the spotlight lights, WO-63; `crop`: a node id). `format` `svg` (default) or `png`;
   `width` 16 to 16,000 px, or `scale` 0.1 to 8; `background` `theme` or `none`;
@@ -193,7 +194,7 @@ python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.pn
 - For many drafts (an agent's trial script), `render.py` is also a library, so no
   process starts per try and no file is written (WO-37):
   `sys.path.insert(0, "<plugin root>/relay-server")`, `from render import draft_report,
-  RenderError`, then `draft_report(map_path, text, maps_dir=..., mode=..., view=...)`
+  RenderError`, then `draft_report(map_path, text, maps_dir=..., layout=..., view=...)`
   returns the layout report as a dict (the state as the request names it; `close` and
   `highlight` as lists or comma-separated ids) or raises `RenderError` (no relay, no
   page, a bad field, the map's own error, or an answer that is not the draft).

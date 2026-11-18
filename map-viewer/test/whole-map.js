@@ -45,12 +45,12 @@ export async function testWholeMap(check) {
     check('Source file saves the map\'s text under its file name', got.name === 'garden.md' && got.text === garden, got.name);
 
     // where the reader is: the view and mode stay, a node page and selection go
-    v.setState({ mode: 'list' });
+    v.setState({ layout: 'list' });
     v.setState({ node: 'n38', page: 'n38' });
     await wait(50);
     let p = payloadOf(await v.snapshot());
     check('snapshot: the map\'s text and path', p.options.text === garden && p.options.path === 'gardens/garden.md');
-    check('snapshot: the reader\'s mode, no page or selection', p.options.state.mode === 'list' && !('page' in p.options.state) && !('node' in p.options.state) && !('focus' in p.options.state), JSON.stringify(p.options.state));
+    check('snapshot: the reader\'s mode, no page or selection', p.options.state.layout === 'list' && !('page' in p.options.state) && !('node' in p.options.state) && !('focus' in p.options.state), JSON.stringify(p.options.state));
     check('snapshot: the colouring and the built-in theme with its fonts', p.options.prefs.colourBy && p.theme === 'default' && p.fonts.length >= 2, JSON.stringify(p.options.prefs));
     check('snapshot: no marks of this reader\'s', p.options.marks === false && !('since' in p.options));
     check('snapshot: the viewer\'s modules, deepest first, ending at index.js', p.order.at(-1) === 'index.js' && p.order.includes('viewer.js') && !p.order.includes('pack.js'), p.order.slice(-3));

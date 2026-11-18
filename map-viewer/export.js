@@ -291,7 +291,7 @@ export function createExporter(v) {
     return { svg: out, w, h, facts };
   }
 
-  // List mode: the list as shown, redrawn as SVG from where each part sits.
+  // List layout: the list as shown, redrawn as SVG from where each part sits.
   async function buildList(opts = {}) {
     const inner = $.list.querySelector('.mmv-list-inner');
     const box = inner.getBoundingClientRect();
@@ -354,7 +354,7 @@ export function createExporter(v) {
     return { svg: out, w, h, facts: null };
   }
 
-  const build = (opts) => (S.mode === 'list' ? buildList(opts) : buildDrawn(opts));
+  const build = (opts) => (S.layout === 'list' ? buildList(opts) : buildDrawn(opts));
   const fileName = (ext) => `${(S.map?.title || 'map').replace(/[^\w.-]+/g, '_')}.${ext}`;
   function save(blob, name) {
     const a = document.createElement('a');
@@ -433,7 +433,7 @@ export function createExporter(v) {
     doc.head.appendChild(meta);
     style(`@page{margin:12mm}html,body{margin:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}${fontCss}`);
     let stylesReady = Promise.resolve();
-    if (S.mode !== 'list') {
+    if (S.layout !== 'list') {
       const img = doc.createElement('img');
       img.src = dataUrl(new XMLSerializer().serializeToString((await buildDrawn()).svg));
       Object.assign(img.style, { display: 'block', maxWidth: '100%', maxHeight: '95vh', margin: '0 auto' });

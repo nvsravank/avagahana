@@ -7,7 +7,7 @@ import { toneClass, passesFilter } from './geometry.js';
 import { diagramOf } from './diagrams/index.js';
 import { queryTone } from './query/cards.js';
 
-// List mode: the outline's rows, in order.
+// List layout: the outline's rows, in order.
 // input: {root, relDepth(n), categoryOf(n), kids(n), collapsed, selected, hits,
 //         iconFilter, relations, byId, countDesc(n)}
 // A root that is the map itself (a box diagram's) is not a row: the outline starts with
@@ -205,7 +205,7 @@ export function renderList(v, on) {
     // Each diagram icon is a direct link to that diagram.
     for (const x of s.inners || []) {
       const di = Object.assign(document.createElement('span'), { className: 'mmv-lnote-ic', title: x.title });
-      di.innerHTML = uiSvg(diagramOf({ type: x.type }).modes[0].icon, 16);
+      di.innerHTML = uiSvg(diagramOf({ type: x.type }).layouts[0].icon, 16);
       // something in it new or changed: a small sparkle on the icon (seen.js)
       if (v.partChanged?.(x.anchor)) { di.classList.add('has-spark'); di.insertAdjacentHTML('beforeend', sparkleSvg()); }
       di.addEventListener('click', (e) => { e.stopPropagation(); on.openDiagram(x.anchor, s.id); });

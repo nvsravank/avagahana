@@ -1,4 +1,4 @@
-// list.js — a sequence's List mode: its steps, numbered as on the arrows, under their
+// list.js — a sequence's List layout: its steps, numbered as on the arrows, under their
 // blocks; a click plays from that step (the shared list.js hands over to this).
 import { uiSvg, putNumber } from '../../chrome.js';
 import { playState } from './scene.js';

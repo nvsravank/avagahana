@@ -42,6 +42,10 @@ export const UI = {
   flowchart: '<rect x="2" y="2" width="7" height="5" rx="1"/><path d="m17 8 4 4-4 4-4-4Z"/><rect x="2" y="17" width="7" height="5" rx="1"/><path d="M5.5 7v5H13M17 16v3.5H9"/>',
   state: '<circle cx="4.5" cy="12" r="3.5"/><circle cx="19.5" cy="12" r="3.5"/><path d="M8 12h7M12.5 9.5 15 12l-2.5 2.5"/>',
   tables: '<rect x="1" y="3" width="8" height="18" rx="1"/><rect x="15" y="3" width="8" height="18" rx="1"/><path d="M1 8h8M1 13h8M1 17h8M15 8h8M15 13h8M15 17h8M9 11h3v4h3"/>',
+  // ER layouts (WO-47): Hubs keeps the tables icon; Flow, three columns joined left to
+  // right; Balanced, four tables spread round their links
+  erFlow: '<rect x="1.5" y="9" width="5" height="6" rx="1"/><rect x="9.5" y="3" width="5" height="6" rx="1"/><rect x="9.5" y="15" width="5" height="6" rx="1"/><rect x="17.5" y="9" width="5" height="6" rx="1"/><path d="M6.5 12h1.5V6h1.5M8 12v6h1.5M14.5 6H16v6h1.5M14.5 18H16v-6"/>',
+  erBalanced: '<rect x="2" y="3" width="6" height="5" rx="1"/><rect x="16" y="5" width="6" height="5" rx="1"/><rect x="3" y="16" width="6" height="5" rx="1"/><rect x="14" y="15" width="6" height="5" rx="1"/><path d="M8 6l8 1.5M5.5 8l.5 8M9 18.5l5-1M18 10l-1 5"/>',
   boxes: '<rect x="2.5" y="3.5" width="19" height="17" rx="2"/><rect x="5.5" y="8" width="5" height="4" rx="1"/><rect x="13.5" y="8" width="5" height="4" rx="1"/><rect x="9.5" y="15" width="5" height="3" rx="1"/><path d="M10.5 10h3"/>',
   views: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
   // a walkthrough: a winding path between two stops
@@ -53,7 +57,7 @@ export const UI = {
   gem: '<path d="M7 4.5h10l4.5 5.5L12 20.5 2.5 10z"/><path d="M2.5 10h19M7 4.5 9.5 10 12 20.5M17 4.5 14.5 10 12 20.5M9.5 10 12 4.5l2.5 5.5"/>',
   changes: '<path d="M11 6h10M11 12h10M11 18h10"/><path d="M3 6h5M5.5 3.5v5M3 12.5c.8-1.2 1.7-1.2 2.5 0s1.7 1.2 2.5 0M3 18h5"/>',
 };
-const lightIcons = new Set(['mindmap', 'flowchart', 'state', 'tables', 'lifelines', 'note']);
+const lightIcons = new Set(['mindmap', 'flowchart', 'state', 'tables', 'erFlow', 'erBalanced', 'lifelines', 'note']);
 export const uiSvg = (name, size = 16) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="${lightIcons.has(name) ? 1.5 : 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${UI[name] || ''}</svg>`;
 
 // The return mark beside a reply's number ("3" and the mark): Phosphor arrow-u-up-left
@@ -153,7 +157,7 @@ export function chromeHtml(uid) {
     <button class="mmv-pill" data-mmv="viewBtn" title="Relation view">${ic('views')}<span data-mmv="viewName"></span></button>
     <div class="mmv-panel mmv-drop mmv-left-drop" data-mmv="viewMenu"></div>
   </div>
-  <div class="mmv-seg mmv-modes" data-mmv="modes"></div>
+  <div class="mmv-seg mmv-layouts" data-mmv="layouts"></div>
   <div class="mmv-hov" data-mmv="playWrap" hidden>
     <button class="mmv-pill mmv-icon" data-mmv="playBtn" title="Play the sequence">${ic('play')}</button>
     <div class="mmv-panel mmv-drop mmv-left-drop" data-mmv="playMenu"></div>

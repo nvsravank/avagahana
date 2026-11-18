@@ -3,7 +3,7 @@
 
   python3 relay-server/pack.py "<folder>/<file>.md" --out snapshot.html
                                [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID] [--node ID]
-                               [--page ID] [--mode MODE] [--colour-by category|level|class|changes]
+                               [--page ID] [--layout LAYOUT] [--colour-by category|level|class|changes]
                                [--seq ANCHOR [--step N]] [--theme ID] [--appearance light|dark]
                                [--since FILE [--since-label TEXT]] [--before FILE] [--maps-dir DIR]
 
@@ -220,7 +220,7 @@ def main(argv=None) -> int:
     ap.add_argument("--focus", help="drill into this node first")
     ap.add_argument("--node", help="the node pointed at")
     ap.add_argument("--page", help="open this node's page")
-    ap.add_argument("--mode", help="diagram mode identifier (for example tables or boxes)")
+    ap.add_argument("--layout", help="diagram layout identifier (for example hubs, flow or layers)")
     ap.add_argument("--colour-by", choices=list(COLOUR_BY))
     ap.add_argument("--seq", help="open this sequence over its view: its heading's anchor (main: the first diagram)")
     ap.add_argument("--step", type=int, help="the sequence's step, from 1")
@@ -256,7 +256,7 @@ def main(argv=None) -> int:
     if args.since_label:
         options["sinceLabel"] = args.since_label
     state = {k: v for k, v in {"part": args.part, "view": args.view, "env": args.env, "focus": args.focus, "node": args.node,
-                               "page": args.page, "mode": args.mode, "seq": args.seq, "step": args.step}.items() if v is not None}
+                               "page": args.page, "layout": args.layout, "seq": args.seq, "step": args.step}.items() if v is not None}
     if state:
         options["state"] = state
     prefs = {k: v for k, v in {"appearance": args.appearance, "colourBy": args.colour_by}.items() if v}

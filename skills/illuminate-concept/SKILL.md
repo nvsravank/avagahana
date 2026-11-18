@@ -228,7 +228,7 @@ moves every open page to that place while you explain it:
   open the node's page (its note, arrows, perspectives and linked diagrams).
 - `--part <heading anchor>` one of the file's further diagrams (`## Orders service` is
   `orders-service`); `--view <name>` a perspective; `--env <name>` a deployment;
-  `--mode mindmap|org|list|boxes|layers|lifelines`.
+  `--layout mindmap|org|list|boxes|layers|hubs|flow|balanced|lifelines`.
 - `--seq <anchor> --step N` play a sequence or a scenario at step N (see the references);
   `--colour-by changes` open a map with change marks in its Changes colouring.
 - `--before <file>` compare with an earlier version of the map (`references/compare.md`).

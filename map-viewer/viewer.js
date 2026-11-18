@@ -10,7 +10,7 @@ import { isCloudCode } from './model/main-icon.js';
 import { placeIn } from './model/deployments.js';
 import { categoryOf as branchCategory } from './model/tree.js';
 import { queryTone } from './query/cards.js';
-import { diagramOf, DIAGRAMS } from './diagrams/index.js';
+import { diagramOf, drawnLayouts, DIAGRAMS } from './diagrams/index.js';
 import { renderList } from './list.js';
 import { createPainter } from './paint.js';
 import { createStage } from './stage.js';
@@ -142,7 +142,7 @@ export function mount(element, options = {}) {
 
   // ---------- state ----------
   const S = {
-    themeId: null, appearance: 'auto', colourBy: 'category', looks: {}, mode: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0', trustMarks: '1', spotlight: '0',
+    themeId: null, appearance: 'auto', colourBy: 'category', looks: {}, layout: 'mindmap', relView: null, rels: '0', infoClosed: 'markers', sparkles: '0', trustMarks: '1', spotlight: '0',
     relNode: null, noteSticky: false, noteOpen: false,
     path: null, text: null, map: null, focus: null, collapsed: new Set(), selected: null,
     arrow: null,   // the line selected while the spotlight is on (WO-63): its arrow id
@@ -179,6 +179,9 @@ export function mount(element, options = {}) {
   // a look set from outside (setPrefs) or by the reader on this file, by diagram (part
   // anchor, '' the first): it wins over the map's ## Look: line until another file opens
   let lookHere = new Map();
+  // the layout the reader switched to, by diagram (WO-47): it wins over the diagram's
+  // ## Layout: line and a stop that names none, until another file opens
+  let layoutHere = new Map();
   if (!APPEARANCES.includes(S.appearance)) S.appearance = 'auto';
   S.colourByKept = saved.colourBy != null ? String(saved.colourBy) : S.colourBy;   // the choice kept while Changes shows
   const wantTheme = link.theme || saved.theme || options.theme || null;
@@ -202,7 +205,7 @@ export function mount(element, options = {}) {
 
   // ---------- the diagram type (diagrams/index.js) ----------
   const diagram = () => diagramOf(S.map);
-  const modeIds = () => diagram().modes.map((m) => m.id);
+  const layoutIds = () => diagram().layouts.map((m) => m.id);
   // The diagram type's looks, [[value, label, drawn as]] (WO-38): each type keeps its own,
   // and a type with one look has no Look row. The look shown: set here (the reader or
   // setPrefs), a link's, the map's ## Look: line, the reader's saved one, the type's default.
@@ -222,7 +225,7 @@ export function mount(element, options = {}) {
     applyChrome();
     if (wasPoster === posterNow() || !S.map?.root) return;
     painter.clearSizes();
-    render(S.layout && !S.userMoved && S.lastFit ? S.lastFit : false);
+    render(S.placed && !S.userMoved && S.lastFit ? S.lastFit : false);
   }
 
   // ---------- tree helpers ----------
@@ -258,7 +261,7 @@ export function mount(element, options = {}) {
     nodeGeom: (n) => painter.nodeGeom(n),
     withExporting(fn) {
       S.exporting = true;
-      try { painter.draw(S.layout); fn(); } finally { S.exporting = false; painter.draw(S.layout); }
+      try { painter.draw(S.placed); fn(); } finally { S.exporting = false; painter.draw(S.placed); }
     },
   };
   v.sinceWords = sinceWords;
@@ -292,12 +295,12 @@ export function mount(element, options = {}) {
     onLod: () => painter.lod(),
     onClick: canvasClick,
     onUserMove: () => { clearPoint(); player.userMoved(); },
-    limit: (vw) => { if (limited()) diagram().limitView(S.layout, vw, limitArea()); },
-    maxZoom: () => (limited() ? diagram().maxZoom(S.layout, limitArea()) : Infinity),
+    limit: (vw) => { if (limited()) diagram().limitView(S.placed, vw, limitArea()); },
+    maxZoom: () => (limited() ? diagram().maxZoom(S.placed, limitArea()) : Infinity),
     onView: () => paintPins(),
   });
   // Lifelines keep a line and its name on screen (WO-52); a map pans freely
-  const limited = () => !!S.layout?.lifelines && !S.thumb && !S.exporting && S.mode !== 'list';
+  const limited = () => !!S.placed?.lifelines && !S.thumb && !S.exporting && S.layout !== 'list';
   function limitArea() {
     const { w, h } = v.size();
     const { top, right, bottom } = player.clearArea();
@@ -307,9 +310,9 @@ export function mount(element, options = {}) {
   function paintPins() {
     if (!$.pins) return;
     // a sequence's names (while its pan is limited), or a lane diagram's (WO-62)
-    const lanes = !!S.layout?.lanes && !S.thumb && !S.exporting && S.mode !== 'list';
+    const lanes = !!S.placed?.lanes && !S.thumb && !S.exporting && S.layout !== 'list';
     if (!limited() && !lanes) { $.pins.replaceChildren(); return; }
-    diagram().paintPins($.pins, S.layout, S.view, v.size().w, (id) => $.nodes.querySelector(`[data-id="${CSS.escape(id)}"]`));
+    diagram().paintPins($.pins, S.placed, S.view, v.size().w, (id) => $.nodes.querySelector(`[data-id="${CSS.escape(id)}"]`));
   }
   const exporter = createExporter(v);
   const page = createPage(v, {
@@ -351,7 +354,7 @@ export function mount(element, options = {}) {
     applyView: () => stage.applyView(),
     painter,
     marker: (kind, tint) => painter.marker(kind, tint),
-    posOf: (id) => { const n = drawnOf(id); return n ? S.layout.pos.get(n) : null; },
+    posOf: (id) => { const n = drawnOf(id); return n ? S.placed.pos.get(n) : null; },
     reveal: (ids) => reveal(ids),
     arrowFor: (from, to, eid) => {
       if (eid) {
@@ -374,7 +377,7 @@ export function mount(element, options = {}) {
     },
     // where an arrow's label goes: the layout's place, else the middle of the arrow
     labelAt: (key) => {
-      const at = S.layout?.labels?.get(key);
+      const at = S.placed?.labels?.get(key);
       if (at) return { x: at[0], y: at[1] };
       const e = root.querySelector(`.mmv-flow-hit[data-arrow="${CSS.escape(key)}"]`);
       if (!e) return null;
@@ -394,7 +397,7 @@ export function mount(element, options = {}) {
   // highlight: these nodes (and what is inside them) keep their colours; every other box,
   // line and label takes the player's idle colours. Not while a sequence plays.
   function paintHighlight() {
-    const on = !!S.highlight && !S.play && S.mode !== 'list' && !!S.map?.root;
+    const on = !!S.highlight && !S.play && S.layout !== 'list' && !!S.map?.root;
     root.classList.toggle('is-highlighting', on);
     if (!on) return;
     const lit = (id) => { for (let n = S.map.byId[id]; n; n = n.parent) if (S.highlight.has(n.id)) return true; return false; };
@@ -416,7 +419,7 @@ export function mount(element, options = {}) {
   // ---------- the spotlight (WO-63) ----------
   // The switch is on and this diagram type has one (diagrams/index.js spotlight), not in
   // List mode nor in a thumbnail.
-  const spotOn = () => S.spotlight === '1' && !!diagram().spotlight && S.mode !== 'list' && !S.thumb && !!S.map?.root;
+  const spotOn = () => S.spotlight === '1' && !!diagram().spotlight && S.layout !== 'list' && !S.thumb && !!S.map?.root;
   v.spotOn = spotOn;
   // A spot ref -> {node: id} or {arrow: the drawn line}, or null when it is not drawn
   // here (a lane is never one: its own highlight, WO-62, is not a spotlight)
@@ -434,7 +437,7 @@ export function mount(element, options = {}) {
   }
   // a selection of one (a click, a search hit, a page, Escape's clear): the spot follows it
   function oneSpot(id) { S.spot = id ? [id] : []; S.spotForced = false; S.arrow = null; }
-  const spotAble = () => !!diagram().spotlight && S.mode !== 'list' && !S.thumb && !!S.map?.root;
+  const spotAble = () => !!diagram().spotlight && S.layout !== 'list' && !S.thumb && !!S.map?.root;
   // shown: the switch is on (or the spot was set from outside), something is spotlit, and
   // no highlight (Point to) or sequence play owns the picture
   const spotShown = () => spotAble() && (S.spotlight === '1' || S.spotForced) && S.spot.length > 0 && !S.play && !S.highlight;
@@ -446,7 +449,7 @@ export function mount(element, options = {}) {
   function paintSpotlight() {
     $.rels.querySelectorAll(':scope > .mmv-mark-line').forEach((e) => e.remove());
     for (const el of root.querySelectorAll('[data-mmv=viewport] .is-spot-out')) el.classList.remove('is-spot-out');
-    const refs = spotShown() && S.layout ? S.spot.map(spotRef).filter(Boolean) : [];
+    const refs = spotShown() && S.placed ? S.spot.map(spotRef).filter(Boolean) : [];
     const on = refs.length > 0;
     root.classList.toggle('is-spotlit', on);
     if (!on) return;
@@ -568,7 +571,7 @@ export function mount(element, options = {}) {
     if ('highlight' in st) {
       const list = st.highlight == null || st.highlight === '' ? [] : ids(st.highlight);
       S.highlight = list.length ? new Set(list) : null;
-      if (!relayout && S.layout) { if (!S.highlight) for (const el of root.querySelectorAll('[data-mmv=viewport] .is-idle')) el.classList.remove('is-idle'); render(false); }
+      if (!relayout && S.placed) { if (!S.highlight) for (const el of root.querySelectorAll('[data-mmv=viewport] .is-idle')) el.classList.remove('is-idle'); render(false); }
     }
     if ('crop' in st) S.crop = st.crop && S.map.byId[st.crop] ? String(st.crop) : null;
     return relayout;
@@ -630,7 +633,7 @@ export function mount(element, options = {}) {
   function clearSeen(keys) { if (seen?.ack(keys)) repaintMarks(); }
   // Only the marks repaint (a page may be open).
   function repaintMarks() {
-    if (S.mode === 'list') renderList(v, listHandlers);
+    if (S.layout === 'list') renderList(v, listHandlers);
     else painter.paintChanges();
     markExpandBtn();
     markSparkles();
@@ -660,12 +663,12 @@ export function mount(element, options = {}) {
     const scope = page.isOpen() ? S.map.byId[page.id] : viewRoot();
     const add = (n) => { if (n && holds(scope, n.id)) nodes.add(n.id); };
     if (page.isOpen()) add(scope);
-    else if (S.mode !== 'list' && diagram().layoutByView && view?.relations.length && !view.deploy) {
+    else if (S.layout !== 'list' && diagram().layoutByView && view?.relations.length && !view.deploy) {
       for (const r of view.relations) for (const id of [r.from, r.to]) {
         for (let n = S.map.byId[id]; n; n = n.parent) add(n);
       }
       // A selected node may be visible even when this view has no arrows to it.
-      for (const n of S.layout?.pos.keys() || []) add(n);
+      for (const n of S.placed?.pos.keys() || []) add(n);
     } else (function walk(n) { add(n); n.children.forEach(walk); })(scope);
     const rels = (view?.relations || []).filter((r) => nodes.has(r.from) || nodes.has(r.to));
     return seen.scopeKeys({ part: partKey(), view: view?.name, nodes,
@@ -677,7 +680,7 @@ export function mount(element, options = {}) {
   const holds = (n, id) => { for (let c = S.map?.byId[id]; c; c = c.parent) if (c === n) return true; return false; };
   // the drawn box a node is in (itself, or the closed box round it)
   function drawnOf(id) {
-    for (let n = S.map?.byId[id]; n; n = n.parent) if (S.layout?.pos.has(n)) return n;
+    for (let n = S.map?.byId[id]; n; n = n.parent) if (S.placed?.pos.has(n)) return n;
     return null;
   }
   // open what hides the given nodes (closed boxes round them, a drill elsewhere); true
@@ -765,7 +768,7 @@ export function mount(element, options = {}) {
       }
     }
     const size = (n) => painter.nodeGeom(n);
-    S.layout = diagram().layout(S.mode, viewRoot(), kids, size, { poster: posterNow(), queryFlow: !!S.map.queryFlow, relations: S.map.relations, byId: S.map.byId, direction: S.map.direction, selected: S.selected, collapsed: S.collapsed, all: !!viewNamed(S.relView)?.deploy, sequence: S.map.sequence,
+    S.placed = diagram().place(S.layout, viewRoot(), kids, size, { poster: posterNow(), queryFlow: !!S.map.queryFlow, relations: S.map.relations, byId: S.map.byId, direction: S.map.direction, selected: S.selected, collapsed: S.collapsed, all: !!viewNamed(S.relView)?.deploy, sequence: S.map.sequence,
       // a sequence played over the view: its arrows make room for the messages' labels
       playLabel: player.onMap() ? player.labelOf : null });
   }
@@ -773,7 +776,7 @@ export function mount(element, options = {}) {
     if (page.isOpen()) page.close({ instant: true });   // a new picture: the page is gone
     if (fit && S.thumb) fit = 'all';   // a thumbnail shows everything
     sizeCheck();
-    const list = S.mode === 'list';
+    const list = S.layout === 'list';
     $.list.hidden = !list;
     $.canvas.style.display = list ? 'none' : '';
     $.zoomCtl.hidden = list;   // zoom is for the drawing
@@ -781,14 +784,14 @@ export function mount(element, options = {}) {
     $.exportWrap.hidden = !S.map?.root;
     $.empty.hidden = !!S.map?.root || !$.errorbar.hidden;
     renderCrumbs();
-    if (!S.map?.root) { $.frames.replaceChildren(); $.edges.replaceChildren(); $.nodes.replaceChildren(); $.rels.replaceChildren(); S.layout = null; return; }
-    if (list) { S.layout = null; renderList(v, listHandlers); markExpandBtn(); return; }
+    if (!S.map?.root) { $.frames.replaceChildren(); $.edges.replaceChildren(); $.nodes.replaceChildren(); $.rels.replaceChildren(); S.placed = null; return; }
+    if (list) { S.placed = null; renderList(v, listHandlers); markExpandBtn(); return; }
     layout();
     // fit first (it needs only the layout), so the drawing is made at the zoom it will
     // be seen at: labels or lines, never redrawn in the middle of a glide
     const view0 = { ...S.view };
     if (fit) stage.fitView(fit === 'levels', true);
-    painter.draw(S.layout, view0);
+    painter.draw(S.placed, view0);
     stage.applyView(true);
     markExpandBtn();
   }
@@ -852,7 +855,7 @@ export function mount(element, options = {}) {
       lastClick = { id: null, t: 0 };
       const n = S.map.byId[id];
       // double-click a node that only opens diagrams opens its page; the centre goes back up one level
-      if (S.map.queryFlow && S.layout.context?.has(n) && n.queryOwner) drill(n.queryOwner);
+      if (S.map.queryFlow && S.placed.context?.has(n) && n.queryOwner) drill(n.queryOwner);
       else if (n?.queryDefinition) drill(n.queryDefinition);
       else if (n?.inners?.length && !n.children.length) openPage(id);
       else if (n === viewRoot() && n.parent) drill(n.parent.id); else drill(id);
@@ -1101,9 +1104,9 @@ export function mount(element, options = {}) {
     S.selected = id;
     oneSpot(id);
     hideNote();
-    if (S.mode === 'list') render(false); else paintMarks();
+    if (S.layout === 'list') render(false); else paintMarks();
     // Poster (WO-38): a click, a tap or the keyboard keeps the node's details open
-    if (id && S.mode !== 'list' && posterNow() && S.map?.byId[id]) {
+    if (id && S.layout !== 'list' && posterNow() && S.map?.byId[id]) {
       const el = [...$.nodes.children, ...$.frames.children].find((g) => g.dataset.id === id);
       if (el) { showDetails(S.map.byId[id], el.querySelector('[data-hover]') || el); S.noteSticky = true; }
     }
@@ -1317,7 +1320,7 @@ export function mount(element, options = {}) {
       for (const inner of n.inners) {
         const b = document.createElement('button');
         b.className = 'mmv-relrow mmv-details-opens';
-        b.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">${UI[diagramOf({ type: inner.type }).modes[0].icon] || UI.list}</svg>`;
+        b.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">${UI[diagramOf({ type: inner.type }).layouts[0].icon] || UI.list}</svg>`;
         if (v.partChanged?.(inner.anchor)) { b.classList.add('has-spark'); b.insertAdjacentHTML('beforeend', sparkleSvg()); }
         b.append(` ${inner.title}`);
         b.addEventListener('click', () => { hideNote(); enterPart(inner.anchor, n.id); });
@@ -1471,7 +1474,7 @@ export function mount(element, options = {}) {
     }
     const away = S.hits.filter((id) => viewFor(S.map.byId[id])).length;
     $.searchCount.textContent = q ? `${S.hits.length} found${away ? `, ${away} in other views` : ''}` : '';
-    if (S.mode === 'list') render(false); else paintMarks();
+    if (S.layout === 'list') render(false); else paintMarks();
   }
   function nextHit(step) {
     if (!S.hits.length) return;
@@ -1495,7 +1498,7 @@ export function mount(element, options = {}) {
     $.search.classList.remove('has-value');
     S.hits = [];
     $.searchCount.textContent = '';
-    if (S.mode === 'list') render(false); else paintMarks();
+    if (S.layout === 'list') render(false); else paintMarks();
   }
   function buildIconBar() {
     const bar = $.iconBar;
@@ -1602,7 +1605,7 @@ export function mount(element, options = {}) {
     fontString = getComputedStyle(root).getPropertyValue('--mmv-font').trim() || 'system-ui, sans-serif';
     clearMeasureCache();
     painter.clearSizes();
-    if (S.map?.root) render(!keepView && S.layout && !S.userMoved && S.lastFit ? S.lastFit : false);
+    if (S.map?.root) render(!keepView && S.placed && !S.userMoved && S.lastFit ? S.lastFit : false);
   }
   let lastLook = null;
   function applyChrome() {
@@ -1619,11 +1622,11 @@ export function mount(element, options = {}) {
     if (S.map?.queryFlow) root.dataset.queryLook = lookOf(); else delete root.dataset.queryLook;
     // a lane diagram's lanes: Flat lines or Zebra stripes (WO-62, base.css)
     if (diagram().type === 'lanes') root.dataset.laneLook = lookOf(); else delete root.dataset.laneLook;
-    $.modes.querySelectorAll('button').forEach((b) => b.classList.toggle('is-on', b.dataset.mode === S.mode));
+    $.layouts.querySelectorAll('button').forEach((b) => b.classList.toggle('is-on', b.dataset.layout === S.layout));
     $.relBtn.hidden = !!diagram().layoutByView || !!diagram().noRelations;   // a box diagram always shows its arrows; a sequence has none
     $.relBtn.classList.toggle('is-active', S.rels === '1');
     $.relBtn.title = S.rels === '1' ? 'Hide related links' : 'Show related links';
-    $.spotBtn.hidden = !diagram().spotlight || S.mode === 'list';
+    $.spotBtn.hidden = !diagram().spotlight || S.layout === 'list';
     $.spotBtn.classList.toggle('is-active', S.spotlight === '1');
     $.spotBtn.setAttribute('aria-pressed', String(S.spotlight === '1'));
     $.spotBtn.title = S.spotlight === '1' ? 'Spotlight what you click: on' : 'Spotlight what you click';
@@ -1740,7 +1743,7 @@ export function mount(element, options = {}) {
     savePrefs();
     applyChrome();
     // ER draws its lit lines only with the switch off
-    if (S.layout && S.mode !== 'list') render(false);
+    if (S.placed && S.layout !== 'list') render(false);
     emitState();
   }
   $.warnBtn.addEventListener('click', () => togglePanel('warnPanel'));
@@ -1860,22 +1863,23 @@ export function mount(element, options = {}) {
     if (PANELS.some((p) => !$[p].hidden) && ![$.verificationPanel, $.verificationBtn, $.infoPanel, $.warnPanel, $.sparklesPanel, $.changesPanel, $.infoBtn, $.warnBtn, $.sparklesBtn, $.changesBtn, $.perspBtn].some((el) => el.contains(t))) closePanels();
   }
   document.addEventListener('pointerdown', outsidePanels, true);
-  // the mode buttons come from the diagram type
-  function buildModes() {
-    $.modes.replaceChildren(...diagram().modes.map((m) => {
+  // the layout buttons come from the diagram type
+  function buildLayouts() {
+    $.layouts.replaceChildren(...diagram().layouts.map((m) => {
       const b = Object.assign(document.createElement('button'), { title: m.label });
-      b.dataset.mode = m.id;
+      b.dataset.layout = m.id;
       b.innerHTML = `<span class="mmv-ic">${uiSvg(m.icon)}</span>`;
       return b;
     }));
   }
-  $.modes.addEventListener('click', (e) => {
-    const b = e.target.closest('button[data-mode]');
+  $.layouts.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-layout]');
     if (!b) return;
     b.blur();
-    setMode(b.dataset.mode);
+    layoutHere.set(S.part || '', b.dataset.layout);
+    setLayout(b.dataset.layout);
   });
-  buildModes();
+  buildLayouts();
   // ---------- relation views ----------
   // A view's relations become S.map.relations, so everything that reads relations
   // (dots, popovers, list counts, the icon index) follows the view. A deployment
@@ -1895,7 +1899,7 @@ export function mount(element, options = {}) {
     return !rels.length || rels.some((r) => [r.from, r.to].some((id) => { for (let c = byId[id]; c; c = c.parent) if (c === m) return true; return false; }));
   };
   const viewFor = (n) => {
-    if (!n || !diagram().layoutByView || S.mode === 'list') return null;
+    if (!n || !diagram().layoutByView || S.layout === 'list') return null;
     const current = viewNamed(S.relView) || S.map.views[0];
     if (!current || shows(current, n)) return null;
     return S.map.views.find((x) => shows(x, n)) || null;
@@ -2092,15 +2096,15 @@ export function mount(element, options = {}) {
     verification.renderPanel();
     // the view decides the layout: fit the new picture unless the reader has moved it
     if (diagram().layoutByView) { painter.animateNext(); render(restored || !S.userMoved ? 'all' : false); }
-    else if (S.mode === 'list') render(false);
+    else if (S.layout === 'list') render(false);
     else paintRels();
     emitState();
   }
-  function setMode(mode) {
-    if (!modeIds().includes(mode) || S.mode === mode) return;
-    // between two drawn modes (mind map and org, boxes and layers) the nodes glide
-    if (S.mode !== 'list' && mode !== 'list') painter.animateNext();
-    S.mode = mode;
+  function setLayout(id) {
+    if (!layoutIds().includes(id) || S.layout === id) return;
+    // between two drawn layouts (mind map and org, boxes and layers) the nodes glide
+    if (S.layout !== 'list' && id !== 'list') painter.animateNext();
+    S.layout = id;
     applyChrome();
     render(S.focus ? 'all' : 'levels');
     emitState();
@@ -2233,7 +2237,7 @@ export function mount(element, options = {}) {
   function fitOrCenter() {
     clearPoint();
     const n = S.selected && S.map?.byId[S.selected];
-    if (n && S.layout?.pos.has(n)) stage.centerOn(n); else stage.fitView(false);
+    if (n && S.placed?.pos.has(n)) stage.centerOn(n); else stage.fitView(false);
   }
   // Export and Theme open their menus on click as well as hover.
   [$.exportBtn, $.themeBtn].forEach((b) => b.addEventListener('click', (e) => e.currentTarget.focus()));
@@ -2309,7 +2313,7 @@ export function mount(element, options = {}) {
   }
   // narrow: the top row does not fit or the viewer is under 480 px; the toolbar then leaves
   // out Export, Search and (viewPicker 'wide') the views. Measured at its widest, as if all
-  // of it always showed: the longest view name, every layout mode, search open, the play
+  // of it always showed: the longest view name, every layout, search open, the play
   // button. So switching views, hovering or playing never flips it; menus stay shut.
   function fitTop() {
     if (S.thumb) return;
@@ -2336,7 +2340,7 @@ export function mount(element, options = {}) {
     page.resize();
     if (S.noteOpen) placeNote();
     barRoom();
-    if (S.layout && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
+    if (S.placed && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
   });
   ro.observe(root);
 
@@ -2345,7 +2349,7 @@ export function mount(element, options = {}) {
   function currentState() {
     // a deployment is reported as env, a relation view as view
     const env = viewNamed(S.relView)?.deploy ? S.relView : null;
-    return { mode: S.mode, part: S.part, focus: S.focus, node: S.selected, arrow: S.arrow, spot: S.spot.slice(), page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state(), ...(S.compare ? { edition: S.edition } : {}), ...(S.walkthrough ? { walkthrough: S.walkthrough, stop: S.stop } : {}) };
+    return { layout: S.layout, part: S.part, focus: S.focus, node: S.selected, arrow: S.arrow, spot: S.spot.slice(), page: page.id || null, view: env ? null : S.relView, env, rels: S.rels === '1', ...player.state(), ...(S.compare ? { edition: S.edition } : {}), ...(S.walkthrough ? { walkthrough: S.walkthrough, stop: S.stop } : {}) };
   }
   function emitState() {
     renderChanges();   // the view shown may be another
@@ -2461,7 +2465,7 @@ export function mount(element, options = {}) {
     clearTimeout(freshTimer);
     if (S.fresh.size) freshTimer = setTimeout(() => { S.fresh = new Set(); }, FRESH_MS);
     // a live reload stays in the diagram shown, while the file still has it
-    if (!keep) lookHere = new Map();
+    if (!keep) { lookHere = new Map(); layoutHere = new Map(); }
     if (!keep || (S.part && !file.parts.has(S.part))) { S.part = null; S.trail = []; }
     else S.trail = S.trail.filter((e) => !e.anchor || file.parts.has(e.anchor));
     show(mapFor(S.part), keep && S.map?.type === mapFor(S.part).type);
@@ -2471,7 +2475,7 @@ export function mount(element, options = {}) {
       firstLoad = false;
       const st = options.state;
       if (st.part) goPart(st.part);
-      if (modeIds().includes(st.mode)) S.mode = st.mode;
+      if (layoutIds().includes(st.layout)) S.layout = st.layout;
       const named = st.env || st.view;
       if (named && viewNamed(named)) useView(named);
       if (st.rels != null) S.rels = st.rels ? '1' : '0';
@@ -2500,7 +2504,7 @@ export function mount(element, options = {}) {
     emitState();
   }
 
-  // Show one of the file's diagrams: its type decides the modes and colouring; keep:
+  // Show one of the file's diagrams: its type decides the layouts and colouring; keep:
   // the same diagram again (a live reload) keeps the reader's place.
   function show(map, keep) {
     const typeChanged = diagramOf(map) !== diagram();
@@ -2510,9 +2514,12 @@ export function mount(element, options = {}) {
     map.base ||= { root: map.root, byId: map.byId };   // the diagram's own tree (a deployment view swaps it)
     // a whole new diagram opened: seen in one go (nothing inside it is marked)
     if (marked()?.partNew(partKey()) && seen.ack(seen.partKeys(partKey()))) { markSparkles(); queueMicrotask(emitContents); }
-    // the diagram type decides the modes and the colour-by choices
+    // the diagram type decides the layouts and the colour-by choices
     const d = diagram();
-    if (!modeIds().includes(S.mode)) S.mode = d.modes[0].id;
+    // another diagram opens in the layout the reader chose for it, else its ## Layout:
+    // line (WO-47), else the reader's layout carries on where the type has it
+    if (!keep) { const want = [layoutHere.get(S.part || ''), map.layout].find((x) => layoutIds().includes(x)); if (want) S.layout = want; }
+    if (!layoutIds().includes(S.layout)) S.layout = d.layouts[0].id;
     // another diagram type starts on its own first colour-by (a mind map's branch colours
     // mean nothing in a box diagram); within one type the reader's choice stays
     // Changes (a plan map's planned changes) stays only while the same map, or one a
@@ -2522,7 +2529,7 @@ export function mount(element, options = {}) {
     if (changes) { /* stays */ } else if (d.autoColourBy) S.colourBy = d.autoColourBy(map);   // the map decides (a box diagram)
     else if (S.colourBy === 'changes') S.colourBy = d.colourBy.some((c) => c.id === S.colourByKept) ? S.colourByKept : d.colourBy[0].id;
     else if ((typeChanged && !fromLink) || !d.colourBy.some((c) => c.id === S.colourBy)) S.colourBy = d.colourBy[0].id;
-    if (typeChanged) buildModes();
+    if (typeChanged) buildLayouts();
     buildThemePanel();   // the colour-by choices may differ map to map (Changes)
     // a live reload keeps the view; a new map starts on its first
     useView(keep ? S.relView : null);
@@ -2571,12 +2578,14 @@ export function mount(element, options = {}) {
     renderWalkthrough();
     // the stop's place is set in steps; the reader is not following until it is there
     openingStop = true;
-    try { if (st.state) setState(st.state); } finally { openingStop = false; }
+    // a stop that names no layout keeps the one the reader chose for its diagram
+    const mine = st.state && !st.layout && !st.state.seq ? layoutHere.get(st.state.part || '') : null;
+    try { if (st.state) setState(mine ? { ...st.state, layout: mine } : st.state); } finally { openingStop = false; }
     renderWalkthrough();
     emitState();
   }
   // Where the reader is against the walkthrough: exploring inside the stop (a box opened,
-  // a node's page, another mode, a step of its scenario) stays on it; opening another
+  // a node's page, another layout, a step of its scenario) stays on it; opening another
   // stop's place moves to that stop; opening any other diagram, perspective, deployment,
   // scenario or sequence is off the path (Return to the stop; Previous and Next go on
   // from it). Places compare by diagram, perspective, deployment and play.
@@ -2640,7 +2649,7 @@ export function mount(element, options = {}) {
     root.classList.toggle('is-tight-bar', inset > 0 && v.size().w - inset < 640);
   }
   function refitForPanel() {
-    if (S.layout && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
+    if (S.placed && !S.userMoved && S.lastFit) stage.fitView(S.lastFit === 'levels');
   }
   function renderWalkthrough() {
     const w = S.walkthrough && walkthroughs().find((x) => x.name === S.walkthrough);
@@ -2748,7 +2757,7 @@ export function mount(element, options = {}) {
     if (stop) player.close();
     if ('part' in partial) goPart(partial.part);
     if (!stop && ('seq' in partial || 'step' in partial)) { playState(partial); emitState(); return; }
-    if ('mode' in partial) setMode(partial.mode);
+    if ('layout' in partial) setLayout(partial.layout);
     if (partial.env != null) setView(partial.env);
     else if ('view' in partial || 'env' in partial) setView(partial.view == null ? S.map.views[0]?.name : partial.view);
     if ('rels' in partial) {
@@ -2786,14 +2795,14 @@ export function mount(element, options = {}) {
     const m = key ? S.file?.parts.get(key) : S.file;
     if (m?.type !== 'sequence') return;
     const link = m.playsOver?.[0];
-    // over its view, unless the link asks for the sequence's own modes
-    if (link && st.mode !== 'lifelines' && !(st.mode === 'list' && st.part === key)) {
+    // over its view, unless the link asks for the sequence's own layouts
+    if (link && st.layout !== 'lifelines' && !(st.layout === 'list' && st.part === key)) {
       openDiagramOf(link.anchor);
       if (viewNamed(link.view) && S.relView !== (viewNamed(link.view) === S.map.views[0] ? null : link.view)) { useView(link.view); render('all'); }
       if (applyPerspectiveDefaults()) render('all');
     } else {
       openDiagramOf(key);
-      if (modeIds().includes(st.mode) && st.mode !== S.mode) setMode(st.mode);
+      if (layoutIds().includes(st.layout) && st.layout !== S.layout) setLayout(st.layout);
     }
     player.open(key, { step, play: false });
   }
@@ -2802,7 +2811,7 @@ export function mount(element, options = {}) {
   // The file's name: the map file's own, else its title.
   const wholeName = () => (S.path ? S.path.split('/').pop().replace(/\.(md|mmd)$/i, '') : S.file?.title || 'map').replace(/[^\w.-]+/g, '_') || 'map';
   // A snapshot of the map shown (pack.js, as relay-server/pack.py makes one): every
-  // diagram, opening where the reader is. Kept: the diagram, view or deployment, mode,
+  // diagram, opening where the reader is. Kept: the diagram, view or deployment, layout,
   // relations shown, colouring, theme and appearance, Before; a sequence opens at step 1.
   // Dropped: a node page, a search, a selection (kept while the spotlight is on: WO-63), a drilled-in box, boxes opened by hand,
   // and this reader's own "since you looked" marks (a host's since goes in).
@@ -2814,7 +2823,7 @@ export function mount(element, options = {}) {
     const play = player.state();
     const state = {
       ...(S.part ? { part: S.part } : {}),
-      mode: S.mode,
+      layout: S.layout,
       ...(env ? { env } : S.relView ? { view: S.relView } : {}),
       ...(S.rels === '1' ? { rels: true } : {}),
       ...(play.seq ? { seq: play.seq, step: 1 } : {}),
@@ -2880,6 +2889,15 @@ export function mount(element, options = {}) {
     }
     return out;
   }
+  // the layout a stop shows its place in (WO-47): its own Layout:, else its diagram's
+  // ## Layout:, else the type's first; none for a sequence stop (it plays)
+  function authoredLayout(st, state) {
+    if (state.seq) return {};
+    const m = mapFor(state.part ?? null) || S.file;
+    const ids = drawnLayouts(diagramOf(m));
+    const id = [st.layout, m.layout, ids[0]].find((x) => ids.includes(x));
+    return id ? { layout: id } : {};
+  }
   // the walkthroughs of the file (model/walkthroughs.js): each stop with the state that opens
   // its item (the contents entry of its kind and name); null when the map has no such item
   function walkthroughs() {
@@ -2888,7 +2906,7 @@ export function mount(element, options = {}) {
     const entries = items();
     return list.map((w) => ({ name: w.name, intro: w.intro, stops: w.stops.map((st) => {
       const hit = st.known && !st.invalidReference && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name && (!st.options?.diagram || (e.diagram || (e.part ? S.file.parts.get(e.part)?.title : S.file.title)) === st.options.diagram));
-      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, state: hit ? { ...hit.state, ...(st.point ? { point: st.point } : {}), ...(st.spot ? { spot: st.spot } : {}) } : null };
+      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, layout: st.layout || null, state: hit ? { ...hit.state, ...authoredLayout(st, hit.state), ...(st.point ? { point: st.point } : {}), ...(st.spot ? { spot: st.spot } : {}) } : null };
     }) }));
   }
   // the walkthroughs come first (the menu's Walks), then the items
@@ -2949,6 +2967,8 @@ export function mount(element, options = {}) {
     get problems() { return problems.all(); },
     get title() { return S.map?.title || null; },
     get views() { return (S.map?.views || []).map((x) => x.name); },
+    // the drawn layouts of the diagram shown (WO-47), List left out
+    get layouts() { return S.map ? drawnLayouts(diagram()) : []; },
     contents,
     // the picture as a file instead of a download (export.js): {format, width | scale,
     // background, crop, report} -> {format, type, data, width, height, scaledDown, report}

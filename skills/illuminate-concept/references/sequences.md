@@ -62,8 +62,8 @@ sequence is the file's first diagram. `step` counts from 1 along the timeline (a
 is one step, a loop adds a repeat step). A link opens paused; the reader presses play.
 
 - Over its view (the usual one): `show.py "<map>" --seq checkout --step 1`.
-- As lifelines: `show.py "<map>" --seq checkout --step 3 --mode lifelines`.
-- As the numbered list: `show.py "<map>" --mode list --part checkout`.
+- As lifelines: `show.py "<map>" --seq checkout --step 3 --layout lifelines`.
+- As the numbered list: `show.py "<map>" --layout list --part checkout`.
 - To move a playing sequence, send `--seq <same> --step N` again. Another `--view`,
   `--part` or map stops it.
 

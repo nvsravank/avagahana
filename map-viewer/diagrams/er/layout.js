@@ -13,17 +13,22 @@
 // table, rounded up to a step. Each table reserves endpoint channel space. Column connections are
 // routed after placement (diagrams/er/scene.js).
 //
+// That is the Hubs layout. Flow (flow.js) and Balanced (balanced.js) place every table
+// on one level instead, a group's tables kept near each other but not boxed in; each
+// open group's frame is then drawn round its tables (WO-47).
+//
 // layoutTables(root, size, input) -> {pos: Map(node -> {x, y, w, h}), edges: []}
-//   input: {relations, collapsed}; a closed table (in collapsed) shows its key columns,
+//   input: {relations, collapsed, layoutId}; a closed table (in collapsed) shows its key columns,
 //   an open one all of them (diagrams/er/table.js)
-import { connectionPaths, connectionLabels, connectionSpace, channelSpace } from './lines.js';
+import { connectionPaths, connectionLabels, connectionSpace, channelSpace, rowY } from './lines.js';
 import { tablesIn } from './table.js';
+import { GAP, crosses, segmentHitsBox, pushApart, bounds, drawnBadness } from './geometry.js';
+import { arrangeFlow } from './flow.js';
+import { arrangeBalanced } from './balanced.js';
 
-const GAP = 44;          // between tables after pushing apart
 const WIDTH_STEP = 40;   // table widths round up to this
 const ALIGN = 56;        // tables this nearly level line up
 const RING_MIN = 190;    // a hub's ring, at least
-const PUSH_ROUNDS = 80;
 const REFINE_SWEEPS = 3;
 const REFINE_MAX = 150;  // more tables than this: no refining (it compares every pair of lines)
 const ANGLES = 16;       // places tried round each neighbour
@@ -79,6 +84,11 @@ export function layoutTables(root, size, input) {
     const [a, b] = key.split('|');
     room.gap = Math.max(room.gap, (corridors.get(a) || 0) + (corridors.get(b) || 0) + room.width + 32);
   }
+  const pos = new Map();
+  const frames = [];
+  if (input.layoutId === 'flow' || input.layoutId === 'balanced') layFlat(input.layoutId, root, boxes, lines, dims, labelRoom, byId, closed, pos, frames, size);
+  else layHubs();
+  function layHubs() {
   // An open group's tables (and groups) are laid out on their own, then the group stands
   // as one table, its frame's size, among the rest.
   const shown = new Set(boxes);
@@ -121,8 +131,6 @@ export function layoutTables(root, size, input) {
     }
     return arrange(level, adj, dims, room);
   };
-  const pos = new Map();
-  const frames = [];
   const place = (at, ox, oy, depth) => {
     for (const [it, p] of at) {
       const d = dims.get(it);
@@ -132,6 +140,7 @@ export function layoutTables(root, size, input) {
     }
   };
   place(lay(build(root)), 0, 0, 0);
+  }
   // Each table's foreign-key rows in the order their lines leave it, top to bottom, in
   // this view (WO-44): a line leaves its column's row, so this keeps them from
   // crossing at the table, whatever the file's order. The grain's foreign keys move
@@ -141,6 +150,111 @@ export function layoutTables(root, size, input) {
   const geom = (n) => (rowOrder.has(n) ? { ...size(n), rows: rowOrder.get(n) } : size(n));
   const connections = connectionPaths(lines, pos, byId, geom);
   return { pos, edges: [], connections, labels: connectionLabels(connections, pos, byId, input.playLabel), groups: frames, rowOrder };
+}
+
+// Flow and Balanced (WO-47): every table (and closed group) on one level; each open
+// group's frame round its tables afterwards, inner frames first.
+function layFlat(id, root, boxes, lines, dims, labelRoom, byId, closed, pos, frames, size) {
+  const items = boxes;
+  const groupOf = (n) => { for (let x = n.parent; x && x !== root; x = x.parent) if (x.group && !closed(x)) return x; return null; };
+  const room = (a, b) => labelRoom.get([a.id, b.id].sort().join('|')) || null;
+  const flat = [];
+  const adj = new Map(items.map((n) => [n, new Set()]));
+  for (const r of lines) {
+    const a = byId[r.from];
+    const b = byId[r.to];
+    if (!adj.has(a) || !adj.has(b)) continue;
+    // the rows each end leaves from, below the table's middle (lines.js rowY)
+    const off = (n, col) => rowY(size(n), { y: 0, h: dims.get(n).h }, col);
+    flat.push({ a, b, parent: parentEnd(r.lifted?.[0] || r, a, b), oa: off(a, r.fromColumns?.[0]), ob: off(b, r.toColumns?.[0]) });
+    if (a !== b) { adj.get(a).add(b); adj.get(b).add(a); }
+  }
+  let at;
+  // each candidate routed as it will be drawn; the one whose lines cross least, run
+  // behind fewest tables and leave fewest group outlines overlapping wins, then the smaller
+  let best = null;
+  const judge = (m) => {
+    const p = new Map([...m].map(([n, q]) => [n, { x: q.x, y: q.y, ...dims.get(n) }]));
+    const bad = drawnBadness(connectionPaths(lines, p, byId, size), p, byId) + groupOverlaps(items, p, groupOf);
+    const box = bounds(m, dims);
+    const area = (box.r - box.l) * (box.b - box.t);
+    if (!best || bad < best.bad || (bad === best.bad && area < best.area)) best = { m, bad, area };
+  };
+  if (id === 'flow') {
+    // how far a group's tables lean together, and a fact's dimensions on both its sides or not
+    for (const lean of [0, 0.35, 0.7]) for (const split of [true, false]) judge(arrangeFlow(items, flat, dims, room, groupOf, { lean, split }));
+    at = best.m;
+  }
+  else {
+    // started from the Hubs picture; Hubs' refine is not run after it: on the test
+    // schemas it traded fewer pixels for more crossings (WO-47 progress, 2026-11-17)
+    for (const m of arrangeBalanced(items, flat, dims, room, groupOf, arrange(items, adj, dims, labelRoom))) {
+      pushApart({ at: m }, dims, new Set());
+      judge(m);
+    }
+    at = best.m;
+  }
+  for (const n of items) { const p = at.get(n); pos.set(n, { x: p.x, y: p.y, ...dims.get(n) }); }
+  // frames, deepest first, round their tables and the frames inside them
+  const open = new Map();
+  for (const n of items) {
+    let depth = 0;
+    for (let x = n.parent; x && x !== root; x = x.parent) if (x.group && !closed(x)) depth++;
+    for (let x = n.parent, d = depth - 1; x && x !== root; x = x.parent) {
+      if (!(x.group && !closed(x))) continue;
+      if (!open.has(x)) open.set(x, { depth: d, items: [] });
+      open.get(x).items.push(n);
+      d--;
+    }
+  }
+  const boxOf = new Map();
+  for (const [g, f] of [...open].sort((a, b) => b[1].depth - a[1].depth)) {
+    const b = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+    for (const n of f.items) {
+      const p = pos.get(n);
+      b.l = Math.min(b.l, p.x - p.w / 2 - p.channel); b.r = Math.max(b.r, p.x + p.w / 2 + p.channel);
+      b.t = Math.min(b.t, p.y - p.h / 2); b.b = Math.max(b.b, p.y + p.h / 2);
+    }
+    for (const [h, hb] of boxOf) if (h.parent === g || (open.get(h) && isInside(h, g))) { b.l = Math.min(b.l, hb.l); b.r = Math.max(b.r, hb.r); b.t = Math.min(b.t, hb.t); b.b = Math.max(b.b, hb.b); }
+    const fb = { l: b.l - GROUP_PAD, r: b.r + GROUP_PAD, t: b.t - GROUP_TITLE, b: b.b + GROUP_PAD };
+    boxOf.set(g, fb);
+    frames.push({ node: g, depth: f.depth, x: (fb.l + fb.r) / 2, y: (fb.t + fb.b) / 2, w: fb.r - fb.l, h: fb.b - fb.t });
+  }
+  frames.sort((a, b) => a.depth - b.depth);
+}
+// open groups whose tables' outlines (with a frame's padding) overlap, counted in pairs
+function groupOverlaps(items, pos, groupOf) {
+  const boxes = new Map();
+  for (const n of items) {
+    const g = groupOf(n);
+    if (!g) continue;
+    const p = pos.get(n);
+    const b = boxes.get(g) || { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+    b.l = Math.min(b.l, p.x - p.w / 2 - p.channel - GROUP_PAD); b.r = Math.max(b.r, p.x + p.w / 2 + p.channel + GROUP_PAD);
+    b.t = Math.min(b.t, p.y - p.h / 2 - GROUP_TITLE); b.b = Math.max(b.b, p.y + p.h / 2 + GROUP_PAD);
+    boxes.set(g, b);
+  }
+  const list = [...boxes.values()];
+  const meet = (A, B) => Math.min(A.r, B.r) > Math.max(A.l, B.l) && Math.min(A.b, B.b) > Math.max(A.t, B.t);
+  let c = 0;
+  for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) if (meet(list[i], list[j])) c++;
+  // a frame over a table of another group (or of none)
+  for (const [g, B] of boxes) for (const n of items) {
+    if (groupOf(n) === g) continue;
+    const p = pos.get(n);
+    if (meet(B, { l: p.x - p.w / 2, r: p.x + p.w / 2, t: p.y - p.h / 2, b: p.y + p.h / 2 })) c++;
+  }
+  return c;
+}
+const isInside = (h, g) => { for (let x = h.parent; x; x = x.parent) if (x === g) return true; return false; };
+
+// Which end of a relationship is the parent: the "one" end facing a "many" end; else the
+// first table written (Flow points its columns from parents to children)
+function parentEnd(r, a, b) {
+  const one = (c) => c === 'one' || c === 'zero-one';
+  if (one(r.fromCard) && !one(r.toCard)) return a;
+  if (one(r.toCard) && !one(r.fromCard)) return b;
+  return a;
 }
 
 // -> Map(table -> its rows reordered), only for tables whose order changes
@@ -471,66 +585,6 @@ function cost(n, at, edges, dims, labels) {
   }
   return c;
 }
-
-const side = (a, b, c) => Math.sign((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
-const crosses = (a, b, c, d) => side(a, b, c) * side(a, b, d) < 0 && side(c, d, a) * side(c, d, b) < 0;
-// does the segment a-b pass through the box? (clipped against it, Liang-Barsky)
-function segmentHitsBox(a, b, r) {
-  let t0 = 0;
-  let t1 = 1;
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  for (const [p, q] of [[-dx, a.x - r.l], [dx, r.r - a.x], [-dy, a.y - r.t], [dy, r.b - a.y]]) {
-    if (p === 0) { if (q < 0) return false; continue; }
-    const t = q / p;
-    if (p < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; }
-  }
-  return t0 < t1;
-}
-
-// Overlapping tables push apart along the shorter overlap; a hub moves a quarter as far.
-function pushApart({ at }, dims, hubs) {
-  const list = [...at.keys()];
-  for (let round = 0; round < PUSH_ROUNDS; round++) {
-    let moved = false;
-    for (let i = 0; i < list.length; i++) {
-      for (let j = i + 1; j < list.length; j++) {
-        const a = list[i];
-        const b = list[j];
-        const p = at.get(a);
-        const q = at.get(b);
-        const ox = (dims.get(a).w + dims.get(b).w) / 2 + dims.get(a).channel + dims.get(b).channel + GAP - Math.abs(p.x - q.x);
-        const oy = (dims.get(a).h + dims.get(b).h) / 2 + GAP - Math.abs(p.y - q.y);
-        if (ox <= 0 || oy <= 0) continue;
-        moved = true;
-        const wa = hubs.has(a) ? 0.25 : 1;
-        const wb = hubs.has(b) ? 0.25 : 1;
-        const share = (v) => [v * wa / (wa + wb), v * wb / (wa + wb)];
-        if (ox < oy) {
-          const s = p.x < q.x || (p.x === q.x && i < j) ? -1 : 1;
-          const [da, db] = share(ox);
-          p.x += s * da; q.x -= s * db;
-        } else {
-          const s = p.y < q.y || (p.y === q.y && i < j) ? -1 : 1;
-          const [da, db] = share(oy);
-          p.y += s * da; q.y -= s * db;
-        }
-      }
-    }
-    if (!moved) break;
-  }
-}
-
-function bounds(at, dims) {
-  const b = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
-  for (const [n, p] of at) {
-    const d = dims.get(n);
-    b.l = Math.min(b.l, p.x - d.w / 2); b.r = Math.max(b.r, p.x + d.w / 2);
-    b.t = Math.min(b.t, p.y - d.h / 2); b.b = Math.max(b.b, p.y + d.h / 2);
-  }
-  return b;
-}
-
 
 // Query dependencies determine columns. Peer occurrences retain SQL source order;
 // a result table is present even when no join connects it to an input.

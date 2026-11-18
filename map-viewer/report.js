@@ -12,6 +12,11 @@
 //              Two lines into one end may run together into it (two keys to one column):
 //              that run is one line, joined, and where they part counts as where they meet.
 //   minGap     the gap asked for (2 px at the output's scale)
+//   linesBehind {count, pairs: [{line, box}]} a line passing behind a box that is not one
+//              of its ends (a group's frame is no box here) (WO-47)
+//   groupOverlaps {count, pairs: [{a, b, area}]} the overlaps that involve a group's frame
+//              (also in overlaps) (WO-47)
+//   aspect     the picture's width over its height (WO-47)
 //   smallestText {px, id}: the smallest text as it comes out at the output width
 //   colours    per node: {id, label, fill, stroke, why} ("category 3", "class database", ...)
 
@@ -217,6 +222,20 @@ export function layoutReport(facts, opts = {}) {
     }
   }
 
+  // a line behind a box: a point of it well inside a box that holds neither of its ends
+  const behind = [];
+  const boxes = nodes.filter((n) => !n.frame);
+  const within = (p, b, pad) => p[0] > b.x + pad && p[0] < b.x + b.w - pad && p[1] > b.y + pad && p[1] < b.y + b.h - pad;
+  for (const l of lines) {
+    const [e0, e1] = ends(l);
+    for (const n of boxes) {
+      if (within(e0, n.box, -END_NEAR) || within(e1, n.box, -END_NEAR)) continue;
+      if (l.points.some((p) => within(p, n.box, 2))) behind.push({ line: l.id, box: n.id });
+    }
+  }
+  const frameIds = new Set(nodes.filter((n) => n.frame).map((n) => n.id));
+  const groupOverlaps = overlaps.filter((o) => frameIds.has(o.a) || frameIds.has(o.b));
+
   const texts = facts.texts || [];
   const smallest = texts.reduce((m, t) => (t.size > 0 && (!m || t.size < m.size) ? t : m), null);
   return {
@@ -228,6 +247,9 @@ export function layoutReport(facts, opts = {}) {
     cutLabels,
     overlaps,
     crossings: { count, pairs },
+    linesBehind: { count: behind.length, pairs: behind },
+    groupOverlaps: { count: groupOverlaps.length, pairs: groupOverlaps },
+    aspect: opts.height ? r1(opts.width / opts.height) : null,
     touching,
     minGap: opts.minGapPx ?? MIN_GAP,
     smallestText: smallest ? { px: r1(smallest.size * scale), id: smallest.id } : null,

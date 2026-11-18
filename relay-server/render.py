@@ -4,7 +4,7 @@ reader's open atlas page (no headless browser), without moving what the reader s
 
   python3 relay-server/render.py "<folder>/<file>.md" --out picture.svg|picture.png
                                  [--part ANCHOR] [--view NAME] [--env NAME] [--focus ID]
-                                 [--mode MODE] [--colour-by category|level|class|changes]
+                                 [--layout LAYOUT] [--colour-by category|level|class|changes]
                                  [--expand N|all] [--close a,b] [--highlight a,b] [--spot a,e1] [--crop ID]
                                  [--seq ANCHOR [--step N | --steps all|3-5]]
                                  [--before FILE [--edition before|after]] [--draft FILE]
@@ -23,7 +23,7 @@ report of a map's text drawn in the map's place, with no process and no file per
 
   sys.path.insert(0, "<plugin root>/relay-server")
   from render import draft_report, RenderError
-  report = draft_report("<folder>/<file>.md", text, maps_dir="<maps folder>", mode="layers")
+  report = draft_report("<folder>/<file>.md", text, maps_dir="<maps folder>", layout="layers")
 
 Finds the relay server serving the maps folder and sends POST /api/render. Prints one line:
   STATUS=rendered FILE=... [REPORT=...] [WARNING=...]   written
@@ -63,7 +63,7 @@ _ports = {}
 def draft_report(map_path, text, *, maps_dir=None, port=DEFAULT_PORT, **state):
     """The layout report (a dict, map-viewer-api.md) of text drawn in map_path's place by
     the reader's open page, out of sight. state: the picture's state as the request names
-    it (mode, view, part, env, focus, expand, close, highlight, spot, crop, colourBy, ...);
+    it (layout, view, part, env, focus, expand, close, highlight, spot, crop, colourBy, ...);
     close, highlight and spot as lists or comma-separated ids. One HTTP request, no files."""
     folder, problem = resolve_maps_dir(maps_dir)
     if problem:
@@ -139,7 +139,7 @@ def main(argv=None) -> int:
     ap.add_argument("--view")
     ap.add_argument("--env")
     ap.add_argument("--focus", help="drill into this node first")
-    ap.add_argument("--mode", help="diagram mode identifier (for example tables or boxes)")
+    ap.add_argument("--layout", help="diagram layout identifier (for example hubs, flow or layers)")
     ap.add_argument("--colour-by", choices=list(COLOUR_BY))
     ap.add_argument("--expand", help="levels shown below the top: a whole number, or all")
     ap.add_argument("--close", help="boxes shown closed: node ids, comma separated")
@@ -193,7 +193,7 @@ def main(argv=None) -> int:
         return 1
 
     state = {k: v for k, v in {"part": args.part, "view": args.view, "env": args.env, "focus": args.focus,
-                                "mode": args.mode, "colourBy": args.colour_by, "expand": expand,
+                                "layout": args.layout, "colourBy": args.colour_by, "expand": expand,
                                 "close": ids(args.close), "highlight": ids(args.highlight), "spot": ids(args.spot), "crop": args.crop,
                                 "seq": args.seq, "step": args.step if args.seq and not args.steps else None,
                                 "edition": args.edition if args.before else None}.items() if v is not None}
@@ -242,7 +242,7 @@ def main(argv=None) -> int:
             print(status_line("failed", error=error))
             return 1
         if got.get("none"):
-            print(status_line("none", url=map_url(port, args.map, part=args.part, view=args.view, env=args.env, focus=args.focus, mode=args.mode)))
+            print(status_line("none", url=map_url(port, args.map, part=args.part, view=args.view, env=args.env, focus=args.focus, layout=args.layout)))
             return 0
         warnings += got["answer"].get("problems") or []
         print(status_line("rendered", file=out, report=got["report"], warning="; ".join(warnings) or None))

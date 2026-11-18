@@ -22,8 +22,10 @@ export const spotlight = true;
 // the icons its tables draw (loaded before the first draw)
 export const icons = ['ph key'];
 
-export const modes = [
-  { id: 'tables', label: 'Tables', icon: 'tables' },
+export const layouts = [
+  { id: 'hubs', label: 'Hubs', icon: 'tables' },
+  { id: 'flow', label: 'Flow', icon: 'erFlow' },
+  { id: 'balanced', label: 'Balanced', icon: 'erBalanced' },
   { id: 'list', label: 'List', icon: 'list' },
 ];
 export const colourBy = [{ id: 'class', label: 'Class' }];
@@ -44,7 +46,7 @@ export { fansOut };
 export const nodeGeometry = tableGeometry;
 export const paintNode = paintTable;
 export const pageSections = tablePage;
-export const layout = (mode, root, kids, size, input) => layoutTables(root, size, input);
+export const place = (layoutId, root, kids, size, input) => layoutTables(root, size, { ...input, layoutId });
 export { buildScene, relationShapes };
 
 export { parseErViews as parseViews, parseRenames } from './connections.js';

@@ -12,7 +12,7 @@ export const matches = (header) => header === 'mindmap';
 export const parseBody = parseMindmap;
 
 // the ways to show it; `icon` names an interface icon (chrome.js)
-export const modes = [
+export const layouts = [
   { id: 'mindmap', label: 'Mind map', icon: 'mindmap' },
   { id: 'org', label: 'Org chart', icon: 'org' },
   { id: 'list', label: 'List', icon: 'list' },
@@ -27,8 +27,8 @@ export const colourBy = [
 export const branchOrder = clockwise;
 export const defaultCollapsed = collapsed;
 
-// positions for a drawn mode: Map(node -> {x, y, w, h, ...}) and the tree's edges
-export function layout(mode, root, kids, size) {
-  return mode === 'org' ? layoutOrg(root, kids, size) : layoutMindmap(root, kids, size);
+// positions for a drawn layout: Map(node -> {x, y, w, h, ...}) and the tree's edges
+export function place(layoutId, root, kids, size) {
+  return layoutId === 'org' ? layoutOrg(root, kids, size) : layoutMindmap(root, kids, size);
 }
 export { buildScene, relationShapes };

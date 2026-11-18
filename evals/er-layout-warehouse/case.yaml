@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.1",
+  "name": "er-layout-warehouse",
+  "tags": [
+    "pick",
+    "layout"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "Explain the data model in warehouse/schema.sql: the facts, their dimensions and how they connect. Save what you create in output/.",
+    "max_turns": 40,
+    "timeout_seconds": 900,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?illuminate-concept\""
+    },
+    {
+      "name": "picture",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?erDiagram"
+    },
+    {
+      "name": "layout",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?## Layout:\\s*(balanced|flow)\\b",
+      "flags": "i"
+    },
+    {
+      "name": "reason",
+      "type": "llm",
+      "focus": "trace",
+      "criteria": "PASS if the agent made an Avagahana map (a Markdown file with a mermaid erDiagram) under output/ with the four fact tables and their dimensions joined column to column, and chose its layout deliberately: it either read a render report's per-layout numbers (render.py --report or draft_report) and wrote the winner's ## Layout: line, or, with no page to draw it, chose by the schema's shape (several facts sharing dimensions: Balanced) and wrote ## Layout: balanced. FAIL if it wrote no ## Layout: line for this multi-fact schema, or named a layout an ER diagram does not have."
+    }
+  ]
+}

@@ -17,7 +17,7 @@ export const boxes = true;
 // a spotlight switch: a selected box or line lit, the rest faded (WO-63, viewer.js paintSpotlight)
 export const spotlight = true;
 
-export const modes = [
+export const layouts = [
   { id: 'lanes', label: 'Lanes', icon: 'lanes' },
   { id: 'list', label: 'List', icon: 'list' },
 ];
@@ -42,7 +42,7 @@ export const drawsSelection = true;
 export const isLane = (id) => LANE_ID.test(id || '');
 // lane names pinned at the edges once their headers scroll away
 export const paintPins = paintLanePins;
-export const layout = (mode, root, kids, size, input) => layoutLanes(root, size, input);
+export const place = (layoutId, root, kids, size, input) => layoutLanes(root, size, input);
 // a lane band is a custom frame (paint.js): its fill and name
 export const paintNode = paintLane;
 export { buildScene, relationShapes };

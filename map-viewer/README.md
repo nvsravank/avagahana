@@ -14,7 +14,7 @@ static server (ES modules do not run from `file://`).
 
 Tests run in the browser, from any server that serves the whole repo:
 `test/index.html` (contract checks), `test/scene.html` (scene snapshots of every example
-map in every mode, compared with `test/snapshots/`) and `test/perf.html` (timings for
+map in every layout, compared with `test/snapshots/`) and `test/perf.html` (timings for
 100 / 1,000 / 5,000 nodes). `python3 scripts/browser_tests.py` runs the first two and
 the atlas tests in headless Chrome; `--update` writes new snapshots after a change to
 the drawing that is meant (review them in the git diff).

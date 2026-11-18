@@ -55,7 +55,7 @@ export async function testRender(check) {
         const where = `${name} / ${c.label}`;
         if (svg.getAttribute('role') !== 'img' || !svg.querySelector(`:scope > title#${CSS.escape(svg.getAttribute('aria-labelledby') || 'none')}`)?.textContent) missing.push(`${where}: the picture is not named`);
         for (const p of linkProblems(svg)) missing.push(`${where}: ${p}`);
-        if (v.state.mode !== 'list') for (const p of labelProblems(svg, host())) missing.push(`${where}: ${p}`);
+        if (v.state.layout !== 'list') for (const p of labelProblems(svg, host())) missing.push(`${where}: ${p}`);
       }
       v.destroy();
     }

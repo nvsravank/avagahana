@@ -38,6 +38,8 @@ export function splitSections(after) {
     if (dep) out.deployments.push({ names: dep[1].split(',').map((x) => x.trim()).filter(Boolean), text });
     const look = h.title.match(/^look\s*:\s*(.*)$/i);
     if (look) (out.looks ||= []).push(look[1].trim().toLowerCase());
+    const layout = h.title.match(/^layout\s*:\s*(.*)$/i);
+    if (layout) (out.layouts ||= []).push(layout[1].trim().toLowerCase());
     const walkthrough = h.title.match(/^walkthrough\s*:\s*(.+)$/i);
     if (walkthrough) out.walkthroughs.push({ name: walkthrough[1].trim(), text });
     const scenario = h.title.match(/^scenario\s*:\s*(.+)$/i);

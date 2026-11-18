@@ -111,9 +111,9 @@ export async function testContents(check) {
   q('stopPrev').click();
   q('stopPrev').click();
   check('walkthrough: Previous moves back, and stop 2 opens its perspective', v.state.stop === 2 && v.state.view === 'Checkout (synchronous)' && !q('stopPrev').hidden && !q('stopNext').hidden, JSON.stringify(v.state));
-  v.setState({ mode: 'list' });
+  v.setState({ layout: 'list' });
   check('walkthrough: exploring inside the stop (another mode) stays on it', v.state.stop === 2 && q('stopOff').hidden, JSON.stringify(v.state));
-  v.setState({ mode: 'boxes' });
+  v.setState({ layout: 'boxes' });
   v.setState({ part: lifecycle.part });
   check('walkthrough: opening another stop\'s place moves to that stop', v.state.stop === 3 && q('stopOff').hidden && q('stopCount').textContent === 'Stop 3 of 5', JSON.stringify(v.state));
   v.setState({ part: null, view: 'Events (asynchronous)' });

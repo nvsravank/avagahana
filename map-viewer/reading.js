@@ -132,7 +132,7 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
     if(state.point)state.crop=state.point;
     if(stop.kind==='sequence'){
       // A native sequence reads as a whole exchange, never as one playback frame.
-      state={part:m===file?null:m.anchor,seq:null,mode:'lifelines'};
+      state={part:m===file?null:m.anchor,seq:null,layout:'lifelines'};
     }else if(stop.kind==='scenario'){
       owner=m.scenarioOf?file.parts.get(m.scenarioOf):file;
       const scenario=owner.scenarios.find(s=>s.name===m.scenarioName);

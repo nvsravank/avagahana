@@ -57,7 +57,7 @@ export function createPage(v, h) {
   // outline), its list row, or a point in the middle
   function nodeAt(nid) {
     const sel = `[data-id="${CSS.escape(nid)}"]`;
-    const e = S.mode === 'list' ? $.list.querySelector(sel) : $.nodes.querySelector(sel) || $.frames.querySelector(sel);
+    const e = S.layout === 'list' ? $.list.querySelector(sel) : $.nodes.querySelector(sel) || $.frames.querySelector(sel);
     const shape = e?.querySelector(':scope > .mmv-shape');
     const cs = shape && getComputedStyle(shape);
     const look = cs ? { fill: cs.fill, stroke: cs.stroke } : { fill: null, stroke: e ? getComputedStyle(e).getPropertyValue('--n').trim() || null : null };
@@ -132,7 +132,7 @@ export function createPage(v, h) {
         const pic = Object.assign(document.createElement('div'), { className: 'mmv-thumb' });
         const cap = document.createElement('span');
         cap.className = 'mmv-page-cap';
-        cap.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">${UI[diagramOf({ type: inner.type }).modes[0].icon] || UI.list}</svg>`;
+        cap.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">${UI[diagramOf({ type: inner.type }).layouts[0].icon] || UI.list}</svg>`;
         // something in it new or changed: a small sparkle on its icon (seen.js)
         if (v.partChanged?.(inner.anchor)) { cap.classList.add('has-spark'); cap.insertAdjacentHTML('beforeend', sparkleSvg()); }
         cap.append(inner.title);

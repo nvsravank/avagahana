@@ -307,14 +307,14 @@ button.mmv-pill:hover { background: var(--mmv-chrome-hover); }
 /* measuring the top row (viewer.js fitTop) at its widest: every layout mode, search open,
    the play button; menus shut */
 .mmv.is-measuring :is(.mmv-drop, .mmv-iconbar) { display: none !important; }
-.mmv.is-measuring .mmv-modes button:not([hidden]) { display: grid !important; }
+.mmv.is-measuring .mmv-layouts button:not([hidden]) { display: grid !important; }
 .mmv.is-measuring .mmv-search input { width: min(200px, 30cqw) !important; padding-right: 4px !important; }
 .mmv.is-still .mmv-float, .mmv.is-still .mmv-float * { transition: none !important; }
 .mmv.is-measuring [data-mmv="playWrap"] { display: block !important; }
 
 /* layout modes: only the current one shows until hovered; it stays first */
-.mmv-modes:not(:hover):not(:focus-within) button:not(.is-on) { display: none; }
-.mmv-modes button.is-on { order: -1; }
+.mmv-layouts:not(:hover):not(:focus-within) button:not(.is-on) { display: none; }
+.mmv-layouts button.is-on { order: -1; }
 
 /* hover-to-open panels (export, theme) */
 .mmv-hov { position: relative; }

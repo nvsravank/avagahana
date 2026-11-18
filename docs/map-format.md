@@ -544,6 +544,27 @@ class ord changed
 What changed since a reader last looked is not written in the map: the viewer works it
 out on its own (`docs/map-viewer-api.md`, "Changes since you looked").
 
+## Layouts: `## Layout: <layout>`
+
+Each diagram type can be drawn in one or more layouts: the same nodes and lines,
+placed another way (the layout switch at the viewer's top left). A mind map: Mind map
+(`mindmap`) or Org chart (`org`); a box diagram: Boxes (`boxes`) or Layers (`layers`);
+an ER diagram: Hubs (`hubs`), Flow (`flow`) or Balanced (`balanced`); a state diagram:
+Boxes (`boxes`); a lane diagram: Lanes (`lanes`); a sequence: Lifelines (`lifelines`).
+List, on the same switch, is the outline a keyboard and a screen reader use, not a
+layout.
+
+`## Layout: flow`, a section line among a diagram's sections, outside its block, says
+which layout the diagram opens in (**Contract**, WO-47). A diagram that names none opens
+in its type's first layout. One line per diagram (`layout-twice`); a value its type does
+not draw, `list` included, is `layout-unknown`. Each further diagram in the file can say
+its own. A walkthrough stop can name its own (`Layout:`, under "Stop options"). The
+reader can still switch: their choice holds for that diagram until another file opens,
+and a stop that names a layout applies it again. `render.py --layout` draws a picture in
+another, and a render's layout report scores every layout the diagram draws (its
+`layouts`, `docs/map-viewer-api.md`), so an agent can choose before writing the
+walkthrough.
+
 ## Several diagrams in one file
 
 Every Mermaid block stays valid Mermaid on its own; Mermaid cannot put one kind of
@@ -976,13 +997,30 @@ erDiagram
   named in. A relationship to or from a group is not drawn (`er-group-relationship`); a
   `direction` inside a group is not used (`er-group-direction`); a group not closed is an
   error (`er-group-not-closed`).
-- **Layout**: the tables with most relationships are hubs; a table joined to one hub
-  rings it, one joined to several sits between them, and places are then refined so
-  lines cross as little as possible, pass behind no table and have room for their
-  labels. All tables in the current view use the width needed by its widest table.
+- **Layouts** (WO-47; `## Layout:`, under "Layouts"). All three keep line ends on column
+  rows, composite pairs, parallel and self relationships, cardinality ends and closed
+  tables. All tables in the current view use the width needed by its widest table.
   Endpoint channels are allocated across all connections on each table side, and
-  layout reserves their space. Tables line up where they can. A group is laid out on its
-  own and then placed as one table. A line meets a table at its column's row; in each
+  layout reserves their space.
+  - **Hubs** (`hubs`, the default): the tables with most relationships are hubs; a
+    table joined to one hub rings it, one joined to several sits between them, and
+    places are then refined so lines cross as little as possible, pass behind no table
+    and have room for their labels. Tables line up where they can. A group is laid out
+    on its own and then placed as one table. Suits one or two facts with their
+    dimensions.
+  - **Flow** (`flow`): columns, left to right along the foreign keys: a relationship's
+    "one" end left of its "many" end, a fact's one-relationship dimensions on both its
+    sides, a column taller than the picture is wide going on in the next. A line that
+    passes a column keeps a slot there. A group's tables stand near each other where
+    that costs no crossing. Suits chains of foreign keys (customer, order, order line)
+    and transactional schemas.
+  - **Balanced** (`balanced`): each pair of tables as far apart as the shortest way
+    between them along the lines, a group's tables pulled a little nearer, tables kept
+    apart and linked tables side by side; started from the Hubs picture, so the same
+    map gives the same picture. Suits several facts, schemas with no hubs, and large
+    schemas.
+  In Flow and Balanced a group's frame is drawn round its tables; two frames may
+  overlap where keeping them apart would cost more (the report counts them). A line meets a table at its column's row; in each
   view the viewer draws a table's foreign keys (among themselves, and the grain's among
   themselves) in the order their lines leave it, top to bottom, so they do not cross at
   the table; the node page and the grain sentence keep the file's order. Not set in the
@@ -1137,6 +1175,7 @@ one optional subsection supplies narrative metadata:
 - Notes: orders, charge
 - Diagram: Shop platform
 - Spotlight: payments, e1
+- Layout: layers
 ```
 
 Title is the section/panel title (default: destination name). Label is the short
@@ -1149,7 +1188,11 @@ with its two end boxes, and the rest fades; it shows whatever the reader's spotl
 says, a move or click in the picture lifts it, and returning to the stop brings it back. It
 is for Diagram, Perspective and Deployment stops of flowchart, state, ER and lane diagrams,
 not with Point to (`walkthrough-options`); an id the diagram does not have is
-`walkthrough-reference`. The reading document draws the stop spotlit. Diagram optionally qualifies a destination name that occurs in several
+`walkthrough-reference`. The reading document draws the stop spotlit. Layout (WO-47) names the layout the
+stop shows its place in, one its diagram draws (`layout-unknown` otherwise), for any stop
+but a Sequence (`walkthrough-options`); a stop with none shows its diagram's
+`## Layout:` (else the first), unless the reader has switched that diagram's layout,
+and the reading document draws each stop in its layout. Diagram optionally qualifies a destination name that occurs in several
 diagrams; unqualified old files keep their first-match resolution. An invalid explicit
 qualifier never falls back to another diagram. Field/subsection names are case-insensitive;
 duplicate, empty or unknown fields are `walkthrough-options`; invalid Diagram/Notes
@@ -1206,7 +1249,7 @@ or an earlier crumb closes it. A diagram opened from the page is the next step, 
 icon shows the note alone, for a quick look. A node with neither icon has no page;
 double-click still drills into a box.
 
-## Box diagram modes
+## Box diagram layouts
 
 - **Boxes**: the layout above. Drilled into a box, the outside ends of the view's
   arrows into it are drawn round it, faded, as they are: each inside its outer boxes

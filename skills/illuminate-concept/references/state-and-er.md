@@ -36,7 +36,10 @@ stateDiagram-v2
 
 ## ER diagrams (`erDiagram`)
 
-A data model, drawn as tables laid out hub and spoke.
+A data model, drawn as tables in one of three layouts: **Hubs** (hub and spoke, the
+default: one or two facts with their dimensions), **Flow** (columns along the foreign
+keys: chains and transactional schemas) or **Balanced** (spread by distance: several
+facts, no hubs, large schemas). Choose with the numbers, below ("Choose the layout").
 
 ````markdown
 ```mermaid
@@ -95,8 +98,22 @@ erDiagram
   columns in the order that reads best and leave them. The order of the tables does
   move the picture (tables with as many relationships as each other are placed in the
   order they are written). When the lines tangle, try table orders as for box diagrams
-  (`boxes.md`, "Crossing arrows": when, and the draft script), with the mode `tables`
-  and each perspective. SQL query layouts follow dependency columns instead.
+  (`boxes.md`, "Crossing arrows": when, and the draft script), with each layout and
+  each perspective. SQL query layouts follow dependency columns instead.
+- **Choose the layout from the numbers, before the walkthrough.** After writing the
+  diagram, render it with `--report` (or `draft_report()`): the report's `layouts` gives
+  each layout (`hubs`, `flow`, `balanced`) its `crossings`, `linesBehind`, `overlaps`,
+  `groupOverlaps`, `cutLabels`, `smallestText` and `aspect`. Pick the one with fewest
+  crossings, then fewest lines behind tables, then the aspect nearest 1 (square), and
+  write it as a section line after the block: `## Layout: balanced`. Leave it out when
+  `hubs` wins (the default). Then write the walkthrough; give a stop its own `Layout:`
+  only where that stop's part of the schema reads clearly better in another layout
+  (`walkthroughs.md`). Say in the text which layout you chose and why, in a few words
+  ("Balanced: 3 crossings against Hubs' 5").
+  With no page to draw it (`STATUS=none`), choose by the schema's shape: several facts
+  sharing dimensions, no clear hub, or 30 tables and more: `balanced`; a chain of
+  foreign keys (customer, order, order line, shipment): `flow`; one or two facts with
+  their dimensions: leave Hubs.
 
 ## Scenario: `## Scenario: <name>`
 

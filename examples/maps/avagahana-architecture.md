@@ -358,7 +358,7 @@ Notes become DOM through a documented Markdown subset (headings 4 to 6, nested a
 
 ### <a id="d"></a>Select diagram behavior
 
-`diagrams/index.js` registers the five diagram families, and the lane diagram type a flowchart with ## Lanes becomes, and selects their parsers, modes, layouts and scene builders. See [Diagram extension hooks](#diagram-extension-hooks).
+`diagrams/index.js` registers the five diagram families, and the lane diagram type a flowchart with ## Lanes becomes, and selects their parsers, layouts and scene builders. See [Diagram extension hooks](#diagram-extension-hooks).
 
 ### <a id="layoutNode"></a>Measure and lay out
 
@@ -424,7 +424,7 @@ measure.js caches text widths; geometry.js and flow-shapes.js derive shapes, siz
 
 ### <a id="layout"></a>Type layout
 
-viewer.js calls diagram().layout with mode, root, visible children, size and relation/selection/collapse/sequence context. Flowcharts and state share graph concepts; ER has its own hub placement and refining pass.
+viewer.js calls diagram().place with the layout shown, root, visible children, size and relation/selection/collapse/sequence context. Flowcharts and state share graph concepts; ER has three layouts of its own (WO-47): Hubs (hub placement and a refining pass), Flow (columns along the foreign keys, diagrams/er/flow.js) and Balanced (stress, diagrams/er/balanced.js); for Flow and Balanced several candidates are routed as drawn and the one whose lines cross least is kept.
 
 
 ### <a id="scene"></a>Build scene
@@ -443,7 +443,7 @@ Semantic zoom changes detail when labels cross thresholds. ResizeObserver works 
 flowchart LR
   registry["DIAGRAMS registry"]
   parseHook["matches and parseBody"]
-  modesHook["modes and colourBy"]
+  modesHook["layouts and colourBy"]
   layoutHook["layout and buildScene"]
   custom["Optional rendering hooks"]
   types["Five built-in plugins"]
@@ -468,9 +468,9 @@ map-viewer/diagrams/index.js imports mindmap, flowchart, sequence, state, er and
 Every type supplies type, label, header recognition and parseBody. Separate parse.js modules parse the supported syntax.
 
 
-### <a id="modesHook"></a>modes and colourBy
+### <a id="modesHook"></a>layouts and colourBy
 
-Types declare modes, colour encodings (or autoColourBy: the map decides, as for box and ER diagrams), classes of their own (builtInClasses: ER's table classes, with fixed colour slots that win over a table's other classes), branch ordering and initial collapse behavior. Shared list rendering (list.js) is a keyboard and screen-reader tree: rows read in full, notes open in place, arrows as rows. It is replaceable; sequences provide sequence/list.js.
+Types declare layouts (the switch at the top left; a map's ## Layout: and a stop's Layout: choose one), colour encodings (or autoColourBy: the map decides, as for box and ER diagrams), classes of their own (builtInClasses: ER's table classes, with fixed colour slots that win over a table's other classes), branch ordering and initial collapse behavior. Shared list rendering (list.js) is a keyboard and screen-reader tree: rows read in full, notes open in place, arrows as rows. It is replaceable; sequences provide sequence/list.js.
 
 
 ### <a id="layoutHook"></a>layout and buildScene
@@ -534,7 +534,7 @@ detectServer probes api/info; valid tree capability selects server source, other
 
 ### <a id="hash"></a>hash.js
 
-parseHash/buildHash own #/path and mode, part, focus, node, page, view, env, seq, step, before (a map picked as Before, WO-43) and optional preferences. Back/Forward restores viewer state. Evidence: atlas/hash.js.
+parseHash/buildHash own #/path and layout, part, focus, node, page, view, env, seq, step, before (a map picked as Before, WO-43) and optional preferences. Back/Forward restores viewer state. Evidence: atlas/hash.js.
 
 
 ### <a id="tree"></a>tree.js

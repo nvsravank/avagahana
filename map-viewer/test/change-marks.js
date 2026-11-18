@@ -153,12 +153,12 @@ export async function testChangeMarks(check, wait) {
   await wait(900);   // the old drawing glides out first
   check('back in the first diagram, the new diagram\'s icon has no sparkle', !sparkOn('b') && sparkOn('ext'), JSON.stringify([sparkOn('b'), sparkOn('ext'), v.state.part, entry(v, 'fresh')?.changed]));
   // selecting the new box clears it and everything under it
-  const mode = v.state.mode;
-  v.setState({ mode: 'list' });
+  const was = v.state.layout;
+  v.setState({ layout: 'list' });
   await wait(30);
   q('.mmv-lrow[data-id="extra"]')?.click();
   await wait(30);
-  v.setState({ mode });
+  v.setState({ layout: was });
   await wait(30);
   await openAll();
   m = marks();
@@ -186,12 +186,12 @@ export async function testChangeMarks(check, wait) {
     const before = marks();
     const relMark = () => !!host.querySelector('[data-mmv=rels] .mmv-change');
     check('a new node carries the sparkle; its arrow does not', before.n === 'new' && !relMark(), JSON.stringify(before));
-    const smode = s.state.mode;
-    s.setState({ mode: 'list' });
+    const smode = s.state.layout;
+    s.setState({ layout: 'list' });
     await wait(30);
     q('.mmv-lrow[data-id="n"]')?.click();
     await wait(30);
-    s.setState({ mode: smode });
+    s.setState({ layout: smode });
     await wait(30);
     check('selecting a new node clears it and its arrow', !marks().n && !relMark(), JSON.stringify(marks()));
     s.destroy();

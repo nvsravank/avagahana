@@ -18,7 +18,7 @@ export const spotlight = true;
 // state diagrams have no click
 export const noteLinks = true;
 
-export const modes = [
+export const layouts = [
   { id: 'boxes', label: 'Boxes', icon: 'state' },
   { id: 'list', label: 'List', icon: 'list' },
 ];
@@ -34,5 +34,5 @@ export const branchOrder = (kids) => kids;
 export const defaultCollapsed = () => new Set();
 export const layoutByView = true;
 
-export const layout = (mode, root, kids, size, input) => layoutBoxes(root, kids, size, input);
+export const place = (layoutId, root, kids, size, input) => layoutBoxes(root, kids, size, input);
 export { buildScene, relationShapes };

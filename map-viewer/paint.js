@@ -46,7 +46,7 @@ export function createPainter(v) {
   // everything the scene needs, read from the viewer's state
   function sceneInput(L) {
     return {
-      layout: L, root: v.viewRoot(), mode: S.mode, thumb: S.thumb,
+      layout: L, root: v.viewRoot(), layoutId: S.layout, thumb: S.thumb,
       relDepth: v.relDepth, categoryOf: v.categoryOf, levelOf: v.levelOf, geom: nodeGeom, zoom: v.detailZoom(),
       collapsed: S.collapsed, selected: S.selected, selectedSet: new Set([S.selected, ...(S.spot || [])].filter(Boolean)), hits: S.hits, iconFilter: S.iconFilter,
       rels: S.rels === '1', relNode: S.relNode, relations: S.map.relations, byId: S.map.byId,
@@ -159,7 +159,7 @@ export function createPainter(v) {
         }
         ghosts?.remove();
         gliding = false;
-        if (lodLater) { lodLater = false; draw(S.layout); }
+        if (lodLater) { lodLater = false; draw(S.placed); }
         fadeIn(lines);
       });
     });
@@ -204,7 +204,7 @@ export function createPainter(v) {
     if (moving) glide(before, view0, leaving);
     animate = false;
     $.mapTitle.textContent = v.fullTitle();
-    $.mapDesc.textContent = `${v.diagram().modes.find((m) => m.id === S.mode)?.label || 'Diagram'} of ${scene.nodes.length} ${scene.nodes.length === 1 ? 'node' : 'nodes'}. List mode reads this map as an outline.`;
+    $.mapDesc.textContent = `${v.diagram().layouts.find((m) => m.id === S.layout)?.label || 'Diagram'} of ${scene.nodes.length} ${scene.nodes.length === 1 ? 'node' : 'nodes'}. List mode reads this map as an outline.`;
     v.afterDraw?.();   // a sequence playing over the drawing marks it again (player.js)
     return scene;
   }
@@ -284,7 +284,7 @@ export function createPainter(v) {
       // Each quick link opens its own diagram; the note still opens the node page.
       const ig = svgEl('g', { class: 'mmv-inner-ic', 'data-inner': s.id, 'data-anchor': inner.anchor, 'data-size': inner.size, transform: `translate(${inner.x},${inner.y})` }, g);
       svgEl('rect', { class: 'mmv-hit', x: -5, y: -5, width: inner.size + 10, height: inner.size + 10 }, ig);
-      svgEl('g', { transform: `scale(${inner.size / 24})` }, ig).innerHTML = UI[diagramOf({ type: inner.type }).modes[0].icon] || UI.list;
+      svgEl('g', { transform: `scale(${inner.size / 24})` }, ig).innerHTML = UI[diagramOf({ type: inner.type }).layouts[0].icon] || UI.list;
       svgEl('title', {}, ig).textContent = `${inner.title} (${diagramOf({ type: inner.type }).label.toLowerCase()})`;
       // something in it new or changed: a small sparkle on the icon (seen.js)
       if (v.partChanged?.(inner.anchor)) drawSpark(ig, inner.size);
@@ -631,10 +631,10 @@ export function createPainter(v) {
   // Selection and search hits change only the nodes whose outline changes.
   function paintMarks() {
     // a type whose drawing changes with the selection (an ER table's grain sentence) draws again
-    if (S.mode === 'list' || !S.layout || !S.marked || v.diagram().drawsSelection) return false;
+    if (S.layout === 'list' || !S.placed || !S.marked || v.diagram().drawsSelection) return false;
     const hitSet = new Set(S.hits);
     const sel = new Set([S.selected, ...(S.spot || [])].filter(Boolean));   // several with the spotlight (WO-63)
-    const want = new Set([...S.hits, ...sel].filter((id) => id && S.layout.pos.has(S.map.byId[id])));
+    const want = new Set([...S.hits, ...sel].filter((id) => id && S.placed.pos.has(S.map.byId[id])));
     const touch = new Set([...S.marked, ...want]);
     for (const g of [...$.frames.children, ...$.nodes.children]) {
       const id = g.dataset.id;
@@ -643,7 +643,7 @@ export function createPainter(v) {
       if (bar) { bar.classList.toggle('is-marked', want.has(id)); continue; }
       g.querySelectorAll(':scope > .mmv-mark').forEach((m) => m.remove());
       const shape = g.querySelector(':scope > .mmv-shape');
-      const p = S.layout.pos.get(S.map.byId[id]);
+      const p = S.placed.pos.get(S.map.byId[id]);
       drawMarks(g, (shape || g.firstElementChild).nextSibling, { hit: hitSet.has(id), sel: sel.has(id) }, p.w, p.h, S.map.byId[id].shape);
     }
     S.marked = want;
@@ -652,8 +652,8 @@ export function createPainter(v) {
 
   // Relations repaint only themselves and the related-links dots.
   function paintRels() {
-    if (S.mode === 'list' || !S.layout) return false;
-    paintRelLayer(v.diagram().relationShapes(sceneInput(S.layout)));
+    if (S.layout === 'list' || !S.placed) return false;
+    paintRelLayer(v.diagram().relationShapes(sceneInput(S.placed)));
     for (const rg of $.nodes.querySelectorAll('.mmv-rel-dot')) {
       rg.replaceChildren();
       drawRelDot(rg, S.rels === '1' || S.relNode === rg.dataset.rel);
@@ -661,7 +661,7 @@ export function createPainter(v) {
     return true;
   }
 
-  return { draw, paintMarks, paintRels, paintChanges, nodeGeom, sceneInput, badge, marker: (kind, tint) => end(kind, null, tint), animateNext: () => { animate = true; }, lod: () => { if (gliding) lodLater = true; else if (S.layout) draw(S.layout); }, forget: () => { lastPos = new Map(); }, arrow: (id) => arrows.get(id) || null, arrowByEid: (eid) => {
+  return { draw, paintMarks, paintRels, paintChanges, nodeGeom, sceneInput, badge, marker: (kind, tint) => end(kind, null, tint), animateNext: () => { animate = true; }, lod: () => { if (gliding) lodLater = true; else if (S.placed) draw(S.placed); }, forget: () => { lastPos = new Map(); }, arrow: (id) => arrows.get(id) || null, arrowByEid: (eid) => {
     // an arrow's own id from the map (e1@): the drawn line that carries that relation
     const rel = (S.map?.relations || []).find((r) => r.eid === eid);
     return rel ? [...arrows.values()].find((a) => a.items.some((r) => r.eid === eid || (r.from === rel.from && r.to === rel.to && (r.label || '') === (rel.label || '')))) || null : null;

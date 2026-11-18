@@ -87,7 +87,7 @@ export async function testSecurity(check) {
     if (node.localName === 'iframe') node.contentWindow.print = () => { printed = node.contentDocument; };
     return result;
   };
-  const exporter = createExporter({ root, S: { map: { root: {} }, mode: 'list' }, $: { list } });
+  const exporter = createExporter({ root, S: { map: { root: {} }, layout: 'list' }, $: { list } });
   try {
     await exporter.print();
     await wait(20);

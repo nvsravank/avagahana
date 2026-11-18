@@ -544,6 +544,16 @@
       "side": "both",
       "what": "A ## Look: value that is not one of a flowchart's looks (outline, poster)"
     },
+    "layout-twice": {
+      "level": "error",
+      "side": "both",
+      "what": "Two ## Layout: lines for one diagram"
+    },
+    "layout-unknown": {
+      "level": "error",
+      "side": "both",
+      "what": "A ## Layout: line or a walkthrough stop's Layout: naming a layout the diagram's type does not draw (List is not a layout)"
+    },
     "main-icon-alone": {
       "level": "error",
       "side": "both",

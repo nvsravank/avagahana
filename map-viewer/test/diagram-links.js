@@ -40,10 +40,10 @@ export async function testDiagramLinks(check) {
     link.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, button: 0 }));
     check(`quick link opens ${name} directly`, v.state.part === anchor && v.state.page === null, JSON.stringify(v.state));
   }
-  v.setState({ part: null, mode: 'list' });
+  v.setState({ part: null, layout: 'list' });
   host.querySelector('.mmv-lnote-ic[title="Tables"]').click();
   check('list diagram icons open their individual destinations too', v.state.part === 'tables' && v.state.page === null);
-  v.setState({ part: null, mode: 'boxes' });
+  v.setState({ part: null, layout: 'boxes' });
   const noteLink = host.querySelector('.mmv-node[data-id=viewer] [data-note]');
   noteLink.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0 }));
   noteLink.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, button: 0 }));

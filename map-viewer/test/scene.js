@@ -23,35 +23,38 @@ const PICK = { garden: { selected: 'n7', hits: ['n26'] }, tools: { selected: 'n2
 // below the top level closed (the arrows lifted to the containers).
 const CASES = {
   mindmap: () => [
-    { name: 'mindmap', mode: 'mindmap', zoom: 1 },
-    { name: 'mindmap-far', mode: 'mindmap', zoom: 0.3 },
-    { name: 'org', mode: 'org', zoom: 1 },
-    { name: 'list', mode: 'list' },
+    { name: 'mindmap', layout: 'mindmap', zoom: 1 },
+    { name: 'mindmap-far', layout: 'mindmap', zoom: 0.3 },
+    { name: 'org', layout: 'org', zoom: 1 },
+    { name: 'list', layout: 'list' },
   ],
   flowchart: (map) => boxCases(map),
   state: (map) => boxCases(map),
   // tables closed (key columns), all open, and zoomed out (rows become bars)
   er: () => [
-    { name: 'tables', mode: 'tables', zoom: 1 },
-    { name: 'tables-open', mode: 'tables', zoom: 1, open: true },
-    { name: 'tables-far', mode: 'tables', zoom: 0.3 },
-    { name: 'list', mode: 'list' },
+    { name: 'hubs', layout: 'hubs', zoom: 1 },
+    { name: 'hubs-open', layout: 'hubs', zoom: 1, open: true },
+    { name: 'hubs-far', layout: 'hubs', zoom: 0.3 },
+    // the other ER layouts (WO-47): their places held as they are drawn
+    { name: 'flow', layout: 'flow', zoom: 1 },
+    { name: 'balanced', layout: 'balanced', zoom: 1 },
+    { name: 'list', layout: 'list' },
   ],
   // lifelines, still and while playing (step 6: the par, both messages at once), and the list
   sequence: () => [
-    { name: 'lifelines', mode: 'lifelines', zoom: 1 },
-    { name: 'lifelines-step-6', mode: 'lifelines', zoom: 1, step: 5 },
-    { name: 'list', mode: 'list' },
-    { name: 'list-step-6', mode: 'list', step: 5 },
+    { name: 'lifelines', layout: 'lifelines', zoom: 1 },
+    { name: 'lifelines-step-6', layout: 'lifelines', zoom: 1, step: 5 },
+    { name: 'list', layout: 'list' },
+    { name: 'list-step-6', layout: 'list', step: 5 },
   ],
 };
 function boxCases(map) {
   return [
     ...map.views.flatMap((view, i) => [
-      { name: `boxes-${i}`, mode: 'boxes', zoom: 1, view: i },
-      { name: `boxes-${i}-closed`, mode: 'boxes', zoom: 1, view: i, closed: true },
+      { name: `boxes-${i}`, layout: 'boxes', zoom: 1, view: i },
+      { name: `boxes-${i}-closed`, layout: 'boxes', zoom: 1, view: i, closed: true },
     ]),
-    { name: 'list', mode: 'list' },
+    { name: 'list', layout: 'list' },
   ];
 }
 // a fixed ruler: width from the character count, size and weight
@@ -81,13 +84,13 @@ function sceneFor(map, c) {
     root, relDepth, categoryOf: (n) => categoryOf(n, root, d.branchOrder), collapsed,
     selected: pick.selected, hits: pick.hits, iconFilter: new Set(), relations, countDesc,
   };
-  if (c.mode === 'list' && map.sequence) return buildSequenceRows(map.sequence, map.byId, c.step);
-  if (c.mode === 'list') return buildListScene({ ...common, kids, byId: tree.byId });
+  if (c.layout === 'list' && map.sequence) return buildSequenceRows(map.sequence, map.byId, c.step);
+  if (c.layout === 'list') return buildListScene({ ...common, kids, byId: tree.byId });
   const cache = new Map();
   const geom = (n) => cache.get(n) || cache.set(n, (d.nodeGeometry || nodeGeometry)(n, relDepth(n), 'test', fakeMeasure)).get(n);
-  const layout = d.layout(c.mode, root, kids, geom, { relations, byId: tree.byId, direction: map.direction, selected: pick.selected, collapsed, all: !!view?.deploy, sequence: map.sequence });
+  const layout = d.place(c.layout, root, kids, geom, { relations, byId: tree.byId, direction: map.direction, selected: pick.selected, collapsed, all: !!view?.deploy, sequence: map.sequence });
   return d.buildScene({
-    ...common, layout, mode: c.mode, geom, zoom: c.zoom,
+    ...common, layout, layoutId: c.layout, geom, zoom: c.zoom,
     rels: true, relNode: null, byId: tree.byId,
     relCount: (id) => relations.filter((r) => r.from === id || r.to === id).length,
     legend: map.iconLegend, iconDef,

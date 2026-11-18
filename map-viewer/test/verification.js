@@ -176,14 +176,14 @@ export async function testVerification(check, wait) {
   viewer.setState({ page: 'app' }); await wait(100);
   check('verification: hidden diagram marks keep node-page evidence and icons', !!q('.mmv-page .mmv-evidence-mark svg') && q('.mmv-page .mmv-evidence').textContent.includes('src/payments.py'));
   check('verification: evidence precedes note and every diagram', q('.mmv-page-body').children[1]?.classList.contains('mmv-evidence') && q('.mmv-page').textContent.split('Creates the order before requesting payment.').length === 2);
-  viewer.setState({ page: null, mode: 'list' }); await wait(40);
+  viewer.setState({ page: null, layout: 'list' }); await wait(40);
   const note = q('.mmv-lnote-head'); if (note) note.click(); await wait(30);
   check('verification: list notes still contain evidence while marks hidden', !!q('.mmv-lnote-body .mmv-evidence'));
   const html = await viewer.snapshot();
   const payload = JSON.parse(/<script type="application\/json" id="avagahana-data">([^]*?)<\/script>/.exec(html)[1]);
   check('verification: HTML captures hidden preference without rewriting Markdown', payload.options.prefs.trustMarks === false && payload.options.text === PROVENANCE);
   viewer.setPrefs({ trustMarks: true });
-  viewer.setState({ mode: 'boxes' }); await wait(30);
+  viewer.setState({ layout: 'boxes' }); await wait(30);
   check('verification: explicit runtime preference shows marks again', getComputedStyle(mark()).visibility !== 'hidden');
   const svg = await viewer.export({ format: 'svg' });
   check('verification: SVG is static without evidence navigation', !new DOMParser().parseFromString(svg.data, 'image/svg+xml').querySelector('a') && !svg.data.includes(`/blob/${SHA}/`));

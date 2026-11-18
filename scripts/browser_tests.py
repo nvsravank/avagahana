@@ -283,7 +283,7 @@ def differences(a, b):
 
 
 # the viewer's state and looks as pack.py's flags
-FLAGS = {"part": "--part", "mode": "--mode", "view": "--view", "env": "--env", "seq": "--seq", "step": "--step",
+FLAGS = {"part": "--part", "layout": "--layout", "view": "--view", "env": "--env", "seq": "--seq", "step": "--step",
          "colourBy": "--colour-by", "appearance": "--appearance"}
 
 
@@ -306,7 +306,7 @@ def viewer_pack_tests(browser, base, tmp, check):
     before = (EXAMPLES / "checkout-release-before.md").read_text(encoding="utf-8")
     cases = [
         ("garden, as it opens", "garden.md", {}),
-        ("garden in List mode, a node page open", "garden.md", {"act": {"mode": "list", "page": "n38"}}),
+        ("garden in List mode, a node page open", "garden.md", {"act": {"layout": "list", "page": "n38"}}),
         ("a deployment with cloud icons", "checkout-release-after.md", {"state": {"env": "Production"}}),
         ("a sequence at step 3", "job-race.md", {"act": {"seq": "main", "step": 3}}),
         ("a walkthrough with authored perspectives", "shop-layers.md", {}),
@@ -366,7 +366,7 @@ def viewer_pack_tests(browser, base, tmp, check):
     foot = made.split("<footer>")[1].split("</footer>")[0] if made and "<footer>" in made else ""
     check("the viewer's file: version and build in the generator tag, the version in the footer, the build not",
           made and f'<meta name="generator" content="Avagahana {version} pack.js abc123">' in made and f"Built with Avagahana {version}</a>" in foot and "abc123" not in foot)
-    ask = json.dumps({"text": (EXAMPLES / "garden.md").read_text(encoding="utf-8"), "path": "garden.md", "act": {"mode": "list", "page": "n38", "node": "n38"}})
+    ask = json.dumps({"text": (EXAMPLES / "garden.md").read_text(encoding="utf-8"), "path": "garden.md", "act": {"layout": "list", "page": "n38", "node": "n38"}})
     _, made, _ = drive(browser, page, lambda ev, _c: ev(f"packWith({ask})", wait=60), wait_drawn=False)
     (tmp / "list.html").write_text(made or "", encoding="utf-8")
     drawn, got, errors = open_snapshot(browser, tmp / "list.html", lambda ev, _c: ev("[!document.querySelector('#avagahana-map .mmv-list').hidden, document.querySelector('#avagahana-map .mmv').classList.contains('is-paged'), !!document.querySelector('#avagahana-map .is-selected')]"))
@@ -404,7 +404,7 @@ def snapshot_tests(browser, base=None):
         _, out = pack("job-race.md", tmp / "seq.html", "--seq", "main", "--step", "2")
         drawn, bar, errors = open_snapshot(browser, out, lambda ev, _c: ev("!document.querySelector('.mmv-stepbar').hidden"))
         check("a sequence opens at its step", bar is True and not errors, errors[:3])
-        _, out = pack("garden.md", tmp / "list.html", "--mode", "list")
+        _, out = pack("garden.md", tmp / "list.html", "--layout", "list")
         drawn, rows, errors = open_snapshot(browser, out, lambda ev, _c: ev("document.querySelector('#avagahana-map .mmv-list')?.textContent.includes('Herb spiral')"))
         check("list mode", rows is True and not errors, errors[:3])
 
