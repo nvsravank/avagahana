@@ -2571,6 +2571,7 @@ export function mount(element, options = {}) {
     const st = w.stops[i - 1];
     S.walkthrough = name;
     S.stop = i;
+    S.atEnd = false;
     S.offPath = false;
     clearPoint();
     dropStopSpot();
@@ -2601,13 +2602,65 @@ export function mount(element, options = {}) {
     // diagram must not silently substitute another stop while opening it.
     if (!w.stops[S.stop - 1]?.state) return;
     const here = currentState();
+    // at the closing panel the picture is the last stop's; anywhere else is off the path
+    if (S.atEnd) { S.offPath = !atPlace(w.stops[S.stop - 1].state, here); return; }
     if (w.stops[S.stop - 1]?.state && atPlace(w.stops[S.stop - 1].state, here)) { S.offPath = false; return; }
     const k = w.stops.findIndex((st) => st.state && atPlace(st.state, here));
     if (k >= 0) { S.stop = k + 1; S.offPath = false; } else S.offPath = true;
   }
+  // "More in this map" (WO-65): the map's other walks, then the diagrams and deployments
+  // this walk shows no stop of. A Perspective or Scenario stop shows its diagram; a
+  // Deployment stop shows its deployment and its diagram. Online only: not in the reading page.
+  function moreInMap(w) {
+    const all = walkthroughs();
+    const walks = all.filter((x) => x.name !== w.name && x.stops.length);
+    const parts = new Set(), envs = new Set();
+    for (const st of w.stops) if (st.visits) { parts.add(st.visits.part ?? ''); if (st.visits.env) envs.add(`${st.visits.part ?? ''}|${st.visits.env}`); }
+    const entries = items().filter((e) => (e.kind === 'diagram' || e.kind === 'sequence') ? !parts.has(e.part ?? '')
+      : e.kind === 'deployment' ? !envs.has(`${e.part ?? ''}|${e.label}`) : false);
+    return { walks, entries };
+  }
+  const hasMore = (w) => { const m = moreInMap(w); return m.walks.length + m.entries.length > 0; };
+  const kindFor = (e) => (e.kind === 'deployment' ? 'Deployment' : e.kind === 'sequence' ? 'Sequence' : diagramOf(e.part ? S.file.parts.get(e.part) : S.file).label);
+  function showEnd() {
+    S.atEnd = true;
+    S.offPath = false;
+    clearPoint();
+    renderWalkthrough();
+    emitState();
+  }
+  function renderEnd(w) {
+    const { walks, entries } = moreInMap(w);
+    $.stopCount.textContent = 'The walk is done';
+    $.stopKind.textContent = '';
+    $.stopTitle.textContent = 'More in this map';
+    $.stopNote.replaceChildren();
+    $.stopNotes.replaceChildren();
+    $.stopNotes.hidden = true;
+    const p = Object.assign(document.createElement('p'), { className: 'mmv-stop-more-intro', textContent: 'Explore the rest of the map on your own. Return brings you back here.' });
+    $.stopNote.append(p);
+    const section = (heading, list) => {
+      if (!list.length) return;
+      const h = Object.assign(document.createElement('div'), { className: 'mmv-stop-more-head', textContent: heading });
+      $.stopNote.append(h, ...list);
+    };
+    const item = (name, line, onClick) => {
+      const b = Object.assign(document.createElement('button'), { type: 'button', className: 'mmv-stop-more-item' });
+      b.append(Object.assign(document.createElement('b'), { textContent: name }), Object.assign(document.createElement('span'), { textContent: line }));
+      b.addEventListener('click', onClick);
+      return b;
+    };
+    section('Other walks', walks.map((x) => item(x.name, `Walk · ${x.stops.length} ${x.stops.length === 1 ? 'stop' : 'stops'}`, () => openWalkthrough(x.name, 1))));
+    section('Diagrams not shown in this walk', entries.map((e) => {
+      const b = item(e.label, kindFor(e), () => { setState(e.state); followStop(); renderWalkthrough(); emitState(); });
+      b.dataset.part = e.part ?? '';
+      return b;
+    }));
+  }
   function closeWalkthrough() {
     S.walkthrough = null;
     S.stop = null;
+    S.atEnd = false;
     S.offPath = false;
     clearPoint();
     dropStopSpot();
@@ -2660,6 +2713,18 @@ export function mount(element, options = {}) {
     const st = w.stops[S.stop - 1];
     const kind = st.kind.charAt(0).toUpperCase() + st.kind.slice(1);
     $.stopWalk.textContent = w.name;
+    $.stopPanel.classList.toggle('is-end', !!S.atEnd);
+    if (S.atEnd) {
+      renderEnd(w);
+      $.stopPrev.hidden = false;
+      $.stopNext.hidden = false;
+      $.stopNext.textContent = 'Close';
+      $.stopNext.classList.remove('mmv-stop-explore');
+      $.stopOff.hidden = !S.offPath;
+      $.stopBack.textContent = 'Return to the list';
+      $.stopPanel.classList.toggle('is-off', !!S.offPath);
+      return;
+    }
     $.stopCount.textContent = `Stop ${S.stop} of ${w.stops.length}`;
     $.stopKind.textContent = kind;
     $.stopTitle.textContent = st.state ? st.title : `${st.name} (not in this map)`;
@@ -2677,9 +2742,14 @@ export function mount(element, options = {}) {
       $.stopNotes.append(b);
     }
     $.stopNotes.hidden = !$.stopNotes.childElementCount;
-    // no Previous on the first stop, no Next on the last
+    // no Previous on the first stop; on the last, Next becomes Explore more when the map
+    // has more to show, else Close (WO-65)
+    const last = S.stop >= w.stops.length;
+    const more = last && hasMore(w);
     $.stopPrev.hidden = S.stop <= 1;
-    $.stopNext.hidden = S.stop >= w.stops.length;
+    $.stopNext.hidden = false;
+    $.stopNext.textContent = more ? 'Explore more' : last ? 'Close' : 'Next';
+    $.stopNext.classList.toggle('mmv-stop-explore', more);
     $.stopOff.hidden = !S.offPath;
     $.stopBack.textContent = `Return to stop ${S.stop}`;
     $.stopPanel.classList.toggle('is-off', !!S.offPath);
@@ -2699,9 +2769,14 @@ export function mount(element, options = {}) {
   }
   // a note opened from a scrolled Notes button stays level with it
   $.stopScroll.addEventListener('scroll', () => { if (!$.note.hidden) placeNote(); }, { passive: true });
-  $.stopBack.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop));
-  $.stopPrev.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop - 1));
-  $.stopNext.addEventListener('click', () => openWalkthrough(S.walkthrough, S.stop + 1));
+  $.stopBack.addEventListener('click', () => { if (S.atEnd) { openWalkthrough(S.walkthrough, S.stop); showEnd(); } else openWalkthrough(S.walkthrough, S.stop); });
+  $.stopPrev.addEventListener('click', () => openWalkthrough(S.walkthrough, S.atEnd ? S.stop : S.stop - 1));
+  $.stopNext.addEventListener('click', () => {
+    const w = walkthroughs().find((x) => x.name === S.walkthrough);
+    if (S.atEnd || (w && S.stop >= w.stops.length && !hasMore(w))) closeWalkthrough();
+    else if (w && S.stop >= w.stops.length) showEnd();
+    else openWalkthrough(S.walkthrough, S.stop + 1);
+  });
   $.stopExport.addEventListener('click', async () => {
     const button = $.stopExport;
     if (button.disabled) return;
@@ -2906,7 +2981,8 @@ export function mount(element, options = {}) {
     const entries = items();
     return list.map((w) => ({ name: w.name, intro: w.intro, stops: w.stops.map((st) => {
       const hit = st.known && !st.invalidReference && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name && (!st.options?.diagram || (e.diagram || (e.part ? S.file.parts.get(e.part)?.title : S.file.title)) === st.options.diagram));
-      return { kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, layout: st.layout || null, state: hit ? { ...hit.state, ...authoredLayout(st, hit.state), ...(st.point ? { point: st.point } : {}), ...(st.spot ? { spot: st.spot } : {}) } : null };
+      const visits = hit ? { part: hit.part ?? null, env: hit.kind === 'deployment' ? hit.state.env : null } : null;
+      return { visits, kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, layout: st.layout || null, state: hit ? { ...hit.state, ...authoredLayout(st, hit.state), ...(st.point ? { point: st.point } : {}), ...(st.spot ? { spot: st.spot } : {}) } : null };
     }) }));
   }
   // the walkthroughs come first (the menu's Walks), then the items

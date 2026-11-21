@@ -1136,6 +1136,7 @@ end of the file). The order is the order written. The reader moves through it wi
 Previous and Next in the walkthrough panel; nothing plays by itself. Exploring inside a
 stop (a box opened, a node's page, another mode) stays on it; opening another stop's place
 moves to that stop; opening any other place is off the path, with Return to the stop.
+A walk tells one story and need not visit every item: the picker reaches them all.
 
 Each stop is a `### <Kind>: <name>` heading, with its note as Markdown underneath:
 
@@ -1147,6 +1148,9 @@ Each stop is a `### <Kind>: <name>` heading, with its note as Markdown underneat
 
 ```markdown
 ## Walkthrough: Payments for the security team
+
+Payments takes a shop's card payments to an outside card provider. For the security
+team: card data leaves the shop only through Payments.
 
 ### Diagram: Shop platform
 
@@ -1164,7 +1168,7 @@ share a map, one section each. Checker problems: `walkthrough-empty`, `walkthrou
 `walkthrough-introduction`.
 
 An introduction precedes the first stop. It says what the subject is and what it is for,
-then who the walk is for: the reading page opens with it. A walk without one still reads;
+then who the walk is for and its main point: the reading page opens with it. A walk without one still reads;
 the checker warns (`walkthrough-introduction`). After each stop's explanation,
 one optional subsection supplies narrative metadata:
 

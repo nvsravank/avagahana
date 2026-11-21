@@ -105,7 +105,7 @@ export async function testContents(check) {
   v.setState({ walkthrough: walk.label, stop: 3 });
   check('walkthrough: stop 3 opens its item (the Order lifecycle diagram)', v.state.walkthrough === walk.label && v.state.stop === 3 && v.state.part === lifecycle.part, JSON.stringify(v.state));
   check('walkthrough: the panel shows the stop, its count and its note', !panel.hidden && q('stopTitle').textContent === 'Order lifecycle' && q('stopCount').textContent === 'Stop 3 of 5' && q('stopKind').textContent === 'Diagram' && /tried again/.test(q('stopNote').textContent), `${q('stopTitle').textContent} | ${q('stopCount').textContent}`);
-  check('walkthrough: no Next on the last stop, no Previous on the first', (() => { v.setState({ walkthrough: walk.label, stop: 5 }); const last = q('stopNext').hidden && !q('stopPrev').hidden; v.setState({ walkthrough: walk.label, stop: 1 }); const first = q('stopPrev').hidden && !q('stopNext').hidden; v.setState({ walkthrough: walk.label, stop: 3 }); return last && first; })());
+  check('walkthrough: Explore more on the last stop (the map has more), no Previous on the first', (() => { v.setState({ walkthrough: walk.label, stop: 5 }); const last = !q('stopNext').hidden && q('stopNext').textContent === 'Explore more' && !q('stopPrev').hidden; v.setState({ walkthrough: walk.label, stop: 1 }); const first = q('stopPrev').hidden && !q('stopNext').hidden; v.setState({ walkthrough: walk.label, stop: 3 }); return last && first; })());
   q('stopNext').click();
   check('walkthrough: Next moves to stop 4 (the scenario), which plays from step 1', v.state.stop === 4 && v.state.seq === scenario.state.seq && q('stopCount').textContent === 'Stop 4 of 5', JSON.stringify(v.state));
   q('stopPrev').click();

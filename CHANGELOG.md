@@ -7,6 +7,18 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.3.1 (2026-11-20)
+
+- **Contract** (viewer API, addition): on a walk's last stop, Next becomes **Explore
+  more** when the map has more to show. It opens **More in this map**: the map's other
+  walks, then the diagrams the walk did not show, each with its kind. A walk that shows
+  everything, with no other walk, ends with **Close**. Snapshots carry it.
+- Walkthroughs are story-first: one story per walk, its main point first, decisions in
+  the notes of the parts they decide. trace-architecture writes a walk when the reader
+  has a purpose (onboarding, a question, a security review, a release).
+- Evals: `repo-map` checks that an overview has no walk; new case `onboard-walk`.
+- A snapshot of the examples may be up to 1.6 MB.
+
 ## 0.3.0 (2026-11-17)
 
 - **Contract** (viewer API, map source, server HTTP API, **breaking**): a diagram's

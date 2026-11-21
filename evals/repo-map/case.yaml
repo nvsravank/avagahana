@@ -53,6 +53,13 @@
       "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence"
     },
     {
+      "name": "no-walk",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "\"name\":\"(?:Write|Edit|MultiEdit|Bash)\",\"input\":\\{[^\\n]*?/output/[^\\n]*?## Walkthrough:",
+      "match": "not_contains"
+    },
+    {
       "name": "reply",
       "type": "llm",
       "focus": "last_message",

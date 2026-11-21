@@ -129,6 +129,15 @@ With the switch off nothing changes.
 `walkthrough` (the name) and `stop` (1-based) are present while a walkthrough is open. Setting
 `walkthrough` opens that stop: the stop's item is opened, then the rest of the call applies;
 `walkthrough: null` closes it. Moving with Previous and Next is the viewer's own panel.
+On the last stop, when the map has more to show, Next becomes **Explore more**: it opens
+**More in this map**, an unnumbered panel listing the map's other walks, then the
+diagrams and deployments the walk shows no stop of (a Perspective or Scenario stop shows
+its diagram; a Deployment stop shows its deployment and its diagram), each with its kind.
+Opening one is off the path, with Return to the list; Previous goes back to the last stop;
+Close ends the walk. While it shows, `stop` stays the last stop. A walk that shows
+everything, in a map with no other walk, ends with Close on its last stop and no panel;
+the viewer works this out from the map. The exported reading page
+has none of this (WO-65).
 
 | Field | Meaning |
 |---|---|

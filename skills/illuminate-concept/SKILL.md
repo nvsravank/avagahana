@@ -209,8 +209,10 @@ Card charge with an idempotency key, so a retry never charges twice.
 
 ## Walkthroughs: a story for one audience
 
-When a reader needs a path through the map (a security review, a new joiner), add a
-`## Walkthrough: <name>` section to the file (the end of the file is fine). Each stop is a
+When a reader needs a story through the map (a security review, a new joiner, a
+question), add a `## Walkthrough: <name>` section to the file (the end of the file is
+fine). A walk tells one story, answer first, and visits only the diagrams that story
+needs; several stories make several short walks, and a map with no such reader needs none. Each stop is a
 `### <Kind>: <name>` heading, in the order written: `Diagram`, `Perspective`, `Deployment`,
 `Scenario` or `Sequence`, then the item's name as its heading gives it. The Markdown
 under the stop says what to notice there. Every stop on a box or ER diagram is its own

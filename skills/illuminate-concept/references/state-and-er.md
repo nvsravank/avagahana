@@ -106,7 +106,7 @@ erDiagram
   `groupOverlaps`, `cutLabels`, `smallestText` and `aspect`. Pick the one with fewest
   crossings, then fewest lines behind tables, then the aspect nearest 1 (square), and
   write it as a section line after the block: `## Layout: balanced`. Leave it out when
-  `hubs` wins (the default). Then write the walkthrough; give a stop its own `Layout:`
+  `hubs` wins (the default). If the map has a walkthrough, write it after; give a stop its own `Layout:`
   only where that stop's part of the schema reads clearly better in another layout
   (`walkthroughs.md`). Say in the text which layout you chose and why, in a few words
   ("Balanced: 3 crossings against Hubs' 5").

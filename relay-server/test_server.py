@@ -662,7 +662,7 @@ class PackTests(unittest.TestCase):
             line, out, page, data = self.packed(path.name)
             self.assertRegex(line, r"^STATUS=packed FILE=\S+ SIZE=\d+$")
             self.assertEqual(int(line.rsplit("SIZE=", 1)[1]), out.stat().st_size)
-            self.assertLess(out.stat().st_size, 1_500_000, path.name)
+            self.assertLess(out.stat().st_size, 1_600_000, path.name)
             self.assertEqual(data["options"]["text"], path.read_text(encoding="utf-8"))
             self.assertFalse(data["options"]["marks"])
 

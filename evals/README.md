@@ -37,6 +37,10 @@ Graders:
   agent's own Write, Edit or Bash calls, not in skill text the trace holds once a skill loads; `communicate` cases are explanations the
   agent makes of its own (a plan it proposes, a trade-off it weighs).
 
+Walkthroughs follow the reader's purpose: `repo-map` (an overview, no purpose) checks
+that no walk is written (`no-walk`); `onboard-walk` (a new engineer) and
+`security-review` check that one is.
+
 `c4-alone` is a C4 request with no competing skill. The same request with a competing
 skill installed is in `../evals-conflict/` (run by `scripts/eval_conflict.sh`).
 

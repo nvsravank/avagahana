@@ -193,7 +193,7 @@ def chrome_pipe(browser, profile):
 
 
 # ---------- snapshots: relay-server/pack.py's files, opened from disk with no server ----------
-SNAPSHOT_MAX = 1_500_000   # bytes, agreed for the examples (WO-33)
+SNAPSHOT_MAX = 1_600_000   # bytes, agreed for the examples (WO-33; raised from 1,500,000 in WO-65)
 EXAMPLES = ROOT / "examples" / "maps"
 DRAWN = "document.querySelectorAll('#avagahana-map [data-id]').length || (document.querySelectorAll('#avagahana-reading .reading-board img').length && [...document.images].every(i => i.complete && i.naturalWidth > 0))"
 
@@ -412,6 +412,18 @@ def snapshot_tests(browser, base=None):
         drawn, persp, errors = open_snapshot(browser, out, lambda ev, _c: ev("!document.querySelector('.mmv-persp').hidden"))
         check("--before offers Before and After", persp is True and not errors, errors[:3])
 
+        # WO-65: the walk's end works the same in a snapshot
+        _, out = pack("shop-layers.md", tmp / "walk-end.html")
+        drawn, end, errors = open_snapshot(browser, out, lambda ev, _c: ev("""(async () => {
+          const q = (k) => document.querySelector(`[data-mmv=${k}]`), wait = (ms) => new Promise((r) => setTimeout(r, ms));
+          [...document.querySelectorAll('[data-mmv=viewMenu] button')].find((b) => b.entry?.kind === 'walk').click();
+          for (let i = 0; i < 20 && q('stopNext').textContent !== 'Explore more'; i++) { q('stopNext').click(); await wait(50); }
+          q('stopNext').click(); await wait(50);
+          return { title: q('stopTitle').textContent, items: document.querySelectorAll('.mmv-stop-more-item').length };
+        })()"""))
+        check("a snapshot's walk ends with Explore more and More in this map",
+              drawn and end and end.get("title") == "More in this map" and end.get("items", 0) > 0 and not errors, f"{end}; {errors[:3]}")
+
         old = tmp / "garden-old.md"
         old.write_text((EXAMPLES / "garden.md").read_text(encoding="utf-8").replace("Herb spiral", "Herb bed"), encoding="utf-8")
         _, out = pack("garden.md", tmp / "since.html", "--since", str(old))
@@ -472,14 +484,22 @@ def snapshot_tests(browser, base=None):
             items = ev(menu)
             # a real click, as a reader makes it (a synthetic one may not count as the
             # reader's on every platform); the menu opens first so the item has a box
-            click('[data-mmv=exportBtn]')
-            if not click('[data-mmv=exportMd]'):
-                ev("document.querySelector('[data-mmv=exportMd]').click()")
             # wait for the saved file, not a fixed time (WO-64: Windows was slower than 2 s).
-            # Chrome renames a download to its final name only once it is complete.
-            end = time.time() + 30
+            # Chrome renames a download to its final name only once it is complete. On
+            # Windows a click now and then starts no download at all (WO-65): click again.
+            for _ in range(3):
+                click('[data-mmv=exportBtn]')
+                if not click('[data-mmv=exportMd]'):
+                    ev("document.querySelector('[data-mmv=exportMd]').click()")
+                end = time.time() + 10
+                while not got.is_file() and time.time() < end:
+                    ev('true')  # drain the download events while the file is being saved
+                    time.sleep(0.1)
+                if got.is_file() or any(saved.iterdir()):
+                    break
+            end = time.time() + 20
             while not got.is_file() and time.time() < end:
-                ev('true')  # drain the download events while the file is being saved
+                ev('true')
                 time.sleep(0.1)
             return items
         events = []

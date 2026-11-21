@@ -653,6 +653,14 @@ details[open] > summary.mmv-legend-head::before { transform: rotate(90deg); }
 .mmv-stop-foot :is([data-mmv="stopPrev"], [data-mmv="stopNext"])[hidden] { display: none; }
 .mmv-stop-foot { display: flex; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid var(--mmv-chrome-border); }
 .mmv-stop-tab { position: absolute; left: 14px; top: 62px; }
+/* the walk's end (WO-65): Explore more on the last stop, then More in this map */
+.mmv-stop-foot .mmv-stop-explore { background: color-mix(in srgb, var(--mmv-highlight) 22%, var(--mmv-bg)); border-color: var(--mmv-highlight); }
+.mmv-stop-more-intro { margin: 0 0 4px; }
+.mmv-stop-more-head { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--mmv-muted); margin: 10px 0 4px; }
+.mmv-stop-more-item { display: block; width: 100%; text-align: left; padding: 6px 8px; margin-bottom: 6px; border-radius: 8px; border: 1px solid var(--mmv-chrome-border); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.mmv-stop-more-item:hover, .mmv-stop-more-item:focus-visible { border-color: var(--mmv-highlight); }
+.mmv-stop-more-item b { display: block; font-weight: 600; }
+.mmv-stop-more-item span { display: block; font-size: 12px; color: var(--mmv-muted); }
 .mmv-seq-panel { top: 62px; right: 14px; width: min(300px, calc(100cqw - 28px)); max-height: calc(100cqh - 62px - 14px - var(--mmv-br-h, 180px) - 12px); overflow: auto; font-size: 13px; line-height: 1.45; padding: 12px 14px; }
 .mmv-seq-head { font-size: 12px; color: var(--mmv-muted); margin-bottom: 6px; }
 .mmv-seq-cap { font-size: 12px; color: var(--mmv-call); margin: 2px 0; }

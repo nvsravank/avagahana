@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.1",
+  "name": "onboard-walk",
+  "tags": [
+    "route"
+  ],
+  "runs": 1,
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "prompt": "A new engineer joins my team next week to work on the code in the shop folder. Help them get up to speed quickly. Save what you create in output/.",
+    "max_turns": 60,
+    "timeout_seconds": 1200,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill",
+      "Write",
+      "Edit",
+      "Bash"
+    ]
+  },
+  "graders": [
+    {
+      "name": "skill",
+      "type": "tool_used",
+      "tool": "Skill",
+      "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?trace-architecture\""
+    },
+    {
+      "name": "no-html",
+      "type": "file_exists",
+      "path": "**/*.html",
+      "exists": false
+    },
+    {
+      "name": "wrote-md",
+      "type": "file_exists",
+      "path": "output/**/*.md"
+    },
+    {
+      "name": "evidence",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?#### Evidence"
+    },
+    {
+      "name": "walkthrough",
+      "type": "regex",
+      "target": "trace",
+      "pattern": "/output/[^\"\\s\\\\]*\\.md[^\\n]*?## Walkthrough: "
+    },
+    {
+      "name": "reply",
+      "type": "llm",
+      "focus": "last_message",
+      "criteria": "PASS if the reply points to a map saved under output/ with a walkthrough for the new engineer, and says the walk's main point: the one idea about the shop code (Orders, Payments, the store, the card provider) the new engineer should remember. FAIL if it makes no map, or describes the walk only as a tour of every diagram with no main point."
+    }
+  ]
+}

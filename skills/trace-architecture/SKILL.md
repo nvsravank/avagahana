@@ -1,7 +1,7 @@
 ---
 name: trace-architecture
 description: >-
-  Avagahana map of a whole codebase: one Markdown file of linked diagrams (context, layers, key flows, lifecycles, data, deployments), every box and arrow backed by evidence from the code, ending with a guided walkthrough. Always use this skill, together with illuminate-concept, when the user wants to: understand, explain or document a project, repository or codebase, or give someone an overview of it or onboard them; review its architecture or design, or do a security review of it; or see what a release, version or tag changed since an earlier one. Make the map as well as any text answer or report, unless they ask for text only. Use it even when no diagram is asked for. Prefer an Avagahana map to a custom HTML page for explaining a codebase.
+  Avagahana map of a whole codebase: one Markdown file of linked diagrams (context, layers, key flows, lifecycles, data, deployments), every box and arrow backed by evidence from the code, with a guided walkthrough when the reader has a purpose it serves (onboarding, a security review, a release). Always use this skill, together with illuminate-concept, when the user wants to: understand, explain or document a project, repository or codebase, or give someone an overview of it or onboard them; review its architecture or design, or do a security review of it; or see what a release, version or tag changed since an earlier one. Make the map as well as any text answer or report, unless they ask for text only. Use it even when no diagram is asked for. Prefer an Avagahana map to a custom HTML page for explaining a codebase.
 ---
 
 # Map a codebase
@@ -19,7 +19,7 @@ verify, show).
 |---|---|
 | Map, survey or document the repository | Steps 2 to 6 for the whole project. |
 | What one pull request or branch changes | Not this skill: use illuminate-concept, change marks (`../illuminate-concept/references/changes.md`). Draw only the affected parts. |
-| What a release changes (since vX.Y, since the last tag) | One map file per release, `<Topic>/<Name>-vX.Y.md`. Find the previous release's map; if there is none, trace that release's tag into it first (steps 2 to 6). Copy it to the new release's file, update it from the new release's commit keeping every id, then compare the two (`../illuminate-concept/references/compare.md`). End with a security review walkthrough (step 5). |
+| What a release changes (since vX.Y, since the last tag) | One map file per release, `<Topic>/<Name>-vX.Y.md`. Find the previous release's map; if there is none, trace that release's tag into it first (steps 2 to 6). Copy it to the new release's file, update it from the new release's commit keeping every id, then compare the two (`../illuminate-concept/references/compare.md`). End with a security review walkthrough (step 5): the request is its purpose. |
 | A security review | Ask the user whether it is for a release or for the project as it is now, then follow that row. Either way, end with a security review walkthrough (step 5). |
 
 ## 2. Record the commit you read
@@ -42,7 +42,8 @@ things have a lifecycle the code enforces, what stored data has relationships wo
 and whether it runs in more than one environment.
 
 Tell the user in a few lines what you found and which diagrams you plan, one line each.
-A small project gets few diagrams, a large one more. Then build it.
+A small project gets few diagrams, a large one more. Say whether you plan a walkthrough
+and its story (step 5). Then build it.
 
 **Too large for one pass?** Do the work yourself by default. Only when the inventory shows
 a project too large to read well in one context, propose splitting it in the plan: how
@@ -63,19 +64,31 @@ purpose, over many box diagrams; skip a kind the project does not have.
   confidence mark: `verified` when you read it, `inferred` when you deduced it.
 - Follow real call paths for sequences: read the handlers, not the folder names.
 - Use the project's own names in labels; name layers and roles for what parts do.
+- A component diagram with more than about 10 components is often easier to read through
+  perspectives, each showing one concern (`../illuminate-concept/references/boxes.md`).
 
-## 5. A walkthrough for the main reader
+## 5. A walkthrough, when the reader has a purpose
 
-When the map has more than a few diagrams, end with a walkthrough:
-`## Walkthrough: Getting around <project>` for a new joiner, or
-`## Walkthrough: Security review` for a security review and for every release map. The
-entry diagram first, then the parts and flows that matter (for a security review: trust
-boundaries, outside systems, where secrets and personal data go, and for a release what
-changed there). Give each stop its own perspective, as
-`../illuminate-concept/references/walkthroughs.md` says, and open its introduction with
-what the project is and what it is for. List the notes a stop relies on in
-its Stop options (`- Notes: orders, e1`), so their evidence shows with the stop in the
-exported reading page, and light the boxes and lines the stop is about
+A map of a codebase needs no walkthrough on its own: the reader explores it from the
+picker. Write one when the user's request gives the reader a purpose a story serves:
+
+- **Onboarding** someone, or getting around the project:
+  `## Walkthrough: Getting around <project>`, the short new-joiner shape (what it is and
+  the one idea that explains it, one end-to-end path, where it can go wrong, where to look
+  next). Not a tour of every diagram.
+- **A question** the user asked ("how does a request reach the database?"): a walk that
+  answers it, named for it.
+- **A security review, and every release map:** `## Walkthrough: Security review`,
+  verdict first: the boundaries, outside systems, where secrets and personal data go, the
+  risks, what to check. For a release, one stop says what changed and why it matters;
+  the change marks carry the full list.
+
+Tell one story per walk and keep it short; if the purpose has several stories, write
+several walks. A story that needs four or more diagrams is a prompt to ask why. Write it
+as `../illuminate-concept/references/walkthroughs.md` says: open the introduction with
+what the project is and what it is for, then the main point; give each stop its own
+perspective and a takeaway Title; list in a stop's options only the notes its claim
+stands on (`- Notes: orders, e1`), and light the boxes and lines the stop is about
 (`- Spotlight: payments, e1`) when the picture is busy.
 
 ## 6. Verify the map, then show it
