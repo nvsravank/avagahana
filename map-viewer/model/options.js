@@ -90,7 +90,8 @@ export function optionsSection(text, name, fields, code, warnings) {
   if (bad) warnings.push(problem(code, `${name}: one section, with unique ${fields.join(', ')} property bullets and nonempty values.`));
   let clean = text;
   for (const [a, b] of cuts.reverse()) clean = clean.slice(0, a) + clean.slice(b);
-  return { text: clean.trim(), options: bad ? null : options, invalid: bad };
+  // partial: the good bullets of a section with a bad one (a walk stop keeps them, WO-67)
+  return { text: clean.trim(), options: bad ? null : options, partial: Object.keys(options).length ? options : null, invalid: bad };
 }
 
 export function perspectiveOptions(options, type, byId, warnings) {
@@ -120,10 +121,13 @@ export function perspectiveOptions(options, type, byId, warnings) {
   return options;
 }
 
-// Notes can belong to a node, any perspective's relation, or a sequence message.
-export function noteTargets(map) {
+// Notes can belong to a node, any perspective's relation, or a sequence message; with
+// env (a deployment of this map, WO-67), also to that deployment's own boxes.
+export function noteTargets(map, env = null) {
   const out = new Map();
-  for (const x of [...Object.values(map.byId || {}), ...(map.views || []).flatMap((v) => v.relations), ...(map.sequence?.messages || [])]) {
+  const dep = env ? (map.views || []).find((v) => v.deploy && v.name === env)?.deploy : null;
+  const boxes = dep ? Object.values(dep.byId).filter((n) => n.infra) : [];
+  for (const x of [...Object.values(map.byId || {}), ...boxes, ...(map.views || []).flatMap((v) => v.relations), ...(map.sequence?.messages || [])]) {
     const id = x.id || x.eid;
     if (id && x.note && !out.has(id)) out.set(id, x.note);
   }

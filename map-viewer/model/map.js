@@ -15,7 +15,7 @@ import { parseClasses, mergeClasses, classOf, reservedTwice, assignSlots, stroke
 import { readDeployment, infraOf, buildDeployment, syncWarnings } from './deployments.js';
 import { SCENARIO_TYPES, readScenario, scenarioText } from './scenarios.js';
 import { parseSources, evidenceOf, checkVerificationPairs } from './provenance.js';
-import { readWalkthroughs } from './walkthroughs.js';
+import { readWalkthroughs, sameName } from './walkthroughs.js';
 import { perspectiveOptions, noteTargets, anchorOf, fenceBlocks } from './options.js';
 
 // A big map is drawn in full, with a warning that drawing may be slow.
@@ -104,66 +104,72 @@ export function parseMap(text, fileName) {
   // walkthroughs belong to the file: each diagram's sections count (model/walkthroughs.js)
   main.walkthroughs = readWalkthroughs([main, ...main.parts.values()].flatMap((p) => p.walkthroughs || []), main.warnings);
   const maps = [main, ...main.parts.values()];
+  // A wrong option drops only itself (WO-67): the stop keeps its place, Title, Label and
+  // its other options, and each problem is listed. The checker fails all of these.
   for (const w of main.walkthroughs) for (const stop of w.stops) {
     if (!stop.options) continue;
-    const candidates = maps.filter((p) => !p.scenario && (!stop.options.diagram || p.title === stop.options.diagram));
-    const owner = candidates.find((p) => stop.kind === 'diagram' || stop.kind === 'sequence' ? p.title === stop.name && (stop.kind !== 'sequence' || p.type === 'sequence')
-      : stop.kind === 'scenario' ? maps.some((x) => x.scenarioName === stop.name && x.scenarioOf === (p === main ? null : p.anchor))
-        : (p.views || []).some((v) => (v.label || v.name) === stop.name && (stop.kind === 'deployment' ? v.deploy : !v.deploy)));
-    if (!owner || (stop.options.notes || []).some((id) => !noteTargets(owner).has(id))) {
-      main.warnings.push(problem('walkthrough-reference', `Stop "${stop.name}": Diagram/Notes must resolve in the destination's owning diagram.`));
-      // Invalid options must not partially redirect or mislabel the narrative.
-      stop.invalidReference = true;
-      stop.options = null;
+    const o = stop.options, say = (code, text) => main.warnings.push(problem(code, `Stop "${stop.name}": ${text}`));
+    const ownView = (p) => (p.views || []).find((v) => sameName(v.label || v.name, stop.name) && (stop.kind === 'deployment' ? v.deploy : !v.deploy));
+    const holds = (p) => stop.kind === 'diagram' || stop.kind === 'sequence' ? sameName(p.title, stop.name) && (stop.kind !== 'sequence' || p.type === 'sequence')
+      : stop.kind === 'scenario' ? maps.some((x) => sameName(x.scenarioName, stop.name) && x.scenarioOf === (p === main ? null : p.anchor))
+        : !!ownView(p);
+    const owners = maps.filter((p) => !p.scenario && holds(p));
+    let owner = owners.find((p) => !o.diagram || sameName(p.title, o.diagram));
+    if (!owner && o.diagram && owners.length) {
+      say('walkthrough-reference', `Diagram "${o.diagram}" has no such item: the first one of that name is shown.`);
+      delete o.diagram;
+      owner = owners[0];
+    }
+    if (!owner) {
+      // no place of that name: the stop cannot open, so options about its picture go
+      if (['notes', 'diagram', 'point to', 'spotlight', 'layout'].some((k) => o[k])) say('walkthrough-reference', 'Diagram/Notes must resolve in the destination\'s owning diagram.');
+      for (const k of ['notes', 'diagram', 'point to', 'spotlight', 'layout']) delete o[k];
       continue;
     }
-    if (stop.options['point to']) {
-      const view = stop.kind === 'perspective' ? owner.views.find((v) => (v.label || v.name) === stop.name) : null;
+    const env = stop.kind === 'deployment' ? ownView(owner)?.name : null;
+    if (o.notes) {
+      const targets = noteTargets(owner, env), away = o.notes.filter((id) => !targets.has(id));
+      if (away.length) {
+        say('walkthrough-reference', `Notes ${away.join(', ')}: no such note in the destination's owning diagram (left out).`);
+        o.notes = o.notes.filter((id) => targets.has(id));
+        if (!o.notes.length) delete o.notes;
+      }
+    }
+    if (o['point to']) {
+      const view = stop.kind === 'perspective' ? ownView(owner) : null;
       const scope = view?.options?.focus ? owner.byId[view.options.focus] : null;
-      const at = scope && queryPart(scope, stop.options['point to']);
+      const at = scope && queryPart(scope, o['point to']);
       if (!at) {
-        main.warnings.push(problem('walkthrough-reference', `Stop "${stop.name}": Point to "${stop.options['point to']}" must name a part of the query box its perspective focuses on.`));
-        stop.invalidReference = true;
-        stop.options = null;
+        say('walkthrough-reference', `Point to "${o['point to']}" must name a part of the query box its perspective focuses on (the whole place is shown).`);
+        delete o['point to'];
       } else stop.point = at.id;
     }
     // Spotlight (WO-63): boxes and lines the stop lights, by node id or an arrow's own id,
     // on a stop that opens a box diagram with a spotlight; never with Point to
-    if (stop.options?.spotlight) {
+    if (o.spotlight) {
       const kinds = ['diagram', 'perspective', 'deployment'];
-      if (!kinds.includes(stop.kind) || stop.options['point to'] || !SPOTLIT.has(owner.type)) {
-        main.warnings.push(problem('walkthrough-options', `Stop "${stop.name}": Spotlight is for a Diagram, Perspective or Deployment stop of a flowchart, state, ER or lane diagram, and not with Point to.`));
-        stop.invalidReference = true;
-        stop.options = null;
-        continue;
+      if (!kinds.includes(stop.kind) || o['point to'] || !SPOTLIT.has(owner.type)) {
+        say('walkthrough-options', 'Spotlight is for a Diagram, Perspective or Deployment stop of a flowchart, state, ER or lane diagram, and not with Point to.');
+        delete o.spotlight;
+      } else {
+        const known = new Set([...Object.keys(owner.byId), ...(owner.views || []).flatMap((v) => [...Object.keys(v.deploy?.byId || {}), ...v.relations.map((r) => r.eid).filter(Boolean)])]);
+        const unknown = o.spotlight.filter((id) => !known.has(id));
+        if (unknown.length) say('walkthrough-reference', `Spotlight ${unknown.join(', ')} must name nodes or arrow ids of the destination's diagram (left out).`);
+        const lit = o.spotlight.filter((id) => known.has(id));
+        if (lit.length) stop.spot = lit.slice(); else delete o.spotlight;
       }
-      const known = new Set([...Object.keys(owner.byId), ...(owner.views || []).flatMap((v) => [...Object.keys(v.deploy?.byId || {}), ...v.relations.map((r) => r.eid).filter(Boolean)])]);
-      const unknown = stop.options.spotlight.filter((id) => !known.has(id));
-      if (unknown.length) {
-        main.warnings.push(problem('walkthrough-reference', `Stop "${stop.name}": Spotlight ${unknown.join(', ')} must name nodes or arrow ids of the destination's diagram.`));
-        stop.invalidReference = true;
-        stop.options = null;
-        continue;
-      }
-      stop.spot = stop.options.spotlight.slice();
     }
     // Layout (WO-47): the layout the stop shows its place in, one of its diagram's drawn layouts
-    if (stop.options?.layout) {
-      const want = stop.options.layout.trim().toLowerCase();
+    if (o.layout) {
+      const want = o.layout.trim().toLowerCase();
       const drawn = drawnLayouts(diagramOf(owner));
       if (stop.kind === 'sequence') {
-        main.warnings.push(problem('walkthrough-options', `Stop "${stop.name}": Layout is for a Diagram, Perspective, Deployment or Scenario stop.`));
-        stop.invalidReference = true;
-        stop.options = null;
-        continue;
-      }
-      if (!drawn.includes(want)) {
-        main.warnings.push(problem('layout-unknown', `Stop "${stop.name}": Layout ${want}: this diagram's layouts are ${drawn.join(', ')}.`));
-        stop.invalidReference = true;
-        stop.options = null;
-        continue;
-      }
-      stop.layout = want;
+        say('walkthrough-options', 'Layout is for a Diagram, Perspective, Deployment or Scenario stop.');
+        delete o.layout;
+      } else if (!drawn.includes(want)) {
+        say('layout-unknown', `Layout ${want}: this diagram's layouts are ${drawn.join(', ')} (its own is shown).`);
+        delete o.layout;
+      } else stop.layout = want;
     }
   }
   linkSequences(main);

@@ -118,13 +118,18 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
   const content=el('div','reading-content');pane.append(content);
   const seal=iconHtml('verified',null,'reading-ic','currentColor');
   const shown=new Map(),used=new Map();let numberedAny=false,evidenceAny=false;
+  // A stop that cannot be made is left out and reported (WO-67); the document numbers
+  // the stops it has. Ids keep the walk's own numbers, so links between stops still match.
+  const skipped=[];let made=0;
   for(let i=0;i<walk.stops.length;i++){
-    const stop=walk.stops[i],number=String(i+1).padStart(2,'0');
-    if(!stop.state)throw new Error(`Stop ${i+1}: ${stop.name} has no valid destination.`);
+    const stop=walk.stops[i],number=String(made+1).padStart(2,'0');
+    const shownHere=new Map(),usedHere=new Map();let numberedHere=false,evidenceHere=false;
+    try{
+    if(!stop.state)throw new Error('it names no place in this map');
     const m=destination(stop.state);
-    if(!m)throw new Error(`Stop ${i+1}: ${stop.name} could not be read.`);
-    const section=el('section','reading-section');section.id=`stop-${i+1}`;content.append(section);
-    const link=el('a');link.href=`#${section.id}`;link.append(el('span','',number),document.createTextNode(stop.label));if(i===0)link.setAttribute('aria-current','location');row.append(link);
+    if(!m)throw new Error('its place could not be read');
+    const section=el('section','reading-section');section.id=`stop-${i+1}`;
+    const link=el('a');link.href=`#${section.id}`;link.append(el('span','',number),document.createTextNode(stop.label));if(made===0)link.setAttribute('aria-current','location');
     section.append(el('div','reading-section-kind',`${number} · ${stop.label} - ${stop.kind}`),el('h2','',stop.title));
     const words=el('div','reading-prose');renderNoteBody(stop.text,words,wire);section.append(words);
     let state={...stop.state},owner=m,caption=stop.name,steps=null;
@@ -136,17 +141,17 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
     }else if(stop.kind==='scenario'){
       owner=m.scenarioOf?file.parts.get(m.scenarioOf):file;
       const scenario=owner.scenarios.find(s=>s.name===m.scenarioName);
-      if(!scenario)throw new Error(`Stop ${i+1}: scenario ${stop.name} could not be read.`);
+      if(!scenario)throw new Error('its scenario could not be read');
       steps=readScenario(owner,scenario,[]);
       state={seq:null,part:m.scenarioOf,view:scenario.view || null,highlight:[...new Set(steps.flatMap(s=>[s.from,s.to]))]};
       caption=`${stop.name} · complete path highlighted`;
     }
     let image,second=null;
-    try {image=await render(state);if(b)second=await render(state,other);}catch(error){throw new Error(`Stop ${i+1}: ${stop.name}: ${error.message || error}`);}
+    try {image=await render(state);if(b)second=await render(state,other);}catch(error){throw new Error(`its picture could not be made (${error.message || error})`);}
     const figure=el('figure'),board=el('div','reading-board'),img=el('img');
     // A sequence already numbers its messages: a message's note takes that number and the
     // picture gains nothing. Elsewhere notes count 1, 2, 3 and the picture is marked to match.
-    const targets=noteTargets(owner),seq=owner.type==='sequence';
+    const targets=noteTargets(owner,stop.state.env||null),seq=owner.type==='sequence';
     const numberOf=(id,k)=>seq?owner.sequence?.messages.find(m=>m.eid===id)?.num??null:k+1;
     const numbered=seq?[]:stop.notes.map((id,k)=>[k+1,targets.has(id)?id:null]).filter(x=>x[1]);
     img.src=dataImage(numberPicture(image,numbered,owner,{accent:a.accent,bg:a.bg}));figure.style.setProperty('--picture-width',`${Math.ceil(image.width)}px`);img.alt=`${stop.name} diagram`;img.width=Math.ceil(image.width);img.height=Math.ceil(image.height);
@@ -166,20 +171,31 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
       const name=id=>owner.byId[id]?.plain || id;
       for(const step of steps){const li=el('li');li.append(el('strong','',`${name(step.from)} → ${name(step.to)}${step.rel.label?`: ${step.rel.label}`:''}`));if(step.text)renderNoteBody(step.text,li,wire);if(owner.type==='er'&&many(step.rel,step.from))li.append(el('p','','Rows multiply here: each '+name(step.from)+' has many '+name(step.to)+'.'));list.append(li);}
     }
-    if(stop.notes.length){const notes=el('aside','reading-notes');notes.setAttribute('aria-label','Notes on this picture');section.append(notes);
+    // a note the map does not have is left out (the viewer lists it as a problem)
+    const noteIds=stop.notes.filter(id=>targets.has(id));
+    if(noteIds.length){const notes=el('aside','reading-notes');notes.setAttribute('aria-label','Notes on this picture');section.append(notes);
       notes.append(el('div','reading-notes-head','Notes on this picture'));
-      stop.notes.forEach((id,k)=>{const note=targets.get(id);if(!note)throw new Error(`Stop ${i+1}: note ${id} is unavailable.`);
-        const num=numberOf(id,k);if(num!=null)numberedAny=true;
+      stop.notes.forEach((id,k)=>{const note=targets.get(id);if(!note)return;
+        const num=numberOf(id,k);if(num!=null)numberedHere=true;
         const body=el('div','reading-note reading-prose');body.id=`stop-${i+1}-note-${k+1}`;
         const head=el('h3');if(num!=null)head.append(el('span','reading-num',String(num)));head.append(document.createTextNode(note.heading || owner.byId[id]?.plain || id));body.append(head);notes.append(body);
         // a note shown in full by an earlier stop is pointed at, not printed again
-        const key=`${owner.anchor||''}\u0000${id}`,first=shown.get(key);
+        const key=`${owner.anchor||''}\u0000${id}`,first=shown.get(key)||shownHere.get(key);
         if(first){body.classList.add('reading-note-again');const p=el('p','','Shown in full at ');const to=el('a','',first.label);to.href=`#${first.id}`;p.append(to,document.createTextNode('.'));body.append(p);return;}
-        shown.set(key,{id:body.id,label:`stop ${number} · ${stop.label}`});
-        if(note.evidence){evidenceAny=true;for(const ref of note.evidence.refs){const t=ref.target||{},k2=t.revision||t.repository;if(!k2)continue;const u=used.get(k2)||{...t,unlinked:false};if(ref.file&&!evidenceUrl(ref))u.unlinked=true;used.set(k2,u);}}
+        shownHere.set(key,{id:body.id,label:`stop ${number} · ${stop.label}`});
+        if(note.evidence){evidenceHere=true;for(const ref of note.evidence.refs){const t=ref.target||{},k2=t.revision||t.repository;if(!k2)continue;const u=usedHere.get(k2)||used.get(k2)||{...t,unlinked:false};if(ref.file&&!evidenceUrl(ref))u.unlinked=true;usedHere.set(k2,u);}}
         renderClaimNote(note,body,{wireLink:wire,reading:true,codes:trustOf(owner,id)});});
     }
+    // the stop is made: only now does it join the document
+    content.append(section);row.append(link);made++;
+    for(const [k,v] of shownHere)shown.set(k,v);
+    for(const [k,v] of usedHere)used.set(k,v);
+    numberedAny||=numberedHere;evidenceAny||=evidenceHere;
+    }catch(error){skipped.push({stop:i+1,name:stop.name,reason:error.message || String(error)});}
   }
+  if(!made)throw Object.assign(new Error(`No stop of this walkthrough could be made (${skipped.map(s=>`stop ${s.stop}, ${s.name}: ${s.reason}`).join('; ')}).`),{skipped});
+  // a link to a stop left out goes nowhere: it stays as text
+  for(const a of root.querySelectorAll('a[href^="#stop-"]'))if(!content.querySelector(`[id="${a.getAttribute('href').slice(1)}"]`)){a.removeAttribute('href');a.title='This stop is not in this reading document.';}
   if(numberedAny||evidenceAny){const key=el('div','reading-key');
     if(numberedAny){key.append(el('span','reading-num','1'),el('span','','Numbers on a picture match the notes under it.'));}
     if(evidenceAny){const ic=el('span','reading-key-ic');ic.innerHTML=seal;key.append(ic,el('span','','Open the mark under a note to see its evidence, or show all evidence from the bar at the top.'));}
@@ -199,5 +215,6 @@ export async function buildReading({ text, path, walk, theme, appearance, fontCs
   const saved=asOf==null||asOf===''?null:new Date(asOf),valid=saved&&!Number.isNaN(saved.getTime()),at=valid?saved:now;
   const about=el('span','',`${file.title} · ${valid?'as of':'exported'} `),time=el('time','',at.toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}));time.dateTime=at.toISOString();about.append(time);footer.append(about);
   const js=el('script');js.textContent=script;doc.body.append(js);
-  return '<!doctype html>\n'+doc.documentElement.outerHTML;
+  const html='<!doctype html>\n'+doc.documentElement.outerHTML;
+  return {html,skipped};
 }

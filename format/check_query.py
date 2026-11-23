@@ -1004,10 +1004,16 @@ def check_flow(m, part, parsed, anchors):
         raise QueryError('Scopes must name CTEs in the outer WITH clause')
     if any(scopes.get(c['name'].lower(), c['name']) == options['into'] for c in q['ctes']):
         raise QueryError('A CTE and final query need distinct overview nodes')
+    # the Sources and Binds boxes are scopes too (the viewer's query/flow.js, WO-67)
+    # kept apart from held: those boxes are no Focus or Open target (perspectiveOptions)
+    boxes = part.setdefault('query_boxes', set())
+    own = {options['sources']} | ({options['binds']} if 'binds' in options else set())
+    boxes.update(own)
+    own = boxes
     for c in q['ctes']:
         target = scopes.get(c['name'].lower(), c['name'])
-        if target in held:
-            raise QueryError('Query scope {} reuses {}'.format(c['name'], target))
+        if target in held or target in own:
+            raise QueryError('Query scope {} reuses {}{}'.format(c['name'], target, ', the query\'s Sources or Binds box' if target in own else ''))
     compile_query(q, tables, settings)
     held.update(scopes.get(c['name'].lower(), c['name']) for c in q['ctes'])
     held.add(options['into'])

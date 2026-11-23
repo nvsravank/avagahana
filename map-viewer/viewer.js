@@ -27,7 +27,7 @@ import { compareFiles, markFile, changesIn, changesOf } from './model/compare.js
 import { createVerification, visibilityControl } from './verification.js';
 import { TRUST } from './model/provenance.js';
 import { renderNoteBody } from './notes.js';
-import { STOP_KINDS } from './model/walkthroughs.js';
+import { STOP_KINDS, sameName } from './model/walkthroughs.js';
 import { noteTargets } from './model/options.js';
 import { problemList, mapProblems } from './problems.js';
 import { checkTheme, acquire, release, loadFont, familyName, fontFaces } from './themes/theme.js';
@@ -2565,6 +2565,7 @@ export function mount(element, options = {}) {
 
   // ---------- walkthrough: a side panel of stops, moved by the reader ----------
   function openWalkthrough(name, k) {
+    exportMessage('');
     const w = walkthroughs().find((x) => x.name === name);
     if (!w || !w.stops.length) return;
     const i = Math.min(Math.max(Math.trunc(k) || 1, 1), w.stops.length);
@@ -2732,7 +2733,7 @@ export function mount(element, options = {}) {
     if (st.text) renderNoteBody(st.text, $.stopNote, wireLink);
     // the stop's chosen notes (Notes:), each opened from here, never marked on the picture
     $.stopNotes.replaceChildren();
-    const targets = st.state && !S.offPath && S.map ? noteTargets(S.map) : new Map();
+    const targets = st.state && !S.offPath && S.map ? noteTargets(S.map, st.state.env || null) : new Map();
     for (const id of st.notes) {
       const note = targets.get(id);
       if (!note) continue;
@@ -2755,7 +2756,7 @@ export function mount(element, options = {}) {
     $.stopPanel.classList.toggle('is-off', !!S.offPath);
   }
   function showStopNote(id, anchorEl) {
-    const note = S.map && noteTargets(S.map).get(id);
+    const note = S.map && noteTargets(S.map, envName()).get(id);
     if (!note) return;
     hideNote();
     $.noteTitle.textContent = note.heading || S.map.byId[id]?.plain || id;
@@ -2784,9 +2785,13 @@ export function mount(element, options = {}) {
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
     button.title = 'Preparing walkthrough…';
+    exportMessage('');
     try {
-      exporter.save(new Blob([await reading(name)], { type: 'text/html' }), `${wholeName()}-${name.replace(/[^\w.-]+/g, '_') || 'walkthrough'}.html`);
+      const { html, skipped } = await readingReport(name);
+      exporter.save(new Blob([html], { type: 'text/html' }), `${wholeName()}-${name.replace(/[^\w.-]+/g, '_') || 'walkthrough'}.html`);
+      if (skipped.length) exportMessage(`Exported without ${skipped.length === 1 ? 'stop' : 'stops'} ${skipped.map((s) => `${s.stop} (${s.name})`).join(', ')}: ${skipped.length === 1 ? 'it' : 'they'} could not be made.`);
     } catch (error) {
+      exportMessage(`The walkthrough could not be exported: ${error.message || error}`);
       hostProblem('reading-failed', `The walkthrough could not be made (${error.message || error}).`);
     } finally {
       button.disabled = false;
@@ -2794,6 +2799,8 @@ export function mount(element, options = {}) {
       button.title = 'Export walkthrough';
     }
   });
+  // the reader is told by the button, not only in the problems list (hidden in snapshots)
+  function exportMessage(text) { $.stopExportMsg.textContent = text; $.stopExportMsg.hidden = !text; }
   $.stopMin.addEventListener('click', () => { S.stopMin = true; renderWalkthrough(); refitForPanel(); });
   $.stopTab.addEventListener('click', () => { S.stopMin = false; renderWalkthrough(); refitForPanel(); });
 
@@ -2920,7 +2927,9 @@ export function mount(element, options = {}) {
 
   // Capture one edition, authored walk and effective theme before any async work.
   // The live camera, selection, expansion and player never enter the document.
-  async function reading(name = S.walkthrough) {
+  // the public reading(): the document alone; a stop left out is also a host problem
+  async function reading(name = S.walkthrough) { return (await readingReport(name)).html; }
+  async function readingReport(name = S.walkthrough) {
     await ready;
     const walk = walkthroughs().find(w => w.name === name);
     if (!walk || options.thumbnail) throw new Error('There is no walkthrough to export.');
@@ -2929,8 +2938,10 @@ export function mount(element, options = {}) {
     const [faces, fontCss] = await Promise.all([fontFaces(theme.id), embeddedFontCss(theme.id)]);
     const capturedTheme = { ...theme, ...(theme.font ? {font:{...theme.font,faces:faces.map(f=>({weight:f.weight,style:f.style,data:f.bytes}))}} : {}) };
     const mark = assets ? await assets('mark.svg') : await fetch(new URL('mark.svg', import.meta.url)).then(r=>{if(!r.ok)throw new Error('Brand mark is unavailable.');return r.text();});
-    return buildReading({ text, path, walk, theme, appearance, mark, asOf:saved, fontCss, fontFamily:`"${familyName(theme.id)}"`,
+    const report = await buildReading({ text, path, walk, theme, appearance, mark, asOf:saved, fontCss, fontFamily:`"${familyName(theme.id)}"`,
       render: (state, app = appearance) => renderWith(mount, {text,path,state,format:'svg'}, {themes:[capturedTheme],defaultTheme:false,theme:theme.id,prefs:{appearance:app},...(assets?{assets}:{})}) });
+    if (report.skipped.length) hostProblem('reading-stops-left-out', `Walkthrough "${name}" was exported without ${report.skipped.map((s) => `stop ${s.stop} (${s.name}: ${s.reason})`).join(', ')}.`);
+    return report;
   }
 
   // ---------- contents ----------
@@ -2980,7 +2991,7 @@ export function mount(element, options = {}) {
     if (!list.length || !S.file?.root || options.thumbnail) return [];
     const entries = items();
     return list.map((w) => ({ name: w.name, intro: w.intro, stops: w.stops.map((st) => {
-      const hit = st.known && !st.invalidReference && entries.find((e) => e.kind === STOP_KINDS[st.kind] && e.label === st.name && (!st.options?.diagram || (e.diagram || (e.part ? S.file.parts.get(e.part)?.title : S.file.title)) === st.options.diagram));
+      const hit = st.known && entries.find((e) => e.kind === STOP_KINDS[st.kind] && sameName(e.label, st.name) && (!st.options?.diagram || sameName(e.diagram || (e.part ? S.file.parts.get(e.part)?.title : S.file.title), st.options.diagram)));
       const visits = hit ? { part: hit.part ?? null, env: hit.kind === 'deployment' ? hit.state.env : null } : null;
       return { visits, kind: st.kind, name: st.name, title: st.options?.title || st.name, label: st.options?.label || st.options?.title || st.name, notes: st.options?.notes || [], text: st.text, layout: st.layout || null, state: hit ? { ...hit.state, ...authoredLayout(st, hit.state), ...(st.point ? { point: st.point } : {}), ...(st.spot ? { spot: st.spot } : {}) } : null };
     }) }));

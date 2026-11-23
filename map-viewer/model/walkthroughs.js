@@ -20,6 +20,11 @@ import { headings, optionsSection } from './options.js';
 // a stop's kind -> the contents entry kind it opens (viewer.js contents())
 export const STOP_KINDS = { diagram: 'diagram', perspective: 'view', deployment: 'deployment', scenario: 'scenario', sequence: 'sequence' };
 
+// a stop names its item as the item's heading does; the viewer forgives capitals and
+// extra spaces (WO-67), the checker does not (walkthrough-stop-unknown)
+const fold = (x) => String(x ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+export const sameName = (a, b) => fold(a) === fold(b);
+
 // -> [{kind, name, text, known}] in the order written
 export function readStops(text, warnings = []) {
   const stops = [];
@@ -30,7 +35,7 @@ export function readStops(text, warnings = []) {
     const parsed = optionsSection(body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to', 'spotlight', 'layout'], 'walkthrough-options', warnings);
     const m = head.match(/^([A-Za-z]+)\s*:\s*(.+)$/);
     const kind = m ? m[1].toLowerCase() : null;
-    stops.push({ kind, name: m ? m[2].trim() : head, text: parsed.text, options: parsed.options, invalidReference: !!parsed.invalid, known: !!(kind && STOP_KINDS[kind]) });
+    stops.push({ kind, name: m ? m[2].trim() : head, text: parsed.text, options: parsed.options || parsed.partial, known: !!(kind && STOP_KINDS[kind]) });
   }
   return stops;
 }

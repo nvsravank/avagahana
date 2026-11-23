@@ -152,8 +152,23 @@ export async function testReadingOptions(check) {
     const broken=READING_EXAMPLE.replace('Notes: a','Notes: missing\n- Diagram: Test system');
     await v.load(broken,'broken.md');
     v.setState({walkthrough:'Read'});
-    let rejection='';try{await v.reading('Read');}catch(e){rejection=e.message;}
-    check('reading HTML: invalid qualified stop cannot fall back or produce a partial file', /Stop 1/.test(rejection) && host.querySelector('[data-mmv=stopTitle]').textContent.includes('not in this map'), `${rejection}; ${host.querySelector('[data-mmv=stopTitle]').textContent}`);
+    // WO-67: a wrong option drops only itself; the stop keeps its place and title
+    const kept=new DOMParser().parseFromString(await v.reading('Read'),'text/html');
+    check('reading HTML: a stop with a missing note keeps its place, title and the rest', kept.querySelectorAll('.reading-section').length===2 && kept.querySelector('#stop-1 h2')?.textContent==='Follow the call' && !kept.querySelector('#stop-1 .reading-notes') && host.querySelector('[data-mmv=stopTitle]').textContent==='Follow the call', `${kept.querySelectorAll('.reading-section').length}; ${host.querySelector('[data-mmv=stopTitle]').textContent}`);
+    // WO-67: a stop with no place is left out of the export, which says so by its button
+    await v.load(READING_EXAMPLE.replace('### Diagram: Test system','### Diagram: Nowhere\nGone.\n### Diagram: Test system'),'gap.md');
+    v.setState({walkthrough:'Read',stop:1});
+    const gap=new DOMParser().parseFromString(await v.reading('Read'),'text/html');
+    const left=v.problems.some(p=>p.code==='reading-stops-left-out'&&/stop 2 \(Nowhere/.test(p.message));
+    check('reading HTML: a stop with no place is left out, the rest numbered in order, and reported', gap.querySelectorAll('.reading-section').length===2 && !gap.querySelector('#stop-2') && gap.querySelector('#stop-3 .reading-section-kind')?.textContent.startsWith('02') && left, `${gap.querySelectorAll('.reading-section').length}; ${left}`);
+    // the button saves the file (caught here, as whole-map.js does) and says what it left out
+    const click=HTMLAnchorElement.prototype.click;
+    const saved=new Promise(resolve=>{HTMLAnchorElement.prototype.click=function(){HTMLAnchorElement.prototype.click=click;fetch(this.href).then(r=>r.text()).then(text=>resolve({name:this.download,text}));};});
+    host.querySelector('[data-mmv=stopExport]').click();
+    const file=await Promise.race([saved,new Promise(r=>setTimeout(()=>r(null),8000))]);
+    HTMLAnchorElement.prototype.click=click;
+    const msg=host.querySelector('[data-mmv=stopExportMsg]');
+    check('export button: saves the file and names the stop it left out, beside the button', !!file && (file.text.match(/class="reading-section"/g)||[]).length===2 && !msg.hidden && /stop 2 \(Nowhere\)/.test(msg.textContent), `${!!file}; ${msg.textContent}`);
     const rendered=await renderMap({text:READING_EXAMPLE,state:{view:'Calls',expand:'all'},format:'svg'});
     const all=new DOMParser().parseFromString(rendered.data,'image/svg+xml');
     check('isolated renderer: public entry works without atlas and explicit expansion wins', !!all.querySelector('[data-id="db"]'));

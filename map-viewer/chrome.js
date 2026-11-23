@@ -183,6 +183,7 @@ export function chromeHtml(uid) {
     <button class="mmv-pill mmv-icon" data-mmv="stopExport" title="Export walkthrough" aria-label="Export walkthrough">${ic('download')}</button>
     <button class="mmv-pill mmv-icon" data-mmv="stopMin" title="Minimise">${ic('close')}</button>
   </div>
+  <div class="mmv-stop-export-msg" data-mmv="stopExportMsg" role="status" hidden></div>
   <div class="mmv-stop-count" data-mmv="stopCount"></div>
   <div class="mmv-stop-kind" data-mmv="stopKind"></div>
   <h3 class="mmv-stop-title" data-mmv="stopTitle"></h3>

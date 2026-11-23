@@ -887,10 +887,15 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if cls not in classes and cls not in BUILT_IN_CLASSES and cls not in read["class_defs"]:
             m.report(ln, "class-unknown", f"line class {cls}: not in ## Classes and no classDef, so it does nothing")
 
-    with_block = {name.lower() for d in part["deployments"] for name in d["names"]}
+    # each ## Deployment: heading needs a block of its own, before the next heading (WO-67:
+    # a second, bare heading of a name that has a block elsewhere is not read either)
+    starts = sorted(hl for _, _, hl in secs)
     for title, _, hl in secs:
         dm = re.fullmatch(r"deployment\s*:\s*(.*)", title, re.I)
-        if dm and dm.group(1).strip() and not any(x.strip().lower() in with_block for x in dm.group(1).split(",")):
+        if not dm or not dm.group(1).strip():
+            continue
+        until = next((x for x in starts if x > hl), float("inf"))
+        if not any(hl < d["line"] < until for d in part["deployments"]):
             m.report(hl, "deployment-no-block", f"## {title} has no Mermaid block (a flowchart of where things run)")
     check_lanes(m, part, secs)
     if not any(t.strip().lower() == "lanes" for t, _, _ in secs) or part["kind"] != "flowchart":
@@ -1234,12 +1239,25 @@ WALK_KINDS = {"diagram": "diagram", "perspective": "view", "deployment": "deploy
               "scenario": "scenario", "sequence": "sequence"}
 
 
+def stop_note_ids(owner, want, dest):
+    """The note ids a stop may name: its diagram's notes, without the deployment boxes,
+    except those of the stop's own deployment (WO-67; the viewer's noteTargets)."""
+    p = owner['part']
+    mine = set()
+    if want == 'deployment':
+        for d in p['deployments']:
+            if d['read'] and dest in (x.strip().lower() for x in d['names']):
+                mine |= set(d['read']['ids'])
+    return {nid for nid in owner['notes'] if nid not in p['infra'] or nid in mine}
+
+
 def check_walkthroughs(m, src, parts, title):
     """Every walkthrough: a name used once, at least one stop, each stop a known kind
     naming an item the map has (a diagram's heading or title, a perspective, a
     deployment environment, a scenario, a sequence diagram)."""
     names = {k: set() for k in set(WALK_KINDS.values())}
     owners = []
+    spelled = {}   # (kind, lower-case name) -> the headings' own spellings
     for i, p in enumerate(parts):
         heading = title if i == 0 else p.get('heading')
         own = {'title': heading, 'names': {k: set() for k in names}, 'notes': set(), 'part': p}
@@ -1264,6 +1282,16 @@ def check_walkthroughs(m, src, parts, title):
                         own['notes'].add(mid[1])
         for key in names:
             names[key].update(own['names'][key])
+        for t2, _, _ in sections_of(p['after'], p['after_line']):
+            for key, pat in (('view', r'perspective\s*:\s*(.+)'), ('scenario', r'scenario\s*:\s*([^|]+)'), ('deployment', r'deployment\s*:\s*(.+)')):
+                match = re.fullmatch(pat, t2, re.I)
+                if match:
+                    for x in (match[1].split(',') if key == 'deployment' else [match[1]]):
+                        spelled.setdefault((key, x.strip().lower()), set()).add(x.strip())
+        if heading:
+            spelled.setdefault(('diagram', heading.lower()), set()).add(heading)
+            if p['kind'] == 'sequence':
+                spelled.setdefault(('sequence', heading.lower()), set()).add(heading)
         owners.append(own)
     heads = [h for h in headings(src) if h['level'] == 2]
     seen = {}
@@ -1292,12 +1320,19 @@ def check_walkthroughs(m, src, parts, title):
             want, dest = WALK_KINDS[kind], sm[2].strip().lower()
             if dest not in names[want]:
                 m.report(sline, 'walkthrough-stop-unknown', '{} "{}" is not in this map'.format(kind, sm[2].strip()))
+            elif sm[2].strip() not in spelled.get((want, dest), {sm[2].strip()}):
+                # the viewer forgives capitals; the checker wants the heading's spelling (WO-67)
+                m.report(sline, 'walkthrough-stop-unknown', '{} "{}" is spelled "{}" in this map: write it as its heading'.format(kind, sm[2].strip(), sorted(spelled[(want, dest)])[0]))
             stop_body = body[st['end']:stops[j + 1]['start'] if j + 1 < len(stops) else len(body)]
             _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to', 'spotlight', 'layout'], lambda msg: m.report(sline, 'walkthrough-options', msg))
             if opts is not None:
                 owner = next((x for x in owners if dest in x['names'][want] and ('diagram' not in opts or x['title'] == opts['diagram'])), None)
                 if not owner or any(nid not in owner['notes'] for nid in opts.get('notes', [])):
                     m.report(sline, 'walkthrough-reference', 'Diagram/Notes must resolve in the destination owning diagram')
+                elif any(nid not in stop_note_ids(owner, want, dest) for nid in opts.get('notes', [])):
+                    # a deployment's own box is in that deployment's picture only (WO-67)
+                    away = [nid for nid in opts['notes'] if nid not in stop_note_ids(owner, want, dest)]
+                    m.report(sline, 'walkthrough-reference', 'Notes: {} is a box of a deployment, not in this stop\'s picture (only a Deployment stop of its environment may name it)'.format(', '.join(away)))
                 elif 'point to' in opts:
                     focus = owner['part'].get('perspective_focus', {}).get(dest) if want == 'view' else None
                     tree = owner['part'].get('query_parts', {}).get(focus)

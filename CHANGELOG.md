@@ -7,6 +7,28 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.3.2 (2026-11-23)
+
+- **Contract** (map format): a walk stop's `Notes:` may name the boxes a Deployment stop's
+  own deployment adds; the viewer showed such a stop as not in this map. The checker now
+  fails a stop whose Notes name another deployment's box (`walkthrough-reference`), which
+  it passed before (WO-67).
+- **Contract** (map format): a walk stop names its item as the item's heading spells it.
+  The viewer now forgives capitals and extra spaces; the checker fails a stop spelled
+  otherwise and names the heading (`walkthrough-stop-unknown`), which it passed before.
+- A walk stop with a wrong option keeps its place, Title and Label and drops only that
+  option (a missing note or Spotlight id, a Diagram qualifier with no such item, a bad
+  Point to or Layout); before, the whole stop showed as not in this map. A malformed Stop
+  options section keeps its good bullets.
+- **Contract** (viewer API): `viewer.reading()` and Export walkthrough leave out a stop
+  they cannot make instead of failing; the host problem `reading-stops-left-out` names it,
+  and the walkthrough panel says so beside its Export button, in snapshots too. They fail
+  only when no stop can be made, and say why beside the button.
+- The checker fails two more maps the viewer could not show whole: a query whose `Sources:`
+  or `Binds:` box is also one of its steps (`query-syntax`), and a `## Deployment:` heading
+  with no block of its own when another heading of that name has one
+  (`deployment-no-block`).
+
 ## 0.3.1 (2026-11-20)
 
 - **Contract** (viewer API, addition): on a walk's last stop, Next becomes **Explore

@@ -70,7 +70,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 | `viewer.contents()` | Everything a reader can open in the map, in file order (below). A new array each call. |
 | `viewer.export(opts)` | The picture as a file instead of a download: a promise of `{format, type, data, width, height, scaledDown, report}`. Below (added in WO-32). The toolbar's SVG and PNG buttons use it. |
 | `viewer.snapshot()` | The whole map as one HTML file that opens offline: a promise of its text, as the Export menu's "Interactive HTML" makes it. Below (added in WO-35). |
-| `viewer.reading(name?)` | Promise of a complete offline HTML reading document for a walkthrough. Name defaults to the active walkthrough; rejects when absent or any stop is unavailable. Added in WO-49. |
+| `viewer.reading(name?)` | Promise of a complete offline HTML reading document for a walkthrough. Name defaults to the active walkthrough; a stop that cannot be made is left out (a host problem `reading-stops-left-out` names it, WO-67); rejects when the walkthrough is absent or no stop can be made. Added in WO-49. |
 | `viewer.problems` | The current problems, below. |
 | `viewer.themes` | `[{id, label}]` of the registered themes. |
 | `viewer.addTheme(theme)` | Register a theme object; returns `{ok, problems}`. |
@@ -598,7 +598,10 @@ file's name (`<name>.md`, or its title when there is no path).
 authored stops and effective theme once (the effective appearance first; when the theme
 has both, the page and each picture also carry the other and follow the reader's
 setting, WO-61), renders each destination in an
-isolated viewer, and returns a complete reading document. It does not change the live
+isolated viewer, and returns a complete reading document. A stop it cannot make (no place
+in the map, a picture that fails to draw) is left out and the document numbers the stops it
+has; the host problem `reading-stops-left-out` names those left out, and the walkthrough
+panel's Export button says so beside itself (WO-67). It does not change the live
 viewer, camera, marks or storage. All SVGs, fonts and the footer mark are embedded;
 the file makes no network requests and works from disk. A small hashed local script
 supports sticky section navigation and optional diagram zoom/pan/Fit. Content remains
