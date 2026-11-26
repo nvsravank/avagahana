@@ -67,7 +67,7 @@ SHAPES = [
 BUILT_IN_CLASSES = {"person", "database", "external", "added", "changed", "removed"}
 # planned changes (map-viewer/model/classes.js): built in, one per node or arrow
 CHANGE_CLASSES = ("added", "changed", "removed")
-RESERVED = re.compile(r"^(relations|perspective|scenario|walkthrough|joins|renames|classes|details|notes|icons|node icons|lanes)\b", re.I)
+RESERVED = re.compile(r"^(relations|perspective|scenario|walkthrough|joins|renames|classes|details|notes|icons|node icons|lanes|opening walk)\b", re.I)
 DIRS = {"LR", "RL", "TB", "TD", "BT"}
 # box diagrams: their own arrows are the default view; sequences and scenarios play over them
 BOX_KINDS = {"flowchart", "state", "er"}
@@ -633,8 +633,8 @@ def check_part(m, part, shared_classes, anchors, legend_out):
         if single and key in seen:
             m.report(hl, "section-twice", f"## {title} appears twice (first on line {seen[key]})")
         seen.setdefault(key, hl)
-        if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|query\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*|layout\s*:.*)$", title, re.I):
-            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Layout: <layout>, Details, Icons, Node icons, Classes, Plays over, Renames, Lanes), and no Mermaid block follows")
+        if not single and not re.match(r"^(relations|perspective\s*:.*|joins\s*:.*|query\s*:.*|deployment\s*:.*|scenario\s*:.*|walkthrough\s*:.*|look\s*:.*|layout\s*:.*|opening walk\s*:.*)$", title, re.I):
+            m.report(hl, "section-unknown", f"## {title}: not a section of the format (Relations, Perspective: <name>, Deployment: <env>, Scenario: <name>, Walkthrough: <name>, Look: <look>, Layout: <layout>, Opening walk: <walkthrough>, Details, Icons, Node icons, Classes, Plays over, Renames, Lanes), and no Mermaid block follows")
         if re.fullmatch(r'joins\s*:\s*.+',title,re.I):
             m.report(hl,'joins-retired','Joins sections are retired. Put query joins in Query SQL; keep model relationships in Relations/Perspective. Migrate using actual SQL or confirmed intent, without guessing join types or outputs.')
         if key == "plays over" and kind != "sequence":
@@ -900,6 +900,7 @@ def check_part(m, part, shared_classes, anchors, legend_out):
     check_lanes(m, part, secs)
     if not any(t.strip().lower() == "lanes" for t, _, _ in secs) or part["kind"] != "flowchart":
         check_deployments(m, part, views)
+        check_drawn(m, part)
     check_verification_pairs(m, part, secs, own_icons, class_trust, classes)
 
 
@@ -1025,6 +1026,59 @@ def check_deployments(m, part, views):
             continue
         no = [name for name, _ in envs if name not in yes]
         m.report(n["line"], "deployment-out-of-step", f"node {nid} is placed in {', '.join(yes)} but not in {', '.join(no)}")
+
+
+# ---------- what a relation view draws ----------
+
+def drawn_by(part, rels):
+    """The ids a relation view draws: its arrows' ends and the boxes round them, or every
+    box when it has no arrows (map-viewer/diagrams/flowchart/layout.js shownBy)."""
+    ids = part["read"]["ids"]
+    out = set()
+    for pair in rels:
+        for nid in pair:
+            n = ids.get(nid)
+            while n and n["id"] != "_map":
+                out.add(n["id"])
+                n = n["parent"]
+    return out or set(ids)
+
+
+def check_drawn(m, part):
+    """A flowchart's boxes that no relation view draws (WO-68): the outermost one is said.
+    A box inside one that is drawn closed is found by opening it, so it is not said."""
+    if part["kind"] != "flowchart" or not part["read"] or part.get("query_scopes") or not part.get("view_rels"):
+        return
+    ids = part["read"]["ids"]
+    drawn = set()
+    for _, rels in part["view_rels"].values():
+        drawn |= drawn_by(part, rels)
+    for nid, n in ids.items():
+        if nid in drawn:
+            continue
+        p = n["parent"]
+        if p and p["id"] != "_map":
+            if p["id"] not in drawn or not any(k["id"] in drawn for k in p["children"]):
+                continue
+        m.report(n["line"], "box-in-no-view", f"box {nid} is drawn in no relation view: give it an arrow, or put what it says in a note")
+
+
+# A walkthrough stop's picture is read whole beside the walk's panel: more boxes than this
+# do not fit a 1280 px screen at a size a person reads (WO-68; a count, no layout here).
+LARGE_STOP = 30
+
+
+def stop_boxes(part, want, dest):
+    """How many boxes a Diagram, Perspective or Deployment stop draws, or None."""
+    if part["kind"] not in ("flowchart", "state") or not part["read"] or part.get("query_scopes"):
+        return None
+    ids = part["read"]["ids"]
+    if want == "deployment":
+        return sum(1 for n in ids.values() if not n["container"])
+    rels = part.get("view_rels", {})
+    vr = rels.get(dest) if want == "view" else rels.get("relations")
+    shown = drawn_by(part, vr[1]) if vr else set(ids)
+    return sum(1 for i in shown if not ids[i]["container"])
 
 
 # ---------- sequence ----------
@@ -1295,6 +1349,13 @@ def check_walkthroughs(m, src, parts, title):
         owners.append(own)
     heads = [h for h in headings(src) if h['level'] == 2]
     seen = {}
+    # ## Opening walk: the walk a plain open of the map starts on (WO-68)
+    walks = {re.sub(r'\s+', ' ', w[1].strip()).lower() for w in (re.fullmatch(r'walkthrough\s*:\s*(.+)', h['title'], re.I) for h in heads) if w}
+    openings = [(om[1].strip(), m.line_at(h['start'])) for h, om in ((h, re.fullmatch(r'opening walk\s*:\s*(.*)', h['title'], re.I)) for h in heads) if om]
+    if len(openings) > 1:
+        m.report(openings[1][1], 'opening-walk-twice', '{} ## Opening walk: lines; one per map'.format(len(openings)))
+    elif openings and re.sub(r'\s+', ' ', openings[0][0]).lower() not in walks:
+        m.report(openings[0][1], 'opening-walk-unknown', '## Opening walk: "{}" names no walkthrough of this map'.format(openings[0][0]))
     for i, h in enumerate(heads):
         mm = re.fullmatch(r'walkthrough\s*:\s*(.+)', h['title'], re.I)
         if not mm:
@@ -1324,6 +1385,11 @@ def check_walkthroughs(m, src, parts, title):
                 # the viewer forgives capitals; the checker wants the heading's spelling (WO-67)
                 m.report(sline, 'walkthrough-stop-unknown', '{} "{}" is spelled "{}" in this map: write it as its heading'.format(kind, sm[2].strip(), sorted(spelled[(want, dest)])[0]))
             stop_body = body[st['end']:stops[j + 1]['start'] if j + 1 < len(stops) else len(body)]
+            big = next((x for x in owners if dest in x['names'][want]), None) if want in ('diagram', 'view', 'deployment') else None
+            count = stop_boxes(big['part'], want, dest) if big else None
+            # a stop that shows part of its picture (a perspective's Focus) is not whole
+            if count and count > LARGE_STOP and not (want == 'view' and dest in big['part'].get('perspective_focus', {})):
+                m.report(sline, 'walkthrough-stop-large', '{} "{}" draws {} boxes, too many to read whole beside the walk (about {}): stop at a smaller diagram or a perspective'.format(kind, sm[2].strip(), count, LARGE_STOP))
             _, opts = options_section(stop_body, 'Stop options', ['title', 'label', 'notes', 'diagram', 'point to', 'spotlight', 'layout'], lambda msg: m.report(sline, 'walkthrough-options', msg))
             if opts is not None:
                 owner = next((x for x in owners if dest in x['names'][want] and ('diagram' not in opts or x['title'] == opts['diagram'])), None)

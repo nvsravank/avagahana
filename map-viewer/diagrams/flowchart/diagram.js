@@ -44,6 +44,7 @@ export const nodeGeometry = queryGeometry;
 export const paintNode = paintQueryCard;
 // switching view lays the diagram out again (the view's arrows place the boxes)
 export const layoutByView = true;
+export const growTitles = true;   // box names keep their size on screen (stage.js, WO-68)
 
 export const place = (layoutId, root, kids, size, input) => root.queryCard && !(root.queryTransform && !input.collapsed.has(root.queryTransform)) ? {
   pos: new Map([[root, { x: 0, y: 0, w: size(root).w, h: input.collapsed.has(root.id) ? size(root).h : size(root).hOpen }]]), edges: [], routes: new Map(),

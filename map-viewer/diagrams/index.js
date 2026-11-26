@@ -17,6 +17,7 @@
 //   looks ([[preference value, reader-facing label, data-look when not the value]]) for
 //   type-specific looks (each type keeps its own; [] or one look: no Look row), defaultLook,
 //   detailSizes (font sizes whose semantic-zoom thresholds trigger redraws),
+//   growTitles (box names keep their size on screen zoomed out: redrawn with the zoom),
 //   parseViews(sections, byId, warnings, own) (type-specific connection sections)
 // Everything else (labels, shapes, notes, icons, relations and views, list mode,
 // painting, the stage) is shared.

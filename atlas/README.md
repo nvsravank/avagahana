@@ -34,6 +34,8 @@ Rule: imports the viewer only through `map-viewer/index.js`.
 - Same shape as the old Simple Mind Maps viewer, so old links open. Old looks in a link
   (`theme=light|dark`, `scheme=colorful|blues`, `look=`) still set the looks; they are
   not kept in the URL afterwards.
+- `walk=<name>&stop=<n>`: the walkthrough open and its stop (WO-68). A link naming no place
+  opens a map with a `## Opening walk:` line on that walk; a layout alone is no place.
 - `before=<path>`: another map of the same source picked as the open map's earlier
   version (WO-43). Each row of the map list has a stone, "Pick as Before", while nothing
   is being compared; picking a map by its name opens it with no Before (the open map's

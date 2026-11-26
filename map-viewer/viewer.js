@@ -93,6 +93,8 @@ function dropCss() {
 }
 // a step's time while a sequence plays: 2 to 5 seconds, in halves; 3 when not a number
 const stepSecondsOf = (x) => (Number.isFinite(+x) && x !== null && x !== '' ? Math.min(5, Math.max(2, Math.round(+x * 2) / 2)) : 3);
+// the state keys that name a place to open at (WO-68): with any, no opening walk
+const PLACE_KEYS = ['part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'arrow', 'spot', 'point', 'walkthrough'];
 const viewers = new Set();
 let activeViewer = null;
 let seq = 0;
@@ -2471,6 +2473,8 @@ export function mount(element, options = {}) {
     show(mapFor(S.part), keep && S.map?.type === mapFor(S.part).type);
     // a live reload: the sequence plays on while the file still has it
     if (S.play) { if (keep && mapFor(S.play.seq)?.sequence?.steps.length) queueMicrotask(() => player.refresh()); else player.close(false); }
+    // the state option names a place (a layout or a look alone is none)
+    const placed0 = firstLoad && !!options.state && PLACE_KEYS.some((k) => options.state[k] != null && options.state[k] !== '');
     if (firstLoad && options.state) {
       firstLoad = false;
       const st = options.state;
@@ -2499,6 +2503,9 @@ export function mount(element, options = {}) {
     markSparkles();
     markEdition();
     emit('load', { path, title: file.title, warnings: file.warnings.slice() });
+    // a plain open of a map with a ## Opening walk: line starts on that walk (WO-68);
+    // a place asked for (the state option, or the host's openingWalk: false) wins
+    if (!keep && !S.thumb && file.openingWalk && options.openingWalk !== false && context.openingWalk !== false && !placed0) openWalkthrough(file.openingWalk, 1);
     fitTopSoon();   // the host may have changed its button in the slot
     emitContents();
     emitState();
@@ -2570,6 +2577,7 @@ export function mount(element, options = {}) {
     if (!w || !w.stops.length) return;
     const i = Math.min(Math.max(Math.trunc(k) || 1, 1), w.stops.length);
     const st = w.stops[i - 1];
+    const insetBefore = panelInset();
     S.walkthrough = name;
     S.stop = i;
     S.atEnd = false;
@@ -2584,6 +2592,9 @@ export function mount(element, options = {}) {
     const mine = st.state && !st.layout && !st.state.seq ? layoutHere.get(st.state.part || '') : null;
     try { if (st.state) setState(mine ? { ...st.state, layout: mine } : st.state); } finally { openingStop = false; }
     renderWalkthrough();
+    // the panel has just opened over a picture that was already there (the stop's place is
+    // the one shown, so nothing drew it again): fit it clear of the panel (WO-68)
+    if (!insetBefore && panelInset() && S.placed && S.layout !== 'list' && !S.point) stage.fitView(S.lastFit === 'levels');
     emitState();
   }
   // Where the reader is against the walkthrough: exploring inside the stop (a box opened,

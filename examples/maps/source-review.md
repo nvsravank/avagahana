@@ -8,6 +8,7 @@ flowchart LR
   viewer[Map viewer]
   checker[Map checker]
   atlas embeds@-->|embeds| viewer
+  checker -->|checks maps for| viewer
 ```
 
 ## Node icons

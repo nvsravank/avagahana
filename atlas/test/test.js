@@ -4,7 +4,7 @@
 //
 // folderSource runs against a real folder handle from the browser's private file
 // system (OPFS), the same kind of handle the folder picker returns.
-import { parseHash, buildHash, ownMapLink } from '../hash.js';
+import { parseHash, buildHash, ownMapLink, namesPlace } from '../hash.js';
 import { detectServer, serverSource, folderSource } from '../sources.js';
 import { mapPanel } from '../tree.js';
 import { navigationTests } from './navigation.js';
@@ -53,6 +53,10 @@ try {
   let h = parseHash('#/Topic/My%20map.md?layout=org&focus=n8&node=n13');
   check('hash: path, layout, focus, node', same(h, { path: 'Topic/My map.md', state: { layout: 'org', focus: 'n8', node: 'n13' }, prefs: {} }), show(h));
   check('hash: nothing named is null', parseHash('') === null && parseHash('#') === null && parseHash('#/') === null);
+  h = parseHash(buildHash('a.md', { layout: 'layers', part: 'data', walkthrough: 'A first read', stop: 3 }));
+  check('hash: the walk and its stop, round trip (WO-68)', h.state.walkthrough === 'A first read' && h.state.stop === 3 && h.state.part === 'data', show(h.state));
+  check('hash: a walk with no stop is its first', parseHash('#/a.md?walk=Main').state.stop === 1);
+  check('hash: a layout alone names no place; a diagram, a walk do', !namesPlace({ layout: 'layers', rels: true }) && namesPlace({ part: 'data' }) && namesPlace({ walkthrough: 'Main' }));
   h = parseHash('#/garden.md');
   check('hash: a path alone', same(h, { path: 'garden.md', state: {}, prefs: {} }), show(h));
   h = parseHash('#/a.md?view=Runtime&env=prod&rels=1');

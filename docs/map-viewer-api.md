@@ -44,6 +44,7 @@ const viewer = mount(element, {
   assets: null,         // (path) => Promise<text>: the viewer's own files from the host (below)
   crossMapNote: null,   // without host.openMap: said beside a link to another map
   asOf: null,           // when the first map was saved (Date, ISO text or ms): the export's footer
+  openingWalk: true,    // false: no map opens on its `## Opening walk:` (WO-68)
   version: null,        // the code's build (a commit), for the export's generator tag only
 });
 ```
@@ -58,7 +59,7 @@ The viewer adds one element, `<div class="mmv">`, inside `element` and fills it;
 
 | Member | What it does |
 |---|---|
-| `viewer.load(text, path, context?)` | Show a map; returns a promise. The same `path` again is a live reload: the viewer keeps the user's place (focus, selection, open branches). `context.before`: the map's earlier version (text, or `null` for none); without it a reload of the same map keeps the earlier version and another map has none (added in WO-34). `context.asOf`: when that map was saved, as the `asOf` option, kept the same way (added in WO-35). |
+| `viewer.load(text, path, context?)` | Show a map; returns a promise. The same `path` again is a live reload: the viewer keeps the user's place (focus, selection, open branches). `context.before`: the map's earlier version (text, or `null` for none); without it a reload of the same map keeps the earlier version and another map has none (added in WO-34). `context.asOf`: when that map was saved, as the `asOf` option, kept the same way (added in WO-35). `context.openingWalk`: `false` opens the map on its first diagram although it has a `## Opening walk:` line (a host that is about to show a place; added in WO-68). A `state` option naming a place does the same for the first map. |
 | `viewer.setBefore(text)` | Set the shown map's earlier version (text), or clear it (`null`), and draw again; a promise (added in WO-34). |
 | `viewer.setState(partial)` | Change state from outside, e.g. to point at a node. With `seq: null` the sequence stops first and the other fields still apply (`{seq: null, view: 'Events'}` stops and switches view). With a sequence to play, the sequence chooses its diagram and view, so only `seq` and `step` are read. |
 | `viewer.state` | The current state (a copy). |
@@ -168,7 +169,7 @@ them, `state` does not report them; another diagram clears `highlight` and `crop
   are ignored.
 - `viewer.on('state', fn)` reports every change, with the full state.
 - **The viewer never reads or writes `location` or `document.title`.** The host maps
-  state to and from its URL (atlas uses `#/<path>?layout=…&part=…&focus=…&page=…&view=…&env=…&seq=…&step=…&before=…`; `before` names a map picked as Before, WO-43).
+  state to and from its URL (atlas uses `#/<path>?layout=…&part=…&focus=…&page=…&view=…&env=…&seq=…&step=…&walk=…&stop=…&before=…`; `before` names a map picked as Before, WO-43).
 
 `load` accepts optional context `{sourceId, signal}`. A stable `sourceId` separates
 reader baselines for equal relative paths in different sources. Changing it starts

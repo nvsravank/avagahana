@@ -315,6 +315,9 @@ bar); its heading stays `## Relations`, and links and `setState` may name it eit
   arrows use and the boxes round them. Search looks through the whole map: a hit the
   current view leaves out opens the first view that shows it (a node no view shows is
   added to the current one).
+- A flowchart's box that no view draws, with the boxes in it, is a warning
+  (`box-in-no-view`, WO-68): give it an arrow, or put what it says in a note. A deployment
+  draws every box, and does not count here.
 - Two sections with the same name are read as one view, with a warning. A named view
   with no relations is a warning.
 - A relation whose end is hidden (inside a closed box or branch, or outside the part
@@ -668,8 +671,8 @@ flowchart LR
   diagram's nodes are ignored with a warning: the diagram's own arrows hold.
 - `class`, `## Classes` and `## Details` notes work for infrastructure ids as for nodes.
 - So the same things look the same in every view: a box keeps the direction it has in
-  the diagram, and a new box holding the diagram's nodes runs the way the box they came
-  from runs. New boxes at the top take the place of the first diagram node they hold;
+  the diagram. A new box holding the diagram's nodes runs the way its block says
+  (`flowchart TB`), unless it has a `direction` of its own (**Contract**, WO-68). New boxes at the top take the place of the first diagram node they hold;
   those holding none go last.
 - Warnings keep environments in step: a bare id that is no node, and a node placed in
   some environments but not in others.
@@ -1166,6 +1169,13 @@ plain Markdown (links, emphasis, lists); raw HTML is not shown. Several walkthro
 share a map, one section each. Checker problems: `walkthrough-empty`, `walkthrough-twice`,
 `walkthrough-stop-kind`, `walkthrough-stop-unknown`, and the warning
 `walkthrough-introduction`.
+
+`## Opening walk: <name>`, a section line among a diagram's sections, outside its block,
+says which walkthrough a plain open of the map starts on, at its first stop, every time
+(**Contract**, WO-68). One per map (`opening-walk-twice`); a name no walkthrough has is
+`opening-walk-unknown`. A link to a place in the map opens there instead. With no line the
+map opens on its first diagram. The checker also warns about a stop whose picture has too
+many boxes to read whole beside the walk (`walkthrough-stop-large`).
 
 An introduction precedes the first stop. It says what the subject is and what it is for,
 then who the walk is for and its main point: the reading page opens with it. A walk without one still reads;

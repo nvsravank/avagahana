@@ -36,6 +36,7 @@ export const defaultLook = 'outline';
 export const branchOrder = (kids) => kids;
 export const defaultCollapsed = () => new Set();
 export const layoutByView = true;
+export const growTitles = true;   // box names keep their size on screen (stage.js, WO-68)
 // a lane selected by its name lights its steps: selecting draws again
 export const drawsSelection = true;
 // a lane's name in the drawing (a click selects the lane, not a node)

@@ -7,6 +7,20 @@ marked **Contract**.
 
 ## Unreleased
 
+## 0.3.3 (2026-11-26)
+
+- **Contract** (map format, viewer API): `## Opening walk: <name>` makes a plain open of the
+  map start on that walk's first stop, every time; a link to a place wins. `load()`'s
+  `openingWalk: false` and the mount option of that name turn it off. The atlas URL carries
+  the walk and stop (`walk=`, `stop=`), so a reload or a copied link keeps them (WO-68).
+- **Contract** (map format): a new box in a deployment with no `direction` runs the way its
+  block says, as in Mermaid; it ran the way the first listed node's old box ran.
+- Opening a walk at the place already shown fits the picture clear of the walk panel.
+- Zoomed out, box diagrams keep their boxes' names at about 12 px on screen, as far as they
+  fit their box.
+- The checker warns about a flowchart box no relation view draws (`box-in-no-view`) and a
+  walkthrough stop with too many boxes to read whole (`walkthrough-stop-large`).
+
 ## 0.3.2 (2026-11-23)
 
 - **Contract** (map format): a walk stop's `Notes:` may name the boxes a Deployment stop's

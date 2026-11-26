@@ -2,6 +2,7 @@
 // pointer input. Knows nothing about mind maps. Sizes come from the mount root,
 // never the window. Wheel and drag updates are applied once per animation frame.
 import { MIN_LABEL_PX } from './paint.js';
+import { FRAME_TITLE, FRAME_TITLE_PX } from './geometry.js';
 
 // the reader may zoom out to half size; below it a picture is a shape, not a diagram
 export const MIN_ZOOM = 0.5;
@@ -22,7 +23,8 @@ export function createStage(v, handlers) {
     handlers.limit?.(S.view);
     const vw = S.view;
     $.viewport.setAttribute('transform', `translate(${vw.x},${vw.y}) scale(${vw.k})`);
-    const key = lodKey(vw.k, v.diagram().detailSizes || [20, 16, 14]);
+    // box names keep their size on screen (WO-68), so they are drawn again below that zoom
+    const key = lodKey(vw.k, v.diagram().detailSizes || [20, 16, 14]) + (v.diagram().growTitles ? `|${vw.k < FRAME_TITLE_PX / FRAME_TITLE ? Math.round(vw.k * 40) : 'full'}` : '');
     handlers.onView?.();
     if (drawn) S.lodKey = key;
     if (key !== S.lodKey) {
@@ -98,6 +100,9 @@ export function createStage(v, handlers) {
       // drawn, as a box diagram's top is not)
       const r = S.placed.pos.get(v.viewRoot()) || { x: (x0 + x1) / 2, y: (y0 + y1) / 2 };
       S.view = { k: floor, x: left + W / 2 - r.x * floor, y: H / 2 - r.y * floor };
+      // beside a panel, a picture only a little too wide starts at the panel's edge, so
+      // none of it opens underneath (WO-68)
+      if (left && (x1 - x0) * floor > W - 32 && (x1 - x0) * floor <= W * 1.25) S.view.x = left + 16 - x0 * floor;
     } else S.view = { k, x: left + W / 2 - ((x0 + x1) / 2) * k, y: H / 2 - ((y0 + y1) / 2) * k };
     if (!quiet) applyView();
   }

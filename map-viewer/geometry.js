@@ -14,6 +14,10 @@ export const MAX_LINE = 280;
 const LINK_GAP = 12; // leaves space between the expanded quick-link hit targets
 // Semantic zoom: a label smaller than MIN_LABEL_PX on screen is drawn as a bar.
 export const MIN_LABEL_PX = 8;
+// An open box's name (a box diagram's frame): its size, and the size on screen it is kept
+// at when zoomed out (WO-68), as far as it fits its box (diagrams/flowchart/scene.js).
+export const FRAME_TITLE = 15;
+export const FRAME_TITLE_PX = 12;
 
 // the colour classes of a node; themes generate rules for k 0..120, l 0..15 and c (a
 // class's slot, model/classes.js). rel: depth below the view root (the depth band,

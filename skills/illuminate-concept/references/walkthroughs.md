@@ -116,6 +116,10 @@ charge. Follow both attempts through to confirmation.
   it shows the diagram's `## Layout:`. Use it rarely: every table moving between two
   stops costs the reader their bearings. Not on Sequence stops.
 
+A map meant to be read as a story can open on its walk: `## Opening walk: <walkthrough's
+name>`, one line among a diagram's sections. Leave it out of a map people look things up
+in. Keep a stop's picture small (the checker warns above about 30 boxes).
+
 All options are optional; field names are case-insensitive. Blank lines do not end the
 options: the next heading at the same level or above does.
 

@@ -8,7 +8,7 @@ export async function renderWith(mount, request, options = {}) {
   let viewer;
   try {
     const state = request.state || {};
-    viewer = mount(host, { ...options, host: undefined, storageKey: null, marks: false, showProblems: 'none', state, ...(request.before != null ? { before: request.before } : {}) });
+    viewer = mount(host, { ...options, host: undefined, storageKey: null, marks: false, showProblems: 'none', openingWalk: false, state, ...(request.before != null ? { before: request.before } : {}) });
     await viewer.ready;
     await viewer.load(request.text, request.path || null);
     if (!viewer.title) throw new Error(viewer.problems.find((p) => p.level === 'error')?.message || 'The map could not be read.');

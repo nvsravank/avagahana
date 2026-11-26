@@ -9,12 +9,13 @@
 // (layout.routes): straight runs with rounded corners; labels where the layout put them
 // (layout.labels), else on the longest run.
 import { TRUST } from '../../model/provenance.js';
-import { nodeShaper, nodeName, typeFor, planClass, passesFilter, clipOutlineOf } from '../../geometry.js';
+import { nodeShaper, nodeName, typeFor, planClass, passesFilter, clipOutlineOf, FRAME_TITLE, FRAME_TITLE_PX } from '../../geometry.js';
 import { samplePath, clipToOutline } from '../../outline.js';
 import { strokeStyle } from '../../model/classes.js';
 import { labelLines, SIGN_W } from '../../connection-labels.js';
 import { queryScene, queryTone } from '../../query/cards.js';
 import { queryRelations } from '../../query/visibility.js';
+import { measure } from '../../measure.js';
 
 const TITLE_X = 12;
 const TITLE_Y = 18;
@@ -23,6 +24,16 @@ const POSTER_CORNER = 26;   // a Poster box's main icon, in its top-left corner
 // as the node's label is (geometry.js), so it fits the width the layout gave the box;
 // layout.js makes the strip taller
 const titleLines = (lines) => (lines.length > 1 ? { lines: lines.map((l) => l.runs.map((r) => r.text).join('').trim()) } : {});
+
+// Zoomed out, a box's name keeps FRAME_TITLE_PX on screen as far as it fits: one line in
+// its strip (TITLE_MAX) and the width beside its icons. Several lines keep their size.
+const TITLE_MAX = 24;
+function titleAt(text, size, y, room, lines, zoom) {
+  if (lines > 1 || !(zoom > 0) || size * zoom >= FRAME_TITLE_PX) return { y, size };
+  const wide = measure(text, size, 600);
+  const grown = Math.max(size, Math.min(FRAME_TITLE_PX / zoom, TITLE_MAX, wide > 0 ? (size * room) / wide : size));
+  return { y: y + (grown - size) * 0.22, size: Math.round(grown * 100) / 100 };
+}
 
 // input: as the mind map's (diagrams/mindmap/scene.js), layout.pos holding frame: true
 // for open boxes
@@ -52,7 +63,7 @@ export function buildScene(input) {
           ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
           ...(main?.src && input.tintOf?.(main.src) ? { tint: input.tintOf(main.src) } : {}),
           name: `${nodeName(n, rel, false)}, a box`,
-          title: { text: n.plain, ...titleLines(input.geom(n).lines), x: main ? POSTER_CORNER + 8 : TITLE_X, y: 17, size: Math.min(type.size, 15) - 1, weight: 600 },
+          title: { text: n.plain, ...titleLines(input.geom(n).lines), x: main ? POSTER_CORNER + 8 : TITLE_X, ...titleAt(n.plain, Math.min(type.size, FRAME_TITLE) - 1, 17, p.w - (main ? POSTER_CORNER + 8 : TITLE_X) - 10, input.geom(n).lines.length, input.zoom), weight: 600 },
           icons: [], ...(main ? { main } : {}), hover: true,
           marks: { hit: input.hits.includes(n.id), sel: input.selectedSet ? input.selectedSet.has(n.id) : input.selected === n.id },
           ...(n.plan ? { plan: n.plan } : {}),
@@ -76,7 +87,7 @@ export function buildScene(input) {
         cls: `mmv-frame ${shaper.tone(n)}${queryTone(n)}${shaper.filterOn && !shaper.passes(n) ? ' is-dim' : ''}${L.context?.has(n) ? ' is-context' : ''}`,
         ...(n.stroke ? { stroke: strokeStyle(n.stroke) } : {}),
         name: `${nodeName(n, rel, false)}, a box`,
-        title: { text: n.plain, ...titleLines(input.geom(n).lines), x: titleX, y: TITLE_Y, size: Math.min(type.size, 15), weight: 600 },
+        title: { text: n.plain, ...titleLines(input.geom(n).lines), x: titleX, ...titleAt(n.plain, Math.min(type.size, FRAME_TITLE), TITLE_Y, main ? right - 22 - titleX - 8 : right - titleX, input.geom(n).lines.length, input.zoom), weight: 600 },
         icons,
         ...(main ? { main } : {}),
         marks: { hit: input.hits.includes(n.id), sel: input.selectedSet ? input.selectedSet.has(n.id) : input.selected === n.id },

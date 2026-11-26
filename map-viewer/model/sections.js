@@ -40,6 +40,8 @@ export function splitSections(after) {
     if (look) (out.looks ||= []).push(look[1].trim().toLowerCase());
     const layout = h.title.match(/^layout\s*:\s*(.*)$/i);
     if (layout) (out.layouts ||= []).push(layout[1].trim().toLowerCase());
+    const opening = h.title.match(/^opening walk\s*:\s*(.*)$/i);
+    if (opening) (out.openingWalks ||= []).push(opening[1].trim());
     const walkthrough = h.title.match(/^walkthrough\s*:\s*(.+)$/i);
     if (walkthrough) out.walkthroughs.push({ name: walkthrough[1].trim(), text });
     const scenario = h.title.match(/^scenario\s*:\s*(.+)$/i);

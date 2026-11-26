@@ -1,4 +1,4 @@
-<!-- expect: sequence-not-in-view -->
+<!-- expect: sequence-not-in-view box-in-no-view -->
 # Sample
 
 ```mermaid

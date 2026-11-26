@@ -55,7 +55,7 @@ export function parseMap(text, fileName) {
     const h = before.match(/(?:^|\n)(#{2,6})\s+(.+)$/);
     // a deployment's block belongs to the diagram above it (model/deployments.js)
     if (h && /^deployment\s*:/i.test(h[2].trim())) continue;
-    if (h && !/^(relations|perspective|scenario|walkthrough|joins|classes|details|notes|icons|node icons|look|layout)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
+    if (h && !/^(relations|perspective|scenario|walkthrough|joins|classes|details|notes|icons|node icons|look|layout|opening walk)\b/i.test(h[2].trim())) cuts.push({ start: h.index + (h[0].startsWith('\n') ? 1 : 0), heading: h[2].trim() });
     else lost.push(f.index);
   }
   const main = parsePart(src.slice(0, cuts[0]?.start ?? src.length), fileName, null);
@@ -104,6 +104,15 @@ export function parseMap(text, fileName) {
   // walkthroughs belong to the file: each diagram's sections count (model/walkthroughs.js)
   main.walkthroughs = readWalkthroughs([main, ...main.parts.values()].flatMap((p) => p.walkthroughs || []), main.warnings);
   const maps = [main, ...main.parts.values()];
+  // ## Opening walk: the walk a plain open of the file starts on (WO-68); one per file
+  const openings = maps.flatMap((p) => p.openingWalks || []);
+  main.openingWalk = null;
+  if (openings.length > 1) main.warnings.push(problem('opening-walk-twice', `${openings.length} "## Opening walk:" lines: one per map.`));
+  else if (openings.length) {
+    const walk = main.walkthroughs.find((w) => sameName(w.name, openings[0]));
+    if (!walk) main.warnings.push(problem('opening-walk-unknown', `"## Opening walk: ${openings[0]}" names no walkthrough of this map.`));
+    else if (walk.stops.length) main.openingWalk = walk.name;
+  }
   // A wrong option drops only itself (WO-67): the stop keeps its place, Title, Label and
   // its other options, and each problem is listed. The checker fails all of these.
   for (const w of main.walkthroughs) for (const stop of w.stops) {
@@ -385,7 +394,7 @@ function parsePart(text, fileName, shared) {
     hasPlan: Object.values(byId).some((n) => n.plan) || infra.some(({ n }) => n.plan) || views.some((x) => x.relations.some((r) => r.plan)),
     ...(diagram.type === 'sequence' ? { playsOver } : {}), notesText: sections.details || '',
     scenarios: SCENARIO_TYPES.has(diagram.type) ? sections.scenarios : [],
-    walkthroughs: sections.walkthroughs, querySections: sections.queries,
+    walkthroughs: sections.walkthroughs, openingWalks: sections.openingWalks || [], querySections: sections.queries,
     ...(look ? { look } : {}),
     ...(layout ? { layout } : {}),
     ...(renames ? { renames } : {}),

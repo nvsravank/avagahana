@@ -33,6 +33,7 @@ export const looks = [];
 export const branchOrder = (kids) => kids;
 export const defaultCollapsed = () => new Set();
 export const layoutByView = true;
+export const growTitles = true;   // box names keep their size on screen (stage.js, WO-68)
 
 export const place = (layoutId, root, kids, size, input) => layoutBoxes(root, kids, size, input);
 export { buildScene, relationShapes };

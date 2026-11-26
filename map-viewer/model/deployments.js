@@ -94,12 +94,11 @@ export function buildDeployment(dep, main, warnings) {
       walk(k);
     }
   })(dep.root);
-  // a new box holding the diagram's nodes runs the way the box they came from runs
-  // (the services in a cluster line up as they did in the system), unless it says
+  // a new box holding the diagram's nodes runs the way its block says (`flowchart TB`),
+  // as Mermaid draws it, unless the box has a direction of its own (WO-68)
   for (const n of placed.values()) {
     if (!n.infra || n.dir) continue;
-    const from = n.children.find((c) => !c.infra);
-    if (from) n.dir = dirOf(byId[from.id].parent);
+    if (n.children.some((c) => !c.infra)) n.dir = dep.direction;
   }
   // a box of the diagram that the deployment emptied goes
   (function prune(n) {

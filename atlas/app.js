@@ -11,7 +11,7 @@
 // agent can ask this page for a picture of a map (render.js): it is drawn in a hidden
 // second viewer, so the one on screen never moves.
 import { mount, applyTheme } from '../map-viewer/index.js';
-import { parseHash, buildHash, ownMapLink } from './hash.js';
+import { parseHash, buildHash, ownMapLink, namesPlace } from './hash.js';
 import { detectServer, serverSource, folderSource, canPickFolder, pickFolder, rememberedFolder, allowFolder } from './sources.js';
 import { mapPanel } from './tree.js';
 import { contentsBar } from './bar.js';
@@ -116,7 +116,7 @@ addEventListener('hashchange', () => {
   const h = parseHash(location.hash);
   if (!h || !source) return;
   // a link names the whole place: no focus means the whole map, no node none selected
-  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ part: null, focus: null, node: null, page: null, ...(h.state.spot ? {} : { spot: null }), ...h.state }); usePrefs(h.prefs); if ((h.before || null) !== picked) useBefore(h.path, h.before || null); }
+  if (h.path === shown?.path) { ++seq; navigationAbort.abort(); reloadAbort.abort(); viewer.setState({ ...(h.state.walkthrough ? {} : { part: null, focus: null, node: null, page: null }), ...(h.state.spot ? {} : { spot: null }), ...h.state }); usePrefs(h.prefs); if ((h.before || null) !== picked) useBefore(h.path, h.before || null); }
   else { picker.close(); openMap(h.path, h.state, h.prefs, h.before || null); }   // a failed open shows the list again
 });
 
@@ -238,7 +238,7 @@ async function openMap(path, state = {}, prefs = null, before = null) {
     return;
   }
   if (my !== seq) return;
-  await viewer.load(text, path, { sourceId, signal: controller.signal, before, asOf: savedAt(path) });
+  await viewer.load(text, path, { sourceId, signal: controller.signal, before, asOf: savedAt(path), openingWalk: !namesPlace(state) });
   if (my === seq) pendingNavigation = 0;
   if (my !== seq || shown?.path !== path) return;
   viewer.setState(state);

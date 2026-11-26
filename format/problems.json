@@ -544,6 +544,26 @@
       "side": "both",
       "what": "A ## Look: value that is not one of a flowchart's looks (outline, poster)"
     },
+    "opening-walk-twice": {
+      "level": "error",
+      "side": "both",
+      "what": "Two ## Opening walk: lines in one map"
+    },
+    "opening-walk-unknown": {
+      "level": "error",
+      "side": "both",
+      "what": "A ## Opening walk: line naming no walkthrough of the map"
+    },
+    "box-in-no-view": {
+      "level": "warning",
+      "side": "checker",
+      "what": "A box of a flowchart that no relation view draws: none of its arrows, or of the boxes in it, is in any view (a deployment may still draw it)"
+    },
+    "walkthrough-stop-large": {
+      "level": "warning",
+      "side": "checker",
+      "what": "A walkthrough stop whose picture has too many boxes to read whole on a 1280 px screen beside the walk panel"
+    },
     "layout-twice": {
       "level": "error",
       "side": "both",

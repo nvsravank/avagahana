@@ -1,4 +1,4 @@
-// hash.js — the atlas URL: #/<folder>/<file>.md?layout=..&part=..&focus=..&node=..&spot=..&page=..&view=..&env=..&seq=..&step=..&rels=1
+// hash.js — the atlas URL: #/<folder>/<file>.md?layout=..&part=..&focus=..&node=..&spot=..&page=..&view=..&env=..&seq=..&step=..&rels=1&walk=..&stop=..
 // (spot: the spotlit boxes and lines, comma-separated, WO-63)
 // (part: which of the file's diagrams, by its heading's anchor; none for the first;
 // page: the node whose page is open; seq: the sequence playing over the view, by its
@@ -40,6 +40,13 @@ export function parseHash(hash) {
   // the spotlit boxes and lines (WO-63), comma-separated
   const spot = (p.get('spot') || '').split(',').map((x) => x.trim()).filter(Boolean);
   if (spot.length) state.spot = spot;
+  // the walkthrough open, and its stop (WO-68)
+  const walk = p.get('walk');
+  if (walk) {
+    state.walkthrough = walk;
+    const stop = Number(p.get('stop'));
+    state.stop = Number.isInteger(stop) && stop > 0 ? stop : 1;
+  }
   const prefs = {};
   if (p.get('trustMarks') === '0' || p.get('trustMarks') === '1') prefs.trustMarks = p.get('trustMarks') === '1';
   // old links: theme=light|dark was the appearance; scheme=colorful|blues the colours
@@ -70,6 +77,7 @@ export function buildHash(path, state = {}, prefs = null, before = null) {
   if (state.rels) p.set('rels', '1');
   // several spotlit, or a line: the whole set (one box is node=)
   if (state.spot?.length > 1 || (state.spot?.length && state.arrow)) p.set('spot', state.spot.join(','));
+  if (state.walkthrough) { p.set('walk', state.walkthrough); p.set('stop', String(state.stop || 1)); }
   if (state.edition === 'before') p.set('edition', 'before');
   if (typeof prefs?.trustMarks === 'boolean') p.set('trustMarks', prefs.trustMarks ? '1' : '0');
   if (prefs?.colourBy) p.set('colourBy', prefs.colourBy);
@@ -78,6 +86,9 @@ export function buildHash(path, state = {}, prefs = null, before = null) {
   const q = String(p);
   return `#/${encodeURIComponent(path).replace(/%2F/g, '/')}${q ? `?${q}` : ''}`;
 }
+
+// Does a link's state name a place in the map (WO-68)? A layout or relations shown do not.
+export const namesPlace = (state = {}) => ['part', 'focus', 'node', 'page', 'view', 'env', 'seq', 'spot', 'walkthrough'].some((k) => state[k] != null);
 
 // The map an href points to when it is this atlas's own link (same page; localhost
 // and 127.0.0.1 count as one host), else null. pageHref is where the atlas runs.
